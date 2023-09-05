@@ -1,22 +1,27 @@
 ::-webkit-scrollbar {
     width: 15px;
     height: 15px;
+    cursor: pointer;
 }
 
 ::-webkit-scrollbar-track {
     background: rgb(239, 239, 239);
+    cursor: pointer;
 }
 
 ::-webkit-scrollbar-thumb {
     background: #bfbfbf;
+    cursor: pointer;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: #bfbfbf;
+    cursor: pointer;
 }
 
 ::-webkit-scrollbar-corner {
     background: #bfbfbf;
+    cursor: pointer;
 }
 
 :root {

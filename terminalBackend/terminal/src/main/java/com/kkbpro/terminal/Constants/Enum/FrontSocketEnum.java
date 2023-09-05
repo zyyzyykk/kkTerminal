@@ -1,26 +1,22 @@
 package com.kkbpro.terminal.Constants.Enum;
 
-public enum ResultCodeEnum {
-    CONNECT_FAIL(-1,"连接服务器失败！"),
+public enum FrontSocketEnum {
 
-    CONTENT_NOT_SHOW(0,"消息不展示"),
+    TEXT_CMD(0,"文本命令"),
 
-    SHELL_SHOW(1,"shell消息"),
-
-    KK_SHOW(2,"欢迎语等消息"),
-
-    GET_INIT(3,"初始化");
+    CRTL_CMD(1,"快捷键");
 
     private Integer state;
+
     private String desc;
 
-    ResultCodeEnum(Integer state, String desc) {
+    FrontSocketEnum(Integer state, String desc) {
         this.state = state;
         this.desc = desc;
     }
 
-    public static ResultCodeEnum getByState(Integer state) {
-        for (ResultCodeEnum item : ResultCodeEnum.values()) {
+    public static FrontSocketEnum getByState(Integer state) {
+        for (FrontSocketEnum item : FrontSocketEnum.values()) {
             if (item.getState().equals(state)) {
                 return item;
             }

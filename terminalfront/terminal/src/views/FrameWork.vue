@@ -6,13 +6,13 @@
         <div><img src="../assets/logo.png" alt="终端" style="height: 20px; margin: 0 7px;" ></div>
         <div>kk Terminal</div>
       </div>
-      <div class="content" @click="cmdInputRef.focus();" style="cursor: text; font-family: 'Courier New';">
+      <div ref="cmdBoxRef" class="content" @contextmenu.prevent="" @click="if(connect_status == 1) cmdInputRef.focus();" style="cursor: text; font-family: 'Courier New';">
         <div v-for="(line,index) in serverInfo" :key="index" style="margin: 5px 5px;">
-          {{ line.replace(/ /g, '&nbsp;') }}
+          <div v-if="index != serverInfo.length - 1" v-html="line.replace(/ /g, '&nbsp;')"></div>
         </div>
-        <div style="display: flex; align-items: center;">
-          <div>{{ cmdPrefix.replace(/ /g, '&nbsp;') }}</div>
-          <div><input type="text" ref="cmdInputRef" style="background-color: black; color: white;"></div>
+        <div style="display: flex; align-items: center; margin: 5px 5px;">
+          <div>{{ serverInfo[serverInfo.length - 1].replace(/ /g, '&nbsp;') }}</div>
+          <div style="flex: 1;" ><input type="text" v-model="now_cmd" ref="cmdInputRef" class="terminal-input" style="color: white;  font-family: 'Courier New';" /></div>
         </div>
       </div>
     </div>
@@ -24,7 +24,9 @@
 </template>
 
 <script>
-import { ref,onMounted,computed } from 'vue';
+// 解析彩色文本
+import AnsiToHtml from 'ansi-to-html';
+import { ref,onMounted,onUnmounted,computed } from 'vue';
 import { Base64 } from '../Utils/Base64Util';
 import LoginSsh from '../components/LoginSsh'
 // import $ from "jquery";
@@ -37,12 +39,13 @@ export default {
   },
   setup() {
 
+    // converter: new AnsiToHtml()
+    const converter = new AnsiToHtml();
+
+    // cmd区域
+    const cmdBoxRef = ref();
     // cmd输入框
     const cmdInputRef = ref();
-    // 监听cmd输入框事件
-    const watchCmdInput = () => {
-      
-    }
 
     // web-socket连接
     const socket = ref(null);
@@ -82,9 +85,9 @@ export default {
       }
     }
     // 连接服务器
-    const cmdPrefix = ref('');
+    const now_cmd = ref('');
     const connectSSH = () => {
-      socket.value = new WebSocket(base_url + 'websocket/' + sshInfo.value.user_name + '/' + sshInfo.value.password);
+      socket.value = new WebSocket(base_url + 'websocket/' + sshInfo.value.user_name + '/' + Base64.encode(sshInfo.value.password));
       // 当接收到服务器发送的信息时触发
       socket.value.onmessage = resp => {
         let result = JSON.parse(resp.data);
@@ -100,29 +103,90 @@ export default {
           loginSshRef.value.DialogVisilble = true;
         }
         // 显示在终端里面
-        if(result.code == 1) {
+        if(result.code >= 1) {
           if(connect_status.value != 1) {
             serverInfo.value.shift();
             connect_status.value = 1;
             // 记住
             remember();
           }
-          serverInfo.value.push(result.info);
-        }
-        // 命令行前缀
-        if(result.code == 2) {
-          cmdPrefix.value = result.info;
-          cmdInputRef.value.focus();
+
+          // kk欢迎语
+          if(result.code == 2) {
+            serverInfo.value.push(Base64.decode(result.info));
+          }
+
+          // 初始化
+          if(result.code == 3) {
+            if(socket.value) {
+              socket.value.send(Base64.encode(JSON.stringify({type:0,content:"\n"})));
+              now_cmd.value = '';
+            }
+          }
+
+          // shell发来的信息
+          if(result.code == 1) {
+            let arr = Base64.decode(result.info).split('\n');
+            console.log(arr);
+            for(let i=0;i<arr.length;i++) {
+              if(arr[i] == '') continue;
+              if(i == 0 && arr[0] == now_cmd.value + '\r') {
+                let info = serverInfo.value[serverInfo.value.length - 1];
+                serverInfo.value.pop();
+                serverInfo.value.push(info + arr[i]);
+              }
+              else serverInfo.value.push(converter.toHtml(arr[i]));
+              now_cmd.value = '';
+            }
+          }
+          cmdBoxRef.value.scrollTop = cmdBoxRef.value.scrollHeight * 2;
         }
       }
     }
 
+
+    // 终端快捷键
+    const shortcutKeys = {
+      'ctrl+c':67,
+      'enter':13,
+    };
+
+
+    // 监听cmd输入框事件
+    const watchCmdInput = () => {
+      // 禁止通过鼠标改变光标位置
+      cmdInputRef.value.addEventListener('mousedown', function(event) {
+        event.preventDefault();
+      });
+      // 监听快捷键
+      cmdInputRef.value.addEventListener('keydown', function(event) {
+        // ctrl+c
+        if (event.ctrlKey && event.keyCode === shortcutKeys['ctrl+c']) {
+          event.preventDefault();
+          if(socket.value) {
+            socket.value.send(Base64.encode(JSON.stringify({type:1,content:"ctrl+c"})));
+          }
+        }
+        // enter
+        else if(event.keyCode === shortcutKeys['enter']) {
+          event.preventDefault();
+          if(socket.value) {
+            socket.value.send(Base64.encode(JSON.stringify({type:0,content:now_cmd.value + "\n"})));
+          }
+        }
+      });
+    }
 
 
     onMounted(() => {
       getSSHInfo();
       // 监听cmd输入框事件
       watchCmdInput();
+    });
+
+    onUnmounted(() => {
+      // 卸载全部监听事件
+      cmdInputRef.value.removeEventListener();
     });
 
     return {
@@ -134,8 +198,10 @@ export default {
       connect_status,
       now_connect_status_tip,
       serverInfo,
-      cmdPrefix,
       cmdInputRef,
+      shortcutKeys,
+      now_cmd,
+      cmdBoxRef,
       
     }
   }
@@ -168,12 +234,21 @@ export default {
   width: 60vw;
   background-color: #000000;
   overflow-y: scroll;
-  overflow-x: scroll;
+  /* overflow-x: scroll; */
   border-top: 1px solid #d7d7d7;
-  border-bottom: 1px solid #d7d7d7;
+  border-bottom: 2px solid #d7d7d7;
   border-left: 1px solid #d7d7d7;
   border-right: 1px solid #d7d7d7;
   color: white;
+}
+
+.terminal-input {
+  border: none; 
+  outline: none; 
+  min-width: 100%; 
+  background-color: transparent; 
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 </style>
