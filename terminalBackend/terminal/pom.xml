@@ -37,9 +37,9 @@
 
         <!--ssh-->
         <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-            <version>0.1.55</version>
+            <groupId>com.hierynomus</groupId>
+            <artifactId>sshj</artifactId>
+            <version>0.36.0</version>
         </dependency>
 
         <!--fastjson-->

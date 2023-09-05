@@ -1,27 +1,28 @@
 package com.kkbpro.terminal.Constants.Enum;
 
-public enum ResultCodeEnum {
-    CONNECT_FAIL(-1,"连接服务器失败！"),
-
-    CONTENT_NOT_SHOW(0,"消息不展示"),
-
-    SHELL_SHOW(1,"shell消息"),
-
-    KK_SHOW(2,"欢迎语等消息"),
-
-    GET_INIT(3,"初始化");
+public enum CmdSignalEnum {
+    CTRL_C(3,"ctrl+c");
 
     private Integer state;
     private String desc;
 
-    ResultCodeEnum(Integer state, String desc) {
+    CmdSignalEnum(Integer state, String desc) {
         this.state = state;
         this.desc = desc;
     }
 
-    public static ResultCodeEnum getByState(Integer state) {
-        for (ResultCodeEnum item : ResultCodeEnum.values()) {
+    public static CmdSignalEnum getByState(Integer state) {
+        for (CmdSignalEnum item : CmdSignalEnum.values()) {
             if (item.getState().equals(state)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public static CmdSignalEnum getByDesc(String desc) {
+        for (CmdSignalEnum item : CmdSignalEnum.values()) {
+            if (item.getDesc().equals(desc)) {
                 return item;
             }
         }
