@@ -7,11 +7,15 @@
         <div>kk Terminal</div>
       </div>
       <div ref="cmdBoxRef" class="content" @contextmenu.prevent="" @click="if(connect_status == 1) cmdInputRef.focus();" style="cursor: text; font-family: 'Courier New';">
-        <div v-for="(line,index) in serverInfo" :key="index" style="margin: 5px 5px;">
-          <div v-if="index != serverInfo.length - 1" v-html="line.replace(/ /g, '&nbsp;')"></div>
+        <div v-for="(line,index) in serverInfo" :key="line.id" style="margin: 5px 5px;">
+          <div v-if="index != serverInfo.length - 1 && line.isHtml == true" v-html="line.content"></div>
+          <div v-if="index != serverInfo.length - 1 && line.isHtml == false">
+            {{ line.content.replace(/ /g, '&nbsp;') }}
+          </div>
         </div>
         <div style="display: flex; align-items: center; margin: 5px 5px;">
-          <div>{{ serverInfo[serverInfo.length - 1].replace(/ /g, '&nbsp;') }}</div>
+          <div v-if="serverInfo[serverInfo.length - 1].isHtml == true" v-html="serverInfo[serverInfo.length - 1].content"></div>
+          <div v-if="serverInfo[serverInfo.length - 1].isHtml == false">{{ serverInfo[serverInfo.length - 1].content.replace(/ /g, '&nbsp;') }}</div>
           <div style="flex: 1;" ><input type="text" v-model="now_cmd" ref="cmdInputRef" class="terminal-input" style="color: white;  font-family: 'Courier New';" /></div>
         </div>
       </div>
@@ -24,13 +28,13 @@
 </template>
 
 <script>
-// 解析彩色文本
-import AnsiToHtml from 'ansi-to-html';
+import handleANSI from "../Utils/HandleANSI";
 import { ref,onMounted,onUnmounted,computed } from 'vue';
 import { Base64 } from '../Utils/Base64Util';
 import LoginSsh from '../components/LoginSsh'
 // import $ from "jquery";
 import base_url from '../Utils/BaseUrl'
+import { generateRandomString } from "../Utils/StringUtil";
 
 export default {
   name: 'FrameWork',
@@ -38,9 +42,6 @@ export default {
     LoginSsh,
   },
   setup() {
-
-    // converter: new AnsiToHtml()
-    const converter = new AnsiToHtml();
 
     // cmd区域
     const cmdBoxRef = ref();
@@ -62,7 +63,7 @@ export default {
 
     // 终端服务器结果信息
     const serverInfo = ref([]);
-    serverInfo.value.push(now_connect_status_tip.value);
+    serverInfo.value.push({id:generateRandomString(64),...handleANSI(now_connect_status_tip.value)});
 
     // 读取服务器信息
     const loginSshRef = ref();
@@ -95,7 +96,7 @@ export default {
         if(result.code == -1) {
           connect_status.value = -1;
           serverInfo.value.shift();
-          serverInfo.value.push(now_connect_status_tip.value);
+          serverInfo.value.push({id:generateRandomString(64),...handleANSI(now_connect_status_tip.value)});
           if(socket.value) {
             socket.value.close();
             socket.value = null;
@@ -113,7 +114,7 @@ export default {
 
           // kk欢迎语
           if(result.code == 2) {
-            serverInfo.value.push(Base64.decode(result.info));
+            serverInfo.value.push({id:generateRandomString(64),...handleANSI(Base64.decode(result.info))});
           }
 
           // 初始化
@@ -131,11 +132,11 @@ export default {
             for(let i=0;i<arr.length;i++) {
               if(arr[i] == '') continue;
               if(i == 0 && arr[0] == now_cmd.value + '\r') {
-                let info = serverInfo.value[serverInfo.value.length - 1];
+                let info = serverInfo.value[serverInfo.value.length - 1].origin;
                 serverInfo.value.pop();
-                serverInfo.value.push(info + arr[i]);
+                serverInfo.value.push({id:generateRandomString(64),...handleANSI(info + arr[i])});
               }
-              else serverInfo.value.push(converter.toHtml(arr[i]));
+              else serverInfo.value.push({id:generateRandomString(64),...handleANSI(arr[i])});
               now_cmd.value = '';
             }
           }
@@ -186,7 +187,7 @@ export default {
 
     onUnmounted(() => {
       // 卸载全部监听事件
-      cmdInputRef.value.removeEventListener();
+      // cmdInputRef.value.removeEventListener();
     });
 
     return {
@@ -236,7 +237,7 @@ export default {
   overflow-y: scroll;
   /* overflow-x: scroll; */
   border-top: 1px solid #d7d7d7;
-  border-bottom: 2px solid #d7d7d7;
+  border-bottom: 1px solid #d7d7d7;
   border-left: 1px solid #d7d7d7;
   border-right: 1px solid #d7d7d7;
   color: white;
