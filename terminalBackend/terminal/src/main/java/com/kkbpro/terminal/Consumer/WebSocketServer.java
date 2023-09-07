@@ -198,6 +198,7 @@ public class WebSocketServer {
         byte[] buffer = new byte[8192];
         int len;
         while ((len = stdin.read(buffer)) != -1) {
+            System.out.println(new String(buffer, 0, len, StandardCharsets.UTF_8));
             sendMessage(sessionSocket, new String(buffer, 0, len, StandardCharsets.UTF_8) + "\n",
                     "success", ResultCodeEnum.SHELL_SHOW.getState());
         }
