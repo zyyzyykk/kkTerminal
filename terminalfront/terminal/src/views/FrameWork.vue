@@ -1,7 +1,7 @@
 <template>
   <div class="global">
     <div style="flex: 1;"></div>
-    <div>
+    <div style="box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">
       <div class="bar">
         <div><img src="../assets/logo.png" alt="终端" style="height: 20px; margin: 0 7px;" ></div>
         <div>kk Terminal</div>
