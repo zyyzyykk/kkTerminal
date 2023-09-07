@@ -1,7 +1,6 @@
 package com.kkbpro.terminal.Result;
 
 import com.alibaba.fastjson.JSON;
-import com.kkbpro.terminal.Constants.Enum.ResultCodeEnum;
 import com.kkbpro.terminal.Utils.BASE64Util;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 返回结果的信息类
