@@ -42,6 +42,7 @@
 
 <script>
 import { ref } from 'vue';
+import { Base64 } from '../Utils/Base64Util';
 
 export default {
   name:'LoginSsh',
@@ -55,6 +56,9 @@ export default {
 
     // 设置信息
     const setInfo = ref({});
+    if(localStorage.getItem('ssh')) {
+      setInfo.value = {...JSON.parse(Base64.decode(localStorage.getItem('ssh')))};
+    }
     const setSSH = () => {
       // 校验参数
       if(!(setInfo.value.user_name && setInfo.value.user_name != '')) {

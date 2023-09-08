@@ -101,6 +101,7 @@ export default {
             socket.value.close();
             socket.value = null;
           }
+          if(localStorage.getItem('ssh')) sshInfo.value = JSON.parse(Base64.decode(localStorage.getItem('ssh')));
           loginSshRef.value.DialogVisilble = true;
         }
         // 显示在终端里面

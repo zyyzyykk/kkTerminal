@@ -183,7 +183,7 @@ public class WebSocketServer {
         }
     }
 
-    // Shell模式
+    // Shell模式连接服务器
     public void doCommandShell(net.schmizz.sshj.connection.channel.direct.Session.Shell shell,
                                Session sessionSocket, String content) throws Exception {
         // 获取输入输出流
