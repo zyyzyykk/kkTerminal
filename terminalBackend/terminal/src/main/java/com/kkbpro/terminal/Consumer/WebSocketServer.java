@@ -2,6 +2,7 @@ package com.kkbpro.terminal.Consumer;
 
 import com.alibaba.fastjson.JSON;
 import com.github.lalyos.jfiglet.FigletFont;
+import com.googlecode.lanterna.TerminalTextUtils;
 import com.kkbpro.terminal.Config.AppConfig;
 import com.kkbpro.terminal.Constants.Constants;
 import com.kkbpro.terminal.Constants.Enum.FrontSocketEnum;
@@ -11,10 +12,12 @@ import com.kkbpro.terminal.Result.Result;
 import com.kkbpro.terminal.Utils.BASE64Util;
 import com.kkbpro.terminal.Utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.ConnectionException;
-import net.schmizz.sshj.transport.TransportException;
+import net.schmizz.sshj.connection.Connection;
+import net.schmizz.sshj.transport.Transport;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -22,9 +25,10 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -64,7 +68,6 @@ public class WebSocketServer {
         // 与服务器建立连接
         String host = appConfig.getServerIP();
         int port = Integer.parseInt(appConfig.getServerPort());
-        net.schmizz.sshj.connection.channel.direct.Session sessionSSH = null;
 
         SSHClient ssh = new SSHClient();
 
@@ -81,13 +84,12 @@ public class WebSocketServer {
         }
 
         // 连接成功
-
-        // 打开一个交互式 Shell 通道
         net.schmizz.sshj.connection.channel.direct.Session session = ssh.startSession();
 
         // 打开一个交互式Shell通道
         session.allocateDefaultPTY();
         net.schmizz.sshj.connection.channel.direct.Session.Shell shell = session.startShell();
+
 
         this.key = StringUtil.getRandomStr(Constants.SSH_RANDOM_KEY_LEN);
         onlineSSH.put(this.key,ssh);
@@ -114,6 +116,7 @@ public class WebSocketServer {
         if(this.key != null) {
             onlineSocket.remove(key);
             onlineSSH.remove(key);
+            onlineShell.remove(key);
             this.key = null;
         }
     }
@@ -129,29 +132,27 @@ public class WebSocketServer {
         net.schmizz.sshj.connection.channel.direct.Session.Shell shell = onlineShell.get(this.key);
         Session sessionSocket = onlineSocket.get(this.key);
 
-        // 文本命令
-        if(FrontSocketEnum.TEXT_CMD.getState().equals(frontSocketInfo.getType())) {
-            try {
-                executorService.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            doCommandShell(shell,sessionSocket,frontSocketInfo.getContent());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            sendMessage(sessionSocket,"连接服务器失败","fail", ResultCodeEnum.CONNECT_FAIL.getState());
-                            // 停止线程
-                            Thread.currentThread().interrupt();
-                            return;
-                        }
+        try {
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        doCommandShell(shell,sessionSocket,frontSocketInfo.getContent(),frontSocketInfo.getType());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        sendMessage(sessionSocket,"连接服务器失败","fail", ResultCodeEnum.CONNECT_FAIL.getState());
+                        // 停止线程
+                        Thread.currentThread().interrupt();
+                        return;
                     }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-                sendMessage(sessionSocket,"连接服务器失败","fail", ResultCodeEnum.CONNECT_FAIL.getState());
-                return;
-            }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendMessage(sessionSocket,"连接服务器失败","fail", ResultCodeEnum.CONNECT_FAIL.getState());
+            return;
         }
+
     }
 
     @OnError
@@ -185,22 +186,25 @@ public class WebSocketServer {
 
     // Shell模式连接服务器
     public void doCommandShell(net.schmizz.sshj.connection.channel.direct.Session.Shell shell,
-                               Session sessionSocket, String content) throws Exception {
+                               Session sessionSocket, String content, Integer type) throws Exception {
         // 获取输入输出流
         InputStream stdin = shell.getInputStream();
         OutputStream stdout = shell.getOutputStream();
 
         // 向Shell通道发送命令
-        stdout.write(content.getBytes(StandardCharsets.UTF_8));
+        // 文本命令
+        if(FrontSocketEnum.TEXT_CMD.getState().equals(type)) stdout.write(content.getBytes(StandardCharsets.UTF_8));
+        // 快捷键
+        if(FrontSocketEnum.CRTL_CMD.getState().equals(type)) stdout.write(Integer.parseInt(content));
         stdout.flush();
 
         // 获取命令输出流中的内容
         byte[] buffer = new byte[8192];
         int len;
         while ((len = stdin.read(buffer)) != -1) {
-            System.out.println(new String(buffer, 0, len, StandardCharsets.UTF_8));
+            System.out.println(StringUtils.removePattern(new String(buffer, 0, len, StandardCharsets.UTF_8), "[\\x00-\\x1F\\x7F]"));
             sendMessage(sessionSocket, new String(buffer, 0, len, StandardCharsets.UTF_8) + "\n",
-                    "success", ResultCodeEnum.SHELL_SHOW.getState());
+                    "success", type);
         }
     }
 }
