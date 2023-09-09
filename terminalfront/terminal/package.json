@@ -10,8 +10,11 @@
   "dependencies": {
     "ansi-parser": "^3.2.10",
     "ansi-up": "^1.0.0",
+    "any-ascii": "^0.3.2",
     "core-js": "^3.8.3",
+    "cross-platform-terminal-characters": "^4.0.0",
     "element-plus": "^2.3.12",
+    "fold-to-ascii": "^5.0.1",
     "jquery": "^3.7.1",
     "vue": "^3.2.13"
   },
