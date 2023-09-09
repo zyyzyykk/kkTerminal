@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import handleANSI from "../Utils/HandleANSI";
+import { handleANSI, handleUnicode } from "../Utils/HandleANSI";
 import { ref,onMounted,onUnmounted,computed } from 'vue';
 import { Base64 } from '../Utils/Base64Util';
 import LoginSsh from '../components/LoginSsh'
@@ -81,6 +81,7 @@ export default {
       connectSSH();
     }
     const remember = () => {
+      localStorage.removeItem('ssh');
       if(sshInfo.value.isRemember == true) {
         localStorage.setItem('ssh',Base64.encode(JSON.stringify(sshInfo.value)))
       }
@@ -121,16 +122,17 @@ export default {
           // 初始化
           if(result.code == 3) {
             if(socket.value) {
-              socket.value.send(Base64.encode(JSON.stringify({type:0,content:"\n"})));
+              socket.value.send(Base64.encode(JSON.stringify({type:10,content:"\n"})));
               now_cmd.value = '';
             }
           }
 
-          // shell发来的信息
-          if(result.code == 1) {
+          // shell发来的命令结果
+          if(result.code == 10) {
             let arr = Base64.decode(result.info).split('\n');
             console.log(arr);
             for(let i=0;i<arr.length;i++) {
+              arr[i] = handleUnicode(arr[i]);
               if(arr[i] == '') continue;
               if(i == 0 && arr[0] == now_cmd.value + '\r') {
                 let info = serverInfo.value[serverInfo.value.length - 1].origin;
@@ -141,7 +143,19 @@ export default {
               now_cmd.value = '';
             }
           }
-          cmdBoxRef.value.scrollTop = cmdBoxRef.value.scrollHeight * 2;
+          
+          // shell发来的快捷键结果
+          if(result.code == 11) {
+            let arr = Base64.decode(result.info).split('\n');
+            console.log(arr);
+            for(let i=0;i<arr.length;i++) {
+              if(arr[i] == '') continue;
+              serverInfo.value.push({id:generateRandomString(64),...handleANSI(arr[i])});
+              now_cmd.value = '';
+            }
+          }
+
+
         }
       }
     }
@@ -151,6 +165,7 @@ export default {
     const shortcutKeys = {
       'ctrl+c':67,
       'enter':13,
+      'tab':9,
     };
 
 
@@ -166,14 +181,21 @@ export default {
         if (event.ctrlKey && event.keyCode === shortcutKeys['ctrl+c']) {
           event.preventDefault();
           if(socket.value) {
-            socket.value.send(Base64.encode(JSON.stringify({type:1,content:"ctrl+c"})));
+            socket.value.send(Base64.encode(JSON.stringify({type:11,content:"3"})));
           }
         }
         // enter
         else if(event.keyCode === shortcutKeys['enter']) {
           event.preventDefault();
           if(socket.value) {
-            socket.value.send(Base64.encode(JSON.stringify({type:0,content:now_cmd.value + "\n"})));
+            socket.value.send(Base64.encode(JSON.stringify({type:10,content:now_cmd.value + "\n"})));
+          }
+        }
+        // tab
+        else if(event.keyCode === shortcutKeys['tab']) {
+          event.preventDefault();
+          if(socket.value) {
+            socket.value.send(Base64.encode(JSON.stringify({type:11,content:"9"})));
           }
         }
       });

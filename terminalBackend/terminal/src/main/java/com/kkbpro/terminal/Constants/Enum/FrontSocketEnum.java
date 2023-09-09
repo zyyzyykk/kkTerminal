@@ -2,9 +2,9 @@ package com.kkbpro.terminal.Constants.Enum;
 
 public enum FrontSocketEnum {
 
-    TEXT_CMD(0,"文本命令"),
+    TEXT_CMD(10,"文本命令"),
 
-    CRTL_CMD(1,"快捷键");
+    CRTL_CMD(11,"快捷键");
 
     private Integer state;
 

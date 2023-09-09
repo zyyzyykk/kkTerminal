@@ -9,7 +9,19 @@ const parseShellToHtml = (stream) => {
   return ansi_up.ansi_to_html(stream)
 }
 
-const handleANSI = (stream) => {
+import {
+  regex,
+} from 'cross-platform-terminal-characters'
+
+
+// 处理Unicode字符
+export const handleUnicode = (stream) => {
+  return stream.replace(regex, '').replace(/\r?\\u001b\[[0-9;]*[A-Za-z]/g, '');
+}
+
+// 处理ANSI字符
+export const handleANSI = (stream) => {
+  stream = handleUnicode(stream);
   let parseText = ansiparser.removeAnsi(stream);
   if(parseText == stream) {
     return {
@@ -26,5 +38,3 @@ const handleANSI = (stream) => {
     }
   }
 }
-
-export default handleANSI
