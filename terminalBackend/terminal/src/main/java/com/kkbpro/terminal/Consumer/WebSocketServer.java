@@ -2,7 +2,7 @@ package com.kkbpro.terminal.Consumer;
 
 import com.alibaba.fastjson.JSON;
 import com.github.lalyos.jfiglet.FigletFont;
-import com.googlecode.lanterna.TerminalTextUtils;
+import com.google.common.base.CharMatcher;
 import com.kkbpro.terminal.Config.AppConfig;
 import com.kkbpro.terminal.Constants.Constants;
 import com.kkbpro.terminal.Constants.Enum.FrontSocketEnum;
@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 @ServerEndpoint("/websocket/{user_name}/{password}")  // 注意不要以'/'结尾
@@ -202,8 +204,23 @@ public class WebSocketServer {
         byte[] buffer = new byte[8192];
         int len;
         while ((len = stdin.read(buffer)) != -1) {
-            System.out.println(StringUtils.removePattern(new String(buffer, 0, len, StandardCharsets.UTF_8), "[\\x00-\\x1F\\x7F]"));
-            sendMessage(sessionSocket, new String(buffer, 0, len, StandardCharsets.UTF_8) + "\n",
+            // 除去ANSI　.replaceAll("\\e\\[[\\d;]*[^\\d;]", "")
+            String shellOut = new String(buffer, 0, len, StandardCharsets.UTF_8);
+            StringBuilder filteredText = new StringBuilder();
+
+            boolean inAnsiSequence = false;
+            for (char c : shellOut.toCharArray()) {
+                if(inAnsiSequence) {
+                    filteredText.append(c);
+                    if(c == 'm') inAnsiSequence = false;
+                } else if(c == 27) {
+                    filteredText.append(c);
+                    inAnsiSequence = true;
+                } else if(!Character.isISOControl(c) || c == '\n' || c == '\r') filteredText.append(c);
+            }
+
+            System.out.println(filteredText);
+            sendMessage(sessionSocket, filteredText + "\n",
                     "success", type);
         }
     }
