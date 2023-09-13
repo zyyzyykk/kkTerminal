@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { handleANSI, handleUnicode } from "../Utils/HandleANSI";
+import { handleANSI } from "../Utils/HandleANSI";
 import { ref,onMounted,onUnmounted,computed } from 'vue';
 import { Base64 } from '../Utils/Base64Util';
 import LoginSsh from '../components/LoginSsh'
@@ -132,7 +132,6 @@ export default {
             let arr = Base64.decode(result.info).split('\n');
             console.log(arr);
             for(let i=0;i<arr.length;i++) {
-              arr[i] = handleUnicode(arr[i]);
               if(arr[i] == '') continue;
               if(i == 0 && arr[0] == now_cmd.value + '\r') {
                 let info = serverInfo.value[serverInfo.value.length - 1].origin;
