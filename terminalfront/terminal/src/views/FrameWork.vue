@@ -88,6 +88,7 @@ export default {
     }
     // 连接服务器
     const now_cmd = ref('');
+    const tag = ref(false);
     const connectSSH = () => {
       socket.value = new WebSocket(base_url + 'websocket/' + sshInfo.value.user_name + '/' + Base64.encode(sshInfo.value.password));
       // 当接收到服务器发送的信息时触发
@@ -130,7 +131,7 @@ export default {
           // shell发来的命令结果
           if(result.code == 10) {
             let arr = Base64.decode(result.info).split('\n');
-            console.log(arr);
+            // console.log(arr);
             for(let i=0;i<arr.length;i++) {
               if(arr[i] == '') continue;
               if(i == 0 && arr[0] == now_cmd.value + '\r') {
@@ -146,11 +147,20 @@ export default {
           // shell发来的快捷键结果
           if(result.code == 11) {
             let arr = Base64.decode(result.info).split('\n');
-            console.log(arr);
+            console.log(arr[0] == now_cmd.value,tag.value,arr[0]);
             for(let i=0;i<arr.length;i++) {
               if(arr[i] == '') continue;
-              serverInfo.value.push({id:generateRandomString(64),...handleANSI(arr[i])});
-              now_cmd.value = '';
+              if(i == 0 && arr[0] == now_cmd.value && tag.value == false) {
+                tag.value = true;
+                continue;
+              }
+              else if(tag.value == true) {
+                now_cmd.value = now_cmd.value + arr[i];
+                tag.value = false;
+                continue;
+              } else if(tag.value == false) {
+                serverInfo.value.push({id:generateRandomString(64),...handleANSI(arr[i])});
+              }
             }
           }
 
@@ -165,6 +175,8 @@ export default {
       'ctrl+c':67,
       'enter':13,
       'tab':9,
+      'ctrl+u':85,
+      'ctrl+d':68,
     };
 
 
@@ -176,11 +188,16 @@ export default {
       });
       // 监听快捷键
       cmdInputRef.value.addEventListener('keydown', function(event) {
+        // ctrl+?
+        if(event.ctrlKey) {
+          event.preventDefault();
+        }
+        
         // ctrl+c
         if (event.ctrlKey && event.keyCode === shortcutKeys['ctrl+c']) {
-          event.preventDefault();
           if(socket.value) {
-            socket.value.send(Base64.encode(JSON.stringify({type:11,content:"3"})));
+            // socket.value.send(Base64.encode(JSON.stringify({type:12,content:now_cmd.value})));
+            socket.value.send(Base64.encode(JSON.stringify({type:13,content:"3"})));
           }
         }
         // enter
@@ -194,8 +211,17 @@ export default {
         else if(event.keyCode === shortcutKeys['tab']) {
           event.preventDefault();
           if(socket.value) {
+            socket.value.send(Base64.encode(JSON.stringify({type:12,content:now_cmd.value})));
             socket.value.send(Base64.encode(JSON.stringify({type:11,content:"9"})));
           }
+        }
+        // ctrl+u
+        else if(event.ctrlKey && event.keyCode === shortcutKeys['ctrl+u']) {
+          now_cmd.value = '';
+        }
+        // ctrl+u
+        else if(event.ctrlKey && event.keyCode === shortcutKeys['ctrl+d']) {
+          socket.value.send(Base64.encode(JSON.stringify({type:11,content:"3"})));
         }
       });
     }

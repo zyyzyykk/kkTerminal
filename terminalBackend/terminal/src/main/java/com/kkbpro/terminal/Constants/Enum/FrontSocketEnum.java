@@ -4,7 +4,11 @@ public enum FrontSocketEnum {
 
     TEXT_CMD(10,"文本命令"),
 
-    CRTL_CMD(11,"快捷键");
+    CRTL_CMD(11,"快捷键"),
+
+    NO_RETURN(12,"向服务器发送，但不返回消息给前端"),
+
+    NO_RETURN_CMD(13,"向服务器发送，但不返回消息给前端");
 
     private Integer state;
 

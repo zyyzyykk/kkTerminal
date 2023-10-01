@@ -2,7 +2,6 @@ package com.kkbpro.terminal.Consumer;
 
 import com.alibaba.fastjson.JSON;
 import com.github.lalyos.jfiglet.FigletFont;
-import com.google.common.base.CharMatcher;
 import com.kkbpro.terminal.Config.AppConfig;
 import com.kkbpro.terminal.Constants.Constants;
 import com.kkbpro.terminal.Constants.Enum.FrontSocketEnum;
@@ -12,12 +11,8 @@ import com.kkbpro.terminal.Result.Result;
 import com.kkbpro.terminal.Utils.BASE64Util;
 import com.kkbpro.terminal.Utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.Connection;
-import net.schmizz.sshj.transport.Transport;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -25,15 +20,10 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Component
 @ServerEndpoint("/websocket/{user_name}/{password}")  // 注意不要以'/'结尾
@@ -197,31 +187,41 @@ public class WebSocketServer {
         // 文本命令
         if(FrontSocketEnum.TEXT_CMD.getState().equals(type)) stdout.write(content.getBytes(StandardCharsets.UTF_8));
         // 快捷键
-        if(FrontSocketEnum.CRTL_CMD.getState().equals(type)) stdout.write(Integer.parseInt(content));
+        if(FrontSocketEnum.CRTL_CMD.getState().equals(type)) {
+            stdout.write(Integer.parseInt(content));
+//            stdout.write(Integer.parseInt(content));
+        }
+        // 不显示
+        if(FrontSocketEnum.NO_RETURN.getState().equals(type)) stdout.write(content.getBytes(StandardCharsets.UTF_8));
+        // 不显示快捷键
+        if(FrontSocketEnum.NO_RETURN_CMD.getState().equals(type)) {
+            stdout.write(Integer.parseInt(content));
+        }
+
         stdout.flush();
 
         // 获取命令输出流中的内容
         byte[] buffer = new byte[8192];
         int len;
         while ((len = stdin.read(buffer)) != -1) {
+
             // 除去ANSI　.replaceAll("\\e\\[[\\d;]*[^\\d;]", "")
             String shellOut = new String(buffer, 0, len, StandardCharsets.UTF_8);
             StringBuilder filteredText = new StringBuilder();
 
-            boolean inAnsiSequence = false;
             for (char c : shellOut.toCharArray()) {
-                if(inAnsiSequence) {
+                if(!Character.isISOControl(c) || c == '\n' || c == '\r' || c == 27) {
                     filteredText.append(c);
-                    if(c == 'm') inAnsiSequence = false;
-                } else if(c == 27) {
-                    filteredText.append(c);
-                    inAnsiSequence = true;
-                } else if(!Character.isISOControl(c) || c == '\n' || c == '\r') filteredText.append(c);
+                }
             }
 
-            System.out.println(filteredText);
-            sendMessage(sessionSocket, filteredText + "\n",
-                    "success", type);
+            if(!FrontSocketEnum.NO_RETURN.getState().equals(type) || !FrontSocketEnum.NO_RETURN_CMD.getState().equals(type)) {
+                System.out.println(filteredText);
+                sendMessage(sessionSocket, filteredText + "\n",
+                        "success", type);
+            }
         }
+
+
     }
 }
