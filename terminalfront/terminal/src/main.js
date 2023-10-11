@@ -25,36 +25,6 @@ app.mount('#app');
 // 引入全局样式
 import './assets/base.css'
 
-// jQuery配置Ajax全局响应拦截，进行数据解密
-// jQuery配置全局Loading...效果
-import $ from 'jquery';
-import { Base64 } from './Utils/Base64Util';
-import Loading from './Utils/Loading'
-
-
-let loading = null;
-
-$.ajaxSetup({
-  processData: true,
-  beforeSend: function() { // 发送请求前执行的方法
-    loading = Loading();
-  },
-  // 携带cookie
-  xhrFields:{
-    withCredentials: true,
-  },
-  dataFilter(resp) {
-    resp = JSON.parse(resp);
-    let data = resp.data;
-    if(data) resp.data = JSON.parse(Base64.decode(resp.data));
-    return JSON.stringify(resp);
-  },
-  complete: function() { // 发送请求完成后执行的方法
-    loading.close();
-  }
-});
-
-
 
 //用于去掉eazyplayer警告,开发时禁用，打包开启
 app.config.warnHandler = () => {}

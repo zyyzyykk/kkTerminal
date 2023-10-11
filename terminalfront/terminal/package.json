@@ -8,16 +8,12 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "ansi-parser": "^3.2.10",
-    "ansi-up": "^1.0.0",
     "core-js": "^3.8.3",
-    "cross-platform-terminal-characters": "^4.0.0",
+    "crypto-js": "^4.1.1",
     "element-plus": "^2.3.12",
-    "fold-to-ascii": "^5.0.1",
-    "he": "^1.2.0",
     "jquery": "^3.7.1",
-    "validator": "^13.11.0",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "xterm": "^5.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
