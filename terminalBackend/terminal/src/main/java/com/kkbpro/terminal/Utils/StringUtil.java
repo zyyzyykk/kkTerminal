@@ -66,5 +66,17 @@ public class StringUtil {
         }
     }
 
+    /**
+     *  将字符串的'@'转为'/'
+     */
+    public static String changeStr(String str) {
+        String result = "";
+        for (int i=0;i<str.length();i++) {
+            if(str.charAt(i) != '@') result += str.charAt(i);
+            else result += '/';
+        }
+
+        return result;
+    }
 
 }

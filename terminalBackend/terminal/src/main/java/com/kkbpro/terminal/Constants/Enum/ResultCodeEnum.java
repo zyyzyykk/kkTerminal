@@ -3,21 +3,9 @@ package com.kkbpro.terminal.Constants.Enum;
 public enum ResultCodeEnum {
     CONNECT_FAIL(-1,"连接服务器失败！"),
 
-    CONTENT_NOT_SHOW(0,"消息不展示"),
+    CONNECT_SUCCESS(0,"连接服务器成功！"),
 
-    KK_SHOW(2,"欢迎语等消息"),
-
-    GET_INIT(3,"初始化"),
-
-    SHELL_EXEC(10,"shell命令消息"),
-
-    SHELL_CMD(11,"shell快捷键消息"),
-
-
-    SHELL_NO_RETURN(12,"向服务器发送，但不返回消息给前端");
-
-
-
+    OUT_TEXT(1,"输出到终端屏幕的文本");
     private Integer state;
     private String desc;
 

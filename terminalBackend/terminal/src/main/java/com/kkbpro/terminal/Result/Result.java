@@ -1,14 +1,13 @@
 package com.kkbpro.terminal.Result;
 
 import com.alibaba.fastjson.JSON;
-import com.kkbpro.terminal.Utils.BASE64Util;
+import com.kkbpro.terminal.Utils.AesUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 返回结果的信息类
@@ -51,7 +50,7 @@ public class Result {
         result.setInfo(info);
         try {
             if(null == data) result.setData(null);
-            else result.setData(BASE64Util.Base64Encrypt(JSON.toJSONString(data)));
+            else result.setData(AesUtil.aesEncrypt(JSON.toJSONString(data)));
         } catch (Exception e) {
             System.out.println("加密异常");
             result.setData(null);

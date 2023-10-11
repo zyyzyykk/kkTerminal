@@ -2,7 +2,7 @@
   <el-dialog
     v-model="DialogVisilble"
     :before-close="closeDialog"
-    title="连接服务器设置"
+    title="连接设置"
     width="30%"
   >
     <div style="margin-top: -15px;"></div>
@@ -45,7 +45,7 @@ import { ref } from 'vue';
 import { Base64 } from '../Utils/Base64Util';
 
 export default {
-  name:'LoginSsh',
+  name:'ConnectSetting',
   components: {
   },
   setup(props,context) {
