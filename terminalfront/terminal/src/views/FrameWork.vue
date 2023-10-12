@@ -1,19 +1,19 @@
 <template>
   <div class="golbal">
-    <div>
-      <!-- 设置栏 -->
+    <!-- <div>
+      设置栏
       <div class="setting" >
         <div class="setting-menu" >连接配置</div>
         <div class="setting-menu" >样式配置</div>
         <div class="setting-menu" >重连</div>
       </div>
-    </div>
-    <!-- <div class="bar">
-      <div><img src="../assets/logo.png" alt="终端" style="height: 20px; margin: 0 7px;" ></div>
-      <div>kk Terminal</div>
     </div> -->
+    <div class="bar">
+      <div><img src="../assets/logo.png" alt="终端" style="height: 16px; margin: 0 7px;" ></div>
+      <div style="font-size: 14px;" ><span>kk Terminal</span></div>
+    </div>
     <!-- terminal主体 -->
-    <div ref="terminal" id="terminal"></div>
+    <div ref="terminal" class="terminal-class"></div>
   </div>
 </template>
 
@@ -21,6 +21,8 @@
 import { ref, onMounted } from 'vue';
 import { encrypt, decrypt } from '@/Utils/Encrypt';
 import { Terminal } from 'xterm';
+import { FitAddon } from 'xterm-addon-fit'
+
 import { default_env } from '@/Utils/Env';
 import base_url from '@/Utils/BaseUrl';
 import { changeStr } from '@/Utils/StringUtil';
@@ -32,6 +34,12 @@ export default {
   components: {
   },
   setup() {
+
+    const fitAddon = new FitAddon();
+
+    // 获取高度
+    const params = new URLSearchParams(window.location.search);
+    const heightValue = params.get('height');
 
     // 读取环境变量
     const env = ref(null);
@@ -48,25 +56,32 @@ export default {
 
     // 终端
     const terminal = ref();
-    let term = new Terminal({
-      rendererType: "canvas",                               // 渲染类型
-      rows: 40,                                             // 行数
-      cols: 100,                                            // 不指定行数，自动回车后光标从下一行开始
-      convertEol: true,                                     // 启用时，光标将设置为下一行的开头
-      // scrollback: 50,                                    // 终端中的回滚量
-      disableStdin: false,                                  // 是否应禁用输入
-      cursorStyle: env.value.cursorStyle,                   // 光标样式
-      cursorBlink: env.value.cursorBlink,                   // 光标闪烁
+    let term = null;
+    const initTerminal = () => {
+      term = new Terminal({
+        rendererType: "canvas",                               // 渲染类型
+        // rows: 20,                                             // 行数
+        // cols: 10,                                             // 不指定行数，自动回车后光标从下一行开始
+        convertEol: true,                                     // 启用时，光标将设置为下一行的开头
+        scrollback: 0,                                       // 终端中的回滚量
+        disableStdin: false,                                  // 是否应禁用输入
+        cursorStyle: env.value.cursorStyle,                   // 光标样式
+        cursorBlink: env.value.cursorBlink,                   // 光标闪烁
 
-      theme: {
         foreground: env.value.fg,                           // 前景色
         background: env.value.bg,                           // 背景色
         cursor: "help",                                     // 设置光标
-        lineHeight: 20,
-        fontFamily: env.value.fontFamily,                   // 设置字体为 Consolas
-        fontSize: env.value.fontSize                        // 设置字号为 16
-      }
-    });
+        lineHeight: 1.2,
+        fontFamily: 'simsun',                               // 设置字体为 Consolas
+        fontSize: 16,                                       // 设置字号为 16
+      });
+      term.loadAddon(fitAddon);
+    }
+
+    // 终端大小自适应
+    const termFit = () => {
+      fitAddon.fit();
+    }
 
     // websocket连接
     const socket = ref(null);
@@ -89,6 +104,9 @@ export default {
         // 输出
         if(result.code == 1) {
           term.write(decrypt(result.info));
+          // 设置回滚量
+          term.options.scrollback += term._core.buffer.lines.length;
+          termFit();
         }
       }
     }
@@ -96,7 +114,13 @@ export default {
     doSSHConnect();
 
     onMounted(() => {
+
+      // 设置最大高度
+      terminal.value.style.maxHeight = heightValue ? (heightValue - 20) + 'px' : '600px';
+
+      initTerminal();
       term.open(terminal.value);
+      termFit();
 
       // term.prompt = () => {
       //     term.write("\r\n\x1b[33m$\x1b[0m ")
@@ -119,6 +143,12 @@ export default {
 
       term.write(now_connect_status.value);
 
+      // 监听窗口大小变化事件，自动调整终端大小
+      window.addEventListener('resize', () => {
+        // terminal.value.style.maxHeight = 
+        termFit();
+      });
+
 
     });
 
@@ -126,6 +156,8 @@ export default {
       terminal,
       doSSHConnect,
       socket,
+      initTerminal,
+      termFit,
     }
 
   }
@@ -137,29 +169,27 @@ export default {
 
 .golbal {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .bar {
-  background-color: #f8f8f8;
-  color: black;
-  width: 60vw;
-  height: 25px;
   display: flex;
   align-items: center;
+  background-color: #f8f8f8;
+  color: black;
+  width: 100%;
+  height: 25px;
   border-top: 1px solid #d7d7d7;
   border-bottom: 1px solid #d7d7d7;
   border-left: 1px solid #d7d7d7;
   border-right: 1px solid #d7d7d7;
 }
 
-#terminal {
+.terminal-class {
   width: 100%;
-  height: 100%;
 }
 
 .setting {

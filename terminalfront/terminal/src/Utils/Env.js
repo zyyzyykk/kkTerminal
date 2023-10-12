@@ -8,7 +8,7 @@ export const default_env = {
   bg:'#000000',
   fg:'#ECECEC',
   fontFamily:'Consolas',
-  fontSize:16,
+  fontSize:20,
   cursorStyle:'underline',
   cursorBlink:true,
   // 
