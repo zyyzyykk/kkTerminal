@@ -88,7 +88,7 @@ public class WebSocketServer {
 
 
         net.schmizz.sshj.connection.channel.direct.Session sshSession = sshClient.startSession();
-        sshSession.allocatePTY("xterm", 100, 40, 0, 0, Collections.emptyMap());
+        sshSession.allocateDefaultPTY();
 
         net.schmizz.sshj.connection.channel.direct.Session.Shell shell = sshSession.startShell();
         shellInputStream = shell.getInputStream();
