@@ -145,8 +145,8 @@ export default {
     } 
     // 重启终端
     const resetTerminal = () => {
-      loadEnv();
       if(term) terminal.value.innerHTML = '';
+      loadEnv();
       initTerminal();
       term.open(terminal.value);
       termFit();

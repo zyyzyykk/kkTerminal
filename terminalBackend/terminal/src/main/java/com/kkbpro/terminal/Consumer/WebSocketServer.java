@@ -74,6 +74,8 @@ public class WebSocketServer {
         sendMessage(sessionSocket,"Connecting success !","success", ResultCodeEnum.CONNECT_SUCCESS.getState());
         // 欢迎语
         sendMessage(sessionSocket, appConfig.getWelcome() + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
+        // github源地址
+        sendMessage(sessionSocket, "source: " + appConfig.getSource() + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
         // 生成艺术字
         String title = appConfig.getTitle();
         String titleArt = FigletFont.convertOneLine(title);

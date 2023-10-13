@@ -1,2 +1,2 @@
-const base_url = 'ws://localhost:3000/socket/ssh/';
+const base_url = 'ws://' + window.location.host + '/socket/ssh/';
 export default base_url;

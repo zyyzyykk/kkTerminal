@@ -19,6 +19,13 @@ public class AppConfig {
     private String welcome;
 
     /**
+     * github源地址
+     */
+    @Value("${kk.source:}")
+    private String source;
+
+
+    /**
      * 艺术字标题
      */
     @Value("${kk.title:}")
