@@ -20,7 +20,6 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 
 @Component
 @ServerEndpoint("/socket/ssh/{env}")  // 注意不要以'/'结尾
@@ -68,14 +67,13 @@ public class WebSocketServer {
         } catch (Exception e) {
             e.printStackTrace();
             sendMessage(sessionSocket,"连接服务器失败","fail", ResultCodeEnum.CONNECT_FAIL.getState());
-            System.out.println("连接服务器失败");
             return;
         }
 
         // 连接成功
         sendMessage(sessionSocket,"Connecting success !","success", ResultCodeEnum.CONNECT_SUCCESS.getState());
         // 欢迎语
-        sendMessage(sessionSocket,"Welcome to kk Server\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
+        sendMessage(sessionSocket, appConfig.getWelcome() + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
         // 生成艺术字
         String title = appConfig.getTitle();
         String titleArt = FigletFont.convertOneLine(title);

@@ -1,58 +1,68 @@
 <template>
   <div class="golbal">
-    <!-- <div>
-      设置栏
-      <div class="setting" >
-        <div class="setting-menu" >连接配置</div>
-        <div class="setting-menu" >样式配置</div>
-        <div class="setting-menu" >重连</div>
-      </div>
-    </div> -->
+    <!-- 设置栏 -->
+    <div class="setting" v-show="isShowSetting" >
+      <div class="setting-menu" @click="doSettings(1)" ><div>连接设置</div></div>
+      <div class="setting-menu" @click="doSettings(2)" ><div>样式设置</div></div>
+      <div class="setting-menu" @click="doSettings(3)" ><div>重启</div></div>
+    </div>
     <div class="bar">
-      <div><img src="../assets/logo.png" alt="终端" style="height: 16px; margin: 0 7px;" ></div>
+      <div @click="showSettings" >
+        <img src="../assets/logo.png" alt="终端" style="height: 16px; margin: 0 7px; cursor: pointer;" >
+      </div>
       <div style="font-size: 14px;" ><span>kk Terminal</span></div>
     </div>
     <!-- terminal主体 -->
     <div ref="terminal" class="terminal-class"></div>
   </div>
+
+  <!-- 连接设置 -->
+  <ConnectSetting ref="connectSettingRef" :env="env" @callback="saveEnv" ></ConnectSetting>
+  <!-- 样式设置 -->
+  <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" ></StyleSetting>
+
 </template>
 
 <script>
 import { ref, onMounted } from 'vue';
 import { encrypt, decrypt } from '@/Utils/Encrypt';
+
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit'
+import "xterm/css/xterm.css";
 
 import { default_env } from '@/Utils/Env';
 import base_url from '@/Utils/BaseUrl';
 import { changeStr } from '@/Utils/StringUtil';
-import "xterm/css/xterm.css";
-// import { FitAddon } from 'xterm-addon-fit';
+
+import ConnectSetting from '@/components/ConnectSetting.vue';
+import StyleSetting from '@/components/StyleSetting.vue';
 
 export default {
   name: "FrameWork",
   components: {
+    ConnectSetting,
+    StyleSetting,
   },
   setup() {
 
     const fitAddon = new FitAddon();
 
-    // 获取高度
-    const params = new URLSearchParams(window.location.search);
-    const heightValue = params.get('height');
-
-    // 读取环境变量
+    // 加载环境变量
     const env = ref(null);
-    if(localStorage.getItem('env')) env.value = JSON.parse(decrypt(localStorage.getItem('env')));
-    else env.value = default_env;
+    const loadEnv = () => {
+      if(localStorage.getItem('env')) env.value = JSON.parse(decrypt(localStorage.getItem('env')));
+      else env.value = default_env;
+    }
+    loadEnv();
 
     // 连接状态
     const connect_status = ref({
-      '-1':'Fail to connect kk server !\r\n',
-      '0':'Connecting success !\r\n',
-      '1':'Connecting to kk server ...\r\n',
+      'Fail':'Fail to connect kk server !\r\n',
+      'Success':'Connecting success !\r\n',
+      'Connecting':'Connecting to kk server ...\r\n',
     })
-    const now_connect_status = ref(connect_status.value['1']);
+    const now_connect_status = ref(connect_status.value['Connecting']);
 
     // 终端
     const terminal = ref();
@@ -60,26 +70,31 @@ export default {
     const initTerminal = () => {
       term = new Terminal({
         rendererType: "canvas",                               // 渲染类型
-        // rows: 20,                                             // 行数
-        // cols: 10,                                             // 不指定行数，自动回车后光标从下一行开始
+        // rows: 20,                                          // 行数
+        // cols: 10,                                          // 不指定行数，自动回车后光标从下一行开始
         convertEol: true,                                     // 启用时，光标将设置为下一行的开头
-        scrollback: 0,                                       // 终端中的回滚量
+        scrollback: 0,                                        // 终端中的回滚量
         disableStdin: false,                                  // 是否应禁用输入
-        cursorStyle: env.value.cursorStyle,                   // 光标样式
+        cursorStyle: env.value.cursorStyle,                   // 光标样式 block
         cursorBlink: env.value.cursorBlink,                   // 光标闪烁
 
-        foreground: env.value.fg,                           // 前景色
-        background: env.value.bg,                           // 背景色
-        cursor: "help",                                     // 设置光标
-        lineHeight: 1.2,
-        fontFamily: 'simsun',                               // 设置字体为 Consolas
-        fontSize: 16,                                       // 设置字号为 16
+        theme:{
+          foreground: env.value.fg,                           // 前景色
+          background: env.value.bg,                           // 背景色
+          cursor: "help",                                     // 设置光标
+        },
+
+        lineHeight: 1.2,  
+        fontFamily: env.value.fontFamily,                     // 设置字体为 Simsun
+        fontSize: env.value.fontSize,                         // 设置字号为 16
+
       });
       term.loadAddon(fitAddon);
     }
 
-    // 终端大小自适应
+    // 终端视高自适应
     const termFit = () => {
+      terminal.value.style.height = (window.innerHeight - 27) + 'px';
       fitAddon.fit();
     }
 
@@ -92,39 +107,49 @@ export default {
         // 连接失败
         if(result.code == -1) {
           term.clear();
-          now_connect_status.value = connect_status.value[resp.code];
+          now_connect_status.value = connect_status.value['Fail'];
           term.write(now_connect_status.value);
+          // 第一次使用
+          if(env.value.server_ip || env.value.server_ip == '') {
+            doSettings(1);
+          }
         }
         // 连接成功
         if(result.code == 0) {
           term.clear();
-          now_connect_status.value = connect_status.value[resp.code];
-          term.write(now_connect_status.value);
+          now_connect_status.value = connect_status.value['Success'];
+          // term.write(now_connect_status.value);
         }
         // 输出
         if(result.code == 1) {
           term.write(decrypt(result.info));
+          fitAddon.fit();
           // 设置回滚量
           term.options.scrollback += term._core.buffer.lines.length;
-          termFit();
         }
       }
-    }
+    };
 
-    doSSHConnect();
-
-    onMounted(() => {
-
-      // 设置最大高度
-      terminal.value.style.maxHeight = heightValue ? (heightValue - 20) + 'px' : '600px';
-
+    // 终端信息设置
+    const isShowSetting = ref(false);
+    const showSettings = () => {
+      isShowSetting.value = !isShowSetting.value;
+    };
+    const connectSettingRef = ref();
+    const styleSettingRef = ref();
+    // 保存更改的环境变量
+    const saveEnv = (new_env) => {
+      env.value = {...env.value,...new_env};
+      localStorage.setItem('env',encrypt(JSON.stringify(env.value)));
+      doSettings(3);
+    } 
+    // 重启终端
+    const resetTerminal = () => {
+      loadEnv();
+      if(term) terminal.value.innerHTML = '';
       initTerminal();
       term.open(terminal.value);
       termFit();
-
-      // term.prompt = () => {
-      //     term.write("\r\n\x1b[33m$\x1b[0m ")
-      // }
 
       // 添加事件监听器，支持输入方法
       term.onKey(e => {
@@ -142,22 +167,53 @@ export default {
       // });
 
       term.write(now_connect_status.value);
+    }
+    const doSettings = (type) => {
+      // 连接设置
+      if(type == 1) {
+        isShowSetting.value = false;
+        connectSettingRef.value.DialogVisilble = true;
+      }
+      // 样式设置
+      else if (type == 2) {
+        isShowSetting.value = false;
+        styleSettingRef.value.DialogVisilble = true;
+      }
+      // 重启
+      else if (type == 3) {
+        isShowSetting.value = false;
+        now_connect_status.value = connect_status.value['Connecting'];
+        if(socket.value) socket.value.close();
+        doSSHConnect();
+        resetTerminal();
+      }
+    }
+
+    onMounted(() => {
+      // 连接服务器
+      doSSHConnect();
+
+      // 启动终端
+      resetTerminal();
 
       // 监听窗口大小变化事件，自动调整终端大小
       window.addEventListener('resize', () => {
-        // terminal.value.style.maxHeight = 
         termFit();
       });
-
-
     });
 
     return {
+      env,
+      now_connect_status,
       terminal,
       doSSHConnect,
       socket,
-      initTerminal,
-      termFit,
+      showSettings,
+      isShowSetting,
+      doSettings,
+      connectSettingRef,
+      styleSettingRef,
+      saveEnv,
     }
 
   }
@@ -178,7 +234,7 @@ export default {
 .bar {
   display: flex;
   align-items: center;
-  background-color: #f8f8f8;
+  background-color: #f5f5f5;
   color: black;
   width: 100%;
   height: 25px;
@@ -190,17 +246,27 @@ export default {
 
 .terminal-class {
   width: 100%;
+  height: calc(100% - 30);
 }
 
 .setting {
   position: absolute;
   left: 0;
-  top: 0;
-  display: none;
+  top: 25px;
+  z-index: 100;
+  cursor: pointer;;
 }
 
 .setting-menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #f2f2f2;
+  text-align: center;
+  width: 80px;
+  height: 25px;
+  font-size: 13px;
+  color: #555;
 }
 
 .setting-menu:hover {
