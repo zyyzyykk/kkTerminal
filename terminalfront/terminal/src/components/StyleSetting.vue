@@ -119,7 +119,6 @@ export default {
       cursorBlink: props.env.cursorBlink,
     });
     const confirm = () => {
-      console.log(setInfo.value);
       context.emit('callback',setInfo.value);
       DialogVisilble.value = false;
     }
