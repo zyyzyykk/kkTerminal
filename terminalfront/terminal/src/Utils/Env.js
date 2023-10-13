@@ -1,16 +1,15 @@
 export const default_env = {
-  // 服务器相关
-  server_ip: '222.187.238.249',
-  server_port: 58794,
+  // 连接相关
+  server_ip: '',
+  server_port: 22,
   server_user: 'root',
-  server_password:'NKV7THQmSEAM',
+  server_password:'',
   // 样式相关
   bg:'#000000',
   fg:'#ECECEC',
-  fontFamily:'Consolas',
-  fontSize:20,
-  cursorStyle:'underline',
-  cursorBlink:true,
-  // 
+  fontFamily: 'Simsun',
+  fontSize: 16,
+  cursorStyle: 'block',
+  cursorBlink: true,
 
 };

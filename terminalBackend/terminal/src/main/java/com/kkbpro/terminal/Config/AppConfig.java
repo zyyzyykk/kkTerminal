@@ -12,7 +12,15 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class AppConfig {
 
-    // 艺术字标题
+    /**
+     * 欢迎语
+     */
+    @Value("${kk.welcome:}")
+    private String welcome;
+
+    /**
+     * 艺术字标题
+     */
     @Value("${kk.title:}")
     private String title;
 
