@@ -34,7 +34,7 @@ docker run -d --name kkterminal -p 3000:3000 zyyzyykk/kkterminal:1.0
 
 - https://ssh.kkbapps.com/
 
-![image-20231014200543821](C:\Users\86185\AppData\Roaming\Typora\typora-user-images\image-20231014200543821.png)
+![kkterminal](https://img.kkbapps.com/kkterminal-show.png)
 
 ### 更新记录
 
