@@ -26,6 +26,12 @@ docker run -d --name kkterminal -p 3000:3000 zyyzyykk/kkterminal:1.0
 
 3.在浏览器中访问：`http://你的服务器ip:3000/`
 
+4.自定义艺术字：`-e TITLE="自定义艺术字"`
+
+```sh
+docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kkterminal:1.0
+```
+
 ### 预览：
 
 访问以下网址：
