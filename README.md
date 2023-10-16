@@ -6,7 +6,7 @@
 >
 > 源码：http://git.kkbapps.com/kk/kkTerminal
 >
-> 预览：https://ssh.kkbpro.com/	或	https://ssh.kkbapps.com/
+> 预览：https://ssh.kkbapps.com/	或	https://ssh.kkbpro.com/	（第一次访问会有点慢）
 >
 > 更新时间：2023-10-14
 
@@ -28,11 +28,10 @@ docker run -d --name kkterminal -p 3000:3000 zyyzyykk/kkterminal:1.0
 
 ### 预览：
 
-访问一下网址：
-
-- https://ssh.kkbpro.com/ 
+访问以下网址：
 
 - https://ssh.kkbapps.com/
+- https://ssh.kkbpro.com/     （第一次访问会有点慢）
 
 ![kkterminal](https://img.kkbapps.com/kkterminal-show.png)
 
