@@ -24,7 +24,8 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import useClipboard from "vue-clipboard3";
+import { ref, onMounted, onUnmounted } from 'vue';
 import { encrypt, decrypt } from '@/Utils/Encrypt';
 
 import { Terminal } from 'xterm';
@@ -46,6 +47,10 @@ export default {
   },
   setup() {
 
+    // 拷贝
+    const { toClipboard } = useClipboard();
+
+    // 终端自适应
     const fitAddon = new FitAddon();
 
     // 加载环境变量
@@ -123,7 +128,7 @@ export default {
         // 输出
         if(result.code == 1) {
           term.write(decrypt(result.info));
-          fitAddon.fit();
+          // fitAddon.fit();
           // 设置回滚量
           term.options.scrollback += term._core.buffer.lines.length;
         }
@@ -155,16 +160,23 @@ export default {
       term.onKey(e => {
         // const printable = !e.domEvent.altKey && !e.domEvent.altGraphKey && !e.domEvent.ctrlKey && !e.domEvent.metaKey
         socket.value.send(e.key);
-      })
+      });
 
-      // 粘贴的情况 ??
-      // term.onData(key => {
-      //     // 仅仅这样判断 双 ascii 按键也会触发，不想要
-      //     if (key.length > 1) {
-      //         for (let i = 0; i < key.length; i++)
-      //             socket.value.send(key[i]);
-      //     }
-      // });
+      // 监听选中文本，自动复制
+      term.onSelectionChange(async () => {
+       if (term.hasSelection()) {
+        let copyText = term.getSelection();
+        let copyTextTrim = copyText.trim();
+        if(copyTextTrim && copyTextTrim != '') await toClipboard(copyText);
+       }
+      });
+
+      // 右键进行粘贴
+      terminal.value.addEventListener('contextmenu', async function(event) {
+        event.preventDefault();   // 阻止默认的上下文菜单弹出
+        let pasteText = await navigator.clipboard.readText();
+        socket.value.send(pasteText);
+      });
 
       term.write(now_connect_status.value);
     }
@@ -200,6 +212,10 @@ export default {
       window.addEventListener('resize', () => {
         termFit();
       });
+    });
+
+    onUnmounted(() => {
+      
     });
 
     return {
