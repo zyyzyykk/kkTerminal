@@ -25,7 +25,7 @@
 
 <script>
 import useClipboard from "vue-clipboard3";
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { encrypt, decrypt } from '@/Utils/Encrypt';
 
 import { Terminal } from 'xterm';
@@ -128,7 +128,7 @@ export default {
         // 输出
         if(result.code == 1) {
           term.write(decrypt(result.info));
-          // fitAddon.fit();
+          fitAddon.fit();
           // 设置回滚量
           term.options.scrollback += term._core.buffer.lines.length;
         }
@@ -178,6 +178,13 @@ export default {
         socket.value.send(pasteText);
       });
 
+      // 左键单击
+      terminal.value.addEventListener('click', function(event) {
+        event.preventDefault();
+        isShowSetting.value = false;
+      });
+
+
       term.write(now_connect_status.value);
     }
     const doSettings = (type) => {
@@ -212,10 +219,6 @@ export default {
       window.addEventListener('resize', () => {
         termFit();
       });
-    });
-
-    onUnmounted(() => {
-      
     });
 
     return {
