@@ -6,7 +6,7 @@
 >
 > 源码：http://git.kkbapps.com/kk/kkTerminal
 >
-> 预览：https://ssh.kkbpro.com/（国内）或	https://ssh.kkbapps.com/（国外）
+> 预览：https://ssh.kkbpro.com/	(国内)	或	https://ssh.kkbapps.com/	(国外)
 >
 > 更新时间：2023-10-19
 
