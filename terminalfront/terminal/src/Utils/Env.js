@@ -7,7 +7,7 @@ export const default_env = {
   // 样式相关
   bg:'#000000',
   fg:'#ECECEC',
-  fontFamily: 'Simsun',
+  fontFamily: 'Monospace',
   fontSize: 16,
   cursorStyle: 'block',
   cursorBlink: true,

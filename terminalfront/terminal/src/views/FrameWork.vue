@@ -115,7 +115,7 @@ export default {
           now_connect_status.value = connect_status.value['Fail'];
           term.write(now_connect_status.value);
           // 第一次使用
-          if(env.value.server_ip || env.value.server_ip == '') {
+          if(!env.value.server_ip || env.value.server_ip == '') {
             doSettings(1);
           }
         }
@@ -147,10 +147,20 @@ export default {
       env.value = {...env.value,...new_env};
       localStorage.setItem('env',encrypt(JSON.stringify(env.value)));
       doSettings(3);
-    } 
+    };
+
+
+    // 右键事件函数
+    const doPaste = async function(event) {
+      event.preventDefault();   // 阻止默认的上下文菜单弹出
+      let pasteText = await navigator.clipboard.readText();
+      socket.value.send(pasteText);
+    };
+
     // 重启终端
     const resetTerminal = () => {
-      if(term) terminal.value.innerHTML = '';
+      if(term && terminal.value) terminal.value.removeEventListener('contextmenu', doPaste);
+      terminal.value.innerHTML = '';
       loadEnv();
       initTerminal();
       term.open(terminal.value);
@@ -164,19 +174,15 @@ export default {
 
       // 监听选中文本，自动复制
       term.onSelectionChange(async () => {
-       if (term.hasSelection()) {
-        let copyText = term.getSelection();
-        let copyTextTrim = copyText.trim();
-        if(copyTextTrim && copyTextTrim != '') await toClipboard(copyText);
-       }
+        if (term.hasSelection()) {
+          let copyText = term.getSelection();
+          let copyTextTrim = copyText.trim();
+          if(copyTextTrim && copyTextTrim != '') await toClipboard(copyText);
+        }
       });
 
       // 右键进行粘贴
-      terminal.value.addEventListener('contextmenu', async function(event) {
-        event.preventDefault();   // 阻止默认的上下文菜单弹出
-        let pasteText = await navigator.clipboard.readText();
-        socket.value.send(pasteText);
-      });
+      terminal.value.addEventListener('contextmenu', doPaste);
 
       // 左键单击
       terminal.value.addEventListener('click', function(event) {
