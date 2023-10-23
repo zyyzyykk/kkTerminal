@@ -103,7 +103,7 @@ export default {
     const err_msg = ref('');
 
     // 字体列表
-    const fontFamilyList = ['Simsun','Consolas','Monospace','DejaVu Sans Mono','Source Code Pro','Inconsolata'];
+    const fontFamilyList = ['Monospace','Consolas','Courier','Liberation Mono'];
     // 字号列表
     const fontSizeList = [12,14,16,18,20];
     // 光标样式列表
