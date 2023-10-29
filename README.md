@@ -51,7 +51,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 
 ### 更新记录
 
-##### zyyzyykk/kkterminal:2.0 ：latest
+##### zyyzyykk/kkterminal:2.2 ：latest
+
+- 修复重启终端后出现的粘贴bug
+
+- 更改了可选择的字体样式
+
+##### zyyzyykk/kkterminal:2.0 ：
 
 增加在终端内复制粘贴功能：
 
@@ -61,4 +67,3 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 ##### zyyzyykk/kkterminal:1.0 ：
 
 提交官方镜像
-
