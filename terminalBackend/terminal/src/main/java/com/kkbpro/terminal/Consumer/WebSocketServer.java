@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.lalyos.jfiglet.FigletFont;
 import com.kkbpro.terminal.Config.AppConfig;
+import com.kkbpro.terminal.Constants.Enum.MessageInfoTypeRnum;
 import com.kkbpro.terminal.Constants.Enum.ResultCodeEnum;
 import com.kkbpro.terminal.Pojo.EnvInfo;
+import com.kkbpro.terminal.Pojo.MessageInfo;
 import com.kkbpro.terminal.Result.Result;
 import com.kkbpro.terminal.Utils.AesUtil;
 import com.kkbpro.terminal.Utils.StringUtil;
@@ -31,6 +33,9 @@ public class WebSocketServer {
     private Session sessionSocket = null;
 
     private SSHClient sshClient;
+
+
+    private net.schmizz.sshj.connection.channel.direct.Session.Shell shell = null;
 
     private InputStream shellInputStream;
 
@@ -91,7 +96,7 @@ public class WebSocketServer {
         net.schmizz.sshj.connection.channel.direct.Session sshSession = sshClient.startSession();
         sshSession.allocateDefaultPTY();
 
-        net.schmizz.sshj.connection.channel.direct.Session.Shell shell = sshSession.startShell();
+        shell = sshSession.startShell();
         shellInputStream = shell.getInputStream();
         shellOutputStream = shell.getOutputStream();
         shellOutThread = new Thread(() -> {
@@ -100,7 +105,7 @@ public class WebSocketServer {
             try {
                 while ((len = shellInputStream.read(buffer)) != -1) {
                     String shellOut = new String(buffer, 0, len, StandardCharsets.UTF_8);
-                    System.out.println(shellOut);
+                    // System.out.println(shellOut);
                     sendMessage(sessionSocket, shellOut,
                             "success", ResultCodeEnum.OUT_TEXT.getState());
                 }
@@ -129,8 +134,20 @@ public class WebSocketServer {
     // 从 Client 接收消息
     @OnMessage
     public void onMessage(String message) throws IOException {
-        shellOutputStream.write(message.getBytes(StandardCharsets.UTF_8));
-        shellOutputStream.flush();
+
+        message = AesUtil.aesDecrypt(message);
+        MessageInfo messageInfo = JSONObject.parseObject(message, MessageInfo.class);
+
+        if(MessageInfoTypeRnum.SIZE_CHANGE.getState().equals(messageInfo.getType())) {
+            shell.changeWindowDimensions(messageInfo.getCols(),messageInfo.getRows(),messageInfo.getCols(),messageInfo.getRows());
+            System.out.println(messageInfo.getCols() + " " + messageInfo.getRows());
+        }
+
+        if(MessageInfoTypeRnum.USER_TEXT.getState().equals(messageInfo.getType())) {
+            shellOutputStream.write(messageInfo.getContent().getBytes(StandardCharsets.UTF_8));
+            shellOutputStream.flush();
+        }
+
     }
 
     @OnError

@@ -97,12 +97,6 @@ export default {
       term.loadAddon(fitAddon);
     }
 
-    // 终端视高自适应
-    const termFit = () => {
-      terminal.value.style.height = (window.innerHeight - 27) + 'px';
-      fitAddon.fit();
-    }
-
     // websocket连接
     const socket = ref(null);
     const doSSHConnect = () => {
@@ -128,7 +122,7 @@ export default {
         // 输出
         if(result.code == 1) {
           term.write(decrypt(result.info));
-          fitAddon.fit();
+          // fitAddon.fit();
           // 设置回滚量
           term.options.scrollback += term._core.buffer.lines.length;
         }
@@ -139,6 +133,15 @@ export default {
         term.write("\r\n" + now_connect_status.value);
       }
     };
+
+    // 终端视高自适应
+    const termFit = () => {
+      terminal.value.style.height = (window.innerHeight - 27) + 'px';
+      // fitAddon.fit();
+      // fitAddon.proposeDimensions().cols
+      // 修改虚拟终端行列大小
+      if(socket.value && socket.value.readyState == WebSocket.OPEN && term) socket.value.send(encrypt(JSON.stringify({type:1,content:"",rows:fitAddon.proposeDimensions().rows,cols:fitAddon.proposeDimensions().cols})));
+    }
 
     // 终端信息设置
     const isShowSetting = ref(false);
@@ -159,7 +162,7 @@ export default {
     const doPaste = async function(event) {
       event.preventDefault();   // 阻止默认的上下文菜单弹出
       let pasteText = await navigator.clipboard.readText();
-      if(socket.value) socket.value.send(pasteText);
+      if(socket.value) socket.value.send(encrypt(JSON.stringify({type:0,content:pasteText,rows:0,cols:0})));
     };
 
     // 重启终端
@@ -174,7 +177,7 @@ export default {
       // 添加事件监听器，支持输入方法
       term.onKey(e => {
         // const printable = !e.domEvent.altKey && !e.domEvent.altGraphKey && !e.domEvent.ctrlKey && !e.domEvent.metaKey
-        if(socket.value) socket.value.send(e.key);
+        if(socket.value) socket.value.send(encrypt(JSON.stringify({type:0,content:e.key,rows:0,cols:0})));
       });
 
       // 监听选中文本，自动复制
