@@ -133,6 +133,11 @@ export default {
           term.options.scrollback += term._core.buffer.lines.length;
         }
       }
+      socket.value.onclose = () => {
+        socket.value = null;
+        now_connect_status.value = connect_status.value['Fail'];
+        term.write("\r\n" + now_connect_status.value);
+      }
     };
 
     // 终端信息设置
@@ -154,7 +159,7 @@ export default {
     const doPaste = async function(event) {
       event.preventDefault();   // 阻止默认的上下文菜单弹出
       let pasteText = await navigator.clipboard.readText();
-      socket.value.send(pasteText);
+      if(socket.value) socket.value.send(pasteText);
     };
 
     // 重启终端
@@ -169,7 +174,7 @@ export default {
       // 添加事件监听器，支持输入方法
       term.onKey(e => {
         // const printable = !e.domEvent.altKey && !e.domEvent.altGraphKey && !e.domEvent.ctrlKey && !e.domEvent.metaKey
-        socket.value.send(e.key);
+        if(socket.value) socket.value.send(e.key);
       });
 
       // 监听选中文本，自动复制
