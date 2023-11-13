@@ -1,16 +1,17 @@
 # kkTerminal
 
-> web终端实现ssh远程连接
+> web终端实现ssh远程连接服务器
 >
 > 作者：zyyzyykk
 >
 > 源码：http://git.kkbapps.com/kk/kkTerminal
 >
-> 预览：https://ssh.kkbpro.com/	(国内)	或	https://ssh.kkbapps.com/	(国外)
+> 预览：https://ssh.kkbpro.com/	(国内用户访问)	或	https://ssh.kkbapps.com/	(国外用户访问)
 >
-> 更新时间：2023-10-19
+> 更新时间：2023-11-14
+>
 
-### 快速引入
+### **⚡** 快速引入
 
 在html网页中使用 iframe 标签实现快速引入：
 
@@ -18,7 +19,7 @@
 <iframe src="https://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
 ```
 
-### 使用docker部署
+### 💪 使用docker部署
 
 1.拉取镜像：
 
@@ -40,18 +41,38 @@ docker run -d --name kkterminal -p 3000:3000 zyyzyykk/kkterminal
 docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kkterminal
 ```
 
-### 预览：
+### 🛸 预览：
 
 访问以下网址：
 
-- https://ssh.kkbpro.com/     （国内）
-- https://ssh.kkbapps.com/   （国外）
+- 🌐 国内用户访问：https://ssh.kkbpro.com/
+- 🌍 国外用户访问：https://ssh.kkbapps.com/
 
-![kkterminal](https://img.kkbapps.com/kkterminal-show.png)
+![kkterminal-概览](https://img.kkbapps.com/kkterminal-show.png)
 
-### 更新记录
+![kkterminal-功能](https://img.kkbapps.com/kkterminal-2.jpg)
 
-##### zyyzyykk/kkterminal:2.2 ：latest
+![kkterminal-样式设置](https://img.kkbapps.com/kkterminal-3.jpg)
+
+### 💡 功能说明
+
+1.kkTerminal是一个web端ssh连接服务器工具，点击右上角的终端图标，打开连接设置进行ssh连接设置
+
+2.支持自定义样式设置，可选择终端背/前景色，字体字号，光标显示样式
+
+3.支持重启，当修改ssh配置或自定义样式配置后，会自动重启；也可手动重启，适用于长时间无交互致使连接断开的情况
+
+4.文件上传下载的功能（**后续，暂未实现**）
+
+### 👨‍💻 更新记录
+
+##### zyyzyykk/kkterminal:2.5：latest
+
+- 新增长时间无交互导致断开连接的提示
+
+- 修复了终端窗口大小变化时由于命令过长导致的展示问题
+
+##### zyyzyykk/kkterminal:2.2 ：
 
 - 修复重启终端后出现的粘贴bug
 
@@ -67,3 +88,9 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 ##### zyyzyykk/kkterminal:1.0 ：
 
 提交官方镜像
+
+### 🏘️ 关于此项目
+
+作者：[zyyzyykk](https://github.com/zyyzyykk/)
+
+欢迎对此项目提出宝贵的意见或建议，也可以加入我们一起进行此项目的维护与开发
