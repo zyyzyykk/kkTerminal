@@ -105,7 +105,7 @@ public class WebSocketServer {
             try {
                 while ((len = shellInputStream.read(buffer)) != -1) {
                     String shellOut = new String(buffer, 0, len, StandardCharsets.UTF_8);
-                    // System.out.println(shellOut);
+                    System.out.println(shellOut);
                     sendMessage(sessionSocket, shellOut,
                             "success", ResultCodeEnum.OUT_TEXT.getState());
                 }
@@ -126,6 +126,8 @@ public class WebSocketServer {
             shellOutputStream.close();
         if(shellInputStream != null)
             shellInputStream.close();
+        if(shell != null)
+            shell.close();
         if(sshClient != null)
             sshClient.disconnect();
         sessionSocket = null;
@@ -138,11 +140,12 @@ public class WebSocketServer {
         message = AesUtil.aesDecrypt(message);
         MessageInfo messageInfo = JSONObject.parseObject(message, MessageInfo.class);
 
+        // 改变虚拟终端大小
         if(MessageInfoTypeRnum.SIZE_CHANGE.getState().equals(messageInfo.getType())) {
-            shell.changeWindowDimensions(messageInfo.getCols(),messageInfo.getRows(),messageInfo.getCols(),messageInfo.getRows());
-            System.out.println(messageInfo.getCols() + " " + messageInfo.getRows());
+             shell.changeWindowDimensions(messageInfo.getCols(),messageInfo.getRows(),0,0);
         }
 
+        // 文本命令
         if(MessageInfoTypeRnum.USER_TEXT.getState().equals(messageInfo.getType())) {
             shellOutputStream.write(messageInfo.getContent().getBytes(StandardCharsets.UTF_8));
             shellOutputStream.flush();
