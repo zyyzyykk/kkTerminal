@@ -72,6 +72,7 @@ export default {
     // 终端
     const terminal = ref();
     let term = null;
+    const isFirst = ref(true);
     const initTerminal = () => {
       term = new Terminal({
         rendererType: "canvas",                               // 渲染类型
@@ -101,21 +102,22 @@ export default {
     const termFit = () => {
       terminal.value.style.height = (window.innerHeight - 27) + 'px';
       fitAddon.fit();
-      // // 修改虚拟终端行列大小
-      // if(socket.value && socket.value.readyState == WebSocket.OPEN && term) {
-      //   let new_rows = fitAddon.proposeDimensions().rows;
-      //   let new_cols = fitAddon.proposeDimensions().cols;
-      //   socket.value.send(encrypt(JSON.stringify({type:1,content:"",rows:new_rows,cols:new_cols})));
-      // }
+      // 修改虚拟终端行列大小
+      if(socket.value && socket.value.readyState == WebSocket.OPEN && term) {
+        let new_rows = fitAddon.proposeDimensions().rows;
+        let new_cols = fitAddon.proposeDimensions().cols;
+        socket.value.send(encrypt(JSON.stringify({type:1,content:"",rows:new_rows,cols:new_cols})));
+        term.resize(new_cols,new_rows);
+      }
     }
 
     // websocket连接
     const socket = ref(null);
     const doSSHConnect = () => {
       socket.value = new WebSocket(base_url + changeStr(encrypt(JSON.stringify(env.value))));
-      // socket.value.onopen = () => {
-      //   termFit();
-      // }
+      socket.value.onopen = () => {
+        termFit();
+      }
       socket.value.onmessage = resp => {
         let result = JSON.parse(resp.data);
         // 连接失败
@@ -137,13 +139,11 @@ export default {
         // 输出
         if(result.code == 1) {
           term.write(decrypt(result.info));
-          fitAddon.fit();
           // 设置回滚量
           term.options.scrollback += term._core.buffer.lines.length;
         }
       }
       socket.value.onclose = () => {
-        socket.value = null;
         now_connect_status.value = connect_status.value['Fail'];
         term.write("\r\n" + now_connect_status.value);
       }
@@ -175,6 +175,7 @@ export default {
     const resetTerminal = () => {
       if(term && terminal.value) terminal.value.removeEventListener('contextmenu', doPaste);
       terminal.value.innerHTML = '';
+      isFirst.value = true;
       loadEnv();
       initTerminal();
       term.open(terminal.value);
@@ -183,7 +184,14 @@ export default {
       // 添加事件监听器，支持输入方法
       term.onKey(e => {
         // const printable = !e.domEvent.altKey && !e.domEvent.altGraphKey && !e.domEvent.ctrlKey && !e.domEvent.metaKey
-        if(socket.value) socket.value.send(encrypt(JSON.stringify({type:0,content:e.key,rows:0,cols:0})));
+        if(socket.value) {
+          // 重启后第一次输入
+          if(isFirst.value) {
+            termFit();
+            isFirst.value = false;
+          }
+          socket.value.send(encrypt(JSON.stringify({type:0,content:e.key,rows:0,cols:0})));
+        }
       });
 
       // 监听选中文本，自动复制
@@ -203,7 +211,6 @@ export default {
         event.preventDefault();
         isShowSetting.value = false;
       });
-
 
       term.write(now_connect_status.value);
     }
