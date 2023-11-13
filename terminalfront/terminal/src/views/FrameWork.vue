@@ -97,10 +97,25 @@ export default {
       term.loadAddon(fitAddon);
     }
 
+    // 终端视高自适应
+    const termFit = () => {
+      terminal.value.style.height = (window.innerHeight - 27) + 'px';
+      fitAddon.fit();
+      // // 修改虚拟终端行列大小
+      // if(socket.value && socket.value.readyState == WebSocket.OPEN && term) {
+      //   let new_rows = fitAddon.proposeDimensions().rows;
+      //   let new_cols = fitAddon.proposeDimensions().cols;
+      //   socket.value.send(encrypt(JSON.stringify({type:1,content:"",rows:new_rows,cols:new_cols})));
+      // }
+    }
+
     // websocket连接
     const socket = ref(null);
     const doSSHConnect = () => {
       socket.value = new WebSocket(base_url + changeStr(encrypt(JSON.stringify(env.value))));
+      // socket.value.onopen = () => {
+      //   termFit();
+      // }
       socket.value.onmessage = resp => {
         let result = JSON.parse(resp.data);
         // 连接失败
@@ -122,7 +137,7 @@ export default {
         // 输出
         if(result.code == 1) {
           term.write(decrypt(result.info));
-          // fitAddon.fit();
+          fitAddon.fit();
           // 设置回滚量
           term.options.scrollback += term._core.buffer.lines.length;
         }
@@ -133,15 +148,6 @@ export default {
         term.write("\r\n" + now_connect_status.value);
       }
     };
-
-    // 终端视高自适应
-    const termFit = () => {
-      terminal.value.style.height = (window.innerHeight - 27) + 'px';
-      // fitAddon.fit();
-      // fitAddon.proposeDimensions().cols
-      // 修改虚拟终端行列大小
-      if(socket.value && socket.value.readyState == WebSocket.OPEN && term) socket.value.send(encrypt(JSON.stringify({type:1,content:"",rows:fitAddon.proposeDimensions().rows,cols:fitAddon.proposeDimensions().cols})));
-    }
 
     // 终端信息设置
     const isShowSetting = ref(false);
