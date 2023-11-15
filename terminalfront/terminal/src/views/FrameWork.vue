@@ -66,6 +66,7 @@ export default {
       'Fail':'Fail to connect kk server !\r\n',
       'Success':'Connecting success !\r\n',
       'Connecting':'Connecting to kk server ...\r\n',
+      'Disconnected':'Disconnect to kk server.\r\n',
     })
     const now_connect_status = ref(connect_status.value['Connecting']);
 
@@ -144,8 +145,10 @@ export default {
         }
       }
       socket.value.onclose = () => {
-        now_connect_status.value = connect_status.value['Fail'];
-        term.write("\r\n" + now_connect_status.value);
+        if(now_connect_status.value == connect_status.value['Success']) {
+          now_connect_status.value = connect_status.value['Disconnected'];
+          term.write("\r\n" + now_connect_status.value);
+        }
       }
     };
 
