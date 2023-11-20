@@ -22,14 +22,20 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @ServerEndpoint("/socket/ssh/{env}")  // 注意不要以'/'结尾
 public class WebSocketServer {
 
+    public static ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
+
     private static AppConfig appConfig;
 
     private Session sessionSocket = null;
+
+    private String sshKey = null;
 
     private SSHClient sshClient;
 
@@ -55,7 +61,7 @@ public class WebSocketServer {
         // 建立 web-socket 连接
         this.sessionSocket = sessionSocket;
         // 设置最大空闲超时
-        sessionSocket.setMaxIdleTimeout(appConfig.getMaxIdleTimeout());
+         sessionSocket.setMaxIdleTimeout(appConfig.getMaxIdleTimeout());
 
         // 与服务器建立连接
         String host = envInfo.getServer_ip();
@@ -76,8 +82,10 @@ public class WebSocketServer {
             return;
         }
 
-        // 连接成功
-        sendMessage(sessionSocket,"Connecting success !","success", ResultCodeEnum.CONNECT_SUCCESS.getState());
+        // 连接成功，生成key标识
+        sshKey = UUID.randomUUID().toString();
+        sendMessage(sessionSocket,sshKey,"success", ResultCodeEnum.CONNECT_SUCCESS.getState());
+        sshClientMap.put(sshKey,sshClient);
         // 欢迎语
         sendMessage(sessionSocket, appConfig.getWelcome() + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
         // github源地址
@@ -131,6 +139,10 @@ public class WebSocketServer {
         if(sshClient != null)
             sshClient.disconnect();
         sessionSocket = null;
+        if(sshKey != null) {
+            sshClientMap.remove(sshKey);
+            sshKey = null;
+        }
     }
 
     // 从 Client 接收消息
