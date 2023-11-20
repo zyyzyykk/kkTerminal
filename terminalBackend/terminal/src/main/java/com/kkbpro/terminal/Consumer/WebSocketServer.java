@@ -22,7 +22,6 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 
 @Component
 @ServerEndpoint("/socket/ssh/{env}")  // 注意不要以'/'结尾
@@ -33,7 +32,6 @@ public class WebSocketServer {
     private Session sessionSocket = null;
 
     private SSHClient sshClient;
-
 
     private net.schmizz.sshj.connection.channel.direct.Session.Shell shell = null;
 
@@ -56,6 +54,8 @@ public class WebSocketServer {
 
         // 建立 web-socket 连接
         this.sessionSocket = sessionSocket;
+        // 设置最大空闲超时
+        sessionSocket.setMaxIdleTimeout(appConfig.getMaxIdleTimeout());
 
         // 与服务器建立连接
         String host = envInfo.getServer_ip();
