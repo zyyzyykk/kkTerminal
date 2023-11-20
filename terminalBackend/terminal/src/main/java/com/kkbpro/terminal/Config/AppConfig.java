@@ -31,4 +31,11 @@ public class AppConfig {
     @Value("${kk.title:}")
     private String title;
 
+    /**
+     * 最大空闲超时
+     */
+    @Value("${kk.max-idle-timeout:}")
+    private Integer MaxIdleTimeout;
+
+
 }
