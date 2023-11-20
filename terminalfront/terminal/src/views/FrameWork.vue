@@ -1,5 +1,9 @@
 <template>
   <div class="golbal">
+
+    <!-- 临时设置 -->
+    <FileBlock :sshKey="sshKey" ></FileBlock>
+
     <!-- 设置栏 -->
     <div class="setting" v-show="isShowSetting" >
       <div class="setting-menu" @click="doSettings(1)" ><div>连接设置</div></div>
@@ -38,12 +42,14 @@ import { changeStr } from '@/Utils/StringUtil';
 
 import ConnectSetting from '@/components/ConnectSetting.vue';
 import StyleSetting from '@/components/StyleSetting.vue';
+import FileBlock from "@/components/FileBlock.vue";
 
 export default {
   name: "FrameWork",
   components: {
     ConnectSetting,
     StyleSetting,
+    FileBlock,
   },
   setup() {
 
@@ -113,6 +119,7 @@ export default {
     }
 
     // websocket连接
+    const sshKey = ref(''); 
     const socket = ref(null);
     const doSSHConnect = () => {
       socket.value = new WebSocket(base_url + changeStr(encrypt(JSON.stringify(env.value))));
@@ -135,6 +142,7 @@ export default {
         if(result.code == 0) {
           term.clear();
           now_connect_status.value = connect_status.value['Success'];
+          sshKey.value = decrypt(result.info);
           // term.write(now_connect_status.value);
         }
         // 输出
@@ -263,6 +271,7 @@ export default {
       connectSettingRef,
       styleSettingRef,
       saveEnv,
+      sshKey,
     }
 
   }
