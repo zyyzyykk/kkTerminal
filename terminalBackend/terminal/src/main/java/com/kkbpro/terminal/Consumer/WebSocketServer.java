@@ -30,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketServer {
 
     public static ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
-
     private static AppConfig appConfig;
 
     private Session sessionSocket = null;
@@ -72,6 +71,7 @@ public class WebSocketServer {
         sshClient = new SSHClient();
 
         try {
+            sshClient.setConnectTimeout(appConfig.getSshMaxTimeout());
             sshClient.addHostKeyVerifier(new PromiscuousVerifier());    // 不验证主机密钥
             sshClient.connect(host,port);
             sshClient.authPassword(user_name, password);                // 使用用户名和密码进行身份验证

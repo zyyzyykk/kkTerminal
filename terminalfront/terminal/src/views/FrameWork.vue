@@ -37,7 +37,7 @@ import { FitAddon } from 'xterm-addon-fit'
 import "xterm/css/xterm.css";
 
 import { default_env } from '@/Utils/Env';
-import base_url from '@/Utils/BaseUrl';
+import { ws_base_url } from '@/Utils/BaseUrl';
 import { changeStr } from '@/Utils/StringUtil';
 
 import ConnectSetting from '@/components/ConnectSetting.vue';
@@ -122,7 +122,7 @@ export default {
     const sshKey = ref(''); 
     const socket = ref(null);
     const doSSHConnect = () => {
-      socket.value = new WebSocket(base_url + changeStr(encrypt(JSON.stringify(env.value))));
+      socket.value = new WebSocket(ws_base_url + changeStr(encrypt(JSON.stringify(env.value))));
       socket.value.onopen = () => {
         termFit();
       }

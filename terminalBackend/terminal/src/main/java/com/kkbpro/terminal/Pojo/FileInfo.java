@@ -4,20 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 /**
- * 服务器相关
+ * 文件信息
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EnvInfo {
-    private String server_ip;
+public class FileInfo {
 
-    private Integer server_port;
+    // 文件名
+    private String name;
 
-    private String server_user;
-
-    private String server_password;
+    // 是否为文件夹
+    private Boolean type;
 
 }
