@@ -52,7 +52,7 @@ export default {
         var a = document.createElement('a');
 
         // 设置 href 和 download 属性
-        a.href = 'http://localhost:3000/api/daaaaaFile?sshKey=' + props.sshKey + '&fileName=terminal.jar';
+        a.href = 'http://localhost:3000/api/download/ffmpeg.7z' + '?sshKey=' + props.sshKey + '&fileName=terminal.jar';
         a.download = "terminal.jar";
 
         // 添加 click 事件监听器以在下载开始时执行自定义语句
