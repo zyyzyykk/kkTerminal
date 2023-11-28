@@ -32,7 +32,13 @@ public class AppConfig {
     private String title;
 
     /**
-     * 最大空闲超时
+     * ssh连接最大超时时间 ms
+     */
+    @Value("${kk.ssh-max-timeout:}")
+    private Integer SshMaxTimeout;
+
+    /**
+     * websocket最大空闲超时 ms
      */
     @Value("${kk.max-idle-timeout:}")
     private Integer MaxIdleTimeout;

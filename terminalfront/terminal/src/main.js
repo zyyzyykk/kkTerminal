@@ -26,5 +26,8 @@ app.mount('#app');
 import './assets/base.css'
 
 
+
+
+
 //用于去掉eazyplayer警告,开发时禁用，打包开启
 app.config.warnHandler = () => {}
