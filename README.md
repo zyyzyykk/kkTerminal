@@ -1,4 +1,4 @@
-# kkTerminal
+# [<img src="https://img.kkbapps.com/kkterminal-show.png" alt="缩略图描述" style="zoom:4%;" />](https://img.kkbapps.com/kkterminal-show.png)kkTerminal
 
 > kkTerminal，一个web终端实现ssh远程连接服务器
 >
