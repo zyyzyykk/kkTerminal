@@ -1,12 +1,14 @@
 # kkTerminal
 
-> web终端实现ssh远程连接服务器
+> kkTerminal，一个web终端实现ssh远程连接服务器
+>
+> kkTerminal, a web-based terminal for SSH remote server connection.
 >
 > 作者：[zyyzyykk](https://github.com/zyyzyykk/)
 >
 > 源码：http://git.kkbapps.com/kk/kkTerminal
 >
-> 预览：https://ssh.kkbpro.com/	(国内用户访问)	或	https://ssh.kkbapps.com/	(国外用户访问)
+> 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
 > 更新时间：2023-11-14
 >
@@ -45,8 +47,8 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 
 访问以下网址：
 
-- 🌐 国内用户访问：https://ssh.kkbpro.com/
-- 🌍 国外用户访问：https://ssh.kkbapps.com/
+- 🌐 国内服务器访问：https://ssh.kkbpro.com/
+- 🌍 国外服务器访问：https://ssh.kkbapps.com/
 
 ![kkterminal-概览](https://img.kkbapps.com/kkterminal-show.png)
 

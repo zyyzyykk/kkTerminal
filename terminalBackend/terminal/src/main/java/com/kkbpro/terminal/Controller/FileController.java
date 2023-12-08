@@ -5,10 +5,6 @@ import com.kkbpro.terminal.Pojo.FileInfo;
 import com.kkbpro.terminal.Result.Result;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.*;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,23 +27,21 @@ public class FileController {
      * 下载文件
      */
     @GetMapping("/download/{fileName}")
-    public ResponseEntity<byte[]> downloadFile(HttpServletResponse response, String sshKey, String path, @PathVariable String fileName) throws IOException {
+    public void downloadFile(HttpServletResponse response, String sshKey, String path, @PathVariable String fileName) throws IOException {
 
         SSHClient sshClient = WebSocketServer.sshClientMap.get(sshKey);
         String remoteFilePath = path + fileName;
 
         // 构建 HTTP 响应，触发文件下载
+        response.setHeader("Content-Type", "application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
         readRemoteFile(sshClient, remoteFilePath,response);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", fileName);
-        return new ResponseEntity<>(null, headers, HttpStatus.OK);
     }
     private void readRemoteFile(SSHClient ssh, String remoteFilePath, HttpServletResponse response) throws IOException {
         try (SFTPClient sftp = ssh.newSFTPClient()) {
             try (RemoteFile file = sftp.open(remoteFilePath)) {
                 try (InputStream is = file.new RemoteFileInputStream()) {
-                    byte[] buffer = new byte[8192];
+                    byte[] buffer = new byte[8096];
                     int bytesRead;
                     while ((bytesRead = is.read(buffer)) != -1) {
                         // 逐块传输至前端
@@ -96,6 +90,31 @@ public class FileController {
         map.put("path",path);
         return Result.setSuccess(200,"首次路径",map);
     }
+
+
+
+//    private static void uploadFile(SFTPClient sftpClient, String localFilePath, String remoteFilePath) throws IOException {
+//        File localFile = new File(localFilePath);
+//        long fileSize = localFile.length();
+//        long uploadedSize = 0;
+//
+//        try (var inputStream = Files.newInputStream(Path.of(localFilePath), StandardOpenOption.READ)) {
+//            while (uploadedSize < fileSize) {
+//                int chunkSize = (int) Math.min(CHUNK_SIZE, fileSize - uploadedSize);
+//                byte[] chunk = new byte[chunkSize];
+//                inputStream.read(chunk);
+//
+//                sftpClient.put(new String(chunk), remoteFilePath, null, SFTPClient.OVERWRITE);
+//
+//                uploadedSize += chunkSize;
+//                System.out.println("Uploaded: " + uploadedSize + " / " + fileSize);
+//            }
+//        } catch (SFTPException e) {
+//            if (e.getStatusCode() != StatusCode.EOF) {
+//                throw e;
+//            }
+//        }
+//    }
 
 
 }
