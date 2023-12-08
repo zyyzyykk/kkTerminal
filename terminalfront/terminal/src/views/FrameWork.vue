@@ -7,7 +7,8 @@
     <!-- 设置栏 -->
     <div class="setting" v-show="isShowSetting" >
       <div class="setting-menu" @click="doSettings(1)" ><div>连接设置</div></div>
-      <div class="setting-menu" @click="doSettings(2)" ><div>样式设置</div></div>
+      <div class="setting-menu" @click="doSettings(2)" ><div>偏好设置</div></div>
+      <div class="setting-menu" @click="doSettings(4)" ><div>文件管理</div></div>
       <div class="setting-menu" @click="doSettings(3)" ><div>重启</div></div>
     </div>
     <div class="bar">
@@ -24,6 +25,8 @@
   <ConnectSetting ref="connectSettingRef" :env="env" @callback="saveEnv" ></ConnectSetting>
   <!-- 样式设置 -->
   <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" ></StyleSetting>
+  <!-- 样式设置 -->
+  <FileBlock ref="fileBlockRef" :sshKey="sshKey" @doHeartBeat="doHeartBeat" ></FileBlock>
 
 </template>
 
@@ -167,6 +170,7 @@ export default {
     };
     const connectSettingRef = ref();
     const styleSettingRef = ref();
+    const fileBlockRef = ref();
     // 保存更改的环境变量
     const saveEnv = (new_env) => {
       env.value = {...env.value,...new_env};
@@ -194,8 +198,9 @@ export default {
 
       // 添加事件监听器，支持输入方法
       term.onKey(e => {
-        // const printable = !e.domEvent.altKey && !e.domEvent.altGraphKey && !e.domEvent.ctrlKey && !e.domEvent.metaKey
         if(socket.value) {
+          // TODO kkterminal快捷键判断
+          // if(chargeKey(e)) return;
           // 重启后第一次输入
           if(isFirst.value) {
             termFit();
@@ -225,6 +230,8 @@ export default {
 
       term.write(now_connect_status.value);
     }
+    
+    // 终端设置
     const doSettings = (type) => {
       // 连接设置
       if(type == 1) {
@@ -243,6 +250,19 @@ export default {
         if(socket.value) socket.value.close();
         doSSHConnect();
         resetTerminal();
+      }
+      // 文件管理
+      else if(type == 4) {
+        isShowSetting.value = false;
+        fileBlockRef.value.DialogVisilble = true;
+        fileBlockRef.value.getInitDir();
+      }
+    }
+
+    // 文件下载中进行心跳续约
+    const doHeartBeat = () => {
+      if(socket.value && socket.value.readyState == WebSocket.OPEN) {
+        socket.value.send(encrypt(JSON.stringify({type:2,content:"",rows:0,cols:0})));
       }
     }
 
@@ -270,8 +290,10 @@ export default {
       doSettings,
       connectSettingRef,
       styleSettingRef,
+      fileBlockRef,
       saveEnv,
       sshKey,
+      doHeartBeat,
     }
 
   }
@@ -324,7 +346,7 @@ export default {
   width: 80px;
   height: 25px;
   font-size: 13px;
-  color: #555;
+  color: #666666;
 }
 
 .setting-menu:hover {

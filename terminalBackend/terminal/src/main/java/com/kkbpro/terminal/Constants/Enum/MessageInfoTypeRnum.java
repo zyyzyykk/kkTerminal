@@ -5,7 +5,10 @@ public enum MessageInfoTypeRnum {
 
     USER_TEXT(0,"用户输入的文本"),
 
-    SIZE_CHANGE(1,"改变虚拟终端大小");
+    SIZE_CHANGE(1,"改变虚拟终端大小"),
+
+
+    HEART_BEAT(2,"进行心跳续约");
 
     private Integer state;
 
