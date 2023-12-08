@@ -26,7 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@ServerEndpoint("/socket/ssh/{env}")  // 注意不要以'/'结尾
+@ServerEndpoint("/ssh/{env}")  // 注意不要以'/'结尾
 public class WebSocketServer {
 
     public static ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
@@ -161,6 +161,10 @@ public class WebSocketServer {
         if(MessageInfoTypeRnum.USER_TEXT.getState().equals(messageInfo.getType())) {
             shellOutputStream.write(messageInfo.getContent().getBytes(StandardCharsets.UTF_8));
             shellOutputStream.flush();
+        }
+        // 心跳续约
+        if(MessageInfoTypeRnum.HEART_BEAT.getState().equals(messageInfo.getType())) {
+            System.out.println("心跳续约");
         }
 
     }
