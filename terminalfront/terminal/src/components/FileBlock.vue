@@ -27,13 +27,13 @@
                 <div v-for="item in files" :key="item.name" >
                   <template v-if="item.type == true">
                     <div class="item-class" @click="changeDir(dir + item.name + '/')" >
-                      <!-- <FileIcons :name="item.name" width="20" height="20" :isFloder="item.type" /> -->
+                      <FileIcons :name="item.name" width="20" height="20" :isFloder="item.type" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
                   </template>
                   <template v-else>
                     <div :class="['item-class', item.name == aimFileName ? 'item-selected' : '']" @click="aimFileName = item.name" @dblclick="downloadFile(item.name)" >
-                      <!-- <FileIcons :name="item.name" width="20" height="20" :isFloder="item.type" /> -->
+                      <FileIcons :name="item.name" width="20" height="20" :isFloder="item.type" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
                   </template>
@@ -55,13 +55,13 @@ import { http_base_url } from '@/Utils/BaseUrl';
 import NoData from '@/components/NoData';
 
 // 引入文件图标组件
-// import FileIcons from 'vue-file-icons'
+import FileIcons from 'vue-file-icons'
 
 export default {
   name:'FileBlock',
   components: {
     NoData,
-    // FileIcons,
+    FileIcons,
   },
   props:['sshKey'],
   setup(props,context) {
