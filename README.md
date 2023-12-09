@@ -1,4 +1,4 @@
-# [<img src="https://img.kkbapps.com/kkterminal-show.png" alt="缩略图描述" style="zoom:4%;" />](https://img.kkbapps.com/kkterminal-show.png)kkTerminal
+# kkTerminal
 
 > kkTerminal，一个web终端实现ssh远程连接服务器
 >
@@ -64,7 +64,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 
 3.支持窗口大小自适应
 
-4.支持自定义样式设置，可选择终端的背/前景色，字体字号，光标显示样式
+4.支持自定义偏好设置，可选择终端的背/前景色，字体字号，光标显示样式
 
 5.支持重启，当修改ssh配置或自定义样式配置后，会自动重启；也可手动重启，适用于长时间无交互致使连接断开的情况
 
