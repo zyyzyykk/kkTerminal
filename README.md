@@ -8,6 +8,8 @@
 >
 > 源码：http://git.kkbapps.com/kk/kkTerminal
 >
+> docker仓库地址：https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general
+>
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
 > 更新时间：2023-11-14
@@ -60,11 +62,11 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 
 1.kkTerminal是一个web端ssh远程连接服务器的工具，点击右上角的终端图标，打开连接设置进行ssh连接设置
 
-2.支持在网页中使用 iframe 标签引入，可快速集成到第三方网站中；
+2.支持在网页中使用 iframe 标签引入，可快速集成到第三方网站中
 
 3.支持窗口大小自适应
 
-4.支持自定义偏好设置，可选择终端的背/前景色，字体字号，光标显示样式
+4.支持自定义偏好设置，可选择终端的背/前景色、字体字号、光标显示样式
 
 5.支持重启，当修改ssh配置或自定义样式配置后，会自动重启；也可手动重启，适用于长时间无交互致使连接断开的情况
 
