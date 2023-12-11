@@ -1,6 +1,8 @@
 package com.kkbpro.terminal.Controller;
 
+import com.kkbpro.terminal.Constants.Enum.FileUploadStateEnum;
 import com.kkbpro.terminal.Consumer.WebSocketServer;
+import com.kkbpro.terminal.Pojo.Dto.FileUploadInfo;
 import com.kkbpro.terminal.Pojo.FileInfo;
 import com.kkbpro.terminal.Result.Result;
 import net.schmizz.sshj.SSHClient;
@@ -13,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -93,71 +94,59 @@ public class FileController {
         return Result.setSuccess(200,"首次路径",map);
     }
 
-
-
-//    @GetMapping("/pwdddd")
-//    public Result dddpwd(String sshKey) throws IOException {
-//
-//        String path = "/";
-//        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
-//        try (SFTPClient sftp = ssh.newSFTPClient()) {
-//            path = sftp.canonicalize(".");
-//            sftp.rename();
-//
-//        }
-//        Map<String,Object> map = new HashMap<>();
-//        map.put("path",path);
-//        return Result.setSuccess(200,"首次路径",map);
-//    }
-
+    private final String folderBasePath = System.getProperty("user.dir") + "/src/main/resources/static/file";
 
     @PostMapping("/upload")
-    public void uploadFile(MultipartFile file, String sshKey, String SFTP_REMOTE_DIR) throws IOException {
+    public Result uploadFile(FileUploadInfo fileUploadInfo) throws IOException {
+
+        String sshKey = fileUploadInfo.getSshKey();
+        MultipartFile file = fileUploadInfo.getFile();
+        String path = fileUploadInfo.getPath();
+        String id = fileUploadInfo.getId();
+        Integer chunks = fileUploadInfo.getChunks();
+        Integer chunk = fileUploadInfo.getChunk();
+
+        String fileName = file.getOriginalFilename();
+        String folderPath = folderBasePath + "/" + sshKey + "-" + id;
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("chunk",chunk);
+        map.put("chunks",chunks);
+        map.put("id",id);
+        map.put("fileName",fileName);
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
 
         try (SFTPClient sftpClient = ssh.newSFTPClient()) {
-            String fileName = file.getOriginalFilename();
-            String uniqueIdentifier = generateUniqueIdentifier();
-
-            // Create a temporary directory for storing the file chunks
-            File tempDir = new File(System.getProperty("java.io.tmpdir"), uniqueIdentifier);
-            if (!tempDir.exists()) {
-                tempDir.mkdirs();
+            File temporaryFolder = new File(folderPath);
+            File temporaryFile = new File(folderPath + "/" + chunk + "-" + fileName);
+            // 如果文件夹不存在则创建
+            if (!temporaryFolder.exists()) {
+                temporaryFolder.mkdirs();
+            }
+            // 如果文件存在则删除
+            if (temporaryFile.exists()) {
+                temporaryFile.delete();
+            }
+            try {
+                file.transferTo(temporaryFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return Result.setError(FileUploadStateEnum.UPLOAD_ERROR.getState(), "文件片上传失败", map);
             }
 
-            // Split the file into chunks and upload each chunk
-            byte[] buffer = new byte[1024 * 1024]; // 1MB buffer size
-            int chunkIndex = 0;
-            try (FileOutputStream outputStream = new FileOutputStream(new File(tempDir, String.valueOf(chunkIndex)))) {
-                int bytesRead;
-                while ((bytesRead = file.getInputStream().read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                    chunkIndex++;
-                }
+            // 上传完毕
+            if(chunk.equals(chunks))
+            {
+                // 将文件片合并
+
+                sftpClient.put(folderPath + "/" + fileName, path + fileName);
+                return Result.setSuccess(FileUploadStateEnum.FILE_UPLOAD_SUCCESS.getState(), "文件上传完成",map);
             }
-
-            // Upload each chunk to the remote directory
-            for (int i = 0; i < chunkIndex; i++) {
-                File chunkFile = new File(tempDir, String.valueOf(i));
-                // 将切片文件上传到远程目录
-                sftpClient.put(chunkFile.getAbsolutePath(), SFTP_REMOTE_DIR + uniqueIdentifier + "/" + chunkFile.getName());
+            else {
+                return Result.setSuccess(FileUploadStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功", map);
             }
-
-            // Merge the chunks into a single file on the remote server
-            // 将切片合并成一个完整的文件在远程服务器上
-            sftpClient.rename(SFTP_REMOTE_DIR + uniqueIdentifier, SFTP_REMOTE_DIR + fileName);
-
-
-            // Delete the temporary directory
-            deleteDirectory(tempDir);
         }
-    }
-
-    private String generateUniqueIdentifier() {
-        // Generate a unique identifier for the file chunks
-        // You can use a UUID or any other method to generate a unique identifier
-        return UUID.randomUUID().toString();
     }
 
     private void deleteDirectory(File directory) {
@@ -172,46 +161,5 @@ public class FileController {
         }
         directory.delete();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    private static void uploadFile(SFTPClient sftpClient, String localFilePath, String remoteFilePath) throws IOException {
-//        File localFile = new File(localFilePath);
-//        long fileSize = localFile.length();
-//        long uploadedSize = 0;
-//
-//        try (var inputStream = Files.newInputStream(Path.of(localFilePath), StandardOpenOption.READ)) {
-//            while (uploadedSize < fileSize) {
-//                int chunkSize = (int) Math.min(CHUNK_SIZE, fileSize - uploadedSize);
-//                byte[] chunk = new byte[chunkSize];
-//                inputStream.read(chunk);
-//
-//                sftpClient.put(new String(chunk), remoteFilePath, null, SFTPClient.OVERWRITE);
-//
-//                uploadedSize += chunkSize;
-//                System.out.println("Uploaded: " + uploadedSize + " / " + fileSize);
-//            }
-//        } catch (SFTPException e) {
-//            if (e.getStatusCode() != StatusCode.EOF) {
-//                throw e;
-//            }
-//        }
-//    }
-
 
 }
