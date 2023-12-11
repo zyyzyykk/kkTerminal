@@ -22,18 +22,18 @@
             <div class="hover-class" @click="doUpload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
           </div>
         </div>
-        <div class="list-class">
+        <div class="list-class no-select">
             <div v-if="files.length != 0">
                 <div v-for="item in files" :key="item.name" >
-                  <template v-if="item.type == true">
-                    <div class="item-class" @click="changeDir(dir + item.name + '/')" >
-                      <FileIcons :name="item.name" width="20" height="20" :isFloder="item.type" />
+                  <template v-if="item.isDirectory == true">
+                    <div class="item-class" @dblclick="changeDir(dir + item.name + '/')" >
+                      <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
                   </template>
                   <template v-else>
                     <div :class="['item-class', item.name == aimFileName ? 'item-selected' : '']" @click="aimFileName = item.name" @dblclick="downloadFile(item.name)" >
-                      <FileIcons :name="item.name" width="20" height="20" :isFloder="item.type" />
+                      <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
                   </template>
@@ -55,7 +55,7 @@ import { http_base_url } from '@/Utils/BaseUrl';
 import NoData from '@/components/NoData';
 
 // 引入文件图标组件
-import FileIcons from 'vue-file-icons'
+import FileIcons from 'file-icons-vue'
 
 export default {
   name:'FileBlock',
@@ -240,6 +240,10 @@ export default {
 .item-selected
 {
   background-color: #f3f3f3;
+}
+
+.no-select {
+  user-select: none;
 }
 
 

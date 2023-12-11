@@ -7,15 +7,16 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 文件上传下载接口类
@@ -66,7 +67,8 @@ public class FileController {
             for(RemoteResourceInfo file : files) {
                 FileInfo fileInfo = new FileInfo();
                 fileInfo.setName(file.getName());
-                fileInfo.setType(file.isDirectory());
+                fileInfo.setIsDirectory(file.isDirectory());
+                fileInfo.setAttributes(file.getAttributes());
                 fileInfoList.add(fileInfo);
             }
         }
@@ -90,6 +92,101 @@ public class FileController {
         map.put("path",path);
         return Result.setSuccess(200,"首次路径",map);
     }
+
+
+
+//    @GetMapping("/pwdddd")
+//    public Result dddpwd(String sshKey) throws IOException {
+//
+//        String path = "/";
+//        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+//        try (SFTPClient sftp = ssh.newSFTPClient()) {
+//            path = sftp.canonicalize(".");
+//            sftp.rename();
+//
+//        }
+//        Map<String,Object> map = new HashMap<>();
+//        map.put("path",path);
+//        return Result.setSuccess(200,"首次路径",map);
+//    }
+
+
+    @PostMapping("/upload")
+    public void uploadFile(MultipartFile file, String sshKey, String SFTP_REMOTE_DIR) throws IOException {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+
+        try (SFTPClient sftpClient = ssh.newSFTPClient()) {
+            String fileName = file.getOriginalFilename();
+            String uniqueIdentifier = generateUniqueIdentifier();
+
+            // Create a temporary directory for storing the file chunks
+            File tempDir = new File(System.getProperty("java.io.tmpdir"), uniqueIdentifier);
+            if (!tempDir.exists()) {
+                tempDir.mkdirs();
+            }
+
+            // Split the file into chunks and upload each chunk
+            byte[] buffer = new byte[1024 * 1024]; // 1MB buffer size
+            int chunkIndex = 0;
+            try (FileOutputStream outputStream = new FileOutputStream(new File(tempDir, String.valueOf(chunkIndex)))) {
+                int bytesRead;
+                while ((bytesRead = file.getInputStream().read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                    chunkIndex++;
+                }
+            }
+
+            // Upload each chunk to the remote directory
+            for (int i = 0; i < chunkIndex; i++) {
+                File chunkFile = new File(tempDir, String.valueOf(i));
+                // 将切片文件上传到远程目录
+                sftpClient.put(chunkFile.getAbsolutePath(), SFTP_REMOTE_DIR + uniqueIdentifier + "/" + chunkFile.getName());
+            }
+
+            // Merge the chunks into a single file on the remote server
+            // 将切片合并成一个完整的文件在远程服务器上
+            sftpClient.rename(SFTP_REMOTE_DIR + uniqueIdentifier, SFTP_REMOTE_DIR + fileName);
+
+
+            // Delete the temporary directory
+            deleteDirectory(tempDir);
+        }
+    }
+
+    private String generateUniqueIdentifier() {
+        // Generate a unique identifier for the file chunks
+        // You can use a UUID or any other method to generate a unique identifier
+        return UUID.randomUUID().toString();
+    }
+
+    private void deleteDirectory(File directory) {
+        // Recursively delete a directory
+        if (directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    deleteDirectory(file);
+                }
+            }
+        }
+        directory.delete();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

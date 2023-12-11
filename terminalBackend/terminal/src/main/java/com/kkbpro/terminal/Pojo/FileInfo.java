@@ -3,6 +3,7 @@ package com.kkbpro.terminal.Pojo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.schmizz.sshj.sftp.FileAttributes;
 
 /**
  * 文件信息
@@ -16,6 +17,9 @@ public class FileInfo {
     private String name;
 
     // 是否为文件夹
-    private Boolean type;
+    private Boolean isDirectory;
+
+    // 文件详细信息
+    private FileAttributes attributes;
 
 }
