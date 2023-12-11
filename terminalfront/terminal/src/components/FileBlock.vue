@@ -19,7 +19,15 @@
             <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
             <div class="hover-class" @click="doReturn" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
             <div class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
-            <div class="hover-class" @click="doUpload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
+            <div class="hover-class" @click="doUpload" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
+              <el-upload
+                :show-file-list="false"
+                :with-credentials="true"
+                :http-request="doUpload"
+                >
+                <el-icon><Upload /></el-icon>
+              </el-upload>
+            </div>
           </div>
         </div>
         <div class="list-class no-select">
@@ -162,8 +170,33 @@ export default {
       if(aimFileName.value != '') downloadFile(aimFileName.value);
     }
     // 上传文件
-    const doUpload = () => {
+    const doUpload = (fileData) => {
       if(isShowDirInput.value == true) return;
+      let file = fileData.file;
+      console.log(file);
+      if(!file) return;
+      let formData = new FormData();
+      formData.append('file',file);
+      formData.append('sshKey',props.sshKey);
+      formData.append('path',dir.value);
+      // formData.append('md5',currentFile.md5);
+      // formData.append('fileName',currentFile.fileName);
+      // formData.append('chunkTotal',chunks);
+      // formData.append('fileTotalSize',currentFile.totalSize);
+      // formData.append('fileUid',currentFile.uid);
+      $.ajax({
+        url: http_base_url + '/upload',
+        type:'post',
+        data: formData,
+        contentType : false,
+        processData : false,
+        success(){
+          // console.log(resp);
+        },
+        error(){
+          // console.log(error);
+        }
+      });
     }
 
     // 控制Dialog显示
@@ -242,6 +275,7 @@ export default {
   background-color: #f3f3f3;
 }
 
+/* 文本不可选中 */
 .no-select {
   user-select: none;
 }

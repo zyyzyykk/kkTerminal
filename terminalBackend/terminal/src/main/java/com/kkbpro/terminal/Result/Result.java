@@ -72,4 +72,21 @@ public class Result {
     }
 
 
+    public static Result setError(Integer code, String info, Map<String,Object> data) {
+        Result result = new Result();
+        result.setStatus("error");
+        result.setCode(code);
+        result.setInfo(info);
+        try {
+            if(null == data) result.setData(null);
+            else result.setData(AesUtil.aesEncrypt(JSON.toJSONString(data)));
+        } catch (Exception e) {
+            System.out.println("加密异常");
+            result.setData(null);
+        }
+
+        return result;
+    }
+
+
 }
