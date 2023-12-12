@@ -15,9 +15,12 @@ public class FileUploadInfo {
 
     private MultipartFile file;
 
+    private String fileName;
     private Integer chunks;
 
     private Integer chunk;
+
+    private Long totalSize;
 
     private String id;
 

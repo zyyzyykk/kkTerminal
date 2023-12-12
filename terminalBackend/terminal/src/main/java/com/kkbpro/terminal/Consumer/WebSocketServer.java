@@ -10,6 +10,7 @@ import com.kkbpro.terminal.Pojo.EnvInfo;
 import com.kkbpro.terminal.Pojo.MessageInfo;
 import com.kkbpro.terminal.Result.Result;
 import com.kkbpro.terminal.Utils.AesUtil;
+import com.kkbpro.terminal.Utils.FileUtil;
 import com.kkbpro.terminal.Utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
@@ -26,7 +27,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@ServerEndpoint("/ssh/{env}")  // 注意不要以'/'结尾
+@ServerEndpoint("/socket/ssh/{env}")  // 注意不要以'/'结尾
 public class WebSocketServer {
 
     public static ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
@@ -59,8 +60,8 @@ public class WebSocketServer {
 
         // 建立 web-socket 连接
         this.sessionSocket = sessionSocket;
-        // 设置最大空闲超时
-         sessionSocket.setMaxIdleTimeout(appConfig.getMaxIdleTimeout());
+        // 设置最大空闲超时（上线后失效？？？）
+        sessionSocket.setMaxIdleTimeout(appConfig.getMaxIdleTimeout());
 
         // 与服务器建立连接
         String host = envInfo.getServer_ip();
@@ -84,7 +85,7 @@ public class WebSocketServer {
 
         // 连接成功，生成key标识
         sshKey = UUID.randomUUID().toString();
-        sendMessage(sessionSocket,sshKey,"success", ResultCodeEnum.CONNECT_SUCCESS.getState());
+        sendMessage(sessionSocket, sshKey,"success", ResultCodeEnum.CONNECT_SUCCESS.getState());
         sshClientMap.put(sshKey,sshClient);
         // 欢迎语
         sendMessage(sessionSocket, appConfig.getWelcome() + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
@@ -127,6 +128,20 @@ public class WebSocketServer {
 
     @OnClose
     public void onClose() throws IOException {
+        // 删除临时文件
+        Thread deleteTmpFileThread = new Thread(() -> {
+            String key = sshKey;
+            // 临时文件根文件夹
+            File temporaryRootFolder = new File(FileUtil.folderBasePath);
+            File[] files = temporaryRootFolder.listFiles();
+            for (File file : files) {
+                // 判断是否是文件对应的文件片
+                if (file.isDirectory() && StringUtil.isPrefix(key, file.getName())) {
+                    FileUtil.tmpFloderDelete(file);
+                }
+            }
+        });
+        deleteTmpFileThread.start();
         // 释放资源
         if (shellOutThread != null && !shellOutThread.isInterrupted())
             shellOutThread.interrupt();

@@ -79,4 +79,32 @@ public class StringUtil {
         return result;
     }
 
+    /**
+     * 判断分片文件名
+     */
+    public static Boolean isFileChunk(String chunkFileName, Integer chunks, String originFileName) {
+        int index = chunkFileName.lastIndexOf("-");
+        if(index != -1) {
+            String fileName = chunkFileName.substring(0,index);
+            int chunk = Integer.parseInt(chunkFileName.substring(index + 1));
+            if(!originFileName.equals(fileName)) return false;
+            if(chunk < 1 || chunk > chunks) return false;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 获取文件片片号
+     */
+    public static Integer getFileChunkIndex(String chunkFileName) {
+        int index = chunkFileName.lastIndexOf("-");
+        if(index != -1) {
+            return Integer.parseInt(chunkFileName.substring(index + 1));
+        }
+
+        return 1;
+    }
+
 }
