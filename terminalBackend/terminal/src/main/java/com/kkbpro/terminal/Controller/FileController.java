@@ -5,12 +5,10 @@ import com.kkbpro.terminal.Consumer.WebSocketServer;
 import com.kkbpro.terminal.Pojo.Dto.FileUploadInfo;
 import com.kkbpro.terminal.Pojo.FileInfo;
 import com.kkbpro.terminal.Result.Result;
+import com.kkbpro.terminal.Utils.FileUtil;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +21,7 @@ import java.util.*;
  * 文件上传下载接口类
  */
 @RestController
+@RequestMapping("/api")
 public class FileController {
 
     /**
@@ -89,37 +88,41 @@ public class FileController {
         try (SFTPClient sftp = ssh.newSFTPClient()) {
             path = sftp.canonicalize(".");
         }
-        Map<String,Object> map = new HashMap<>();
-        map.put("path",path);
-        return Result.setSuccess(200,"首次路径",map);
+        Map<String, Object> map = new HashMap<>();
+        map.put("path", path);
+        return Result.setSuccess(200, "首次路径", map);
     }
-
-    private final String folderBasePath = System.getProperty("user.dir") + "/src/main/resources/static/file";
 
     @PostMapping("/upload")
     public Result uploadFile(FileUploadInfo fileUploadInfo) throws IOException {
 
         String sshKey = fileUploadInfo.getSshKey();
         MultipartFile file = fileUploadInfo.getFile();
+        String fileName = fileUploadInfo.getFileName();
         String path = fileUploadInfo.getPath();
         String id = fileUploadInfo.getId();
         Integer chunks = fileUploadInfo.getChunks();
         Integer chunk = fileUploadInfo.getChunk();
+        Long totalSize = fileUploadInfo.getTotalSize();
 
-        String fileName = file.getOriginalFilename();
-        String folderPath = folderBasePath + "/" + sshKey + "-" + id;
+        String folderPath = FileUtil.folderBasePath + "/" + sshKey + "-" + id;
 
         Map<String,Object> map = new HashMap<>();
         map.put("chunk",chunk);
         map.put("chunks",chunks);
         map.put("id",id);
         map.put("fileName",fileName);
+        map.put("totalSize",totalSize);
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
 
         try (SFTPClient sftpClient = ssh.newSFTPClient()) {
             File temporaryFolder = new File(folderPath);
-            File temporaryFile = new File(folderPath + "/" + chunk + "-" + fileName);
+            File temporaryFile = null;
+            if(!chunks.equals(1)) {
+                temporaryFile = new File(folderPath + "/" + fileName + "-" + chunk);
+            }
+            else temporaryFile = new File(folderPath + "/" + fileName);
             // 如果文件夹不存在则创建
             if (!temporaryFolder.exists()) {
                 temporaryFolder.mkdirs();
@@ -139,27 +142,21 @@ public class FileController {
             if(chunk.equals(chunks))
             {
                 // 将文件片合并
-
+                if(!chunks.equals(1))
+                    FileUtil.fileChunkMerge(folderPath,fileName,chunks,totalSize);
+                // 上传到服务器
                 sftpClient.put(folderPath + "/" + fileName, path + fileName);
+                // 删除临时文件
+                Thread deleteTmpFileThread = new Thread(() -> {
+                    FileUtil.tmpFloderDelete(temporaryFolder);
+                });
+                deleteTmpFileThread.start();
                 return Result.setSuccess(FileUploadStateEnum.FILE_UPLOAD_SUCCESS.getState(), "文件上传完成",map);
             }
             else {
                 return Result.setSuccess(FileUploadStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功", map);
             }
         }
-    }
-
-    private void deleteDirectory(File directory) {
-        // Recursively delete a directory
-        if (directory.isDirectory()) {
-            File[] files = directory.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    deleteDirectory(file);
-                }
-            }
-        }
-        directory.delete();
     }
 
 }

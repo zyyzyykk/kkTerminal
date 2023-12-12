@@ -58,6 +58,7 @@
 <script>
 import { ref } from 'vue';
 import $ from 'jquery';
+import { ElMessage } from 'element-plus'
 import { http_base_url } from '@/Utils/BaseUrl';
 
 import NoData from '@/components/NoData';
@@ -72,14 +73,15 @@ export default {
     FileIcons,
   },
   props:['sshKey'],
-  setup(props,context) {
+  setup(props) {
 
     const aimFileName = ref('');
 
     // 获取初始目录
     const isShowDirInput = ref(false);
-    const dir = ref('/');
+    const dir = ref('');
     const getInitDir = () => {
+      if(dir.value != '') return;
       $.ajax({
         url: http_base_url + '/pwd',
         type:'get',
@@ -123,14 +125,8 @@ export default {
       let a = document.createElement('a');
       a.href = http_base_url + '/download/' + name + '?sshKey=' + props.sshKey + '&path=' + dir.value;
       document.body.appendChild(a);
-      context.emit('doHeartBeat');
       a.click();
-      let timer = setInterval(() => {
-        context.emit('doHeartBeat');
-        console.log('kk');
-      },180000);
       document.body.removeChild(a);
-      clearInterval(timer);
     }
 
     // 更新目录路径
@@ -170,33 +166,61 @@ export default {
       if(aimFileName.value != '') downloadFile(aimFileName.value);
     }
     // 上传文件
-    const doUpload = (fileData) => {
+    const chunkSize = 1024 * 517;   // 每一片大小517kB
+    const doUpload = async (fileData) => {
       if(isShowDirInput.value == true) return;
       let file = fileData.file;
-      console.log(file);
       if(!file) return;
-      let formData = new FormData();
-      formData.append('file',file);
-      formData.append('sshKey',props.sshKey);
-      formData.append('path',dir.value);
-      // formData.append('md5',currentFile.md5);
-      // formData.append('fileName',currentFile.fileName);
-      // formData.append('chunkTotal',chunks);
-      // formData.append('fileTotalSize',currentFile.totalSize);
-      // formData.append('fileUid',currentFile.uid);
-      $.ajax({
-        url: http_base_url + '/upload',
-        type:'post',
-        data: formData,
-        contentType : false,
-        processData : false,
-        success(){
-          // console.log(resp);
-        },
-        error(){
-          // console.log(error);
-        }
-      });
+      // 文件切片
+      const fileName = file.name;
+      const fileSize = file.size;
+      const chunks = parseInt(Math.ceil(fileSize / chunkSize));
+      const fileId = file.uid;
+      let chunkIndex = 1;
+      const path = dir.value;
+
+      // 分片上传
+      for(let chunk=chunkIndex;chunk<=chunks;chunk++) {
+        // 上传逻辑
+        let start = (chunk-1) * chunkSize;
+        let end = start + chunkSize >= fileSize ? fileSize : start + chunkSize;
+        let chunkFile = file.slice(start, end);
+        let formData = new FormData();
+        formData.append('file',chunkFile);
+        formData.append('fileName',fileName);
+        formData.append('chunks',chunks);
+        formData.append('chunk',chunk);
+        formData.append('totalSize',fileSize);
+        formData.append('id',fileId);
+        formData.append('sshKey',props.sshKey);
+        formData.append('path',path);
+
+        await $.ajax({
+          url: http_base_url + '/upload',
+          type:'post',
+          data: formData,
+          contentType : false,
+          processData : false,
+          success(resp){
+            // 文件上传成功
+            if(resp.code == 202) {
+              ElMessage({
+                message: resp.info,
+                type: resp.status,
+              })
+              getDirList();
+            }
+            // 文件上传失败
+            if(resp.code > 500) {
+              ElMessage({
+                message: resp.info,
+                type: resp.status,
+              })
+            }
+          },
+        });
+        
+      }
     }
 
     // 控制Dialog显示
@@ -204,9 +228,9 @@ export default {
 
     // 关闭
     const closeDialog = (done) => {
-      dir.value = '/';
-      aimFileName.value = '';
-      files.value = [];
+      // dir.value = '/';
+      // aimFileName.value = '';
+      // files.value = [];
       done();
     }
 

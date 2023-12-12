@@ -6,7 +6,11 @@ public enum FileUploadStateEnum {
 
     CHUNK_UPLOAD_SUCCESS(203,"文件片上传成功"),
 
-    UPLOAD_ERROR(502,"文件片上传失败");
+    UPLOAD_ERROR(502,"文件片上传失败"),
+
+    UPLOAD_CHUNK_LOST(502,"文件片缺失"),
+
+    UPLOAD_SIZE_DIFF(503,"上传文件大小不一致");
 
     private Integer state;
 

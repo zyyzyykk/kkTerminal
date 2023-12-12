@@ -26,13 +26,13 @@
   <!-- 样式设置 -->
   <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" ></StyleSetting>
   <!-- 样式设置 -->
-  <FileBlock ref="fileBlockRef" :sshKey="sshKey" @doHeartBeat="doHeartBeat" ></FileBlock>
+  <FileBlock ref="fileBlockRef" :sshKey="sshKey" ></FileBlock>
 
 </template>
 
 <script>
 import useClipboard from "vue-clipboard3";
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { encrypt, decrypt } from '@/Utils/Encrypt';
 
 import { Terminal } from 'xterm';
@@ -259,10 +259,15 @@ export default {
       }
     }
 
-    // 文件下载中进行心跳续约
+    // websocket心跳续约 (25秒)
+    let timer = null;
     const doHeartBeat = () => {
-      if(socket.value && socket.value.readyState == WebSocket.OPEN) {
-        socket.value.send(encrypt(JSON.stringify({type:2,content:"",rows:0,cols:0})));
+      if(timer == null) {
+        timer = setInterval(() => {
+          if(socket.value && socket.value.readyState == WebSocket.OPEN) {
+            socket.value.send(encrypt(JSON.stringify({type:2,content:"",rows:0,cols:0})));
+          }
+        },25000);
       }
     }
 
@@ -277,6 +282,12 @@ export default {
       window.addEventListener('resize', () => {
         termFit();
       });
+
+      doHeartBeat();
+    });
+
+    onUnmounted(() => {
+      if(timer) clearInterval(timer);
     });
 
     return {
