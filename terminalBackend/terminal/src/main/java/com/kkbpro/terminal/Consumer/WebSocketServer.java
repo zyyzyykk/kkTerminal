@@ -131,14 +131,13 @@ public class WebSocketServer {
         shellOutThread.start();
     }
 
-
     @OnClose
     public void onClose() throws IOException {
         // 删除临时文件
         Thread deleteTmpFileThread = new Thread(() -> {
-            //
+            // 延时2s执行
             try {
-                Thread.sleep(1000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

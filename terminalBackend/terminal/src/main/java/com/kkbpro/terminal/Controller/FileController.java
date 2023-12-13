@@ -1,7 +1,7 @@
 package com.kkbpro.terminal.Controller;
 
 import com.kkbpro.terminal.Config.AppConfig;
-import com.kkbpro.terminal.Constants.Enum.FileUploadStateEnum;
+import com.kkbpro.terminal.Constants.Enum.FileBlockStateEnum;
 import com.kkbpro.terminal.Consumer.WebSocketServer;
 import com.kkbpro.terminal.Pojo.Dto.FileUploadInfo;
 import com.kkbpro.terminal.Pojo.EnvInfo;
@@ -65,19 +65,24 @@ public class FileController {
      */
     @GetMapping("/ls")
     public Result ls(String sshKey, String path) throws IOException {
-        // 读取文件内容
-        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         Map<String,Object> map = new HashMap<>();
         List<FileInfo> fileInfoList = new ArrayList<>();
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"文件列表获取失败",map);
+        }
         try (SFTPClient sftp = ssh.newSFTPClient()) {
             List<RemoteResourceInfo> files = sftp.ls(path);
             for(RemoteResourceInfo file : files) {
                 FileInfo fileInfo = new FileInfo();
                 fileInfo.setName(file.getName());
-                fileInfo.setIsDirectory(file.isDirectory());
+                fileInfo.setIsDirectory(file.isDirectory() || !file.isRegularFile());
                 fileInfo.setAttributes(file.getAttributes());
                 fileInfoList.add(fileInfo);
             }
+        } catch (net.schmizz.sshj.sftp.SFTPException e) {
+            e.printStackTrace();
+            return Result.setError(500,"目录不存在",map);
         }
         map.put("files",fileInfoList);
 
@@ -90,12 +95,16 @@ public class FileController {
     @GetMapping("/pwd")
     public Result pwd(String sshKey) throws IOException {
 
+        Map<String, Object> map = new HashMap<>();
         String path = "/";
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            map.put("path", path);
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件路径获取失败",map);
+        }
         try (SFTPClient sftp = ssh.newSFTPClient()) {
             path = sftp.canonicalize(".");
         }
-        Map<String, Object> map = new HashMap<>();
         map.put("path", path);
         return Result.setSuccess(200, "首次路径", map);
     }
@@ -104,6 +113,11 @@ public class FileController {
     public Result uploadFile(FileUploadInfo fileUploadInfo) throws IOException {
 
         String sshKey = fileUploadInfo.getSshKey();
+        // 判断连接状态
+        if(WebSocketServer.sshClientMap.get(sshKey) == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件上传失败");
+        }
+
         MultipartFile file = fileUploadInfo.getFile();
         String fileName = fileUploadInfo.getFileName();
         String path = fileUploadInfo.getPath();
@@ -111,11 +125,6 @@ public class FileController {
         Integer chunks = fileUploadInfo.getChunks();
         Integer chunk = fileUploadInfo.getChunk();
         Long totalSize = fileUploadInfo.getTotalSize();
-
-        // 判断连接状态
-//        if(WebSocketServer.sshClientMap.get(sshKey) == null) {
-//
-//        }
 
         String folderPath = FileUtil.folderBasePath + "/" + sshKey + "-" + id;
 
@@ -144,16 +153,17 @@ public class FileController {
             file.transferTo(temporaryFile);
         } catch (IOException e) {
             e.printStackTrace();
-            return Result.setError(FileUploadStateEnum.UPLOAD_ERROR.getState(), "文件片上传失败", map);
+            return Result.setError(FileBlockStateEnum.UPLOAD_ERROR.getState(), "文件片上传失败", map);
         }
 
         // 上传完毕
         if(chunk.equals(chunks))
         {
-            // 将文件片合并
-            if(!chunks.equals(1))
-                FileUtil.fileChunkMerge(folderPath,fileName,chunks,totalSize);
             Thread FileThread = new Thread(() -> {
+                WebSocketServer.fileUploadingMap.put(folderPath,folderPath);
+                // 将文件片合并
+                if(!chunks.equals(1))
+                    FileUtil.fileChunkMerge(folderPath,fileName,chunks,totalSize);
                 // 与服务器建立连接
                 EnvInfo envInfo = WebSocketServer.envInfoMap.get(sshKey);
                 String host = envInfo.getServer_ip();
@@ -168,7 +178,6 @@ public class FileController {
                     sshFileClient.authPassword(user_name, password);                // 使用用户名和密码进行身份验证
                     // 上传到服务器
                     try (SFTPClient sftpFileClient = sshFileClient.newSFTPClient()) {
-                        WebSocketServer.fileUploadingMap.put(folderPath,folderPath);
                         sftpFileClient.put(folderPath + "/" + fileName, path + fileName);
                     }
                 } catch (Exception e) {
@@ -180,10 +189,10 @@ public class FileController {
                 }
             });
             FileThread.start();
-            return Result.setSuccess(FileUploadStateEnum.FILE_UPLOADING.getState(), "文件上传中",map);
+            return Result.setSuccess(FileBlockStateEnum.FILE_UPLOADING.getState(), "文件后台上传中",map);
         }
         else {
-            return Result.setSuccess(FileUploadStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功", map);
+            return Result.setSuccess(FileBlockStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功", map);
         }
     }
 
