@@ -31,6 +31,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketServer {
 
     public static ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
+
+    public static ConcurrentHashMap<String, EnvInfo> envInfoMap = new ConcurrentHashMap<>();
+
+
+    public static ConcurrentHashMap<String, String> fileUploadingMap = new ConcurrentHashMap<>();
     private static AppConfig appConfig;
 
     private Session sessionSocket = null;
@@ -87,6 +92,7 @@ public class WebSocketServer {
         sshKey = UUID.randomUUID().toString();
         sendMessage(sessionSocket, sshKey,"success", ResultCodeEnum.CONNECT_SUCCESS.getState());
         sshClientMap.put(sshKey,sshClient);
+        envInfoMap.put(sshKey,envInfo);
         // 欢迎语
         sendMessage(sessionSocket, appConfig.getWelcome() + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
         // github源地址
@@ -130,14 +136,22 @@ public class WebSocketServer {
     public void onClose() throws IOException {
         // 删除临时文件
         Thread deleteTmpFileThread = new Thread(() -> {
+            //
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             String key = sshKey;
             // 临时文件根文件夹
             File temporaryRootFolder = new File(FileUtil.folderBasePath);
             File[] files = temporaryRootFolder.listFiles();
             for (File file : files) {
-                // 判断是否是文件对应的文件片
+                // 判断是否是本次ssh对应的临时文件夹
                 if (file.isDirectory() && StringUtil.isPrefix(key, file.getName())) {
-                    FileUtil.tmpFloderDelete(file);
+                    // 忽略正在进行文件上传的文件夹
+                    if(fileUploadingMap.get(file.getName()) == null)
+                        FileUtil.tmpFloderDelete(file);
                 }
             }
         });
