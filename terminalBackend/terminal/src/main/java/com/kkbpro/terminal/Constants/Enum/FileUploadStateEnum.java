@@ -2,7 +2,7 @@ package com.kkbpro.terminal.Constants.Enum;
 
 public enum FileUploadStateEnum {
 
-    FILE_UPLOAD_SUCCESS(202,"文件上传成功"),
+    FILE_UPLOADING(202,"文件上传中"),
 
     CHUNK_UPLOAD_SUCCESS(203,"文件片上传成功"),
 

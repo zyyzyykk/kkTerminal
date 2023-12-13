@@ -1,13 +1,17 @@
 package com.kkbpro.terminal.Controller;
 
+import com.kkbpro.terminal.Config.AppConfig;
 import com.kkbpro.terminal.Constants.Enum.FileUploadStateEnum;
 import com.kkbpro.terminal.Consumer.WebSocketServer;
 import com.kkbpro.terminal.Pojo.Dto.FileUploadInfo;
+import com.kkbpro.terminal.Pojo.EnvInfo;
 import com.kkbpro.terminal.Pojo.FileInfo;
 import com.kkbpro.terminal.Result.Result;
 import com.kkbpro.terminal.Utils.FileUtil;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.*;
+import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +28,9 @@ import java.util.*;
 @RequestMapping("/api")
 public class FileController {
 
+    @Autowired
+    private AppConfig appConfig;
+
     /**
      * 下载文件
      */
@@ -36,7 +43,7 @@ public class FileController {
         // 构建 HTTP 响应，触发文件下载
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-        readRemoteFile(sshClient, remoteFilePath,response);
+        readRemoteFile(sshClient, remoteFilePath, response);
     }
     private void readRemoteFile(SSHClient ssh, String remoteFilePath, HttpServletResponse response) throws IOException {
         try (SFTPClient sftp = ssh.newSFTPClient()) {
@@ -105,6 +112,11 @@ public class FileController {
         Integer chunk = fileUploadInfo.getChunk();
         Long totalSize = fileUploadInfo.getTotalSize();
 
+        // 判断连接状态
+//        if(WebSocketServer.sshClientMap.get(sshKey) == null) {
+//
+//        }
+
         String folderPath = FileUtil.folderBasePath + "/" + sshKey + "-" + id;
 
         Map<String,Object> map = new HashMap<>();
@@ -114,48 +126,64 @@ public class FileController {
         map.put("fileName",fileName);
         map.put("totalSize",totalSize);
 
-        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        File temporaryFolder = new File(folderPath);
+        File temporaryFile = null;
+        if(!chunks.equals(1)) {
+            temporaryFile = new File(folderPath + "/" + fileName + "-" + chunk);
+        }
+        else temporaryFile = new File(folderPath + "/" + fileName);
+        // 如果文件夹不存在则创建
+        if (!temporaryFolder.exists()) {
+            temporaryFolder.mkdirs();
+        }
+        // 如果文件存在则删除
+        if (temporaryFile.exists()) {
+            temporaryFile.delete();
+        }
+        try {
+            file.transferTo(temporaryFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Result.setError(FileUploadStateEnum.UPLOAD_ERROR.getState(), "文件片上传失败", map);
+        }
 
-        try (SFTPClient sftpClient = ssh.newSFTPClient()) {
-            File temporaryFolder = new File(folderPath);
-            File temporaryFile = null;
-            if(!chunks.equals(1)) {
-                temporaryFile = new File(folderPath + "/" + fileName + "-" + chunk);
-            }
-            else temporaryFile = new File(folderPath + "/" + fileName);
-            // 如果文件夹不存在则创建
-            if (!temporaryFolder.exists()) {
-                temporaryFolder.mkdirs();
-            }
-            // 如果文件存在则删除
-            if (temporaryFile.exists()) {
-                temporaryFile.delete();
-            }
-            try {
-                file.transferTo(temporaryFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return Result.setError(FileUploadStateEnum.UPLOAD_ERROR.getState(), "文件片上传失败", map);
-            }
+        // 上传完毕
+        if(chunk.equals(chunks))
+        {
+            // 将文件片合并
+            if(!chunks.equals(1))
+                FileUtil.fileChunkMerge(folderPath,fileName,chunks,totalSize);
+            Thread FileThread = new Thread(() -> {
+                // 与服务器建立连接
+                EnvInfo envInfo = WebSocketServer.envInfoMap.get(sshKey);
+                String host = envInfo.getServer_ip();
+                int port = envInfo.getServer_port();
+                String user_name = envInfo.getServer_user();
+                String password = envInfo.getServer_password();
 
-            // 上传完毕
-            if(chunk.equals(chunks))
-            {
-                // 将文件片合并
-                if(!chunks.equals(1))
-                    FileUtil.fileChunkMerge(folderPath,fileName,chunks,totalSize);
-                // 上传到服务器
-                sftpClient.put(folderPath + "/" + fileName, path + fileName);
-                // 删除临时文件
-                Thread deleteTmpFileThread = new Thread(() -> {
+                try(SSHClient sshFileClient = new SSHClient()) {
+                    sshFileClient.setConnectTimeout(appConfig.getSshMaxTimeout());
+                    sshFileClient.addHostKeyVerifier(new PromiscuousVerifier());    // 不验证主机密钥
+                    sshFileClient.connect(host,port);
+                    sshFileClient.authPassword(user_name, password);                // 使用用户名和密码进行身份验证
+                    // 上传到服务器
+                    try (SFTPClient sftpFileClient = sshFileClient.newSFTPClient()) {
+                        WebSocketServer.fileUploadingMap.put(folderPath,folderPath);
+                        sftpFileClient.put(folderPath + "/" + fileName, path + fileName);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    // 删除临时文件
                     FileUtil.tmpFloderDelete(temporaryFolder);
-                });
-                deleteTmpFileThread.start();
-                return Result.setSuccess(FileUploadStateEnum.FILE_UPLOAD_SUCCESS.getState(), "文件上传完成",map);
-            }
-            else {
-                return Result.setSuccess(FileUploadStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功", map);
-            }
+                    WebSocketServer.fileUploadingMap.remove(folderPath);
+                }
+            });
+            FileThread.start();
+            return Result.setSuccess(FileUploadStateEnum.FILE_UPLOADING.getState(), "文件上传中",map);
+        }
+        else {
+            return Result.setSuccess(FileUploadStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功", map);
         }
     }
 
