@@ -1,28 +1,30 @@
 package com.kkbpro.terminal.Constants.Enum;
 
-public enum FileUploadStateEnum {
+public enum FileBlockStateEnum {
 
-    FILE_UPLOADING(202,"文件上传中"),
+    FILE_UPLOADING(202,"文件后台上传中"),
 
     CHUNK_UPLOAD_SUCCESS(203,"文件片上传成功"),
 
     UPLOAD_ERROR(502,"文件片上传失败"),
 
-    UPLOAD_CHUNK_LOST(502,"文件片缺失"),
+    UPLOAD_CHUNK_LOST(503,"文件片缺失"),
 
-    UPLOAD_SIZE_DIFF(503,"上传文件大小不一致");
+    UPLOAD_SIZE_DIFF(504,"上传文件大小不一致"),
+
+    SSH_NOT_EXIST(602,"ssh连接断开");
 
     private Integer state;
 
     private String desc;
 
-    FileUploadStateEnum(Integer state, String desc) {
+    FileBlockStateEnum(Integer state, String desc) {
         this.state = state;
         this.desc = desc;
     }
 
-    public static FileUploadStateEnum getByState(Integer state) {
-        for (FileUploadStateEnum item : FileUploadStateEnum.values()) {
+    public static FileBlockStateEnum getByState(Integer state) {
+        for (FileBlockStateEnum item : FileBlockStateEnum.values()) {
             if (item.getState().equals(state)) {
                 return item;
             }

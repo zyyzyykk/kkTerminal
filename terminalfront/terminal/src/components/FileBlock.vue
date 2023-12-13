@@ -34,13 +34,13 @@
             <div v-if="files.length != 0">
                 <div v-for="item in files" :key="item.name" >
                   <template v-if="item.isDirectory == true">
-                    <div class="item-class" @dblclick="changeDir(dir + item.name + '/')" >
+                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" >
                       <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
                   </template>
                   <template v-else>
-                    <div :class="['item-class', item.name == aimFileName ? 'item-selected' : '']" @click="aimFileName = item.name" @dblclick="downloadFile(item.name)" >
+                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="downloadFile(item.name)" >
                       <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
@@ -75,7 +75,7 @@ export default {
   props:['sshKey'],
   setup(props) {
 
-    const aimFileName = ref('');
+    const aimFileInfo = ref(null);
 
     // 获取初始目录
     const isShowDirInput = ref(false);
@@ -92,7 +92,8 @@ export default {
           dir.value = resp.data.path;
           if(dir.value == '' || dir.value[0] != '/') dir.value = '/' + dir.value;
           if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
-          aimFileName.value = '';
+          dir.value = dir.value.replace(/\/{2,}/g, '/');
+          aimFileInfo.value = null;
           getDirList();
         }
       });
@@ -110,13 +111,19 @@ export default {
           path:dir.value,
         },
         success(resp){
-          files.value = resp.data.files;
-          noDataMsg.value = '暂无文件';
+          if(resp.status == 'success') {
+            files.value = resp.data.files;
+            noDataMsg.value = '暂无文件';
+          }
+          else {
+            files.value = [];
+            noDataMsg.value = resp.info;
+            ElMessage({
+              message: resp.info,
+              type: resp.status,
+            })
+          }
         },
-        error(){
-          files.value = [];
-          noDataMsg.value = '目录不存在';
-        }
       });
     }
 
@@ -134,7 +141,7 @@ export default {
     const changeDir = (new_dir) => {
       if(isShowDirInput.value == true) return;
       dir.value = new_dir;
-      aimFileName.value = '';
+      aimFileInfo.value = null;
       getDirList();
     }
 
@@ -143,7 +150,8 @@ export default {
       isShowDirInput.value = false;
       if(dir.value == '' || dir.value[0] != '/') dir.value = '/' + dir.value;
       if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
-      aimFileName.value = '';
+      dir.value = dir.value.replace(/\/{2,}/g, '/');
+      aimFileInfo.value = null;
       getDirList();
     }
 
@@ -159,13 +167,13 @@ export default {
       if(dir.value[dir.value.length - 1] == '/') dir.value = dir.value.substring(0,dir.value.length - 1);
       let index = dir.value.lastIndexOf('/');
       if(index != -1) dir.value = dir.value.substring(0,index + 1);
-      aimFileName.value = '';
+      aimFileInfo.value = null;
       doRefresh();
     }
     // 下载文件
     const doDownload = () => {
       if(isShowDirInput.value == true) return;
-      if(aimFileName.value != '') downloadFile(aimFileName.value);
+      if(aimFileInfo.value && aimFileInfo.value.name && !aimFileInfo.value.isDirectory) downloadFile(aimFileInfo.value.name);
     }
     // 上传文件
     const chunkSize = 1024 * 517;   // 每一片大小517kB
@@ -204,24 +212,51 @@ export default {
           contentType : false,
           processData : false,
           success(resp){
-            // 文件上传成功
+            // 文件后台上传中
             if(resp.code == 202) {
               ElMessage({
                 message: resp.info,
                 type: resp.status,
               })
-              getDirList();
             }
-            // 文件上传失败
-            if(resp.code > 500) {
+            // 文件片上传成功
+            // else if(resp.code == 203) {
+
+            // }
+            // 文件片上传失败
+            else if(resp.code == 502) {
               ElMessage({
                 message: resp.info,
                 type: resp.status,
               })
+              chunk = chunks + 1;
+            }
+            // 文件片缺失
+            else if(resp.code == 503) {
+              ElMessage({
+                message: resp.info,
+                type: resp.status,
+              })
+              chunk = chunks + 1;
+            }
+            // 上传文件大小不一致
+            else if(resp.code == 504) {
+              ElMessage({
+                message: resp.info,
+                type: resp.status,
+              })
+              chunk = chunks + 1;
+            }
+            // ssh连接断开
+            else if(resp.code == 602) {
+              ElMessage({
+                message: resp.info,
+                type: resp.status,
+              })
+              chunk = chunks + 1;
             }
           },
         });
-        
       }
     }
 
@@ -231,7 +266,7 @@ export default {
     // 关闭
     const closeDialog = (done) => {
       // dir.value = '/';
-      // aimFileName.value = '';
+      // aimFileInfo.value = null;
       // files.value = [];
       done();
     }
@@ -252,7 +287,7 @@ export default {
       doReturn,
       doDownload,
       doUpload,
-      aimFileName,
+      aimFileInfo,
 
     }
   }
