@@ -90,6 +90,7 @@ export default {
         },
         success(resp){
           dir.value = resp.data.path;
+          if(dir.value == '' || dir.value[0] != '/') dir.value = '/' + dir.value;
           if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
           aimFileName.value = '';
           getDirList();
@@ -140,6 +141,7 @@ export default {
     // 更改路径回调
     const dirInputCallback = () => {
       isShowDirInput.value = false;
+      if(dir.value == '' || dir.value[0] != '/') dir.value = '/' + dir.value;
       if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
       aimFileName.value = '';
       getDirList();
