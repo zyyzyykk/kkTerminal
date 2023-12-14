@@ -80,7 +80,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:2.8.0：latest
+##### zyyzyykk/kkterminal:2.8.3：latest
+
+- 优化文件上传功能，实现文件后台上传
+- 优化文件模块的展示细节
+- 修复了因ssh连接未校验导致数据混乱的bug
+
+##### zyyzyykk/kkterminal:2.8.0：
 
 - 新增websocket心跳续约，保证ws连接不断开
 
