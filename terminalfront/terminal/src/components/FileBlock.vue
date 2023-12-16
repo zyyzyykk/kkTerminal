@@ -30,7 +30,7 @@
             </div>
           </div>
         </div>
-        <div class="list-class no-select">
+        <div element-loading-text="Loading..." v-loading="loading" class="list-class no-select">
             <div v-if="files.length != 0">
                 <div v-for="item in files" :key="item.name" >
                   <template v-if="item.isDirectory == true">
@@ -48,7 +48,7 @@
                 </div>
             </div>
             <div v-else>
-              <NoData :msg="noDataMsg"></NoData>
+              <NoData v-if="loading == false" :msg="noDataMsg"></NoData>
             </div>
         </div>
     </div>
@@ -74,6 +74,9 @@ export default {
   },
   props:['sshKey'],
   setup(props) {
+
+    // 加载
+    const loading = ref(true);
 
     const aimFileInfo = ref(null);
 
@@ -110,6 +113,10 @@ export default {
           sshKey:props.sshKey,
           path:dir.value,
         },
+        beforeSend: function() { // 发送请求前执行的方法
+          loading.value = true;
+          files.value = [];
+        },
         success(resp){
           if(resp.status == 'success') {
             files.value = resp.data.files;
@@ -124,6 +131,9 @@ export default {
             })
           }
         },
+        complete: function() { // 发送请求完成后执行的方法
+          loading.value = false;
+        }
       });
     }
 
@@ -288,6 +298,7 @@ export default {
       doDownload,
       doUpload,
       aimFileInfo,
+      loading,
 
     }
   }
