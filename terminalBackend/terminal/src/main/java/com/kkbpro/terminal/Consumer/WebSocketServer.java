@@ -135,13 +135,13 @@ public class WebSocketServer {
     public void onClose() throws IOException {
         // 删除临时文件
         Thread deleteTmpFileThread = new Thread(() -> {
+            String key = sshKey;
             // 延时2s执行
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            String key = sshKey;
             // 临时文件根文件夹
             File temporaryRootFolder = new File(FileUtil.folderBasePath);
             File[] files = temporaryRootFolder.listFiles();
@@ -193,6 +193,8 @@ public class WebSocketServer {
         // 心跳续约
         if(MessageInfoTypeRnum.HEART_BEAT.getState().equals(messageInfo.getType())) {
             System.out.println("心跳续约");
+            shellOutputStream.write("".getBytes(StandardCharsets.UTF_8));
+            shellOutputStream.flush();
         }
 
     }

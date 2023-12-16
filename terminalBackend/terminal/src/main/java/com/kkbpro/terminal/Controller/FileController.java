@@ -76,7 +76,14 @@ public class FileController {
             for(RemoteResourceInfo file : files) {
                 FileInfo fileInfo = new FileInfo();
                 fileInfo.setName(file.getName());
-                fileInfo.setIsDirectory(file.isDirectory() || !file.isRegularFile());
+
+                // 是否为文件夹
+                if(file.isDirectory()) fileInfo.setIsDirectory(true);
+                else if(!file.isRegularFile()) {
+                    fileInfo.setIsDirectory(FileMode.Type.DIRECTORY.equals(sftp.stat(path + "/" + file.getName()).getType()));
+                }
+                else fileInfo.setIsDirectory(false);
+
                 fileInfo.setAttributes(file.getAttributes());
                 fileInfoList.add(fileInfo);
             }
@@ -110,7 +117,7 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public Result uploadFile(FileUploadInfo fileUploadInfo) throws IOException {
+    public Result uploadFile(FileUploadInfo fileUploadInfo) {
 
         String sshKey = fileUploadInfo.getSshKey();
         // 判断连接状态

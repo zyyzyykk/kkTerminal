@@ -1,9 +1,5 @@
 <template>
   <div class="golbal">
-
-    <!-- 临时设置 -->
-    <FileBlock :sshKey="sshKey" ></FileBlock>
-
     <!-- 设置栏 -->
     <div class="setting" v-show="isShowSetting" >
       <div class="setting-menu" @click="doSettings(1)" ><div>连接设置</div></div>
@@ -25,7 +21,7 @@
   <ConnectSetting ref="connectSettingRef" :env="env" @callback="saveEnv" ></ConnectSetting>
   <!-- 样式设置 -->
   <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" ></StyleSetting>
-  <!-- 样式设置 -->
+  <!-- 文件管理 -->
   <FileBlock ref="fileBlockRef" :sshKey="sshKey" ></FileBlock>
 
 </template>
@@ -110,7 +106,7 @@ export default {
 
     // 终端视高自适应
     const termFit = () => {
-      terminal.value.style.height = (window.innerHeight - 27) + 'px';
+      terminal.value.style.height = (window.innerHeight - 25) + 'px';
       fitAddon.fit();
       // 修改虚拟终端行列大小
       if(socket.value && socket.value.readyState == WebSocket.OPEN && term) {
