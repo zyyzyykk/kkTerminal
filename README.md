@@ -80,7 +80,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:2.8.3：latest
+##### zyyzyykk/kkterminal:2.8.8：latest
+
+- 修复了部分情况下文件与文件夹类别展示错误的bug
+- 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.0.4` 版本
+- 优化了一些细节
+
+##### zyyzyykk/kkterminal:2.8.3：
 
 - 优化文件上传功能，实现文件后台上传
 - 优化文件模块的展示细节
