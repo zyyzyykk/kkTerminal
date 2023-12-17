@@ -106,33 +106,36 @@ export default {
     const files = ref([]);
     const noDataMsg = ref('暂无文件');
     const getDirList = () => {
+      let now_dir = dir.value;
       $.ajax({
         url: http_base_url + '/ls',
         type:'get',
         data:{
           sshKey:props.sshKey,
-          path:dir.value,
+          path:now_dir,
         },
         beforeSend: function() { // 发送请求前执行的方法
           loading.value = true;
           files.value = [];
         },
         success(resp){
-          if(resp.status == 'success') {
-            files.value = resp.data.files;
-            noDataMsg.value = '暂无文件';
-          }
-          else {
-            files.value = [];
-            noDataMsg.value = resp.info;
-            ElMessage({
-              message: resp.info,
-              type: resp.status,
-            })
+          if(now_dir == dir.value) {
+            if(resp.status == 'success') {
+              files.value = resp.data.files;
+              noDataMsg.value = '暂无文件';
+            }
+            else {
+              files.value = [];
+              noDataMsg.value = resp.info;
+              ElMessage({
+                message: resp.info,
+                type: resp.status,
+              })
+            }
           }
         },
         complete: function() { // 发送请求完成后执行的方法
-          loading.value = false;
+          if(now_dir == dir.value) loading.value = false;
         }
       });
     }
