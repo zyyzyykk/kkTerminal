@@ -5,7 +5,7 @@ export const default_env = {
   server_user: 'root',
   server_password:'',
   // 样式相关
-  bg:'#000000',
+  bg:'#0c0c0c',
   fg:'#ECECEC',
   fontFamily: 'Monospace',
   fontSize: 16,
