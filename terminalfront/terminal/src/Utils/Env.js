@@ -6,7 +6,7 @@ export const default_env = {
   server_password:'',
   // 样式相关
   bg:'#0c0c0c',
-  fg:'#ECECEC',
+  fg:'#f2f2f2',
   fontFamily: 'Monospace',
   fontSize: 16,
   cursorStyle: 'block',
