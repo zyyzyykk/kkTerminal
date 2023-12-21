@@ -8,10 +8,10 @@
       <div class="setting-menu" @click="doSettings(3)" ><div>重启</div></div>
     </div>
     <div class="bar">
-      <div @click="showSettings" >
+      <div style="user-select: none;" @click="showSettings" >
         <img src="../assets/logo.png" alt="终端" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
-      <div style="font-size: 14px;" ><span>kk Terminal</span></div>
+      <div style="user-select: none; font-size: 14px;" ><span>kk Terminal</span></div>
     </div>
     <!-- terminal主体 -->
     <div ref="terminal" class="terminal-class"></div>
@@ -184,6 +184,8 @@ export default {
 
     // 重启终端
     const resetTerminal = () => {
+      // 文件管理
+      fileBlockRef.value.dir = '';
       if(term && terminal.value) terminal.value.removeEventListener('contextmenu', doPaste);
       terminal.value.innerHTML = '';
       isFirst.value = true;
@@ -195,7 +197,7 @@ export default {
       // 添加事件监听器，支持输入方法
       term.onKey(e => {
         if(socket.value) {
-          // TODO kkterminal快捷键判断
+          // TODO kkterminal 快捷键判断
           // if(chargeKey(e)) return;
           // 重启后第一次输入
           if(isFirst.value) {
