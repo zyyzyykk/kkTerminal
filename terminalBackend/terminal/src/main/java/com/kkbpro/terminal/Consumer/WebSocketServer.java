@@ -166,6 +166,7 @@ public class WebSocketServer {
             shell.close();
         if(sshClient != null)
             sshClient.disconnect();
+        this.sessionSocket.close();
         sessionSocket = null;
         if(sshKey != null) {
             sshClientMap.remove(sshKey);
