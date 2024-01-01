@@ -12,12 +12,12 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2023-12-12
+> 更新时间：2024-01-01
 >
 
 ### **⚡** 快速引入
 
-在html网页中使用 iframe 标签实现快速引入：
+在html网页中使用 `iframe` 标签实现快速引入：
 
 ```html
 <iframe src="https://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
@@ -64,7 +64,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 
 1.kkTerminal是一个web端ssh远程连接服务器的工具，点击右上角的终端图标，打开连接设置进行ssh连接设置
 
-2.支持在网页中使用 iframe 标签引入，可快速集成到第三方网站中
+2.支持在网页中使用 `iframe` 标签引入，可快速集成到第三方网站中
 
 3.支持窗口大小自适应
 
@@ -72,7 +72,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 
 5.支持重启，当修改ssh配置或自定义样式配置后，会自动重启；也可手动重启，适用于长时间无交互致使ssh连接断开的情况
 
-6.支持复制粘贴：复制同git终端，选中文本会进行自动复制；粘贴同cmd终端，鼠标右键单击进行粘贴（需要浏览器打开权限）
+6.支持复制粘贴：复制同 `git` 终端，选中文本会进行自动复制；粘贴同 `cmd` 终端，鼠标右键单击进行粘贴（需要浏览器打开权限）
 
 7.支持文件管理，打开文件管理模块进行文件的查看、上传与下载
 
@@ -80,7 +80,12 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:2.8.8：latest
+##### zyyzyykk/kkterminal:2.9.0：latest
+
+- 修改了一些默认样式，增加了网页描述与细节处理
+- 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.0.8` 版本
+
+##### zyyzyykk/kkterminal:2.8.8：
 
 - 修复了部分情况下文件与文件夹类别展示错误的bug
 - 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.0.4` 版本
