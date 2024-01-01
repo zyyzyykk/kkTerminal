@@ -355,7 +355,7 @@ export default {
   width: 80px;
   height: 25px;
   font-size: 13px;
-  color: #444444;
+  color: #666;
 }
 
 .setting-menu:hover {
