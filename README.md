@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-01-01
+> 更新时间：2024-01-11
 >
 
 ### **⚡** 快速引入
@@ -83,7 +83,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 ##### zyyzyykk/kkterminal:2.9.0：latest
 
 - 修改了一些默认样式，增加了网页描述与细节处理
-- 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.0.8` 版本
+- 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.1.3` 版本，后续版本会同步更新图标库，不再进行说明
 
 ##### zyyzyykk/kkterminal:2.8.8：
 
