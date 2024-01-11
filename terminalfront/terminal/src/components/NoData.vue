@@ -1,5 +1,4 @@
 <template>
-  <slot name="forMid"></slot>
   <div class="no-data">
     <div>
       <div>
@@ -25,18 +24,13 @@ export default {
 <style scoped>
 .no-data {
   text-align: center;
-  padding: 10px 0px;
   width: 100%;
-  height: 100%;
+  height: 30vh;
   display: flex;
   align-items: center;
-  align-content: center;
   justify-content: center;
 }
-.icon-empty {
-  font-size: 50px;
-  color: #bbb;
-}
+
 .msg {
   margin-top: 10px;
   color: #909399;

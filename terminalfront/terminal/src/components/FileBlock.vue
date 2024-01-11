@@ -4,6 +4,7 @@
     :before-close="closeDialog"
     title="文件管理"
     width="50%"
+    :modal="false"
     draggable
   >
     <div style="margin-top: -15px;"></div>
