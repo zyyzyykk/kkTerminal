@@ -68,10 +68,10 @@ export default {
 
     // 连接状态
     const connect_status = ref({
-      'Fail':'Fail to connect kk server !\r\n',
+      'Fail':'Fail to connect the server !\r\n',
       'Success':'Connecting success !\r\n',
-      'Connecting':'Connecting to kk server ...\r\n',
-      'Disconnected':'Disconnect to kk server.\r\n',
+      'Connecting':'Connecting to the server ...\r\n',
+      'Disconnected':'Disconnect to the server.\r\n',
     })
     const now_connect_status = ref(connect_status.value['Connecting']);
 
