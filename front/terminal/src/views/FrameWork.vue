@@ -68,10 +68,10 @@ export default {
 
     // 连接状态
     const connect_status = ref({
-      'Fail':'Fail to connect the server !\r\n',
+      'Fail':'Fail to connect remote server !\r\n',
       'Success':'Connecting success !\r\n',
-      'Connecting':'Connecting to the server ...\r\n',
-      'Disconnected':'Disconnect to the server.\r\n',
+      'Connecting':'Connecting to remote server ...\r\n',
+      'Disconnected':'Disconnect to remote server.\r\n',
     })
     const now_connect_status = ref(connect_status.value['Connecting']);
 
@@ -179,7 +179,15 @@ export default {
     const doPaste = async function(event) {
       event.preventDefault();   // 阻止默认的上下文菜单弹出
       let pasteText = await navigator.clipboard.readText();
-      if(socket.value) socket.value.send(encrypt(JSON.stringify({type:0,content:pasteText,rows:0,cols:0})));
+      if(socket.value)
+      {
+        // 重启后第一次输入
+        if(isFirst.value) {
+          termFit();
+          isFirst.value = false;
+        }
+        socket.value.send(encrypt(JSON.stringify({type:0,content:pasteText,rows:0,cols:0})));
+      }
     };
 
     // 重启终端
