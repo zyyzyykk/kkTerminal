@@ -70,13 +70,11 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 
 4.支持自定义偏好设置，可选择终端的背/前景色、字体字号、光标显示样式
 
-5.支持重启，当修改ssh配置或自定义样式配置后，会自动重启；也可手动重启，适用于长时间无交互致使ssh连接断开的情况
+5.支持重启，当修改ssh配置或自定义样式配置后，会自动重启；也可手动重启，适用于ssh连接断开的情况
 
 6.支持复制粘贴：复制同 `git` 终端，选中文本会进行自动复制；粘贴同 `cmd` 终端，鼠标右键单击进行粘贴（需要浏览器打开权限）
 
 7.支持文件管理，打开文件管理模块进行文件的查看、上传与下载
-
-8.**后续功能**：文件管理模块的细节处理与功能扩展、文件上传下载提速
 
 ### 👨‍💻 更新记录
 
@@ -125,6 +123,15 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 ##### zyyzyykk/kkterminal:1.0 ：
 
 提交官方镜像
+
+### 🧬 架构
+
+```markdown
++---------+     http     +-------------+    ssh     +---------------+
+| browser | <==========> | kk Terminal | <========> | remote server |
++---------+   websocket  +-------------+    sftp    +---------------+
+Vue + xterm             SpringBoot + sshj
+```
 
 ### 🏘️ 关于此项目
 
