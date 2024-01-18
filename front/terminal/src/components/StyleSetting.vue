@@ -8,7 +8,7 @@
     draggable
   >
     <div style="margin-top: -15px;"></div>
-    <div>
+    <div class="no-select">
       <div class="item-class" style="margin-bottom: 15px;">
         <div style="margin-right: 10px;">颜色：</div>
         <div class="item-class">
@@ -77,7 +77,7 @@
         </div>
       </div>
     </div>
-    <div class="errInfo"> {{ err_msg }} </div>
+    <div class="errInfo no-select"> {{ err_msg }} </div>
     <div style="margin-bottom: 5px;"></div>
     <div style="display: flex; border-top: 1px solid #f1f2f4;">
       <div style="flex: 1;"></div>
@@ -149,5 +149,10 @@ export default {
   font-size: 12px;
   color: rgb(234, 80, 80);
   margin-top: 5px;
+}
+
+/* 文本不可选中 */
+.no-select {
+  user-select: none;
 }
 </style>

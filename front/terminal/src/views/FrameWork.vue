@@ -2,10 +2,10 @@
   <div class="golbal">
     <!-- 设置栏 -->
     <div class="setting" v-show="isShowSetting" >
-      <div class="setting-menu" @click="doSettings(1)" ><div>连接设置</div></div>
-      <div class="setting-menu" @click="doSettings(2)" ><div>偏好设置</div></div>
-      <div class="setting-menu" @click="doSettings(4)" ><div>文件管理</div></div>
-      <div class="setting-menu" @click="doSettings(3)" ><div>重启</div></div>
+      <div class="setting-menu no-select" @click="doSettings(1)" ><div>连接设置</div></div>
+      <div class="setting-menu no-select" @click="doSettings(2)" ><div>偏好设置</div></div>
+      <div class="setting-menu no-select" @click="doSettings(4)" ><div>文件管理</div></div>
+      <div class="setting-menu no-select" @click="doSettings(3)" ><div>重启</div></div>
     </div>
     <div class="bar">
       <div style="user-select: none;" @click="showSettings" >
@@ -18,7 +18,7 @@
   </div>
 
   <!-- 连接设置 -->
-  <ConnectSetting ref="connectSettingRef" :env="env" @callback="saveEnv" ></ConnectSetting>
+  <ConnectSetting ref="connectSettingRef" :env="env" @callback="saveEnv" :close-on-click-modal="false" ></ConnectSetting>
   <!-- 样式设置 -->
   <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" ></StyleSetting>
   <!-- 文件管理 -->
@@ -370,5 +370,8 @@ export default {
   background-color: #91c9f7;
 }
 
-
+/* 文本不可选中 */
+.no-select {
+  user-select: none;
+}
 </style>

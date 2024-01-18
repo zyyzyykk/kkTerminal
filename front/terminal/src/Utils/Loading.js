@@ -1,4 +1,4 @@
-// 加载中。。。
+// 加载中...
 import { ElLoading } from 'element-plus'
 export default function() {
     const loading = ElLoading.service({

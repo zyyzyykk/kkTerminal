@@ -10,7 +10,7 @@
     <div style="margin-top: -15px;"></div>
     <div>
       <div class="item-class" style="margin-bottom: 15px;">
-        <div>主机ip：</div>
+        <div class="no-select">主机ip：</div>
         <div>
           <el-input v-model="setInfo.server_ip" class="w-50 m-2" placeholder="输入主机ip">
             <template #prefix>
@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;">
-        <div>端口号：</div>
+        <div class="no-select">端口号：</div>
         <div>
           <el-input v-model="setInfo.server_port" class="w-50 m-2" placeholder="输入端口号">
             <template #prefix>
@@ -30,7 +30,7 @@
         </div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;">
-        <div>用户名：</div>
+        <div class="no-select">用户名：</div>
         <div>
           <el-input v-model="setInfo.server_user" class="w-50 m-2" placeholder="输入用户名">
             <template #prefix>
@@ -40,7 +40,7 @@
         </div>
       </div>
       <div class="item-class" style="margin-bottom: 5px;">
-        <div>密 &nbsp; 码：</div>
+        <div class="no-select">密 &nbsp; 码：</div>
         <div>
           <el-input v-model="setInfo.server_password" type="password" class="w-50 m-2" placeholder="输入密码">
             <template #prefix>
@@ -50,7 +50,7 @@
         </div>
       </div>
     </div>
-    <div class="errInfo"> {{ err_msg }} </div>
+    <div class="errInfo no-select"> {{ err_msg }} </div>
     <div style="margin-bottom: 5px;"></div>
     <div style="display: flex; border-top: 1px solid #f1f2f4;">
       <div style="flex: 1;"></div>
@@ -83,6 +83,29 @@ export default {
       server_password:props.env.server_password,
     });
     const confirm = () => {
+      // 校验参数
+      err_msg.value = '';
+      // 验证IP地址
+      const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+      if (!ipRegex.test(setInfo.value.server_ip)) {
+        err_msg.value = "主机ip地址无效";
+        return;
+      }
+      // 校验端口号
+      if (isNaN(setInfo.value.server_port) || setInfo.value.server_port < 0 || setInfo.value.server_port > 65535) {
+        err_msg.value = "端口号无效";
+        return;
+      }
+      // 校验用户名
+      if (!(setInfo.value.server_user && setInfo.value.server_user != '')) {
+        err_msg.value = "用户名不能为空";
+        return;
+      }
+      // 校验密码
+      if (!(setInfo.value.server_password && setInfo.value.server_password != '')) {
+        err_msg.value = "密码不能为空";
+        return;
+      }
       context.emit('callback',setInfo.value);
       DialogVisilble.value = false;
     }
@@ -110,6 +133,11 @@ export default {
 .errInfo{
   font-size: 12px;
   color: rgb(234, 80, 80);
-  margin-top: 5px;
+  margin-top: 8px;
+}
+
+/* 文本不可选中 */
+.no-select {
+  user-select: none;
 }
 </style>

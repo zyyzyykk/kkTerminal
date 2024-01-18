@@ -45,7 +45,7 @@ docker run -d --name kkterminal -p 3000:3000 zyyzyykk/kkterminal
 docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kkterminal
 ```
 
-### 🛸 预览：
+### 🛸 预览
 
 访问以下网址：
 
@@ -127,10 +127,10 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 ### 🧬 架构
 
 ```markdown
-+---------+     http     +-------------+    ssh     +---------------+
-| browser | <==========> | kk Terminal | <========> | remote server |
-+---------+   websocket  +-------------+    sftp    +---------------+
-Vue + xterm             SpringBoot + sshj
++---------+     http      +-------------+    ssh     +---------------+
+| browser | <===========> | kk Terminal | <========> | remote server |
++---------+   websocket   +-------------+    sftp    +---------------+
+Vue + xterm              SpringBoot + sshj
 ```
 
 ### 🏘️ 关于此项目
