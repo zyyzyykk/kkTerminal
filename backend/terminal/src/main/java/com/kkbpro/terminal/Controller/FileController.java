@@ -80,7 +80,15 @@ public class FileController {
                 // 是否为文件夹
                 if(file.isDirectory()) fileInfo.setIsDirectory(true);
                 else if(file.isRegularFile()) fileInfo.setIsDirectory(false);
-                else fileInfo.setIsDirectory(FileMode.Type.DIRECTORY.equals(sftp.stat(path + "/" + file.getName()).getType()));
+                else
+                {
+                    try {
+                        fileInfo.setIsDirectory(FileMode.Type.DIRECTORY.equals(sftp.stat(path + "/" + file.getName()).getType()));
+                    } catch (net.schmizz.sshj.sftp.SFTPException e) {
+                        e.printStackTrace();
+                        fileInfo.setIsDirectory(false);
+                    }
+                }
 
                 fileInfo.setAttributes(file.getAttributes());
                 fileInfoList.add(fileInfo);

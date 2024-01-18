@@ -128,10 +128,6 @@ export default {
             else {
               files.value = [];
               noDataMsg.value = resp.info;
-              ElMessage({
-                message: resp.info,
-                type: resp.status,
-              })
             }
           }
         },
