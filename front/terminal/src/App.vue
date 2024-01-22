@@ -21,4 +21,12 @@ img {
   -moz-user-drag: none; /* Firefox */
   -o-user-drag: none; /* Opera */
 }
+
+.el-dialog__wrapper{
+  pointer-events: none;
+}
+.el-dialog{
+  pointer-events: auto;
+}
+
 </style>

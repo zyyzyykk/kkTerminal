@@ -5,18 +5,27 @@
     :width="360"
     title="连接设置"
     :modal="false"
+    :append-to-body="true"
+    :close-on-click-modal="false"
     draggable
   >
     <div style="margin-top: -15px;"></div>
     <div>
       <div class="item-class" style="margin-bottom: 15px;">
+        <div class="no-select">配 &nbsp; 置：</div>
+        <div :class="!(option && option.length > 0) ? 'new-option': 'old-option'" >{{ !(option && option.length > 0) ? '新建配置' : option }}</div>
+        <div style="flex: 1;"></div>
+        <div><el-button size="small" type="primary" @click="confirm" >导入</el-button></div>
+        <div><el-button size="small" type="primary" @click="confirm" style="margin-left: 10px;" >保存</el-button></div>
+      </div>
+      <div class="item-class" style="margin-bottom: 15px;">
         <div class="no-select">主机ip：</div>
-        <div>
-          <el-input v-model="setInfo.server_ip" class="w-50 m-2" placeholder="输入主机ip">
-            <template #prefix>
-              <el-icon><HomeFilled /></el-icon>
-            </template>
-          </el-input>
+          <div>
+            <el-input v-model="setInfo.server_ip" class="w-50 m-2" placeholder="输入主机ip">
+              <template #prefix>
+                <el-icon><HomeFilled /></el-icon>
+              </template>
+            </el-input>
         </div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;">
@@ -82,6 +91,17 @@ export default {
       server_user: props.env.server_user,
       server_password:props.env.server_password,
     });
+
+    // 配置选项
+    const option = ref(props.option);
+    const useOption = () => {
+      if(option.value != null && localStorage.getItem("option-" + option.value)) {
+        setInfo.value = JSON.parse(localStorage.getItem("option-" + option.value));
+      }
+    }
+    useOption();
+
+
     const confirm = () => {
       // 校验参数
       err_msg.value = '';
@@ -115,6 +135,7 @@ export default {
       DialogVisilble,
       err_msg,
       confirm,
+      option,
 
     }
   }
@@ -139,5 +160,13 @@ export default {
 /* 文本不可选中 */
 .no-select {
   user-select: none;
+}
+
+.old-option {
+  color: #67c23a;
+}
+
+.new-option {
+  color: #f56c6c;
 }
 </style>

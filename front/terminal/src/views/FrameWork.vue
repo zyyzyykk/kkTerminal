@@ -132,10 +132,7 @@ export default {
           term.clear();
           now_connect_status.value = connect_status.value['Fail'];
           term.write(now_connect_status.value);
-          // 第一次使用
-          if(!env.value.server_ip || env.value.server_ip == '') {
-            doSettings(1);
-          }
+          doSettings(1);
         }
         // 连接成功
         if(result.code == 0) {
