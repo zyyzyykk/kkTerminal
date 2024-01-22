@@ -22,10 +22,11 @@ img {
   -o-user-drag: none; /* Opera */
 }
 
-.el-dialog__wrapper{
+.kk-dialog-class {
   pointer-events: none;
 }
-.el-dialog{
+
+.el-dialog {
   pointer-events: auto;
 }
 

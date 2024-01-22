@@ -4,7 +4,7 @@
     destroy-on-close
     :width="420"
     :modal="false"
-    :append-to-body="true"
+    modal-class="kk-dialog-class"
     draggable
   >
     <div style="margin-top: -15px;"></div>

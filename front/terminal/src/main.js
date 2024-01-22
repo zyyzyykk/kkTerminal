@@ -25,7 +25,6 @@ app.mount('#app');
 // 引入全局样式
 import './assets/base.css'
 
-
 // jQuery配置Ajax全局响应拦截，进行数据解密
 import $ from 'jquery';
 import { decrypt } from './Utils/Encrypt';
