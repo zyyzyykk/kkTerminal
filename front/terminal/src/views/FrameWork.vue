@@ -18,7 +18,7 @@
   </div>
 
   <!-- 连接设置 -->
-  <ConnectSetting ref="connectSettingRef" :env="env" @callback="saveEnv" :close-on-click-modal="false" ></ConnectSetting>
+  <ConnectSetting ref="connectSettingRef" :env="env" :sshOptions="options" @saveOp="saveOp" @callback="saveEnv"></ConnectSetting>
   <!-- 样式设置 -->
   <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" ></StyleSetting>
   <!-- 文件管理 -->
@@ -60,11 +60,26 @@ export default {
 
     // 加载环境变量
     const env = ref(null);
+    const options = ref({});
     const loadEnv = () => {
       if(localStorage.getItem('env')) env.value = JSON.parse(decrypt(localStorage.getItem('env')));
       else env.value = default_env;
     }
     loadEnv();
+
+    const loadOp = () => {
+      if(localStorage.getItem('options')) options.value = JSON.parse(decrypt(localStorage.getItem('options')));
+      else options.value = {};
+    }
+    loadOp();
+
+    // 保存更改的配置
+    const saveOp = (name,item) => {
+      console.log('iiiu');
+      options.value = {...options.value,[name]:item};
+      localStorage.setItem('options',encrypt(JSON.stringify(options.value)));
+      loadOp();
+    }
 
     // 连接状态
     const connect_status = ref({
@@ -295,6 +310,7 @@ export default {
 
     return {
       env,
+      options,
       now_connect_status,
       terminal,
       doSSHConnect,
@@ -308,6 +324,7 @@ export default {
       saveEnv,
       sshKey,
       doHeartBeat,
+      saveOp,
     }
 
   }
