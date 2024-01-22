@@ -13,10 +13,10 @@
     <div>
       <div class="item-class" style="margin-bottom: 15px;">
         <div class="no-select">配 &nbsp; 置：</div>
-        <div :class="!(option && option.length > 0) ? 'new-option': 'old-option'" >{{ !(option && option.length > 0) ? '新建配置' : option }}</div>
+        <div :class="!(setInfo.option && setInfo.option.length > 0) ? 'new-option': 'old-option'" >{{ !(setInfo.option && setInfo.option.length > 0) ? '未命名配置' : setInfo.option }}</div>
         <div style="flex: 1;"></div>
-        <div><el-button size="small" type="primary" @click="confirm" >导入</el-button></div>
-        <div><el-button size="small" type="primary" @click="confirm" style="margin-left: 10px;" >保存</el-button></div>
+        <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" >导入</el-button></div>
+        <div><el-button size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" >保存</el-button></div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;">
         <div class="no-select">主机ip：</div>
@@ -68,16 +68,21 @@
       </el-button>
     </div>
   </el-dialog>
+
+  <!-- 配置管理 -->
+  <OptionBlock ref="optionBlockRef" @callback="doOption" :opType="optionBlockType" :sshOptions="sshOptions" ></OptionBlock>
 </template>
 
 <script>
 import { ref } from 'vue';
+import OptionBlock from './OptionBlock';
 
 export default {
   name:'ConnectSetting',
   components: {
+    OptionBlock,
   },
-  props:['env'],
+  props:['env','sshOptions'],
   setup(props,context) {
 
     // 控制Dialog显示
@@ -90,17 +95,31 @@ export default {
       server_port: props.env.server_port,
       server_user: props.env.server_user,
       server_password:props.env.server_password,
+      option: props.env.option,
     });
 
     // 配置选项
-    const option = ref(props.option);
-    const useOption = () => {
-      if(option.value != null && localStorage.getItem("option-" + option.value)) {
-        setInfo.value = JSON.parse(localStorage.getItem("option-" + option.value));
+    const optionBlockRef = ref();
+    const optionBlockType = ref(0);
+
+    const showOption = (type) => {
+      optionBlockType.value = type;
+      optionBlockRef.value.DialogVisilble = true;
+    }
+
+    const doOption = (option) => {
+      // 导入
+      if(optionBlockType.value == 0)
+      {
+        setInfo.value = {...setInfo.value, ...props.sshOptions[option]};
+      }
+      // 保存
+      else if(optionBlockType.value == 1)
+      {
+        setInfo.value.option = option;
+        context.emit('saveOp', option, setInfo.value);
       }
     }
-    useOption();
-
 
     const confirm = () => {
       // 校验参数
@@ -135,7 +154,10 @@ export default {
       DialogVisilble,
       err_msg,
       confirm,
-      option,
+      optionBlockRef,
+      showOption,
+      optionBlockType,
+      doOption,
 
     }
   }
@@ -168,18 +190,5 @@ export default {
 
 .new-option {
   color: #f56c6c;
-}
-
-.el-dialog__wrapper {
-  pointer-events: none !important;
-}
-
-.el-dialog {
-  pointer-events: auto;
-}
-
-.ff
-{
-  display: none;
 }
 </style>
