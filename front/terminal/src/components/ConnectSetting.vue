@@ -5,8 +5,8 @@
     :width="360"
     title="连接设置"
     :modal="false"
-    :append-to-body="true"
     :close-on-click-modal="false"
+    modal-class="kk-dialog-class"
     draggable
   >
     <div style="margin-top: -15px;"></div>
@@ -168,5 +168,18 @@ export default {
 
 .new-option {
   color: #f56c6c;
+}
+
+.el-dialog__wrapper {
+  pointer-events: none !important;
+}
+
+.el-dialog {
+  pointer-events: auto;
+}
+
+.ff
+{
+  display: none;
 }
 </style>

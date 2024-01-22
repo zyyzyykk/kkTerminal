@@ -5,7 +5,7 @@
     :width="420"
     title="样式设置"
     :modal="false"
-    :append-to-body="true"
+    modal-class="kk-dialog-class"
     draggable
   >
     <div style="margin-top: -15px;"></div>
