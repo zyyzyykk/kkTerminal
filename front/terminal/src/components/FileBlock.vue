@@ -5,7 +5,7 @@
     title="文件管理"
     width="50%"
     :modal="false"
-    :append-to-body="true"
+    modal-class="kk-dialog-class"
     draggable
   >
     <div style="margin-top: -15px;"></div>

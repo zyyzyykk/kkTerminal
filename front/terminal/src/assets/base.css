@@ -66,10 +66,3 @@ body {
         margin-right: 5px;
     }
 }
-
-.el-dialog__wrapper{
-  pointer-events: none;
-}
-.el-dialog {
-    pointer-events: auto;
-}
