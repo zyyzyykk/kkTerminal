@@ -4,51 +4,112 @@
     destroy-on-close
     :width="420"
     :modal="false"
+    title="全部配置"
     modal-class="kk-dialog-class"
     draggable
   >
     <div style="margin-top: -15px;"></div>
     <div class="no-select">
-        <div v-if="files.length != 0">
-            <div v-for="item in files" :key="item.name" >
-              <template v-if="item.isDirectory == true">
-                <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" >
-                  <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
-                  <div style="margin: 0 10px;">{{ item.name }}</div>
-                </div>
-              </template>
-              <template v-else>
-                <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="downloadFile(item.name)" >
-                  <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
-                  <div style="margin: 0 10px;">{{ item.name }}</div>
-                </div>
-              </template>
-            </div>
+      <div v-if="Object.keys(sshOptions).length > 0" class="kk-border">
+        <div v-for="(value, key) in sshOptions" :key="key" >
+          <div class="item-class" @click="aimOption = key">
+            <FileIcons name="kk.txt" width="20" height="20" :isFloder="false" />
+            <div style="margin: 0 10px;">{{ key }}</div>
+          </div>
         </div>
-        <div v-else>
-          <NoData v-if="loading == false" :msg="noDataMsg"></NoData>
+      </div>
+      <div v-else class="kk-border">
+        <NoData :msg="noDataMsg"></NoData>
+      </div>
+      <div class="kk-flex">
+        <div>配置名：</div>
+        <div style="flex: 1;">
+          <el-input size="small" v-model="aimOption" :disabled="opType == 0" class="w-50 m-2" placeholder="">
+          </el-input>
         </div>
+        <div style="margin-left: 10px;">
+          <el-button size="small" type="primary" @click="confirm" >
+            {{ opType ? '保存' : '导入'}}
+          </el-button>
+        </div>
+      </div>
     </div>
   </el-dialog>
 </template>
 
 <script>
+import { ref } from 'vue';
+
+import NoData from '@/components/NoData';
+// 引入文件图标组件
+import FileIcons from 'file-icons-vue'
 
 export default {
   name: 'OptionBlock',
   components: {
-
+    FileIcons,
+    NoData,
   },
-  setup(props)
+  props:['opType','sshOptions'],
+  setup(props,context)
   {
+    // 控制Dialog显示
+    const DialogVisilble = ref(false);
+    const err_msg = ref('');
+    const noDataMsg = ref('暂无配置');
+    
+    // 目标配置
+    const aimOption = ref('');
+    
+    // 确定
+    const confirm = () => {
+      if(aimOption.value == '') return;
+      context.emit('callback',aimOption.value);
+      DialogVisilble.value = false;
+    }
 
     return {
-      
+      DialogVisilble,
+      err_msg,
+      noDataMsg,
+      aimOption,
+      confirm,
+
     }
   }
 }
 </script>
 
 <style scoped>
+.item-class {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-bottom: 1px solid #ececec;
+  cursor: pointer;
+  width: 100%;
+}
 
+.item-class:hover {
+  background-color: #f3f3f3;
+}
+
+.kk-flex {
+  display: flex; 
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* 文本不可选中 */
+.no-select {
+  user-select: none;
+}
+
+.kk-border
+{
+  height: 30vh;
+  overflow-y: scroll;
+  width: 100%;
+  border-bottom: 1px solid #ececec;
+}
 </style>
