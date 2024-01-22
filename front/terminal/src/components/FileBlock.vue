@@ -5,6 +5,7 @@
     title="文件管理"
     width="50%"
     :modal="false"
+    :append-to-body="true"
     draggable
   >
     <div style="margin-top: -15px;"></div>
@@ -227,6 +228,7 @@ export default {
               ElMessage({
                 message: resp.info,
                 type: resp.status,
+                grouping: true,
               })
             }
             // 文件片上传成功
@@ -238,6 +240,7 @@ export default {
               ElMessage({
                 message: resp.info,
                 type: resp.status,
+                grouping: true,
               })
               chunk = chunks + 1;
             }
@@ -246,6 +249,7 @@ export default {
               ElMessage({
                 message: resp.info,
                 type: resp.status,
+                grouping: true,
               })
               chunk = chunks + 1;
             }
@@ -254,6 +258,7 @@ export default {
               ElMessage({
                 message: resp.info,
                 type: resp.status,
+                grouping: true,
               })
               chunk = chunks + 1;
             }
@@ -262,6 +267,7 @@ export default {
               ElMessage({
                 message: resp.info,
                 type: resp.status,
+                grouping: true,
               })
               chunk = chunks + 1;
             }
