@@ -68,14 +68,16 @@ export default {
     loadEnv();
 
     const loadOp = () => {
-      if(localStorage.getItem('options')) options.value = JSON.parse(decrypt(localStorage.getItem('options')));
+      if(localStorage.getItem('options')) {
+        options.value = JSON.parse(decrypt(localStorage.getItem('options')));
+        env.value = {...env.value,...options.value[env.value['option']]};
+      }
       else options.value = {};
     }
     loadOp();
 
     // 保存更改的配置
     const saveOp = (name,item) => {
-      console.log('iiiu');
       options.value = {...options.value,[name]:item};
       localStorage.setItem('options',encrypt(JSON.stringify(options.value)));
       loadOp();

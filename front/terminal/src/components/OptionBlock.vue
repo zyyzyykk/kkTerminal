@@ -1,6 +1,7 @@
 <template>
   <el-dialog
     v-model="DialogVisilble"
+    :before-close="closeDialog"
     destroy-on-close
     :width="420"
     :modal="false"
@@ -12,7 +13,7 @@
     <div class="no-select">
       <div v-if="Object.keys(sshOptions).length > 0" class="kk-border">
         <div v-for="(value, key) in sshOptions" :key="key" >
-          <div class="item-class" @click="aimOption = key">
+          <div :class="['item-class', (aimOption == key) ? 'item-selected' : '']" @click="aimOption = key">
             <FileIcons name="kk.txt" width="20" height="20" :isFloder="false" />
             <div style="margin: 0 10px;">{{ key }}</div>
           </div>
@@ -68,12 +69,19 @@ export default {
       DialogVisilble.value = false;
     }
 
+    // 关闭
+    const closeDialog = (done) => {
+      aimOption.value = '';
+      done();
+    }
+
     return {
       DialogVisilble,
       err_msg,
       noDataMsg,
       aimOption,
       confirm,
+      closeDialog,
 
     }
   }
@@ -94,6 +102,10 @@ export default {
   background-color: #f3f3f3;
 }
 
+.item-selected {
+  background-color: #f3f3f3;
+}
+
 .kk-flex {
   display: flex; 
   align-items: center;
@@ -107,7 +119,7 @@ export default {
 
 .kk-border
 {
-  height: 30vh;
+  height: 30.1vh;
   overflow-y: scroll;
   width: 100%;
   border-bottom: 1px solid #ececec;
