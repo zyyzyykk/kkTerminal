@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-01-11
+> 更新时间：2024-01-23
 >
 
 ### **⚡** 快速引入
@@ -52,13 +52,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 - 🌐 国内服务器访问：https://ssh.kkbpro.com/
 - 🌍 国外服务器访问：https://ssh.kkbapps.com/
 
-![kkterminal](https://img.kkbapps.com/kkterminal-1.png)
+![kkterminal](https://img.kkbapps.com/terminal/1.png)
 
-![kkterminal](https://img.kkbapps.com/kkterminal-2.png)
+![kkterminal](https://img.kkbapps.com/terminal/2.png)
 
-![kkterminal](https://img.kkbapps.com/kkterminal-3.png)
+![kkterminal](https://img.kkbapps.com/terminal/3.png)
 
-![kkterminal](https://img.kkbapps.com/kkterminal-4.png)
+![kkterminal](https://img.kkbapps.com/terminal/4.png)
 
 ### 💡 功能说明
 
@@ -78,7 +78,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbapps" zyyzyykk/kktermi
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:2.9.0：latest
+##### zyyzyykk/kkterminal:2.9.2：latest
+
+- 修改提示语内容
+- 对弹窗模块进行优化，打开弹窗后可继续操作终端
+- 新增连接配置的保存与导入，可快速切换连接多个远程服务器
+
+##### zyyzyykk/kkterminal:2.9.0：
 
 - 修改了一些默认样式，增加了网页描述与细节处理
 - 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.1.3` 版本，后续版本会同步更新图标库，不再进行说明
