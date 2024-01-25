@@ -135,7 +135,7 @@ export default {
     }
 
     // websocket连接
-    const sshKey = ref(''); 
+    const sshKey = ref('');
     const socket = ref(null);
     const doSSHConnect = () => {
       socket.value = new WebSocket(ws_base_url + changeStr(encrypt(JSON.stringify(env.value))));
@@ -156,6 +156,9 @@ export default {
           term.clear();
           now_connect_status.value = connect_status.value['Success'];
           sshKey.value = decrypt(result.info);
+          setTimeout(() => {
+            termFit();
+          },200);
           // term.write(now_connect_status.value);
         }
         // 输出
@@ -165,8 +168,8 @@ export default {
           term.options.scrollback += term._core.buffer.lines.length;
         }
       }
-      socket.value.onclose = () => {
-        if(now_connect_status.value == connect_status.value['Success']) {
+      socket.value.onclose = (e) => {
+        if(now_connect_status.value == connect_status.value['Success'] && e.code != 3333) {
           now_connect_status.value = connect_status.value['Disconnected'];
           term.write("\r\n" + now_connect_status.value);
         }
@@ -267,7 +270,7 @@ export default {
       else if (type == 3) {
         isShowSetting.value = false;
         now_connect_status.value = connect_status.value['Connecting'];
-        if(socket.value) socket.value.close();
+        if(socket.value) socket.value.close(3333);  // 主动释放资源，必需
         doSSHConnect();
         resetTerminal();
       }
