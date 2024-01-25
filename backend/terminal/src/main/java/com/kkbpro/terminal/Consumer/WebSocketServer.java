@@ -145,6 +145,7 @@ public class WebSocketServer {
             // 临时文件根文件夹
             File temporaryRootFolder = new File(FileUtil.folderBasePath);
             File[] files = temporaryRootFolder.listFiles();
+            if(files == null || files.length == 0) return;
             for (File file : files) {
                 // 判断是否是本次ssh对应的临时文件夹
                 if (file.isDirectory() && StringUtil.isPrefix(key, file.getName())) {
