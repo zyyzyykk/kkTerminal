@@ -113,7 +113,7 @@ export default {
           cursor: "help",                                     // 设置光标
         },
 
-        lineHeight: 1.2,  
+        lineHeight: 1.2,
         fontFamily: env.value.fontFamily,                     // 设置字体为 Simsun
         fontSize: env.value.fontSize,                         // 设置字号为 16
 
@@ -191,27 +191,41 @@ export default {
       doSettings(3);
     };
 
-
-    // 右键事件函数
-    const doPaste = async function(event) {
-      event.preventDefault();   // 阻止默认的上下文菜单弹出
-      let pasteText = await navigator.clipboard.readText();
-      if(socket.value)
-      {
+    // 文本消息发送
+    const sendMessage = (text) => {
+      if(socket.value) {
+        // TODO kkterminal 快捷键判断
+        // if(chargeKey(e)) return;
         // 重启后第一次输入
         if(isFirst.value) {
           termFit();
           isFirst.value = false;
         }
-        socket.value.send(encrypt(JSON.stringify({type:0,content:pasteText,rows:0,cols:0})));
+        socket.value.send(encrypt(JSON.stringify({type:0,content:text,rows:0,cols:0})));
       }
+    }
+
+    // 中文
+    const putChinese = (event) => {
+      event.preventDefault();
+      sendMessage(event.target.value);
+    }
+
+    // 右键事件函数
+    const doPaste = async function(event) {
+      event.preventDefault();   // 阻止默认的上下文菜单弹出
+      let pasteText = await navigator.clipboard.readText();
+      sendMessage(pasteText);
     };
 
     // 重启终端
     const resetTerminal = () => {
       // 文件管理
       fileBlockRef.value.dir = '';
-      if(term && terminal.value) terminal.value.removeEventListener('contextmenu', doPaste);
+      if(term && terminal.value) {
+        terminal.value.removeEventListener('contextmenu', doPaste);
+        terminal.value.removeEventListener('compositionend', putChinese);
+      }
       terminal.value.innerHTML = '';
       isFirst.value = true;
       loadEnv();
@@ -219,18 +233,12 @@ export default {
       term.open(terminal.value);
       termFit();
 
-      // 添加事件监听器，支持输入方法
+      // 支持中文输入
+      terminal.value.addEventListener('compositionend', putChinese);
+
+      // 正常输入
       term.onKey(e => {
-        if(socket.value) {
-          // TODO kkterminal 快捷键判断
-          // if(chargeKey(e)) return;
-          // 重启后第一次输入
-          if(isFirst.value) {
-            termFit();
-            isFirst.value = false;
-          }
-          socket.value.send(encrypt(JSON.stringify({type:0,content:e.key,rows:0,cols:0})));
-        }
+        sendMessage(e.key);
       });
 
       // 监听选中文本，自动复制
