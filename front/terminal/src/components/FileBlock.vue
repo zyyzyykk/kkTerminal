@@ -6,6 +6,7 @@
     width="50%"
     :modal="false"
     modal-class="kk-dialog-class"
+    style="position: relative;"
     draggable
   >
     <div style="margin-top: -15px;"></div>
@@ -36,13 +37,13 @@
             <div v-if="files.length != 0">
                 <div v-for="item in files" :key="item.name" >
                   <template v-if="item.isDirectory == true">
-                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" >
+                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @contextmenu="doContextmenu($event,item)" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" >
                       <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
                   </template>
                   <template v-else>
-                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="downloadFile(item.name)" >
+                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @contextmenu="doContextmenu($event,item)" @click="aimFileInfo = item" @dblclick="preViewFile(item.name)" >
                       <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
@@ -55,6 +56,10 @@
         </div>
     </div>
   </el-dialog>
+
+  <FileOption ref="fileOptionRef" :file="fileOptionFile" @callback="fileOptionCallback" ></FileOption>
+  <TxtPreview ref="txtPreviewRef" ></TxtPreview>
+
 </template>
 
 <script>
@@ -64,6 +69,8 @@ import { ElMessage } from 'element-plus'
 import { http_base_url } from '@/Utils/BaseUrl';
 
 import NoData from '@/components/NoData';
+import FileOption from './FileOption';
+import TxtPreview from './preview/TxtPreview';
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue'
@@ -73,6 +80,8 @@ export default {
   components: {
     NoData,
     FileIcons,
+    FileOption,
+    TxtPreview,
   },
   props:['sshKey'],
   setup(props) {
@@ -138,11 +147,16 @@ export default {
       });
     }
 
+    // 获取文件url
+    const getFileUrl = (name) => {
+      return http_base_url + '/download/' + name + '?sshKey=' + props.sshKey + '&path=' + dir.value;
+    }
+
     // 下载文件
     const downloadFile = (name) => {
       if(isShowDirInput.value == true) return;
       let a = document.createElement('a');
-      a.href = http_base_url + '/download/' + name + '?sshKey=' + props.sshKey + '&path=' + dir.value;
+      a.href = getFileUrl(name);
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -284,7 +298,32 @@ export default {
       // dir.value = '/';
       // aimFileInfo.value = null;
       // files.value = [];
+      fileOptionRef.value.isShow = false;
       done();
+    }
+
+    // 右键
+    const fileOptionRef = ref();
+    const fileOptionFile = ref(null);
+    const doContextmenu = (event,item) => {
+      event.preventDefault();
+      fileOptionRef.value.fileOptionBody.style.top = event.pageY + 'px';
+      fileOptionRef.value.fileOptionBody.style.left = event.pageX + 'px';
+      fileOptionFile.value = item;
+      fileOptionRef.value.isShow = true;
+    }
+    const fileOptionCallback = () => {
+
+    }
+
+    // 文本文件编辑
+    const txtPreviewRef = ref();
+    const preViewFile = (name) => {
+      txtPreviewRef.value.fileName = name;
+      txtPreviewRef.value.fileUrl = getFileUrl(name);
+      txtPreviewRef.value.initText();
+      txtPreviewRef.value.loading = true;
+      txtPreviewRef.value.DialogVisilble = true;
     }
 
     return {
@@ -305,6 +344,12 @@ export default {
       doUpload,
       aimFileInfo,
       loading,
+      fileOptionRef,
+      doContextmenu,
+      fileOptionFile,
+      fileOptionCallback,
+      txtPreviewRef,
+      preViewFile,
 
     }
   }

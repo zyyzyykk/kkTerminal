@@ -378,7 +378,7 @@ export default {
   left: 0;
   top: 25px;
   z-index: 100;
-  cursor: pointer;;
+  cursor: pointer;
 }
 
 .setting-menu {

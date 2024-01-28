@@ -1,7 +1,6 @@
 package com.kkbpro.terminal.Utils;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.util.DigestUtils;
 
 /**
  * 字符串相关工具类
