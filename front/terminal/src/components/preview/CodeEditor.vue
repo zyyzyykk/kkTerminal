@@ -8,7 +8,7 @@
 
 <script>
 import * as monaco from "monaco-editor";
-import { ref, toRaw, onMounted } from "vue";
+import { ref, toRaw, onMounted, onUnmounted } from "vue";
 
 export default {
   name: 'CodeEditor',
@@ -24,6 +24,17 @@ export default {
       const range = model.getFullModelRange();
       model.pushEditOperations(null, [{ range, text: text }]);
     }
+
+    const CtrlS = (event) => {
+      if (event.ctrlKey || event.metaKey) {
+        switch (String.fromCharCode(event.which).toLowerCase()) {
+          case 's':
+            event.preventDefault();
+            context.emit('handleSave', toRaw(codeEditor.value).getValue());
+            break;
+        }
+      }
+    };
 
     onMounted(() => {
       if (!codeEditorRef.value) return;
@@ -46,15 +57,23 @@ export default {
       codeEditor.value.onDidChangeModelContent(() => {
         // 当前最新内容
         // console.log(toRaw(codeEditor.value).getValue());
-        console.log(toRaw(codeEditor.value));
-        context.emit('handleChange', toRaw(codeEditor.value).getValue());
+        context.emit('handleChange');
       });
+
+      // 监听保存键 ctrl+s
+      codeEditorRef.value.addEventListener('keydown', CtrlS);
+
+    });
+
+    onUnmounted(() => {
+      if(codeEditorRef.value) codeEditorRef.value.removeEventListener('keydown', CtrlS);
     });
 
     return {
       codeEditorRef,
       codeEditor,
       setValue,
+      CtrlS,
 
     }
   }

@@ -37,13 +37,13 @@
             <div v-if="files.length != 0">
                 <div v-for="item in files" :key="item.name" >
                   <template v-if="item.isDirectory == true">
-                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @contextmenu="doContextmenu($event,item)" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" >
+                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" >
                       <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
                   </template>
                   <template v-else>
-                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @contextmenu="doContextmenu($event,item)" @click="aimFileInfo = item" @dblclick="preViewFile(item.name)" >
+                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="preViewFile(item.name)" >
                       <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
@@ -57,8 +57,8 @@
     </div>
   </el-dialog>
 
-  <FileOption ref="fileOptionRef" :file="fileOptionFile" @callback="fileOptionCallback" ></FileOption>
-  <TxtPreview ref="txtPreviewRef" ></TxtPreview>
+  <!-- <FileOption ref="fileOptionRef" :file="fileOptionFile" @callback="fileOptionCallback" ></FileOption> -->
+  <TxtPreview ref="txtPreviewRef" @doSave="doSave" ></TxtPreview>
 
 </template>
 
@@ -69,7 +69,7 @@ import { ElMessage } from 'element-plus'
 import { http_base_url } from '@/Utils/BaseUrl';
 
 import NoData from '@/components/NoData';
-import FileOption from './FileOption';
+// import FileOption from './FileOption';
 import TxtPreview from './preview/TxtPreview';
 
 // 引入文件图标组件
@@ -80,7 +80,7 @@ export default {
   components: {
     NoData,
     FileIcons,
-    FileOption,
+    // FileOption,
     TxtPreview,
   },
   props:['sshKey'],
@@ -152,6 +152,13 @@ export default {
       return http_base_url + '/download/' + name + '?sshKey=' + props.sshKey + '&path=' + dir.value;
     }
 
+    // 解析url的path
+    const parseUrlPath = (url) => {
+      let index = url.indexOf('&path=');
+      if(index != -1) return url.substr(index + 6);
+      else return null;
+    }
+
     // 下载文件
     const downloadFile = (name) => {
       if(isShowDirInput.value == true) return;
@@ -202,7 +209,7 @@ export default {
     }
     // 上传文件
     const chunkSize = 1024 * 517;   // 每一片大小517kB
-    const doUpload = async (fileData) => {
+    const doUpload = async (fileData, pathVal) => {
       if(isShowDirInput.value == true) return;
       let file = fileData.file;
       if(!file) return;
@@ -212,7 +219,7 @@ export default {
       const chunks = parseInt(Math.ceil(fileSize / chunkSize));
       const fileId = file.uid;
       let chunkIndex = 1;
-      const path = dir.value;
+      const path = pathVal ? pathVal : dir.value;
 
       // 分片上传
       for(let chunk=chunkIndex;chunk<=chunks;chunk++) {
@@ -298,23 +305,25 @@ export default {
       // dir.value = '/';
       // aimFileInfo.value = null;
       // files.value = [];
-      fileOptionRef.value.isShow = false;
+
+      // fileOptionRef.value.isShow = false;
+      txtPreviewRef.value.DialogVisilble = false;
       done();
     }
 
     // 右键
-    const fileOptionRef = ref();
-    const fileOptionFile = ref(null);
-    const doContextmenu = (event,item) => {
-      event.preventDefault();
-      fileOptionRef.value.fileOptionBody.style.top = event.pageY + 'px';
-      fileOptionRef.value.fileOptionBody.style.left = event.pageX + 'px';
-      fileOptionFile.value = item;
-      fileOptionRef.value.isShow = true;
-    }
-    const fileOptionCallback = () => {
+    // const fileOptionRef = ref();
+    // const fileOptionFile = ref(null);
+    // const doContextmenu = (event,item) => {
+    //   event.preventDefault();
+    //   fileOptionRef.value.fileOptionBody.style.top = event.pageY + 'px';
+    //   fileOptionRef.value.fileOptionBody.style.left = event.pageX + 'px';
+    //   fileOptionFile.value = item;
+    //   fileOptionRef.value.isShow = true;
+    // }
+    // const fileOptionCallback = () => {
 
-    }
+    // }
 
     // 文本文件编辑
     const txtPreviewRef = ref();
@@ -324,6 +333,16 @@ export default {
       txtPreviewRef.value.initText();
       txtPreviewRef.value.loading = true;
       txtPreviewRef.value.DialogVisilble = true;
+    }
+    // 保存文本，写回服务器
+    const doSave = (name, url, text) => {
+      let path = parseUrlPath(url);
+      // 创建Blob对象
+      const blob = new Blob([text], { type: 'text/plain' });
+      // 创建File对象
+      const file = new File([blob], name);
+      file.uid = Math.random().toString(36).substring(2);
+      doUpload({file:file}, path);
     }
 
     return {
@@ -343,13 +362,15 @@ export default {
       doDownload,
       doUpload,
       aimFileInfo,
+      // fileOptionRef,
+      // doContextmenu,
+      // fileOptionFile,
+      // fileOptionCallback,
       loading,
-      fileOptionRef,
-      doContextmenu,
-      fileOptionFile,
-      fileOptionCallback,
       txtPreviewRef,
       preViewFile,
+      doSave,
+      parseUrlPath,
 
     }
   }
