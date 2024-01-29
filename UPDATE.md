@@ -1,5 +1,10 @@
 ### 👨‍💻 历史更新记录
 
+##### zyyzyykk/kkterminal:2.9.0：
+
+- 修改了一些默认样式，增加了网页描述与细节处理
+- 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.1.3` 版本，后续版本会同步更新图标库，不再进行说明
+
 ##### zyyzyykk/kkterminal:2.8.8：
 
 - 修复了部分情况下文件与文件夹类别展示错误的bug
