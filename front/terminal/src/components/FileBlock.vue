@@ -153,10 +153,13 @@ export default {
     }
 
     // 解析url的path
-    const parseUrlPath = (url) => {
-      let index = url.indexOf('&path=');
-      if(index != -1) return url.substr(index + 6);
-      else return null;
+    const parseUrl = (url) => {
+      let urlParams = {key:'', path:null};
+      let indexKey = url.indexOf('?sshKey=');
+      let indexPath = url.indexOf('&path=');
+      if(indexKey != -1 && indexPath != -1) urlParams.key = url.substr(indexKey + 8, indexPath);
+      if(indexPath != -1) urlParams.path = url.substr(indexPath + 6);
+      return urlParams;
     }
 
     // 下载文件
@@ -336,13 +339,14 @@ export default {
     }
     // 保存文本，写回服务器
     const doSave = (name, url, text) => {
-      let path = parseUrlPath(url);
+      let urlParams = parseUrl(url);
+      if(urlParams.key != sshKey.value) return;
       // 创建Blob对象
       const blob = new Blob([text], { type: 'text/plain' });
       // 创建File对象
       const file = new File([blob], name);
       file.uid = Math.random().toString(36).substring(2);
-      doUpload({file:file}, path);
+      doUpload({file:file}, urlParams.path);
     }
 
     return {
@@ -370,7 +374,6 @@ export default {
       txtPreviewRef,
       preViewFile,
       doSave,
-      parseUrlPath,
 
     }
   }
