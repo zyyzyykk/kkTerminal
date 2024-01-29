@@ -279,6 +279,9 @@ export default {
         isShowSetting.value = false;
         now_connect_status.value = connect_status.value['Connecting'];
         if(socket.value) socket.value.close(3333);  // 主动释放资源，必需
+        // 关闭文件模块
+        fileBlockRef.value.DialogVisilble = false;
+        // 进行重启
         doSSHConnect();
         resetTerminal();
       }
@@ -318,6 +321,10 @@ export default {
     });
 
     onUnmounted(() => {
+      if(term && terminal.value) {
+        terminal.value.removeEventListener('contextmenu', doPaste);
+        terminal.value.removeEventListener('compositionend', putChinese);
+      }
       if(timer) clearInterval(timer);
     });
 
