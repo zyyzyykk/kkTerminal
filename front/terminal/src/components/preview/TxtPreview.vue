@@ -11,7 +11,7 @@
     <template #title>
       <div v-if="DialogVisilble" class="kk-flex">
         <FileIcons :name="fileName" width="25" height="25" :isFloder="false" />
-        <div style="margin: 0 5px; font-size: larger;">{{ fileName + modifyTag }}</div>
+        <div style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
       </div>
     </template>
     <div style="margin-top: -15px;"></div>
