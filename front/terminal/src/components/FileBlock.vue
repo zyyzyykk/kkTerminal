@@ -157,8 +157,8 @@ export default {
       let urlParams = {key:'', path:null};
       let indexKey = url.indexOf('?sshKey=');
       let indexPath = url.indexOf('&path=');
-      if(indexKey != -1 && indexPath != -1) urlParams.key = url.substr(indexKey + 8, indexPath);
-      if(indexPath != -1) urlParams.path = url.substr(indexPath + 6);
+      if(indexKey != -1 && indexPath != -1) urlParams.key = url.substring(indexKey + 8, indexPath);
+      if(indexPath != -1) urlParams.path = url.substring(indexPath + 6);
       return urlParams;
     }
 
@@ -219,7 +219,8 @@ export default {
       // 文件切片
       const fileName = file.name;
       const fileSize = file.size;
-      const chunks = parseInt(Math.ceil(fileSize / chunkSize));
+      // 允许上传空文件
+      const chunks = parseInt(Math.ceil(fileSize / chunkSize)) == 0 ? 1 : parseInt(Math.ceil(fileSize / chunkSize));
       const fileId = file.uid;
       let chunkIndex = 1;
       const path = pathVal ? pathVal : dir.value;
@@ -340,7 +341,7 @@ export default {
     // 保存文本，写回服务器
     const doSave = (name, url, text) => {
       let urlParams = parseUrl(url);
-      if(urlParams.key != sshKey.value) return;
+      if(urlParams.key != props.sshKey) return;
       // 创建Blob对象
       const blob = new Blob([text], { type: 'text/plain' });
       // 创建File对象

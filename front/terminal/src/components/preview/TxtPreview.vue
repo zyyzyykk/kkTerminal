@@ -74,6 +74,8 @@ export default {
               type: 'error',
               grouping: true,
             });
+            resetEditor();
+            DialogVisilble.value = false;
           }
         }
       });
@@ -89,10 +91,14 @@ export default {
       modifyTag.value = '';
     }
 
+    const resetEditor = () => {
+      codeEditorRef.value.setValue('');
+      modifyTag.value = '';
+    }
+
     const closeDialog = (done) => {
       setTimeout(() => {
-        codeEditorRef.value.setValue('');
-        modifyTag.value = '';
+        resetEditor();
       },200);
       done();
     }
@@ -109,6 +115,7 @@ export default {
       handleChange,
       handleSave,
       closeDialog,
+      resetEditor,
     }
   }
 }
