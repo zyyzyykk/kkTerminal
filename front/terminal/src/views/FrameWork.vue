@@ -281,6 +281,7 @@ export default {
         if(socket.value) socket.value.close(3333);  // 主动释放资源，必需
         // 关闭文件模块
         fileBlockRef.value.txtPreviewRef.DialogVisilble = false;
+        fileBlockRef.value.txtPreviewRef.resetEditor();
         fileBlockRef.value.DialogVisilble = false;
         // 进行重启
         doSSHConnect();
