@@ -61,20 +61,21 @@ export default {
     // 加载环境变量
     const env = ref(null);
     const options = ref({});
-    const loadEnv = () => {
-      if(localStorage.getItem('env')) env.value = JSON.parse(decrypt(localStorage.getItem('env')));
-      else env.value = default_env;
-    }
-    loadEnv();
-
     const loadOp = () => {
-      if(localStorage.getItem('options')) {
-        options.value = JSON.parse(decrypt(localStorage.getItem('options')));
-        env.value = {...env.value,...options.value[env.value['option']]};
-      }
+      if(localStorage.getItem('options')) options.value = JSON.parse(decrypt(localStorage.getItem('options')));
       else options.value = {};
     }
     loadOp();
+    const loadEnv = () => {
+      if(localStorage.getItem('env')) {
+        env.value = JSON.parse(decrypt(localStorage.getItem('env')));
+        let nowOpInfo = options.value[env.value['option']];
+        if(nowOpInfo) env.value = {...env.value,...nowOpInfo};
+        else env.value.option = '';
+      }
+      else env.value = default_env;
+    }
+    loadEnv();
 
     // 保存更改的配置
     const saveOp = (name,item) => {
@@ -170,6 +171,8 @@ export default {
       }
       socket.value.onclose = (e) => {
         if(now_connect_status.value == connect_status.value['Success'] && e.code != 3333) {
+          sshKey.value = '';
+          closeFileBlock();
           now_connect_status.value = connect_status.value['Disconnected'];
           term.write("\r\n" + now_connect_status.value);
         }
@@ -220,8 +223,6 @@ export default {
 
     // 重启终端
     const resetTerminal = () => {
-      // 文件管理
-      fileBlockRef.value.dir = '';
       if(term && terminal.value) {
         terminal.value.removeEventListener('contextmenu', doPaste);
         terminal.value.removeEventListener('compositionend', putChinese);
@@ -278,12 +279,10 @@ export default {
       else if (type == 3) {
         isShowSetting.value = false;
         now_connect_status.value = connect_status.value['Connecting'];
+        sshKey.value = '';
         if(socket.value) socket.value.close(3333);  // 主动释放资源，必需
-        // 关闭文件模块
-        fileBlockRef.value.txtPreviewRef.DialogVisilble = false;
-        fileBlockRef.value.txtPreviewRef.resetEditor();
-        fileBlockRef.value.DialogVisilble = false;
         // 进行重启
+        closeFileBlock();
         doSSHConnect();
         resetTerminal();
       }
@@ -305,6 +304,14 @@ export default {
           }
         },25000);
       }
+    }
+
+    // 关闭文件模块
+    const closeFileBlock = () => {
+      fileBlockRef.value.txtPreviewRef.DialogVisilble = false;
+      fileBlockRef.value.txtPreviewRef.resetEditor();
+      fileBlockRef.value.DialogVisilble = false;
+      fileBlockRef.value.dir = '';
     }
 
     onMounted(() => {
