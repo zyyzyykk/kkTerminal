@@ -131,6 +131,7 @@ export default {
         },
         success(resp){
           if(now_dir == dir.value) {
+            aimFileInfo.value = null;
             if(resp.status == 'success') {
               files.value = resp.data.files;
               noDataMsg.value = '暂无文件';
