@@ -61,11 +61,11 @@ export default {
     // 加载环境变量
     const env = ref(null);
     const options = ref({});
-    const loadOp = () => {
+    const loadOps = () => {
       if(localStorage.getItem('options')) options.value = JSON.parse(decrypt(localStorage.getItem('options')));
       else options.value = {};
     }
-    loadOp();
+    loadOps();
     const loadEnv = () => {
       if(localStorage.getItem('env')) {
         env.value = JSON.parse(decrypt(localStorage.getItem('env')));
@@ -81,7 +81,7 @@ export default {
     const saveOp = (name,item) => {
       options.value = {...options.value,[name]:item};
       localStorage.setItem('options',encrypt(JSON.stringify(options.value)));
-      loadOp();
+      loadOps();
     }
 
     // 连接状态
