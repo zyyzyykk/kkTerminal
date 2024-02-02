@@ -8,13 +8,12 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "ace-builds": "^1.32.5",
     "core-js": "^3.8.3",
     "crypto-js": "^4.1.1",
     "element-plus": "^2.3.12",
     "file-icons-vue": "^1.1.9",
     "jquery": "^3.7.1",
-    "monaco-editor": "^0.45.0",
-    "monaco-editor-webpack-plugin": "^7.1.0",
     "vue": "^3.2.13",
     "vue-clipboard3": "^2.0.0",
     "xterm": "^5.3.0",

@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-01-29
+> 更新时间：2024-02-02
 >
 
 ### **⚡** 快速引入
@@ -52,13 +52,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 🌐 国内服务器访问：https://ssh.kkbpro.com/
 - 🌍 国外服务器访问：https://ssh.kkbapps.com/
 
-![kkterminal](https://img.kkbapps.com/terminal/2.png)
+![kkterminal](https://img.kkbapps.com/terminal/2.9.7-1.png)
 
-![kkterminal](https://img.kkbapps.com/terminal/3.png)
+![kkterminal](https://img.kkbapps.com/terminal/2.9.7-2.png)
 
-![kkterminal](https://img.kkbapps.com/terminal/4.png)
+![kkterminal](https://img.kkbapps.com/terminal/2.9.7-3.png)
 
-![kkterminal](https://img.kkbapps.com/terminal/5.png)
+![kkterminal](https://img.kkbapps.com/terminal/2.9.7-4.png)
 
 ### 💡 功能说明
 
@@ -80,17 +80,16 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:2.9.5：latest
+##### zyyzyykk/kkterminal:2.9.7：latest
+
+- 优化显示细节
+- 文本编辑器由 `Monaco` 替换为更轻量的 `Ace`
+
+##### zyyzyykk/kkterminal:2.9.5：
 
 - 修复了已知bug
 - 支持中文输入
 - 新增文件的浏览与编辑功能，修改文件后使用 `ctrl+s` 保存至远程服务器
-
-##### zyyzyykk/kkterminal:2.9.2：
-
-- 修改提示语内容
-- 对弹窗模块进行优化，打开弹窗后可继续操作终端
-- 新增连接配置的保存与导入，可快速切换连接多个远程服务器
 
 ##### [历史更新记录](./UPDATE.md)
 

@@ -5,7 +5,7 @@
     :modal="false"
     modal-class="kk-dialog-class"
     :before-close="closeDialog"
-    top="10vh"
+    align-center
     draggable
   >
     <template #title>
@@ -16,14 +16,14 @@
     </template>
     <div style="margin-top: -15px;"></div>
     <div element-loading-text="Loading..." v-loading="loading" style="padding: 0px 5px; width: 100%; height: 60vh;">
-      <CodeEditor ref="codeEditorRef" :value="text" @handleChange="handleChange" @handleSave="handleSave" ></CodeEditor>
+      <AceEditor ref="codeEditorRef" :value="text" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
     </div>
   </el-dialog>
 </template>
 
 <script>
 import { ref } from 'vue';
-import CodeEditor from './CodeEditor';
+import AceEditor from './AceEditor';
 import $ from 'jquery';
 import { ElMessage } from 'element-plus'
 
@@ -33,7 +33,7 @@ import FileIcons from 'file-icons-vue'
 export default {
   name: 'TxtPreview',
   components: {
-    CodeEditor,
+    AceEditor,
     FileIcons,
   },
   setup(props,context) {
@@ -92,7 +92,7 @@ export default {
     }
 
     const resetEditor = () => {
-      codeEditorRef.value.setValue('');
+      if(codeEditorRef.value) codeEditorRef.value.setValue('');
       modifyTag.value = '';
     }
 
