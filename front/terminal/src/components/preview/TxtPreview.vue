@@ -52,9 +52,7 @@ export default {
       await $.ajax({
         url: url,
         method: 'GET',
-        xhrFields: {
-          responseType: "text",
-        },
+        dataType: 'text',
         dataFilter(resp) {
           return resp;
         },

@@ -9,7 +9,6 @@ public class MyErrorController implements ErrorController {
 
     @GetMapping("/error")
     public String handleError() {
-        System.out.println("redirect:/");
         return "redirect:/";
     }
 }
