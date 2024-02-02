@@ -34,9 +34,6 @@ export default {
       aceEditor.value = ace.edit(aceEditorRef.value, {
         autoScrollEditorIntoView: false,
         copyWithEmptySelection: false,
-        enableBasicAutocompletion: true,
-        enableSnippets: true,
-        enableLiveAutocompletion: true,
         showPrintMargin: false,
         highlightActiveLine: true,
       });

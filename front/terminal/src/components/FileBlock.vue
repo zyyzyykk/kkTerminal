@@ -150,13 +150,13 @@ export default {
 
     // 获取文件url
     const getFileUrl = (name) => {
-      return http_base_url + '/download/' + name + '?sshKey=' + props.sshKey + '&path=' + dir.value;
+      return http_base_url + '/download/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&path=' + dir.value;
     }
 
     // 解析url的path
     const parseUrl = (url) => {
       let urlParams = {key:'', path:null};
-      let indexKey = url.indexOf('?sshKey=');
+      let indexKey = url.indexOf('&sshKey=');
       let indexPath = url.indexOf('&path=');
       if(indexKey != -1 && indexPath != -1) urlParams.key = url.substring(indexKey + 8, indexPath);
       if(indexPath != -1) urlParams.path = url.substring(indexPath + 6);

@@ -65,7 +65,7 @@ export default {
     // 确定
     const confirm = () => {
       if(aimOption.value == '' || aimOption.value.trim() == '') return;
-      context.emit('callback',aimOption.value);
+      context.emit('callback',aimOption.value.trim());
       DialogVisilble.value = false;
     }
 
