@@ -14,7 +14,7 @@
       <div style="user-select: none; font-size: 14px;" ><span>kk Terminal</span></div>
     </div>
     <!-- terminal主体 -->
-    <div ref="terminal" class="terminal-class"></div>
+    <div ref="terminal" class="terminal-class" ></div>
   </div>
 
   <!-- 连接设置 -->
@@ -133,7 +133,7 @@ export default {
         socket.value.send(encrypt(JSON.stringify({type:1,content:"",rows:new_rows,cols:new_cols})));
         term.resize(new_cols,new_rows);
       }
-    }
+    };
 
     // websocket连接
     const sshKey = ref('');
@@ -386,7 +386,6 @@ export default {
 
 .terminal-class {
   width: 100%;
-  height: calc(100% - 30);
 }
 
 .setting {
