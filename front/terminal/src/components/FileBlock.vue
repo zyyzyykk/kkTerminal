@@ -9,7 +9,7 @@
     style="position: relative;"
     draggable
   >
-    <div style="margin-top: -15px;"></div>
+    <div style="margin-top: -22px;"></div>
     <div>
         <div class="title" style="display: flex; align-items: center;" >
           <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
@@ -392,7 +392,7 @@ export default {
   white-space: nowrap; 
   overflow: hidden;
   text-overflow:ellipsis;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .list-class {

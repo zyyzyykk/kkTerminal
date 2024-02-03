@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class MyErrorController implements ErrorController {
-
     @GetMapping("/error")
     public String handleError() {
         return "redirect:/";
