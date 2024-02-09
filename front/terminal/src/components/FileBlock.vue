@@ -107,6 +107,7 @@ export default {
     const loading = ref(true);
 
     const aimFileInfo = ref(null);
+    const files = ref([]);
 
     // 获取初始目录
     const isShowDirInput = ref(false);
@@ -125,15 +126,19 @@ export default {
           if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
           dir.value = dir.value.replace(/\/{2,}/g, '/');
           aimFileInfo.value = null;
-          fileAreaRef.value.addEventListener("dragover", preventDefault);
-          fileAreaRef.value.addEventListener("drop", handleFileDrag);
+          files.value = [];
+          if(fileAreaRef.value) {
+            fileAreaRef.value.removeEventListener('dragover', preventDefault);
+            fileAreaRef.value.removeEventListener('drop', handleFileDrag);
+            fileAreaRef.value.addEventListener("dragover", preventDefault);
+            fileAreaRef.value.addEventListener("drop", handleFileDrag);
+          }
           getDirList();
         }
       });
     }
     
     // 获取当前路径下的文件列表
-    const files = ref([]);
     const noDataMsg = ref('暂无文件');
     const getDirList = () => {
       let now_dir = dir.value;
@@ -359,19 +364,21 @@ export default {
     };
     const handleFileDrag = (event) => {
       event.preventDefault();
-      let files = event.dataTransfer.files;
-      if(!(files && files.length > 0)) return;
-      for(let i = 0; i < files.length; i++)
+      let filesArray = event.dataTransfer.files;
+      if(!(filesArray && filesArray.length > 0)) return;
+      for(let i=0;i<filesArray.length;i++)
       {
-        let file = files[i];
+        let file = filesArray[i];
         file.uid = Math.random().toString(36).substring(2);
         doUpload({file:file});
       }
     };
 
     onUnmounted(() => {
-      if(fileAreaRef.value) fileAreaRef.value.removeEventListener('dragover', preventDefault);
-      if(fileAreaRef.value) fileAreaRef.value.removeEventListener('drop', handleFileDrag);
+      if(fileAreaRef.value) {
+        fileAreaRef.value.removeEventListener('dragover', preventDefault);
+        fileAreaRef.value.removeEventListener('drop', handleFileDrag);
+      }
     });
 
     return {
