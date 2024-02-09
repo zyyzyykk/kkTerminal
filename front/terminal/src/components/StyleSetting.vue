@@ -91,10 +91,12 @@
 
 <script>
 import { ref } from 'vue';
+import { ArrowDown } from '@element-plus/icons';
 
 export default {
   name:'StyleSetting',
   components: {
+    ArrowDown,
   },
   props:['env'],
   setup(props,context) {

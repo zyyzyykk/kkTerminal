@@ -14,10 +14,11 @@
         <div style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
       </div>
     </template>
-    <div style="margin-top: -22px;"></div>
+    <div style="margin-top: -28px;"></div>
     <div element-loading-text="Loading..." v-loading="loading" style="padding: 0px 5px; width: 100%; height: 60vh;">
       <AceEditor ref="codeEditorRef" :value="text" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
     </div>
+    <div style="margin-top: -13px;"></div>
   </el-dialog>
 </template>
 

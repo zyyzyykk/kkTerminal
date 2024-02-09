@@ -134,8 +134,8 @@ public class WebSocketServer {
     @OnClose
     public void onClose() throws IOException {
         // 删除临时文件
+        String key = sshKey;
         Thread deleteTmpFileThread = new Thread(() -> {
-            String key = sshKey;
             // 延时2s执行
             try {
                 Thread.sleep(2000);

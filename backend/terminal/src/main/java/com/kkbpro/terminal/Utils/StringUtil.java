@@ -10,7 +10,7 @@ public class StringUtil {
     /**
      * 生成随机字符与数字
      */
-    public static final String getRandomStr(Integer count)
+    public static String getRandomStr(Integer count)
     {
         return RandomStringUtils.random(count,true,true);
     }
@@ -18,7 +18,7 @@ public class StringUtil {
     /**
      * 生成随机数
      */
-    public static final String getRandomNumber(Integer count)
+    public static String getRandomNumber(Integer count)
     {
         return RandomStringUtils.random(count,false,true);
     }
@@ -69,13 +69,13 @@ public class StringUtil {
      *  将字符串的'@'转为'/'
      */
     public static String changeStr(String str) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (int i=0;i<str.length();i++) {
-            if(str.charAt(i) != '@') result += str.charAt(i);
-            else result += '/';
+            if(str.charAt(i) != '@') result.append(str.charAt(i));
+            else result.append('/');
         }
 
-        return result;
+        return result.toString();
     }
 
     /**

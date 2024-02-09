@@ -3,27 +3,21 @@ import App from './App.vue'
 
 const app = createApp(App);
 
-// 引入element UI
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import zhCn from 'element-plus/es/locale/lang/zh-cn'  // 中文
+// 按需引入element-plus
+import 'element-plus/dist/index.css';
+import { ElButton, ElDialog, ElIcon, ElInput, ElUpload, ElColorPicker,ElDropdown, ElDropdownMenu, ElDropdownItem, ElSwitch } from 'element-plus';
+app.use(ElButton).use(ElDialog).use(ElIcon).use(ElInput).use(ElUpload).use(ElColorPicker);
+app.use(ElDropdown).use(ElDropdownMenu).use(ElDropdownItem).use(ElSwitch);
 
-app.use(ElementPlus, {
-  locale: zhCn,
-});
-
-app.config.globalProperties.$ELEMENT = { size: 'small' };
-
-// 引入element icon
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-  app.component(key, component)
-}
+// 按需引入 ant-design
+import 'ant-design-vue/dist/reset.css';
+import { Dropdown, Menu, MenuItem } from 'ant-design-vue';
+app.use(Dropdown).use(Menu).use(MenuItem);
 
 app.mount('#app');
 
 // 引入全局样式
-import './assets/base.css'
+import './assets/base.css';
 
 // jQuery配置Ajax全局响应拦截，进行数据解密
 import $ from 'jquery';
