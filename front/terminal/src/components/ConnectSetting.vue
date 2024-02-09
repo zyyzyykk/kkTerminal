@@ -79,11 +79,16 @@
 <script>
 import { ref } from 'vue';
 import OptionBlock from './OptionBlock';
+import { HomeFilled, Paperclip, User, Lock } from '@element-plus/icons';
 
 export default {
   name:'ConnectSetting',
   components: {
     OptionBlock,
+    HomeFilled,
+    Paperclip,
+    User,
+    Lock,
   },
   props:['env','sshOptions'],
   setup(props,context) {

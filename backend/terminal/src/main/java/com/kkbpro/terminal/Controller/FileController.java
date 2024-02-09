@@ -173,13 +173,13 @@ public class FileController {
         // 上传完毕
         if(chunk.equals(chunks))
         {
+            WebSocketServer.fileUploadingMap.put(sshKey + "-" + id, "kkterminal");
+            EnvInfo envInfo = WebSocketServer.envInfoMap.get(sshKey);
             Thread FileThread = new Thread(() -> {
-                WebSocketServer.fileUploadingMap.put(folderPath,folderPath);
                 // 将文件片合并
                 if(!chunks.equals(1))
                     FileUtil.fileChunkMerge(folderPath,fileName,chunks,totalSize);
                 // 与服务器建立连接
-                EnvInfo envInfo = WebSocketServer.envInfoMap.get(sshKey);
                 String host = envInfo.getServer_ip();
                 int port = envInfo.getServer_port();
                 String user_name = envInfo.getServer_user();
