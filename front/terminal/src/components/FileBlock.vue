@@ -6,7 +6,6 @@
     width="50%"
     :modal="false"
     modal-class="kk-dialog-class"
-    style="position: relative;"
     draggable
   >
     <div style="margin-top: -22px;"></div>
@@ -27,13 +26,15 @@
                 :show-file-list="false"
                 :with-credentials="true"
                 :http-request="doUpload"
+                :multiple="true"
                 >
                 <el-icon><Upload /></el-icon>
               </el-upload>
             </div>
           </div>
         </div>
-        <div element-loading-text="Loading..." v-loading="loading" class="list-class no-select">
+        <a-dropdown style="position: relative;" :trigger="['contextmenu']">
+          <div ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select">
             <div v-if="files.length != 0">
                 <div v-for="item in files" :key="item.name" >
                   <template v-if="item.isDirectory == true">
@@ -53,35 +54,51 @@
             <div v-else>
               <NoData v-if="loading == false" :msg="noDataMsg"></NoData>
             </div>
-        </div>
+          </div>
+          <template #overlay>
+            <a-menu class="kk-menu no-select" >
+              <a-menu-item key="1">刷新</a-menu-item>
+              <a-menu-item key="2">打开</a-menu-item>
+              <a-menu-item key="3">复制路径</a-menu-item>
+              <a-menu-item key="4">下载</a-menu-item>
+              <a-menu-item key="5">新建</a-menu-item>
+              <a-menu-item key="6">重命名</a-menu-item>
+              <a-menu-item key="7">删除</a-menu-item>
+              <a-menu-item :disabled="true" key="8">属性</a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
     </div>
+    <div style="margin-top: -12px;"></div>
   </el-dialog>
 
-  <!-- <FileOption ref="fileOptionRef" :file="fileOptionFile" @callback="fileOptionCallback" ></FileOption> -->
   <TxtPreview ref="txtPreviewRef" @doSave="doSave" ></TxtPreview>
 
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onUnmounted } from 'vue';
 import $ from 'jquery';
 import { ElMessage } from 'element-plus'
 import { http_base_url } from '@/Utils/BaseUrl';
+import { Refresh, Fold, Download, Upload } from '@element-plus/icons';
 
 import NoData from '@/components/NoData';
-// import FileOption from './FileOption';
 import TxtPreview from './preview/TxtPreview';
 
 // 引入文件图标组件
-import FileIcons from 'file-icons-vue'
+import FileIcons from 'file-icons-vue';
 
 export default {
   name:'FileBlock',
   components: {
     NoData,
     FileIcons,
-    // FileOption,
     TxtPreview,
+    Refresh,
+    Fold,
+    Download,
+    Upload,
   },
   props:['sshKey'],
   setup(props) {
@@ -108,6 +125,8 @@ export default {
           if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
           dir.value = dir.value.replace(/\/{2,}/g, '/');
           aimFileInfo.value = null;
+          fileAreaRef.value.addEventListener("dragover", preventDefault);
+          fileAreaRef.value.addEventListener("drop", handleFileDrag);
           getDirList();
         }
       });
@@ -307,28 +326,10 @@ export default {
 
     // 关闭
     const closeDialog = (done) => {
-      // dir.value = '/';
-      // aimFileInfo.value = null;
-      // files.value = [];
-
-      // fileOptionRef.value.isShow = false;
+      aimFileInfo.value = null;
       txtPreviewRef.value.DialogVisilble = false;
       done();
     }
-
-    // 右键
-    // const fileOptionRef = ref();
-    // const fileOptionFile = ref(null);
-    // const doContextmenu = (event,item) => {
-    //   event.preventDefault();
-    //   fileOptionRef.value.fileOptionBody.style.top = event.pageY + 'px';
-    //   fileOptionRef.value.fileOptionBody.style.left = event.pageX + 'px';
-    //   fileOptionFile.value = item;
-    //   fileOptionRef.value.isShow = true;
-    // }
-    // const fileOptionCallback = () => {
-
-    // }
 
     // 文本文件编辑
     const txtPreviewRef = ref();
@@ -351,6 +352,28 @@ export default {
       doUpload({file:file}, urlParams.path);
     }
 
+    // 文件拖拽
+    const fileAreaRef = ref();
+    const preventDefault = (event) => {
+      event.preventDefault();
+    };
+    const handleFileDrag = (event) => {
+      event.preventDefault();
+      let files = event.dataTransfer.files;
+      if(!(files && files.length > 0)) return;
+      for(let i = 0; i < files.length; i++)
+      {
+        let file = files[i];
+        file.uid = Math.random().toString(36).substring(2);
+        doUpload({file:file});
+      }
+    };
+
+    onUnmounted(() => {
+      if(fileAreaRef.value) fileAreaRef.value.removeEventListener('dragover', preventDefault);
+      if(fileAreaRef.value) fileAreaRef.value.removeEventListener('drop', handleFileDrag);
+    });
+
     return {
       DialogVisilble,
       closeDialog,
@@ -368,14 +391,11 @@ export default {
       doDownload,
       doUpload,
       aimFileInfo,
-      // fileOptionRef,
-      // doContextmenu,
-      // fileOptionFile,
-      // fileOptionCallback,
       loading,
       txtPreviewRef,
       preViewFile,
       doSave,
+      fileAreaRef,
 
     }
   }
@@ -427,6 +447,11 @@ export default {
 /* 文本不可选中 */
 .no-select {
   user-select: none;
+}
+
+.kk-menu
+{
+  text-align: center;
 }
 
 

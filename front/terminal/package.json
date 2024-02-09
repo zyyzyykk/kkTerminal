@@ -8,11 +8,13 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@element-plus/icons": "^0.0.11",
     "ace-builds": "^1.32.5",
+    "ant-design-vue": "^4.1.2",
     "core-js": "^3.8.3",
     "crypto-js": "^4.1.1",
     "element-plus": "^2.3.12",
-    "file-icons-vue": "^1.1.9",
+    "file-icons-vue": "^1.2.0",
     "jquery": "^3.7.1",
     "vue": "^3.2.13",
     "vue-clipboard3": "^2.0.0",
