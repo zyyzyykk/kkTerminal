@@ -13,6 +13,9 @@ import net.schmizz.sshj.sftp.FileAttributes;
 @AllArgsConstructor
 public class FileInfo {
 
+    // 文件id
+    private String id;
+
     // 文件名
     private String name;
 

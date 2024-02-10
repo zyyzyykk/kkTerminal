@@ -33,21 +33,27 @@
             </div>
           </div>
         </div>
-        <a-dropdown :overlayStyle="{position:'relative',zIndex: 3456,width: '100px'}" :trigger="['contextmenu']" :placement="topLeft">
+        <a-dropdown :overlayStyle="{position:'relative',zIndex: 3456,width: '100px'}" :trigger="['contextmenu']" placement="topLeft">
           <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select" 
            @contextmenu="handleEmpty" @dragover="preventDefault" @drop="handleFileDrag" @scroll="handleScroll" >
             <div v-if="files.length != 0" >
-                <div v-for="item in files" :key="item.name" >
+                <div v-for="item in files" :key="item.id" >
                   <template v-if="item.isDirectory == true">
-                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="aimFileInfo = item" >
+                    <div :class="['item-class', (aimFileInfo && item.id == aimFileInfo.id) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="aimFileInfo = item" >
                       <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
-                      <div style="margin: 0 10px;">{{ item.name }}</div>
+                      <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
+                        <el-input v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
+                      </div>
+                      <div v-else style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
                   </template>
                   <template v-else>
-                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="preViewFile(item.name)" @contextmenu="aimFileInfo = item" >
+                    <div :class="['item-class', (aimFileInfo && item.id == aimFileInfo.id) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="preViewFile(item.name)" @contextmenu="aimFileInfo = item" >
                       <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
-                      <div style="margin: 0 10px;">{{ item.name }}</div>
+                      <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
+                        <el-input v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
+                      </div>
+                      <div v-else style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
                   </template>
                 </div>
@@ -80,6 +86,7 @@
 
 <script>
 import { ref, onUnmounted } from 'vue';
+import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
 import { ElMessage } from 'element-plus'
 import { http_base_url } from '@/Utils/BaseUrl';
@@ -108,12 +115,22 @@ export default {
     // 加载
     const loading = ref(true);
 
+    // 拷贝
+    const { toClipboard } = useClipboard();
+
     const aimFileInfo = ref(null);
     const files = ref([]);
 
+    const dir = ref('');
+    // 保证路径正确
+    const confirmDirCorrect = () => {
+      if(dir.value == '' || dir.value[0] != '/') dir.value = '/' + dir.value;
+      if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
+      dir.value = dir.value.replace(/\/{2,}/g, '/');
+    }
+
     // 获取初始目录
     const isShowDirInput = ref(false);
-    const dir = ref('');
     const getInitDir = () => {
       if(dir.value != '') return;
       $.ajax({
@@ -124,9 +141,7 @@ export default {
         },
         success(resp){
           dir.value = resp.data.path;
-          if(dir.value == '' || dir.value[0] != '/') dir.value = '/' + dir.value;
-          if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
-          dir.value = dir.value.replace(/\/{2,}/g, '/');
+          confirmDirCorrect();
           aimFileInfo.value = null;
           files.value = [];
           getDirList();
@@ -204,9 +219,7 @@ export default {
     // 更改路径回调
     const dirInputCallback = () => {
       isShowDirInput.value = false;
-      if(dir.value == '' || dir.value[0] != '/') dir.value = '/' + dir.value;
-      if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
-      dir.value = dir.value.replace(/\/{2,}/g, '/');
+      confirmDirCorrect();
       aimFileInfo.value = null;
       getDirList();
     }
@@ -372,8 +385,52 @@ export default {
 
     // 右键菜单
     const isShowMenu = ref(false);
-    const handleMenuSelect = (type) => {
-      console.log(type);
+    const isShowRenameInput = ref(false);
+    const renameFile = ref(null);
+    const handleMenuSelect = async (type) => {
+      switch (type) {
+        // 刷新
+        case 1:
+          doRefresh();
+          break;
+        // 打开
+        case 2:
+          if(aimFileInfo.value && aimFileInfo.value.isDirectory == true) changeDir(dir.value + aimFileInfo.value.name + '/');
+          else if(aimFileInfo.value && aimFileInfo.value.isDirectory == false) preViewFile(aimFileInfo.value.name);
+          break;
+        // 复制路径
+        case 3:
+          await toClipboard(dir.value);
+          ElMessage({
+            message: '复制成功',
+            type: 'success',
+            grouping: true,
+          });
+          break;
+        // 下载
+        case 4:
+          if(aimFileInfo.value && aimFileInfo.value.isDirectory == false) doDownload();
+          break;
+        // 新建
+        case 5:
+          
+          break;
+        // 重命名
+        case 6:
+          renameFile.value = {...aimFileInfo.value};
+          isShowRenameInput.value = true;
+          break;
+        // 删除
+        case 7:
+          
+          break;
+        // 属性
+        case 8:
+          
+          break;
+        default:
+          break;
+      }
     };
     const handleScroll = () => {
       isShowMenu.value = false;
@@ -382,6 +439,29 @@ export default {
       // 点击空白处
       if(event.target.id == 'fileArea') aimFileInfo.value = null;
       isShowMenu.value = true;
+    };
+    const handleRename = (item) => {
+      isShowRenameInput.value = false;
+      // 校验
+      if(item.name == renameFile.value.name) return;
+      if(!(renameFile.value.name && renameFile.value.name.length > 0)) {
+        ElMessage({
+          message: "文件名不能为空",
+          type: "warning",
+          grouping: true,
+        })
+        return;
+      }
+      if(renameFile.value.name.indexOf('/') != -1) {
+        ElMessage({
+          message: "文件名不能含有 /",
+          type: "warning",
+          grouping: true,
+        })
+        return;
+      }
+      // 文件重命名
+      // 文件夹重命名
     }
 
 
@@ -421,6 +501,9 @@ export default {
       handleFileDrag,
       handleScroll,
       handleEmpty,
+      isShowRenameInput,
+      handleRename,
+      renameFile,
 
     }
   }
