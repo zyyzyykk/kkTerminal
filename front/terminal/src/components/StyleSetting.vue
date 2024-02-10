@@ -8,7 +8,7 @@
     modal-class="kk-dialog-class"
     draggable
   >
-    <div style="margin-top: -22px;"></div>
+    <div style="margin-top: -27px;"></div>
     <div class="no-select">
       <div class="item-class" style="margin-bottom: 15px;">
         <div style="margin-right: 10px;">颜色：</div>

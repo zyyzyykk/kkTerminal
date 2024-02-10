@@ -24,6 +24,7 @@ img {
 
 .kk-dialog-class {
   pointer-events: none;
+  z-index: 3456;
 }
 
 .el-dialog {
