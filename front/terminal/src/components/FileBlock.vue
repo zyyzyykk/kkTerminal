@@ -8,7 +8,7 @@
     modal-class="kk-dialog-class"
     draggable
   >
-    <div style="margin-top: -22px;"></div>
+    <div style="margin-top: -27px;"></div>
     <div>
         <div class="title" style="display: flex; align-items: center;" >
           <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
@@ -33,18 +33,19 @@
             </div>
           </div>
         </div>
-        <a-dropdown style="position: relative;" :trigger="['contextmenu']">
-          <div ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select">
-            <div v-if="files.length != 0">
+        <a-dropdown :overlayStyle="{position:'relative',zIndex: 3456,width: '100px'}" :trigger="['contextmenu']" :placement="topLeft">
+          <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select" 
+           @contextmenu="handleEmpty" @dragover="preventDefault" @drop="handleFileDrag" @scroll="handleScroll" >
+            <div v-if="files.length != 0" >
                 <div v-for="item in files" :key="item.name" >
                   <template v-if="item.isDirectory == true">
-                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" >
+                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="aimFileInfo = item" >
                       <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
                   </template>
                   <template v-else>
-                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="preViewFile(item.name)" >
+                    <div :class="['item-class', (aimFileInfo && item.name == aimFileInfo.name) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="preViewFile(item.name)" @contextmenu="aimFileInfo = item" >
                       <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
                       <div style="margin: 0 10px;">{{ item.name }}</div>
                     </div>
@@ -52,21 +53,22 @@
                 </div>
             </div>
             <div v-else>
-              <NoData v-if="loading == false" :msg="noDataMsg"></NoData>
+              <NoData @contextmenu="aimFileInfo = null" v-if="loading == false" :msg="noDataMsg"></NoData>
             </div>
           </div>
           <template #overlay>
-            <a-menu class="kk-menu no-select" >
-              <a-menu-item key="1">刷新</a-menu-item>
-              <a-menu-item key="2">打开</a-menu-item>
-              <a-menu-item key="3">复制路径</a-menu-item>
-              <a-menu-item key="4">下载</a-menu-item>
-              <a-menu-item key="5">新建</a-menu-item>
-              <a-menu-item key="6">重命名</a-menu-item>
-              <a-menu-item key="7">删除</a-menu-item>
-              <a-menu-item :disabled="true" key="8">属性</a-menu-item>
+            <a-menu v-show="isShowMenu" class="kk-menu no-select">
+              <a-menu-item @click="handleMenuSelect(1)" key="1" >刷新</a-menu-item>
+              <a-menu-item @click="handleMenuSelect(2)" key="2" :disabled="aimFileInfo == null" >打开</a-menu-item>
+              <a-menu-item @click="handleMenuSelect(3)" key="3" >复制路径</a-menu-item>
+              <a-menu-item @click="handleMenuSelect(4)" key="4" :disabled="!(aimFileInfo && aimFileInfo.isDirectory == false)" >下载</a-menu-item>
+              <a-menu-item @click="handleMenuSelect(5)" key="5" >新建</a-menu-item>
+              <a-menu-item @click="handleMenuSelect(6)" key="6" :disabled="aimFileInfo == null" >重命名</a-menu-item>
+              <a-menu-item @click="handleMenuSelect(7)" key="7" :disabled="aimFileInfo == null" >删除</a-menu-item>
+              <a-menu-item @click="handleMenuSelect(8)" key="8" :disabled="aimFileInfo == null" >属性</a-menu-item>
             </a-menu>
           </template>
+          
         </a-dropdown>
     </div>
     <div style="margin-top: -12px;"></div>
@@ -127,12 +129,6 @@ export default {
           dir.value = dir.value.replace(/\/{2,}/g, '/');
           aimFileInfo.value = null;
           files.value = [];
-          if(fileAreaRef.value) {
-            fileAreaRef.value.removeEventListener('dragover', preventDefault);
-            fileAreaRef.value.removeEventListener('drop', handleFileDrag);
-            fileAreaRef.value.addEventListener("dragover", preventDefault);
-            fileAreaRef.value.addEventListener("drop", handleFileDrag);
-          }
           getDirList();
         }
       });
@@ -341,8 +337,8 @@ export default {
     const preViewFile = (name) => {
       txtPreviewRef.value.fileName = name;
       txtPreviewRef.value.fileUrl = getFileUrl(name);
-      txtPreviewRef.value.initText();
       txtPreviewRef.value.loading = true;
+      txtPreviewRef.value.initText();
       txtPreviewRef.value.DialogVisilble = true;
     }
     // 保存文本，写回服务器
@@ -374,10 +370,26 @@ export default {
       }
     };
 
+    // 右键菜单
+    const isShowMenu = ref(false);
+    const handleMenuSelect = (type) => {
+      console.log(type);
+    };
+    const handleScroll = () => {
+      isShowMenu.value = false;
+    };
+    const handleEmpty = (event) => {
+      // 点击空白处
+      if(event.target.id == 'fileArea') aimFileInfo.value = null;
+      isShowMenu.value = true;
+    }
+
+
     onUnmounted(() => {
       if(fileAreaRef.value) {
         fileAreaRef.value.removeEventListener('dragover', preventDefault);
         fileAreaRef.value.removeEventListener('drop', handleFileDrag);
+        fileAreaRef.value.removeEventListener('scroll', handleScroll);
       }
     });
 
@@ -403,6 +415,12 @@ export default {
       preViewFile,
       doSave,
       fileAreaRef,
+      handleMenuSelect,
+      isShowMenu,
+      preventDefault,
+      handleFileDrag,
+      handleScroll,
+      handleEmpty,
 
     }
   }
@@ -460,6 +478,5 @@ export default {
 {
   text-align: center;
 }
-
 
 </style>

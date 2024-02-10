@@ -49,6 +49,7 @@ export default {
     const codeEditorRef = ref();
 
     const initText = async () => {
+      loading.value = true;
       let url = fileUrl.value;
       await $.ajax({
         url: url,
