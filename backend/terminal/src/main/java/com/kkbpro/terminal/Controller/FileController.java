@@ -76,6 +76,7 @@ public class FileController {
             List<RemoteResourceInfo> files = sftp.ls(path);
             for(RemoteResourceInfo file : files) {
                 FileInfo fileInfo = new FileInfo();
+                fileInfo.setId(UUID.randomUUID().toString());
                 fileInfo.setName(file.getName());
 
                 // 是否为文件夹
