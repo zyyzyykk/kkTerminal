@@ -9,7 +9,7 @@
     modal-class="kk-dialog-class"
     draggable
   >
-    <div style="margin-top: -22px;"></div>
+    <div style="margin-top: -27px;"></div>
     <div class="no-select">
       <div v-if="Object.keys(sshOptions).length > 0" class="kk-border">
         <div v-for="(value, key) in sshOptions" :key="key" >

@@ -29,13 +29,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ServerEndpoint("/socket/ssh/{env}")  // 注意不要以'/'结尾
 public class WebSocketServer {
-
     public static ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
 
     public static ConcurrentHashMap<String, EnvInfo> envInfoMap = new ConcurrentHashMap<>();
 
-
     public static ConcurrentHashMap<String, String> fileUploadingMap = new ConcurrentHashMap<>();
+
     private static AppConfig appConfig;
 
     private Session sessionSocket = null;

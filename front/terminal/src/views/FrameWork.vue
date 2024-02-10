@@ -323,6 +323,7 @@ export default {
 
       // 监听窗口大小变化事件，自动调整终端大小
       window.addEventListener('resize', () => {
+        if(fileBlockRef.value) fileBlockRef.value.isShowMenu = false;
         termFit();
       });
 
