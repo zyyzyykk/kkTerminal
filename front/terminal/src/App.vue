@@ -1,6 +1,5 @@
 <template>
   <FrameWork></FrameWork>
-  <div class=""></div>
 </template>
 
 <script>
@@ -32,41 +31,8 @@ img {
   pointer-events: auto;
 }
 
-.ant-dropdown {
-  margin: 0 0;
-  padding: 0 0;
-  border-radius: 0;
-}
-
-.ant-dropdown-menu {
-  margin: 0 0;
-  padding: 0 0;
-  border-radius: 0;
-}
-
-/* :where.ant-dropdown-menu-item {
-  height: 30px;
-  color: #000;
-  background-color: #fff;
-} */
-
-.ant-dropdown-menu-item {
-  height: 30px;
-  color: #000;
-  background-color: #fff;
-  margin:  0 0 !important;
-  padding: 0 0 !important;
-}
-
-.ant-dropdown-menu-item-active {
-  background-color: #000;
-}
-
-.ant-dropdown-menu-title-content {
-  font-size: 13px;
-  border-radius: 0;
-  margin:  0 0 !important;
-  padding: 0 0 !important;
+.ant-popover-arrow {
+  display: none;
 }
 
 </style>
