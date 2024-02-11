@@ -1,7 +1,7 @@
-package com.kkbpro.terminal.Result;
+package com.kkbpro.terminal.result;
 
 import com.alibaba.fastjson.JSON;
-import com.kkbpro.terminal.Utils.AesUtil;
+import com.kkbpro.terminal.utils.AesUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

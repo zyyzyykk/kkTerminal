@@ -33,7 +33,7 @@
             </div>
           </div>
         </div>
-        <a-dropdown :overlayStyle="{position:'relative',zIndex: 3456,width: '100px'}" :trigger="['contextmenu']" placement="topLeft">
+        <a-dropdown :overlayStyle="{position:'relative',zIndex: 3456,width: '100px'}" :trigger="['contextmenu']" >
           <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select" 
            @contextmenu="handleEmpty" @dragover="preventDefault" @drop="handleFileDrag" @scroll="handleScroll" >
             <div v-if="files.length != 0" >
@@ -64,14 +64,30 @@
           </div>
           <template #overlay>
             <a-menu v-show="isShowMenu" class="kk-menu no-select">
-              <a-menu-item @click="handleMenuSelect(1)" key="1" >刷新</a-menu-item>
-              <a-menu-item @click="handleMenuSelect(2)" key="2" :disabled="aimFileInfo == null" >打开</a-menu-item>
-              <a-menu-item @click="handleMenuSelect(3)" key="3" >复制路径</a-menu-item>
-              <a-menu-item @click="handleMenuSelect(4)" key="4" :disabled="!(aimFileInfo && aimFileInfo.isDirectory == false)" >下载</a-menu-item>
-              <a-menu-item @click="handleMenuSelect(5)" key="5" >新建</a-menu-item>
-              <a-menu-item @click="handleMenuSelect(6)" key="6" :disabled="aimFileInfo == null" >重命名</a-menu-item>
-              <a-menu-item @click="handleMenuSelect(7)" key="7" :disabled="aimFileInfo == null" >删除</a-menu-item>
-              <a-menu-item @click="handleMenuSelect(8)" key="8" :disabled="aimFileInfo == null" >属性</a-menu-item>
+              <a-menu-item @click="handleMenuSelect($event,1)" key="1" >刷新</a-menu-item>
+              <a-menu-item @click="handleMenuSelect($event,2)" key="2" :disabled="aimFileInfo == null" >打开</a-menu-item>
+              <a-menu-item @click="handleMenuSelect($event,3)" key="3" >复制路径</a-menu-item>
+              <a-menu-item @click="handleMenuSelect($event,4)" key="4" :disabled="!(aimFileInfo && aimFileInfo.isDirectory == false)" >下载</a-menu-item>
+              <a-menu-item @click="handleMenuSelect($event,5)" key="5" >新建</a-menu-item>
+              <a-menu-item @click="handleMenuSelect($event,6)" key="6" :disabled="aimFileInfo == null" >重命名</a-menu-item>
+              <a-popconfirm :overlayStyle="{zIndex: 3466}" placement="rightBottom" ok-text="确定" cancel-text="取消" @confirm="confirm">
+                <template #title>
+                  <div style="margin-top: 3px;" >确定删除此文件/文件夹吗</div>
+                </template>
+                <template #okButton>
+                  <el-button size="small" type="primary" @click="confirm" >确定</el-button>
+                </template>
+                <template #cancelButton>
+                  <el-button size="small" text >取消</el-button>
+                </template>
+
+
+
+                <a-menu-item key="7" :disabled="aimFileInfo == null" >
+                  <div @click="handleMenuSelect($event,7)" >删除</div>
+                </a-menu-item>
+              </a-popconfirm>
+              <a-menu-item @click="handleMenuSelect($event,8)" key="8" :disabled="aimFileInfo == null" >属性</a-menu-item>
             </a-menu>
           </template>
           
@@ -341,6 +357,7 @@ export default {
     // 关闭
     const closeDialog = (done) => {
       aimFileInfo.value = null;
+      renameFile.value = null;
       txtPreviewRef.value.DialogVisilble = false;
       done();
     }
@@ -387,7 +404,7 @@ export default {
     const isShowMenu = ref(false);
     const isShowRenameInput = ref(false);
     const renameFile = ref(null);
-    const handleMenuSelect = async (type) => {
+    const handleMenuSelect = async (event, type) => {
       switch (type) {
         // 刷新
         case 1:
@@ -422,7 +439,9 @@ export default {
           break;
         // 删除
         case 7:
-          
+          console.log(event.target);
+          event.preventDefault();
+          event.preventDefault();
           break;
         // 属性
         case 8:
@@ -443,13 +462,17 @@ export default {
     const handleRename = (item) => {
       isShowRenameInput.value = false;
       // 校验
-      if(item.name == renameFile.value.name) return;
+      if(item.name == renameFile.value.name) {
+        renameFile.value = null;
+        return;
+      }
       if(!(renameFile.value.name && renameFile.value.name.length > 0)) {
         ElMessage({
           message: "文件名不能为空",
           type: "warning",
           grouping: true,
         })
+        renameFile.value = null;
         return;
       }
       if(renameFile.value.name.indexOf('/') != -1) {
@@ -458,10 +481,12 @@ export default {
           type: "warning",
           grouping: true,
         })
+        renameFile.value = null;
         return;
       }
       // 文件重命名
       // 文件夹重命名
+      // renameFile.value = null;
     }
 
 
@@ -560,6 +585,9 @@ export default {
 .kk-menu
 {
   text-align: center;
+  border-radius: 0px;
+  /* box-shadow: none; */
+  padding: 0 0;
 }
 
 </style>

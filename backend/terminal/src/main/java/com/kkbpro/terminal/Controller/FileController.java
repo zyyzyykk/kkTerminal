@@ -1,13 +1,13 @@
-package com.kkbpro.terminal.Controller;
+package com.kkbpro.terminal.controller;
 
-import com.kkbpro.terminal.Config.AppConfig;
-import com.kkbpro.terminal.Constants.Enum.FileBlockStateEnum;
-import com.kkbpro.terminal.Consumer.WebSocketServer;
-import com.kkbpro.terminal.Pojo.Dto.FileUploadInfo;
-import com.kkbpro.terminal.Pojo.EnvInfo;
-import com.kkbpro.terminal.Pojo.FileInfo;
-import com.kkbpro.terminal.Result.Result;
-import com.kkbpro.terminal.Utils.FileUtil;
+import com.kkbpro.terminal.config.AppConfig;
+import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
+import com.kkbpro.terminal.consumer.WebSocketServer;
+import com.kkbpro.terminal.pojo.dto.FileUploadInfo;
+import com.kkbpro.terminal.pojo.vo.EnvInfo;
+import com.kkbpro.terminal.pojo.vo.FileInfo;
+import com.kkbpro.terminal.result.Result;
+import com.kkbpro.terminal.utils.FileUtil;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.*;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
@@ -124,6 +124,9 @@ public class FileController {
         return Result.setSuccess(200, "首次路径", map);
     }
 
+    /**
+     * 分片上传文件
+     */
     @PostMapping("/upload")
     public Result uploadFile(FileUploadInfo fileUploadInfo) {
 

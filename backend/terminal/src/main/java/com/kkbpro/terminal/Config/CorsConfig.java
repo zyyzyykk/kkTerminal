@@ -1,4 +1,4 @@
-package com.kkbpro.terminal.Config;
+package com.kkbpro.terminal.config;
 
 import org.springframework.context.annotation.Configuration;
 
