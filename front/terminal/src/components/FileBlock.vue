@@ -7,101 +7,95 @@
     :modal="false"
     modal-class="kk-dialog-class"
     draggable
+    style="position: relative;"
   >
     <div style="margin-top: -27px;"></div>
     <div>
-        <div class="title" style="display: flex; align-items: center;" >
-          <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
-            <div v-if="isShowDirInput == true" >
-              <el-input v-model="dir" placeholder="输入目录路径" size="small" @change="dirInputCallback" />
-            </div>
-            <div v-else @dblclick="isShowDirInput = true" >{{ dir }}</div>
+      <div class="title" style="display: flex; align-items: center;" >
+        <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
+          <div v-if="isShowDirInput == true" >
+            <el-input v-model="dir" placeholder="输入目录路径" size="small" @change="dirInputCallback" />
           </div>
-          <div style="display: flex; align-items: center;">
-            <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
-            <div class="hover-class" @click="doReturn" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
-            <div class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
-            <div class="hover-class" @click="doUpload" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
-              <el-upload
-                :show-file-list="false"
-                :with-credentials="true"
-                :http-request="doUpload"
-                :multiple="true"
-                >
-                <el-icon><Upload /></el-icon>
-              </el-upload>
-            </div>
+          <div v-else @dblclick="isShowDirInput = true" >{{ dir }}</div>
+        </div>
+        <div style="display: flex; align-items: center;">
+          <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
+          <div class="hover-class" @click="doReturn" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
+          <div class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
+          <div class="hover-class" @click="doUpload" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
+            <el-upload
+              :show-file-list="false"
+              :with-credentials="true"
+              :http-request="doUpload"
+              :multiple="true"
+              >
+              <el-icon><Upload /></el-icon>
+            </el-upload>
           </div>
         </div>
-        <a-dropdown :overlayStyle="{position:'relative',zIndex: 3456,width: '100px'}" :trigger="['contextmenu']" >
-          <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select" 
-           @contextmenu="handleEmpty" @dragover="preventDefault" @drop="handleFileDrag" @scroll="handleScroll" >
-            <div v-if="files.length != 0" >
-                <div v-for="item in files" :key="item.id" >
-                  <template v-if="item.isDirectory == true">
-                    <div :class="['item-class', (aimFileInfo && item.id == aimFileInfo.id) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="aimFileInfo = item" >
-                      <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
-                      <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
-                        <el-input v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
-                      </div>
-                      <div v-else style="margin: 0 10px;">{{ item.name }}</div>
+      </div>
+      <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select" 
+         @contextmenu="handleContextMenu" @dragover="preventDefault" @drop="handleFileDrag" @scroll="handleScroll" >
+          <div v-if="files.length != 0" >
+              <div v-for="item in files" :key="item.id" >
+                <template v-if="item.isDirectory == true">
+                  <div :class="['item-class', (aimFileInfo && item.id == aimFileInfo.id) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="aimFileInfo = item" >
+                    <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
+                    <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
+                      <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
                     </div>
-                  </template>
-                  <template v-else>
-                    <div :class="['item-class', (aimFileInfo && item.id == aimFileInfo.id) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="preViewFile(item.name)" @contextmenu="aimFileInfo = item" >
-                      <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
-                      <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
-                        <el-input v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
-                      </div>
-                      <div v-else style="margin: 0 10px;">{{ item.name }}</div>
+                    <div v-else style="margin: 0 10px;">{{ item.name }}</div>
+                  </div>
+                </template>
+                <template v-else>
+                  <div :class="['item-class', (aimFileInfo && item.id == aimFileInfo.id) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="preViewFile(item.name)" @contextmenu="aimFileInfo = item" >
+                    <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
+                    <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
+                      <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
                     </div>
-                  </template>
-                </div>
-            </div>
-            <div v-else>
-              <NoData @contextmenu="aimFileInfo = null" v-if="loading == false" :msg="noDataMsg"></NoData>
-            </div>
+                    <div v-else style="margin: 0 10px;">{{ item.name }}</div>
+                  </div>
+                </template>
+              </div>
           </div>
-          <template #overlay>
-            <a-menu v-show="isShowMenu" class="kk-menu no-select">
-              <a-menu-item @click="handleMenuSelect($event,1)" key="1" >刷新</a-menu-item>
-              <a-menu-item @click="handleMenuSelect($event,2)" key="2" :disabled="aimFileInfo == null" >打开</a-menu-item>
-              <a-menu-item @click="handleMenuSelect($event,3)" key="3" >复制路径</a-menu-item>
-              <a-menu-item @click="handleMenuSelect($event,4)" key="4" :disabled="!(aimFileInfo && aimFileInfo.isDirectory == false)" >下载</a-menu-item>
-              <a-menu-item @click="handleMenuSelect($event,5)" key="5" >新建</a-menu-item>
-              <a-menu-item @click="handleMenuSelect($event,6)" key="6" :disabled="aimFileInfo == null" >重命名</a-menu-item>
-              <a-popconfirm :overlayStyle="{zIndex: 3466}" placement="rightBottom" ok-text="确定" cancel-text="取消" @confirm="confirm">
-                <template #title>
-                  <div style="margin-top: 3px;" >确定删除此文件/文件夹吗</div>
-                </template>
-                <template #okButton>
-                  <el-button size="small" type="primary" @click="confirm" >确定</el-button>
-                </template>
-                <template #cancelButton>
-                  <el-button size="small" text >取消</el-button>
-                </template>
-
-
-
-                <a-menu-item key="7" :disabled="aimFileInfo == null" >
-                  <div @click="handleMenuSelect($event,7)" >删除</div>
-                </a-menu-item>
-              </a-popconfirm>
-              <a-menu-item @click="handleMenuSelect($event,8)" key="8" :disabled="aimFileInfo == null" >属性</a-menu-item>
-            </a-menu>
-          </template>
-          
-        </a-dropdown>
+          <div v-else>
+            <NoData @contextmenu="aimFileInfo = null" v-if="loading == false" :msg="noDataMsg"></NoData>
+          </div>
+      </div>
     </div>
     <div style="margin-top: -12px;"></div>
   </el-dialog>
 
   <TxtPreview ref="txtPreviewRef" @doSave="doSave" ></TxtPreview>
 
+  <div ref="menuBlockRef" @mousedown="preventDefault" v-show="isShowMenu" class="kk-menu no-select">
+    <div class="kk-menu-item" @click="handleMenuSelect($event,1)" key="1" >刷新</div>
+    <div class="kk-menu-item" @click="handleMenuSelect($event,2)" key="2" :disabled="aimFileInfo == null" >打开</div>
+    <div class="kk-menu-item" @click="handleMenuSelect($event,3)" key="3" >复制路径</div>
+    <div class="kk-menu-item" @click="handleMenuSelect($event,4)" key="4" :disabled="!(aimFileInfo && aimFileInfo.isDirectory == false)" >下载</div>
+    <div class="kk-menu-item" @click="handleMenuSelect($event,5)" key="5" >新建</div>
+    <div class="kk-menu-item" @click="handleMenuSelect($event,6)" key="6" :disabled="aimFileInfo == null" >重命名</div>
+    <a-popconfirm :overlayStyle="{zIndex: 3466,marginLeft: '10px'}" placement="rightBottom" ok-text="确定" cancel-text="取消" @confirm="confirm">
+      <template #title>
+        <div style="font-size: 13px; margin-top: 4px;" >确定删除此文件/文件夹吗?</div>
+      </template>
+      <template #okButton>
+        <el-button size="small" type="primary" @click="confirm" >确定</el-button>
+      </template>
+      <template #cancelButton>
+        <el-button size="small" text >取消</el-button>
+      </template>
+      <div class="kk-menu-item" key="7" :disabled="aimFileInfo == null" >
+        <div @click="handleMenuSelect($event,7)" >删除</div>
+      </div>
+    </a-popconfirm>
+    <div class="kk-menu-item" @click="handleMenuSelect($event,8)" key="8" :disabled="aimFileInfo == null" >属性</div>
+  </div>
+
 </template>
 
 <script>
-import { ref, onUnmounted } from 'vue';
+import { ref, onUnmounted, onMounted } from 'vue';
 import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
 import { ElMessage } from 'element-plus'
@@ -400,11 +394,12 @@ export default {
       }
     };
 
-    // 右键菜单
+    // 菜单项
     const isShowMenu = ref(false);
     const isShowRenameInput = ref(false);
     const renameFile = ref(null);
     const handleMenuSelect = async (event, type) => {
+      // event.preventDefault();
       switch (type) {
         // 刷新
         case 1:
@@ -436,12 +431,12 @@ export default {
         case 6:
           renameFile.value = {...aimFileInfo.value};
           isShowRenameInput.value = true;
+          setTimeout(() => {
+            document.querySelector('#rename').focus();
+          },1);
           break;
         // 删除
         case 7:
-          console.log(event.target);
-          event.preventDefault();
-          event.preventDefault();
           break;
         // 属性
         case 8:
@@ -450,14 +445,23 @@ export default {
         default:
           break;
       }
+      if(type != 7) isShowMenu.value = false;
     };
     const handleScroll = () => {
       isShowMenu.value = false;
     };
-    const handleEmpty = (event) => {
+    const menuBlockRef = ref();
+    // 右键显示
+    const handleContextMenu = (event) => {
       // 点击空白处
       if(event.target.id == 'fileArea') aimFileInfo.value = null;
+      menuBlockRef.value.style.top = event.clientY + 'px';
+      menuBlockRef.value.style.left = event.clientX + 'px';
       isShowMenu.value = true;
+      // setTimeout(() => {
+      //     menuBlockRef.value.focus();
+      // },200);
+      event.preventDefault();
     };
     const handleRename = (item) => {
       isShowRenameInput.value = false;
@@ -489,6 +493,12 @@ export default {
       // renameFile.value = null;
     }
 
+    onMounted(() => {
+      document.addEventListener('mousedown', () => {
+        isShowMenu.value = false;
+        console.log('mousedown');
+      });
+    });
 
     onUnmounted(() => {
       if(fileAreaRef.value) {
@@ -525,10 +535,11 @@ export default {
       preventDefault,
       handleFileDrag,
       handleScroll,
-      handleEmpty,
+      handleContextMenu,
       isShowRenameInput,
       handleRename,
       renameFile,
+      menuBlockRef,
 
     }
   }
@@ -584,10 +595,25 @@ export default {
 
 .kk-menu
 {
+  position: absolute;
+  z-index: 3466;
   text-align: center;
-  border-radius: 0px;
-  /* box-shadow: none; */
-  padding: 0 0;
+  cursor: pointer;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}
+
+.kk-menu-item {
+  height: 30px;
+  font-size: 13px;
+  line-height: 30px;
+  width: 80px;
+  color: #444;
+  background-color: #fcfcfc;
+}
+
+.kk-menu-item:hover
+{
+  background-color: #efefef;
 }
 
 </style>

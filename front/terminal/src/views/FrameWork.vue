@@ -159,7 +159,7 @@ export default {
           sshKey.value = decrypt(result.info);
           setTimeout(() => {
             termFit();
-          },200);
+          },1);
           // term.write(now_connect_status.value);
         }
         // 输出
@@ -255,8 +255,7 @@ export default {
       terminal.value.addEventListener('contextmenu', doPaste);
 
       // 左键单击
-      terminal.value.addEventListener('click', function(event) {
-        event.preventDefault();
+      terminal.value.addEventListener('click', function() {
         isShowSetting.value = false;
       });
 
