@@ -1,4 +1,4 @@
-package com.kkbpro.terminal.Pojo.Dto;
+package com.kkbpro.terminal.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

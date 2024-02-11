@@ -1,4 +1,4 @@
-package com.kkbpro.terminal.Utils;
+package com.kkbpro.terminal.utils;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
