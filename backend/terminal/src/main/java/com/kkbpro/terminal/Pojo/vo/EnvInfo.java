@@ -1,4 +1,4 @@
-package com.kkbpro.terminal.Pojo;
+package com.kkbpro.terminal.pojo.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

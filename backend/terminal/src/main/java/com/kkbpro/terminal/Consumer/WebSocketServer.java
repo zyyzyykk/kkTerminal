@@ -1,17 +1,17 @@
-package com.kkbpro.terminal.Consumer;
+package com.kkbpro.terminal.consumer;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.lalyos.jfiglet.FigletFont;
-import com.kkbpro.terminal.Config.AppConfig;
-import com.kkbpro.terminal.Constants.Enum.MessageInfoTypeRnum;
-import com.kkbpro.terminal.Constants.Enum.ResultCodeEnum;
-import com.kkbpro.terminal.Pojo.EnvInfo;
-import com.kkbpro.terminal.Pojo.MessageInfo;
-import com.kkbpro.terminal.Result.Result;
-import com.kkbpro.terminal.Utils.AesUtil;
-import com.kkbpro.terminal.Utils.FileUtil;
-import com.kkbpro.terminal.Utils.StringUtil;
+import com.kkbpro.terminal.config.AppConfig;
+import com.kkbpro.terminal.constants.enums.MessageInfoTypeRnum;
+import com.kkbpro.terminal.constants.enums.ResultCodeEnum;
+import com.kkbpro.terminal.pojo.vo.EnvInfo;
+import com.kkbpro.terminal.pojo.vo.MessageInfo;
+import com.kkbpro.terminal.result.Result;
+import com.kkbpro.terminal.utils.AesUtil;
+import com.kkbpro.terminal.utils.FileUtil;
+import com.kkbpro.terminal.utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +87,9 @@ public class WebSocketServer {
             return;
         }
 
+        net.schmizz.sshj.connection.channel.direct.Session sshSession = sshClient.startSession();
+        sshSession.allocateDefaultPTY();
+
         // 连接成功，生成key标识
         sshKey = UUID.randomUUID().toString();
         sendMessage(sessionSocket, sshKey,"success", ResultCodeEnum.CONNECT_SUCCESS.getState());
@@ -105,10 +108,6 @@ public class WebSocketServer {
         for (String asciiArt : asciiArts) {
             sendMessage(sessionSocket,asciiArt + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
         }
-
-
-        net.schmizz.sshj.connection.channel.direct.Session sshSession = sshClient.startSession();
-        sshSession.allocateDefaultPTY();
 
         shell = sshSession.startShell();
         shellInputStream = shell.getInputStream();

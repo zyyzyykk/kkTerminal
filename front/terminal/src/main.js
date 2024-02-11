@@ -11,8 +11,8 @@ app.use(ElDropdown).use(ElDropdownMenu).use(ElDropdownItem).use(ElSwitch).use(El
 
 // 按需引入 ant-design
 import 'ant-design-vue/dist/reset.css';
-import { Dropdown, Menu, MenuItem } from 'ant-design-vue';
-app.use(Dropdown).use(Menu).use(MenuItem);
+import { Dropdown, Menu, MenuItem, Popconfirm } from 'ant-design-vue';
+app.use(Dropdown).use(Menu).use(MenuItem).use(Popconfirm);
 
 app.mount('#app');
 

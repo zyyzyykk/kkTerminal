@@ -1,7 +1,7 @@
-package com.kkbpro.terminal.GlobalExceptionHandler;
+package com.kkbpro.terminal.exceptionHandler;
 
 
-import com.kkbpro.terminal.Result.Result;
+import com.kkbpro.terminal.result.Result;
 import lombok.Data;
 
 /**

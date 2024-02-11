@@ -1,21 +1,26 @@
-package com.kkbpro.terminal.Constants.Enum;
+package com.kkbpro.terminal.constants.enums;
 
-public enum ResultCodeEnum {
-    CONNECT_FAIL(-1,"连接服务器失败！"),
 
-    CONNECT_SUCCESS(0,"连接服务器成功！"),
+public enum MessageInfoTypeRnum {
 
-    OUT_TEXT(1,"输出到终端屏幕的文本");
+    USER_TEXT(0,"用户输入的文本"),
+
+    SIZE_CHANGE(1,"改变虚拟终端大小"),
+
+
+    HEART_BEAT(2,"进行心跳续约");
+
     private Integer state;
+
     private String desc;
 
-    ResultCodeEnum(Integer state, String desc) {
+    MessageInfoTypeRnum(Integer state, String desc) {
         this.state = state;
         this.desc = desc;
     }
 
-    public static ResultCodeEnum getByState(Integer state) {
-        for (ResultCodeEnum item : ResultCodeEnum.values()) {
+    public static MessageInfoTypeRnum getByState(Integer state) {
+        for (MessageInfoTypeRnum item : MessageInfoTypeRnum.values()) {
             if (item.getState().equals(state)) {
                 return item;
             }

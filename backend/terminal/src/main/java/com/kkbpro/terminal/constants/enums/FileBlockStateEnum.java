@@ -1,4 +1,4 @@
-package com.kkbpro.terminal.Constants.Enum;
+package com.kkbpro.terminal.constants.enums;
 
 public enum FileBlockStateEnum {
 

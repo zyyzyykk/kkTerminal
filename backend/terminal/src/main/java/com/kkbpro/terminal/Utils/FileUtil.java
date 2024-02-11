@@ -1,8 +1,8 @@
-package com.kkbpro.terminal.Utils;
+package com.kkbpro.terminal.utils;
 
-import com.kkbpro.terminal.Constants.Enum.FileBlockStateEnum;
-import com.kkbpro.terminal.GlobalExceptionHandler.MyException;
-import com.kkbpro.terminal.Result.Result;
+import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
+import com.kkbpro.terminal.exceptionHandler.MyException;
+import com.kkbpro.terminal.result.Result;
 
 import java.io.*;
 import java.util.ArrayList;
