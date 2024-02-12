@@ -14,9 +14,9 @@
       <div class="title" style="display: flex; align-items: center;" >
         <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
           <div v-if="isShowDirInput == true" >
-            <el-input v-model="dir" placeholder="输入目录路径" size="small" @change="dirInputCallback" />
+            <el-input id="aimDirInput" v-model="dir" placeholder="输入目录路径" size="small" @blur="dirInputCallback" />
           </div>
-          <div v-else @dblclick="isShowDirInput = true" >{{ dir }}</div>
+          <div class="no-select" v-else @dblclick="doShowDirInput" >{{ dir }}</div>
         </div>
         <div style="display: flex; align-items: center;">
           <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
@@ -68,28 +68,28 @@
 
   <TxtPreview ref="txtPreviewRef" @doSave="doSave" ></TxtPreview>
 
-  <div ref="menuBlockRef" @mousedown="preventDefault" v-show="isShowMenu" class="kk-menu no-select">
-    <div class="kk-menu-item" @click="handleMenuSelect($event,1)" key="1" >刷新</div>
-    <div class="kk-menu-item" @click="handleMenuSelect($event,2)" key="2" :disabled="aimFileInfo == null" >打开</div>
-    <div class="kk-menu-item" @click="handleMenuSelect($event,3)" key="3" >复制路径</div>
-    <div class="kk-menu-item" @click="handleMenuSelect($event,4)" key="4" :disabled="!(aimFileInfo && aimFileInfo.isDirectory == false)" >下载</div>
+  <div ref="menuBlockRef" v-show="isShowMenu" class="kk-menu no-select">
+    <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect($event,1)" key="1" >刷新</div>
+    <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect($event,2)" key="2" >打开</div>
+    <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect($event,3)" key="3" >复制路径</div>
+    <div :class="['kk-menu-item', !(aimFileInfo && aimFileInfo.isDirectory == false) ? 'disabled':'']" @click="handleMenuSelect($event,4)" key="4" >下载</div>
     <div class="kk-menu-item" @click="handleMenuSelect($event,5)" key="5" >新建</div>
-    <div class="kk-menu-item" @click="handleMenuSelect($event,6)" key="6" :disabled="aimFileInfo == null" >重命名</div>
-    <a-popconfirm :overlayStyle="{zIndex: 3466,marginLeft: '10px'}" placement="rightBottom" ok-text="确定" cancel-text="取消" @confirm="confirm">
+    <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect($event,6)" key="6" >重命名</div>
+    <a-popconfirm :open="isShowMenu && isShowPop" :overlayStyle="{zIndex: 3466,marginLeft: '10px'}" placement="rightBottom" ok-text="确定" cancel-text="取消" >
       <template #title>
-        <div style="font-size: 13px; margin-top: 4px;" >确定删除此文件/文件夹吗?</div>
+        <div class="no-select" style="font-size: 13px; margin-top: 4px;" >确定删除此文件/文件夹吗?</div>
       </template>
       <template #okButton>
-        <el-button size="small" type="primary" @click="confirm" >确定</el-button>
+        <el-button id="sureDelFileBtn" size="small" type="primary" @click="handlePopConfirm" >确定</el-button>
       </template>
       <template #cancelButton>
         <el-button size="small" text >取消</el-button>
       </template>
-      <div class="kk-menu-item" key="7" :disabled="aimFileInfo == null" >
+      <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" key="7" >
         <div @click="handleMenuSelect($event,7)" >删除</div>
       </div>
     </a-popconfirm>
-    <div class="kk-menu-item" @click="handleMenuSelect($event,8)" key="8" :disabled="aimFileInfo == null" >属性</div>
+    <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect($event,8)" key="8" >属性</div>
   </div>
 
 </template>
@@ -345,6 +345,13 @@ export default {
       }
     }
 
+    const doShowDirInput = () => {
+      isShowDirInput.value = true;
+      setTimeout(() => {
+        document.querySelector('#aimDirInput').focus();
+      },1);
+    }
+
     // 控制Dialog显示
     const DialogVisilble = ref(false);
 
@@ -396,6 +403,7 @@ export default {
 
     // 菜单项
     const isShowMenu = ref(false);
+    const isShowPop = ref(false);
     const isShowRenameInput = ref(false);
     const renameFile = ref(null);
     const handleMenuSelect = async (event, type) => {
@@ -437,6 +445,7 @@ export default {
           break;
         // 删除
         case 7:
+          isShowPop.value = true;
           break;
         // 属性
         case 8:
@@ -445,22 +454,24 @@ export default {
         default:
           break;
       }
-      if(type != 7) isShowMenu.value = false;
+      if(type != 7) {
+        isShowMenu.value = false;
+        isShowPop.value = false;
+      }
     };
     const handleScroll = () => {
       isShowMenu.value = false;
+      isShowPop.value = false;
     };
     const menuBlockRef = ref();
     // 右键显示
     const handleContextMenu = (event) => {
       // 点击空白处
       if(event.target.id == 'fileArea') aimFileInfo.value = null;
-      menuBlockRef.value.style.top = event.clientY + 'px';
-      menuBlockRef.value.style.left = event.clientX + 'px';
+      menuBlockRef.value.style.top = event.clientY - 135 + 'px';
+      menuBlockRef.value.style.left = event.clientX + 1 + 'px';
       isShowMenu.value = true;
-      // setTimeout(() => {
-      //     menuBlockRef.value.focus();
-      // },200);
+      isShowPop.value = false;
       event.preventDefault();
     };
     const handleRename = (item) => {
@@ -488,15 +499,24 @@ export default {
         renameFile.value = null;
         return;
       }
-      // 文件重命名
-      // 文件夹重命名
+      // TODO 文件重命名
+      // TODO 文件夹重命名
       // renameFile.value = null;
-    }
+    };
+    const handlePopConfirm = () => {
+      isShowMenu.value = false;
+      isShowPop.value = false;
+      // TODO 删除文件
+      console.log('删除文件');
+    };
 
     onMounted(() => {
-      document.addEventListener('mousedown', () => {
+      document.addEventListener('mousedown', (event) => {
+        if (menuBlockRef.value && menuBlockRef.value.contains(event.target)) return;
+        let sureDelFileBtn = document.querySelector('#sureDelFileBtn');
+        if (sureDelFileBtn && sureDelFileBtn.contains(event.target)) return;
         isShowMenu.value = false;
-        console.log('mousedown');
+        isShowPop.value = false;
       });
     });
 
@@ -540,6 +560,9 @@ export default {
       handleRename,
       renameFile,
       menuBlockRef,
+      doShowDirInput,
+      isShowPop,
+      handlePopConfirm,
 
     }
   }
@@ -598,8 +621,10 @@ export default {
   position: absolute;
   z-index: 3466;
   text-align: center;
-  cursor: pointer;
   box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 5px;
+  border-top: 8px solid #fff;
+  border-bottom: 8px solid #fff;
 }
 
 .kk-menu-item {
@@ -607,13 +632,20 @@ export default {
   font-size: 13px;
   line-height: 30px;
   width: 80px;
-  color: #444;
-  background-color: #fcfcfc;
+  color: #666;
+  background-color: #fff;
+  cursor: pointer;
 }
 
 .kk-menu-item:hover
 {
   background-color: #efefef;
+}
+
+.disabled {
+  background-color: #f5f7fa;
+  color: #a8abb2;
+  pointer-events: none;
 }
 
 </style>
