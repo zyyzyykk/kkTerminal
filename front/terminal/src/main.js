@@ -9,10 +9,10 @@ import { ElButton, ElDialog, ElIcon, ElInput, ElUpload, ElColorPicker,ElDropdown
 app.use(ElButton).use(ElDialog).use(ElIcon).use(ElInput).use(ElUpload).use(ElColorPicker);
 app.use(ElDropdown).use(ElDropdownMenu).use(ElDropdownItem).use(ElSwitch).use(ElLoading);
 
-// 按需引入 ant-design
+// 按需引入ant-design
 import 'ant-design-vue/dist/reset.css';
-import { Dropdown, Menu, MenuItem, Popconfirm } from 'ant-design-vue';
-app.use(Dropdown).use(Menu).use(MenuItem).use(Popconfirm);
+import { Popconfirm } from 'ant-design-vue';
+app.use(Popconfirm);
 
 app.mount('#app');
 
