@@ -11,7 +11,7 @@
     align-center
     draggable
   >
-    <div style="margin-top: -22px;"></div>
+    <div style="margin-top: -25px;"></div>
     <div>
       <div class="item-class" style="margin-bottom: 15px;">
         <div class="no-select">配 &nbsp; 置：</div>

@@ -31,8 +31,5 @@ img {
   pointer-events: auto;
 }
 
-.ant-popover-arrow {
-  display: none;
-}
 
 </style>
