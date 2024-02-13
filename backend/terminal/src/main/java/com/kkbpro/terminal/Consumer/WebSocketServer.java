@@ -134,7 +134,7 @@ public class WebSocketServer {
         // 删除临时文件
         String key = sshKey;
         Thread deleteTmpFileThread = new Thread(() -> {
-            // 延时2s执行
+            // 延时2s执行，确保文件上传已经结束
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -173,7 +173,7 @@ public class WebSocketServer {
         }
     }
 
-    // 从 Client 接收消息
+    // 从Client接收消息
     @OnMessage
     public void onMessage(String message) throws IOException {
 
@@ -205,7 +205,7 @@ public class WebSocketServer {
     }
 
 
-    // 向 Client 发送信息
+    // 向Client发送信息
     public void sendMessage(Session sessionSocket, String message, String type, Integer code) {
         if(message == null || "".equals(message)) return;
         message = AesUtil.aesEncrypt(message);

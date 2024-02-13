@@ -621,18 +621,18 @@ export default {
   position: absolute;
   z-index: 3466;
   text-align: center;
-  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
-  border-radius: 5px;
+  border-radius: 8px;
   border-top: 8px solid #fff;
   border-bottom: 8px solid #fff;
+  box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.15), 0 3px 6px -2px rgba(0, 0, 0, 0.2), 0 8px 16px 4px rgba(0, 0, 0, 0.12);
 }
 
 .kk-menu-item {
   height: 30px;
   font-size: 13px;
   line-height: 30px;
-  width: 80px;
-  color: #666;
+  width: 110px;
+  color: #1c1c1c;
   background-color: #fff;
   cursor: pointer;
 }
