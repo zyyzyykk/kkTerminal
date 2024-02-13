@@ -408,7 +408,8 @@ export default {
   width: 80px;
   height: 25px;
   font-size: 13px;
-  color: #666;
+  border: 2px solid #f2f2f2;
+  color: #1c1c1c;
 }
 
 .setting-menu:hover {

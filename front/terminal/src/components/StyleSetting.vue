@@ -3,7 +3,7 @@
     v-model="DialogVisilble"
     destroy-on-close
     :width="420"
-    title="样式设置"
+    title="偏好设置"
     :modal="false"
     modal-class="kk-dialog-class"
     draggable

@@ -1,7 +1,7 @@
 package com.kkbpro.terminal.utils;
 
 import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
-import com.kkbpro.terminal.exceptionHandler.MyException;
+import com.kkbpro.terminal.exception.MyException;
 import com.kkbpro.terminal.result.Result;
 
 import java.io.*;

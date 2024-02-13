@@ -1,4 +1,4 @@
-package com.kkbpro.terminal.exceptionHandler;
+package com.kkbpro.terminal.exception;
 
 
 import com.kkbpro.terminal.result.Result;
