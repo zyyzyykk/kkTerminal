@@ -125,6 +125,65 @@ public class FileController {
     }
 
     /**
+     * 删除文件/文件夹
+     */
+    @PostMapping("/rm")
+    public Result rm(String sshKey, Boolean isDirectory, String path) throws IOException {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
+        }
+        try (SFTPClient sftp = ssh.newSFTPClient()) {
+            if(isDirectory) rmFloder(sftp,path);
+            else sftp.rm(path);
+        }
+        return Result.setSuccess(200, "删除成功", null);
+    }
+
+    private void rmFloder(SFTPClient sftp, String path) throws IOException {
+        List<RemoteResourceInfo> files = sftp.ls(path);
+        for(RemoteResourceInfo file : files) {
+            String tmp = path + "/" + file.getName();
+            if(file.isDirectory()) rmFloder(sftp,tmp);
+            else sftp.rm(tmp);
+        }
+        sftp.rmdir(path);
+    }
+
+    /**
+     * 新建文件夹
+     */
+    @PostMapping("/mkdir")
+    public Result mkdir(String sshKey, String path) throws IOException {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件夹新建失败",null);
+        }
+        try (SFTPClient sftp = ssh.newSFTPClient()) {
+            sftp.mkdir(path);
+        }
+        return Result.setSuccess(200, "文件夹新建成功", null);
+    }
+
+    /**
+     * 文件/文件夹重命名
+     */
+    @PostMapping("/rename")
+    public Result rename(String sshKey, String oldPath, String newPath) throws IOException {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹重命名失败",null);
+        }
+        try (SFTPClient sftp = ssh.newSFTPClient()) {
+            sftp.rename(oldPath,newPath);
+        }
+        return Result.setSuccess(200, "重命名成功", null);
+    }
+
+    /**
      * 分片上传文件
      */
     @PostMapping("/upload")

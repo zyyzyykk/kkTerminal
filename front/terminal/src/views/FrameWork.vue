@@ -397,6 +397,7 @@ export default {
   top: 25px;
   z-index: 100;
   cursor: pointer;
+  border: 2px solid #f2f2f2;
 }
 
 .setting-menu {
@@ -407,9 +408,9 @@ export default {
   text-align: center;
   width: 80px;
   height: 25px;
+  line-height: 25px;
   font-size: 13px;
-  border: 2px solid #f2f2f2;
-  color: #1c1c1c;
+  color: #383838;
 }
 
 .setting-menu:hover {
