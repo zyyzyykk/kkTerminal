@@ -67,14 +67,16 @@
   </el-dialog>
 
   <TxtPreview ref="txtPreviewRef" @doSave="doSave" ></TxtPreview>
+  <MkFile ref="mkFileRef" @callback="handleMkFile" ></MkFile>
+  <FileAttr ref="fileAttrRef" @callback="doRename" ></FileAttr>
 
-  <div ref="menuBlockRef" v-show="isShowMenu" class="kk-menu no-select">
-    <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect($event,1)" key="1" >刷新</div>
-    <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect($event,2)" key="2" >打开</div>
-    <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect($event,3)" key="3" >复制路径</div>
-    <div :class="['kk-menu-item', !(aimFileInfo && aimFileInfo.isDirectory == false) ? 'disabled':'']" @click="handleMenuSelect($event,4)" key="4" >下载</div>
-    <div class="kk-menu-item" @click="handleMenuSelect($event,5)" key="5" >新建</div>
-    <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect($event,6)" key="6" >重命名</div>
+  <div ref="menuBlockRef" @contextmenu="preventDefault" v-show="isShowMenu" class="kk-menu no-select">
+    <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(1)" key="1" >刷新</div>
+    <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >打开</div>
+    <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(3)" key="3" >复制路径</div>
+    <div :class="['kk-menu-item', !(aimFileInfo && aimFileInfo.isDirectory == false) ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >下载</div>
+    <div class="kk-menu-item" @click="handleMenuSelect(5)" key="5" >新建</div>
+    <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >重命名</div>
     <a-popconfirm :open="isShowMenu && isShowPop" :overlayStyle="{zIndex: 3466,marginLeft: '10px'}" placement="rightBottom" ok-text="确定" cancel-text="取消" >
       <template #title>
         <div class="no-select" style="font-size: 13px; margin-top: 4px;" >确定删除此文件/文件夹吗?</div>
@@ -86,24 +88,26 @@
         <el-button size="small" text >取消</el-button>
       </template>
       <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" key="7" >
-        <div @click="handleMenuSelect($event,7)" >删除</div>
+        <div @click="handleMenuSelect(7)" >删除</div>
       </div>
     </a-popconfirm>
-    <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect($event,8)" key="8" >属性</div>
+    <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect(8)" key="8" >属性</div>
   </div>
 
 </template>
 
 <script>
-import { ref, onUnmounted, onMounted } from 'vue';
+import { ref, onUnmounted, onMounted, watch } from 'vue';
 import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/Utils/BaseUrl';
 import { Refresh, Fold, Download, Upload } from '@element-plus/icons';
 
 import NoData from '@/components/NoData';
 import TxtPreview from './preview/TxtPreview';
+import MkFile from './MkFile';
+import FileAttr from './FileAttr'
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
@@ -114,6 +118,8 @@ export default {
     NoData,
     FileIcons,
     TxtPreview,
+    MkFile,
+    FileAttr,
     Refresh,
     Fold,
     Download,
@@ -180,6 +186,7 @@ export default {
             if(resp.status == 'success') {
               files.value = resp.data.files;
               noDataMsg.value = '暂无文件';
+              console.log(files.value[0]);
             }
             else {
               files.value = [];
@@ -256,7 +263,7 @@ export default {
     }
     // 上传文件
     const chunkSize = 1024 * 517;   // 每一片大小517kB
-    const doUpload = async (fileData, pathVal) => {
+    const doUpload = async (fileData, pathVal, alert) => {
       if(isShowDirInput.value == true) return;
       let file = fileData.file;
       if(!file) return;
@@ -295,10 +302,10 @@ export default {
             // 文件后台上传中
             if(resp.code == 202) {
               ElMessage({
-                message: resp.info,
+                message: alert ? alert : resp.info,
                 type: resp.status,
                 grouping: true,
-              })
+              });
             }
             // 文件片上传成功
             // else if(resp.code == 203) {
@@ -360,6 +367,7 @@ export default {
       aimFileInfo.value = null;
       renameFile.value = null;
       txtPreviewRef.value.DialogVisilble = false;
+      mkFileRef.value.DialogVisilble = false;
       done();
     }
 
@@ -397,7 +405,7 @@ export default {
       {
         let file = filesArray[i];
         file.uid = Math.random().toString(36).substring(2);
-        doUpload({file:file});
+        doUpload({file:file},dir.value,"文件新建成功");
       }
     };
 
@@ -406,8 +414,8 @@ export default {
     const isShowPop = ref(false);
     const isShowRenameInput = ref(false);
     const renameFile = ref(null);
-    const handleMenuSelect = async (event, type) => {
-      // event.preventDefault();
+    const fileAttrRef = ref();
+    const handleMenuSelect = async (type) => {
       switch (type) {
         // 刷新
         case 1:
@@ -433,7 +441,8 @@ export default {
           break;
         // 新建
         case 5:
-          
+          mkFileRef.value.DialogVisilble = true;
+          mkFileRef.value.nowDir = dir.value;
           break;
         // 重命名
         case 6:
@@ -449,7 +458,10 @@ export default {
           break;
         // 属性
         case 8:
-          
+          fileAttrRef.value.fileInfo = {...aimFileInfo.value};
+          fileAttrRef.value.fileDir = dir.value;
+          fileAttrRef.value.rename = aimFileInfo.value.name;
+          fileAttrRef.value.DialogVisilble = true;
           break;
         default:
           break;
@@ -474,6 +486,7 @@ export default {
       isShowPop.value = false;
       event.preventDefault();
     };
+    // 重命名文件
     const handleRename = (item) => {
       isShowRenameInput.value = false;
       // 校验
@@ -481,7 +494,7 @@ export default {
         renameFile.value = null;
         return;
       }
-      if(!(renameFile.value.name && renameFile.value.name.length > 0)) {
+      if(!(renameFile.value.name && renameFile.value.name.trim().length > 0)) {
         ElMessage({
           message: "文件名不能为空",
           type: "warning",
@@ -499,16 +512,98 @@ export default {
         renameFile.value = null;
         return;
       }
-      // TODO 文件重命名
-      // TODO 文件夹重命名
-      // renameFile.value = null;
+      let oldPath = dir.value + item.name;
+      let newPath = dir.value + renameFile.value.name;
+      renameFile.value = null;
+      doRename(oldPath,newPath);
     };
+    const doRename = (oldPath,newPath) => {
+      $.ajax({
+        url: http_base_url + '/rename',
+        type:'post',
+        data:{
+          sshKey:props.sshKey,
+          oldPath:oldPath,
+          newPath:newPath,
+        },
+        success(resp){
+          ElMessage({
+            message: resp.info,
+            type: resp.status,
+            grouping: true,
+          });
+          getDirList();
+        }
+      });
+    }
+    // 删除文件
     const handlePopConfirm = () => {
       isShowMenu.value = false;
       isShowPop.value = false;
-      // TODO 删除文件
-      console.log('删除文件');
+      $.ajax({
+        url: http_base_url + '/rm',
+        type:'post',
+        data:{
+          sshKey:props.sshKey,
+          isDirectory:aimFileInfo.value.isDirectory,
+          path:dir.value + aimFileInfo.value.name,
+        },
+        success(resp){
+          ElMessage({
+            message: resp.info,
+            type: resp.status,
+            grouping: true,
+          });
+          getDirList();
+        }
+      });
     };
+    // 新建文件
+    const mkFileRef = ref();
+    const handleMkFile = (type, name, nowDir) => {
+      // 文件
+      if(type == false) {
+        // 防止覆盖
+        for(let i=0;i<files.value.length;i++) {
+          if(files.value[i].name == name && dir.value == nowDir) {
+            ElMessage({
+              message: '存在同名文件或目录',
+              type: 'error',
+              grouping: true,
+            });
+            return;
+          }
+        }
+        // 创建Blob对象
+        const blob = new Blob([''], {type:'text/plain'});
+        // 创建File对象
+        const file = new File([blob], name);
+        file.uid = Math.random().toString(36).substring(2);
+        doUpload({file:file},nowDir,"文件新建成功");
+      }
+      // 文件夹
+      else {
+        $.ajax({
+          url: http_base_url + '/mkdir',
+          type:'post',
+          data:{
+            sshKey:props.sshKey,
+            path:nowDir + name,
+          },
+          success(resp){
+            ElMessage({
+              message: resp.info,
+              type: resp.status,
+              grouping: true,
+            });
+            getDirList();
+          }
+        });
+      }
+    };
+    watch(dir,() => {
+      if(mkFileRef.value) mkFileRef.value.reset();
+    });
 
     onMounted(() => {
       document.addEventListener('mousedown', (event) => {
@@ -563,6 +658,10 @@ export default {
       doShowDirInput,
       isShowPop,
       handlePopConfirm,
+      mkFileRef,
+      handleMkFile,
+      doRename,
+      fileAttrRef,
 
     }
   }
@@ -632,7 +731,7 @@ export default {
   font-size: 13px;
   line-height: 30px;
   width: 110px;
-  color: #1c1c1c;
+  color: #383838;
   background-color: #fff;
   cursor: pointer;
 }
