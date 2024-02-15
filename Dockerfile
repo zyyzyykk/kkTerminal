@@ -5,7 +5,7 @@ FROM openjdk:8-alpine
 ENV TITLE="kkbapps"
 
 # 将Java应用程序复制到目录
-COPY terminal.jar /data/terminal.jar
+COPY terminal.jar /terminal.jar
 
 # 入口，java项目的启动命令
-ENTRYPOINT java -jar /kkbpro/backend/terminal.jar --kk.title=$TITLE
+ENTRYPOINT java -jar /terminal.jar --kk.title=$TITLE

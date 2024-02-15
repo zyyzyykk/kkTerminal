@@ -9,8 +9,8 @@
     draggable
   >
     <template #title>
-      <div v-if="DialogVisilble" class="kk-flex">
-        <FileIcons :name="fileName" width="25" height="25" :isFloder="false" />
+      <div class="kk-flex">
+        <FileIcons v-if="DialogVisilble" :name="fileName" width="25" height="25" :isFloder="false" />
         <div style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
       </div>
     </template>
@@ -49,6 +49,7 @@ export default {
     const codeEditorRef = ref();
 
     const initText = async () => {
+      resetEditor();
       loading.value = true;
       let url = fileUrl.value;
       await $.ajax({
