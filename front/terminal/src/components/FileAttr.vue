@@ -5,19 +5,20 @@
     :width="350"
     :modal="false"
     modal-class="kk-dialog-class"
+    align-center
     draggable
   >
     <template #title>
-      <div v-if="DialogVisilble" class="kk-flex">
-        <FileIcons :name="fileInfo.name" width="16" height="16" :isFloder="fileInfo.isDirectory" />
+      <div class="kk-flex">
+        <FileIcons v-if="DialogVisilble" :name="fileInfo.name" width="16" height="16" :isFloder="fileInfo.isDirectory" />
         <div style="margin: 0 5px; font-size: small;">{{ fileInfo.name }}</div>
         <div style="font-size: small;">属性</div>
       </div>
     </template>
-    <div style="margin-top: -27px;"></div>
+    <div style="margin-top: -32px;"></div>
     <div>
       <div class="kk-flex">
-        <div style="margin-right: 10px;" ><FileIcons :name="fileInfo.name" width="32" height="32" :isFloder="fileInfo.isDirectory" /></div>
+        <div v-if="DialogVisilble" style="margin-right: 10px;" ><FileIcons :name="fileInfo.name" width="32" height="32" :isFloder="fileInfo.isDirectory" /></div>
         <div>
           <el-input v-model="rename" placeholder="" />
         </div>
