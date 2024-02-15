@@ -186,7 +186,6 @@ export default {
             if(resp.status == 'success') {
               files.value = resp.data.files;
               noDataMsg.value = '暂无文件';
-              console.log(files.value[0]);
             }
             else {
               files.value = [];
@@ -368,17 +367,19 @@ export default {
       renameFile.value = null;
       txtPreviewRef.value.DialogVisilble = false;
       mkFileRef.value.DialogVisilble = false;
+      fileAttrRef.value.DialogVisilble = false;
       done();
     }
 
     // 文本文件编辑
     const txtPreviewRef = ref();
     const preViewFile = (name) => {
+      txtPreviewRef.value.DialogVisilble = false;
       txtPreviewRef.value.fileName = name;
       txtPreviewRef.value.fileUrl = getFileUrl(name);
       txtPreviewRef.value.loading = true;
       txtPreviewRef.value.initText();
-      txtPreviewRef.value.DialogVisilble = true;
+      setTimeout(() => {txtPreviewRef.value.DialogVisilble = true},1);
     }
     // 保存文本，写回服务器
     const doSave = (name, url, text) => {
@@ -405,7 +406,7 @@ export default {
       {
         let file = filesArray[i];
         file.uid = Math.random().toString(36).substring(2);
-        doUpload({file:file},dir.value,"文件新建成功");
+        doUpload({file:file},dir.value);
       }
     };
 
@@ -458,10 +459,11 @@ export default {
           break;
         // 属性
         case 8:
+          fileAttrRef.value.DialogVisilble = false;
           fileAttrRef.value.fileInfo = {...aimFileInfo.value};
           fileAttrRef.value.fileDir = dir.value;
           fileAttrRef.value.rename = aimFileInfo.value.name;
-          fileAttrRef.value.DialogVisilble = true;
+          setTimeout(() => {fileAttrRef.value.DialogVisilble = true},1);
           break;
         default:
           break;
