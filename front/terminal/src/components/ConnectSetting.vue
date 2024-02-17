@@ -15,7 +15,7 @@
     <div>
       <div class="item-class" style="margin-bottom: 15px;">
         <div class="no-select">配 &nbsp; 置：</div>
-        <div style="user-select: none;" :class="!(setInfo.option && setInfo.option.length > 0) ? 'new-option': 'old-option'" >{{ !(setInfo.option && setInfo.option.length > 0) ? '新建配置' : setInfo.option }}</div>
+        <div class="ellipsis" style="user-select: none;" :class="!(setInfo.option && setInfo.option.length > 0) ? 'new-option': 'old-option'" >{{ !(setInfo.option && setInfo.option.length > 0) ? '新建配置' : setInfo.option }}</div>
         <div style="flex: 1;"></div>
         <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" >导入</el-button></div>
         <div><el-button v-if="isForbidInput == false" size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" >保存</el-button></div>
@@ -230,6 +230,13 @@ export default {
 /* 文本不可选中 */
 .no-select {
   user-select: none;
+}
+
+/* 文本溢出省略 */
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .old-option {
