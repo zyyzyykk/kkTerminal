@@ -15,7 +15,7 @@
         <div v-for="(value, key) in sshOptions" :key="key" >
           <div :class="['item-class', (aimOption == key) ? 'item-selected' : '']" @click="aimOption = key">
             <FileIcons name="kk.txt" width="20" height="20" :isFloder="false" />
-            <div style="margin: 0 10px;">{{ key }}</div>
+            <div class="ellipsis" style="margin: 0 10px;">{{ key }}</div>
           </div>
         </div>
       </div>
@@ -124,5 +124,12 @@ export default {
   overflow-y: scroll;
   width: 100%;
   border-bottom: 1px solid #ececec;
+}
+
+/* 文本溢出省略 */
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

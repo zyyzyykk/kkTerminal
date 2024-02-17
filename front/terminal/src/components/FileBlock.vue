@@ -16,7 +16,7 @@
           <div v-if="isShowDirInput == true" >
             <el-input id="aimDirInput" v-model="dir" placeholder="输入目录路径" size="small" @blur="dirInputCallback" />
           </div>
-          <div class="no-select" v-else @dblclick="doShowDirInput" >{{ dir }}</div>
+          <div class="no-select ellipsis" v-else @dblclick="doShowDirInput" >{{ dir }}</div>
         </div>
         <div style="display: flex; align-items: center;">
           <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
@@ -44,7 +44,7 @@
                     <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                       <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
                     </div>
-                    <div v-else style="margin: 0 10px;">{{ item.name }}</div>
+                    <div v-else class="ellipsis" style="margin: 0 10px;">{{ item.name }}</div>
                   </div>
                 </template>
                 <template v-else>
@@ -53,7 +53,7 @@
                     <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                       <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
                     </div>
-                    <div v-else style="margin: 0 10px;">{{ item.name }}</div>
+                    <div v-else class="ellipsis" style="margin: 0 10px;">{{ item.name }}</div>
                   </div>
                 </template>
               </div>
@@ -715,6 +715,13 @@ export default {
 /* 文本不可选中 */
 .no-select {
   user-select: none;
+}
+
+/* 文本溢出省略 */
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .kk-menu
