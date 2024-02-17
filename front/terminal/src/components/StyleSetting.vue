@@ -78,7 +78,6 @@
         </div>
       </div>
     </div>
-    <div class="errInfo no-select"> {{ err_msg }} </div>
     <div style="margin-bottom: 5px;"></div>
     <div style="display: flex; border-top: 1px solid #f1f2f4;">
       <div style="flex: 1;"></div>
@@ -103,14 +102,13 @@ export default {
 
     // 控制Dialog显示
     const DialogVisilble = ref(false);
-    const err_msg = ref('');
 
     // 字体列表
-    const fontFamilyList = ['Monospace','Consolas','Courier','Liberation Mono'];
+    const fontFamilyList = ['Monospace','Consolas','Courier','Lucida Console'];
     // 字号列表
     const fontSizeList = [12,14,16,18,20];
     // 光标样式列表
-    const cursorStyleList = ['block','underline','bar']
+    const cursorStyleList = ['block','underline','bar'];
 
     // 设置信息
     const setInfo = ref({
@@ -132,7 +130,6 @@ export default {
       cursorStyleList,
       setInfo,
       DialogVisilble,
-      err_msg,
       confirm,
 
     }
@@ -146,12 +143,6 @@ export default {
 .item-class {
   display: flex; 
   align-items: center; 
-}
-
-.errInfo{
-  font-size: 12px;
-  color: rgb(234, 80, 80);
-  margin-top: 5px;
 }
 
 /* 文本不可选中 */

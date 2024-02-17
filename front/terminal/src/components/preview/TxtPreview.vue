@@ -11,7 +11,7 @@
     <template #title>
       <div class="kk-flex">
         <FileIcons v-if="DialogVisilble" :name="fileName" width="25" height="25" :isFloder="false" />
-        <div style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
+        <div class="ellipsis" style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
       </div>
     </template>
     <div style="margin-top: -28px;"></div>
@@ -126,5 +126,12 @@ export default {
 .kk-flex {
   display: flex;
   align-items: center;
+}
+
+/* 文本溢出省略 */
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
