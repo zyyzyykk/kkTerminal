@@ -10,7 +10,7 @@
   >
     <template #title>
       <div class="kk-flex">
-        <FileIcons v-if="DialogVisilble" :name="fileName" width="25" height="25" :isFloder="false" />
+        <FileIcons :name="fileName" width="25" height="25" :isFloder="false" />
         <div class="ellipsis" style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
       </div>
     </template>
@@ -26,10 +26,10 @@
 import { ref } from 'vue';
 import AceEditor from './AceEditor';
 import $ from 'jquery';
-import { ElMessage } from 'element-plus'
+import { ElMessage } from 'element-plus';
 
 // 引入文件图标组件
-import FileIcons from 'file-icons-vue'
+import FileIcons from 'file-icons-vue';
 
 export default {
   name: 'TxtPreview',

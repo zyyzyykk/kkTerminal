@@ -10,8 +10,8 @@
   >
     <template #title>
       <div style="margin-top: -15px;"></div>
-      <div class="kk-flex">
-        <FileIcons v-if="DialogVisilble" :name="fileInfo.name" width="16" height="16" :isFloder="fileInfo.isDirectory" />
+      <div class="kk-flex nowrap">
+        <FileIcons :name="fileInfo.name" width="16" height="16" :isFloder="fileInfo.isDirectory" />
         <div class="ellipsis" style="margin: 0 5px; font-size: small;">{{ fileInfo.name }}</div>
         <div style="font-size: small;">属性</div>
       </div>
@@ -19,13 +19,13 @@
     <div style="margin-top: -32px;"></div>
     <div>
       <div class="kk-flex">
-        <div v-if="DialogVisilble" style="margin-right: 10px;" ><FileIcons :name="fileInfo.name" width="32" height="32" :isFloder="fileInfo.isDirectory" /></div>
+        <div style="margin-right: 10px;" ><FileIcons :name="fileInfo.name" width="32" height="32" :isFloder="fileInfo.isDirectory" /></div>
         <div>
           <el-input v-model="rename" placeholder="" />
         </div>
       </div>
       <div class="kk-border" ></div>
-      <div class="kk-flex">
+      <div class="kk-flex nowrap">
         <div class="no-select" style="text-align: left; width: 100px;">位置：</div>
         <div class="ellipsis">
           {{ fileDir + fileInfo.name }}
@@ -183,5 +183,9 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 </style>
