@@ -14,7 +14,7 @@
     <div style="margin-top: -25px;"></div>
     <div>
       <div class="item-class" style="margin-bottom: 15px;">
-        <div class="no-select">配 &nbsp; 置：</div>
+        <div class="no-select nowrap">配 &nbsp; 置：</div>
         <div class="ellipsis" style="user-select: none;" :class="!(setInfo.option && setInfo.option.length > 0) ? 'new-option': 'old-option'" >{{ !(setInfo.option && setInfo.option.length > 0) ? '新建配置' : setInfo.option }}</div>
         <div style="flex: 1;"></div>
         <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" >导入</el-button></div>
@@ -237,6 +237,10 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 .old-option {

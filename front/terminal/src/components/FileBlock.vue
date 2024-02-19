@@ -12,7 +12,7 @@
     <div style="margin-top: -27px;"></div>
     <div>
       <div class="title" style="display: flex; align-items: center;" >
-        <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">
+        <div class="ellipsis" style="flex: 1;">
           <div v-if="isShowDirInput == true" >
             <el-input id="aimDirInput" v-model="dir" placeholder="输入目录路径" size="small" @blur="dirInputCallback" />
           </div>
@@ -238,7 +238,7 @@ export default {
       confirmDirCorrect();
       aimFileInfo.value = null;
       getDirList();
-    }
+    };
 
     // 刷新文件列表
     const doRefresh = () => {
@@ -367,20 +367,20 @@ export default {
       renameFile.value = null;
       txtPreviewRef.value.DialogVisilble = false;
       mkFileRef.value.DialogVisilble = false;
+      mkFileRef.value.reset();
       fileAttrRef.value.DialogVisilble = false;
       done();
-    }
+    };
 
     // 文本文件编辑
     const txtPreviewRef = ref();
     const preViewFile = (name) => {
-      txtPreviewRef.value.DialogVisilble = false;
       txtPreviewRef.value.fileName = name;
       txtPreviewRef.value.fileUrl = getFileUrl(name);
       txtPreviewRef.value.loading = true;
       txtPreviewRef.value.initText();
-      setTimeout(() => {txtPreviewRef.value.DialogVisilble = true},1);
-    }
+      txtPreviewRef.value.DialogVisilble = true;
+    };
     // 保存文本，写回服务器
     const doSave = (name, url, text) => {
       let urlParams = parseUrl(url);
@@ -391,7 +391,7 @@ export default {
       const file = new File([blob], name);
       file.uid = Math.random().toString(36).substring(2);
       doUpload({file:file}, urlParams.path);
-    }
+    };
 
     // 文件拖拽
     const fileAreaRef = ref();
@@ -416,6 +416,7 @@ export default {
     const isShowRenameInput = ref(false);
     const renameFile = ref(null);
     const fileAttrRef = ref();
+    // 菜单选择
     const handleMenuSelect = async (type) => {
       switch (type) {
         // 刷新
@@ -459,11 +460,10 @@ export default {
           break;
         // 属性
         case 8:
-          fileAttrRef.value.DialogVisilble = false;
           fileAttrRef.value.fileInfo = {...aimFileInfo.value};
           fileAttrRef.value.fileDir = dir.value;
           fileAttrRef.value.rename = aimFileInfo.value.name;
-          setTimeout(() => {fileAttrRef.value.DialogVisilble = true},1);
+          fileAttrRef.value.DialogVisilble = true;
           break;
         default:
           break;
