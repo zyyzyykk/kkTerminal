@@ -37,7 +37,7 @@ docker pull zyyzyykk/kkterminal
 docker run -d --name kkterminal -p 3000:3000 zyyzyykk/kkterminal
 ```
 
-3.挂载数据卷：`数据卷路径:/data`
+3.挂载数据卷：`-v 数据卷路径:/data`
 
 ```sh
 docker run -d --name kkterminal -p 3000:3000 -v /data:/data zyyzyykk/kkterminal
@@ -58,7 +58,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 🌐 国内服务器访问：https://ssh.kkbpro.com/
 - 🌍 国外服务器访问：https://ssh.kkbapps.com/
 
-![kkterminal](https://img.kkbapps.com/terminal/300-1.png)
+![kkterminal](https://img.kkbapps.com/terminal/300-1-1.png)
 
 ![kkterminal](https://img.kkbapps.com/terminal/300-2.png)
 
@@ -78,7 +78,10 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 5.支持重启：当修改ssh设置或自定义偏好设置后会自动重启，也可在ssh连接断开后手动进行重启
 
-6.支持复制粘贴：复制同 `git` 终端，选中文本会自动进行复制；粘贴同 `cmd` 终端，单击鼠标右键进行粘贴（需要浏览器打开权限）
+6.支持复制粘贴：
+
+- 复制同 `git` 终端，选中文本会自动进行复制
+- 粘贴同 `cmd` 终端，单击鼠标右键进行粘贴（需要浏览器打开权限）
 
 7.支持文件管理，打开文件管理模块进行文件的查看、上传与下载
 

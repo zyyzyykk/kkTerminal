@@ -6,6 +6,8 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import ace from 'ace-builds/src-noconflict/ace';
 import 'ace-builds/src-noconflict/ext-searchbox';
+import 'ace-builds/src-noconflict/mode-text';
+import 'ace-builds/src-noconflict/theme-chrome';
 
 export default {
   name: 'AceEditor',
@@ -36,6 +38,8 @@ export default {
         copyWithEmptySelection: false,
         showPrintMargin: false,
         highlightActiveLine: true,
+        mode: 'ace/mode/text',                                // 高亮
+        theme: 'ace/theme/chrome',                            // 主题
       });
 
       // 编辑 监听内容变化

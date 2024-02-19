@@ -64,7 +64,7 @@ export default {
     const loadOps = () => {
       if(localStorage.getItem('options')) options.value = JSON.parse(decrypt(localStorage.getItem('options')));
       else options.value = {};
-    }
+    };
     loadOps();
     const loadEnv = () => {
       if(localStorage.getItem('env')) {
@@ -74,7 +74,7 @@ export default {
         else env.value.option = '';
       }
       else env.value = default_env;
-    }
+    };
     loadEnv();
 
     // 保存更改的配置
@@ -82,7 +82,7 @@ export default {
       options.value = {...options.value,[name]:item};
       localStorage.setItem('options',encrypt(JSON.stringify(options.value)));
       loadOps();
-    }
+    };
 
     // 连接状态
     const connect_status = ref({
@@ -90,34 +90,29 @@ export default {
       'Success':'Connecting success !\r\n',
       'Connecting':'Connecting to remote server ...\r\n',
       'Disconnected':'Disconnect to remote server.\r\n',
-    })
+    });
     const now_connect_status = ref(connect_status.value['Connecting']);
 
-    // 终端
+    // 初始化终端
     const terminal = ref();
     let term = null;
     const isFirst = ref(true);
     const initTerminal = () => {
       term = new Terminal({
         rendererType: "canvas",                               // 渲染类型
-        // rows: 20,                                          // 行数
-        // cols: 10,                                          // 不指定行数，自动回车后光标从下一行开始
         convertEol: true,                                     // 启用时，光标将设置为下一行的开头
         scrollback: 0,                                        // 终端中的回滚量
         disableStdin: false,                                  // 是否应禁用输入
         cursorStyle: env.value.cursorStyle,                   // 光标样式 block
         cursorBlink: env.value.cursorBlink,                   // 光标闪烁
-
         theme:{
           foreground: env.value.fg,                           // 前景色
           background: env.value.bg,                           // 背景色
           cursor: "help",                                     // 设置光标
         },
-
         lineHeight: 1.2,
-        fontFamily: env.value.fontFamily,                     // 设置字体为 Simsun
+        fontFamily: env.value.fontFamily,                     // 设置字体为 Monospace
         fontSize: env.value.fontSize,                         // 设置字号为 16
-
       });
       term.loadAddon(fitAddon);
     }
@@ -160,7 +155,6 @@ export default {
           setTimeout(() => {
             termFit();
           },1);
-          // term.write(now_connect_status.value);
         }
         // 输出
         if(result.code == 1) {
@@ -197,8 +191,6 @@ export default {
     // 文本消息发送
     const sendMessage = (text) => {
       if(socket.value) {
-        // TODO kkterminal 快捷键判断
-        // if(chargeKey(e)) return;
         // 重启后第一次输入
         if(isFirst.value) {
           termFit();
@@ -206,13 +198,13 @@ export default {
         }
         socket.value.send(encrypt(JSON.stringify({type:0,content:text,rows:0,cols:0})));
       }
-    }
+    };
 
     // 中文
     const putChinese = (event) => {
       event.preventDefault();
       sendMessage(event.target.value);
-    }
+    };
 
     // 右键事件函数
     const doPaste = async function(event) {
@@ -221,11 +213,17 @@ export default {
       sendMessage(pasteText);
     };
 
+    // 单击事件
+    const doClick = () => {
+      isShowSetting.value = false;
+    };
+
     // 重启终端
     const resetTerminal = () => {
       if(term && terminal.value) {
         terminal.value.removeEventListener('contextmenu', doPaste);
         terminal.value.removeEventListener('compositionend', putChinese);
+        terminal.value.removeEventListener('click', doClick);
       }
       terminal.value.innerHTML = '';
       isFirst.value = true;
@@ -255,12 +253,10 @@ export default {
       terminal.value.addEventListener('contextmenu', doPaste);
 
       // 左键单击
-      terminal.value.addEventListener('click', function() {
-        isShowSetting.value = false;
-      });
+      terminal.value.addEventListener('click', doClick);
 
       term.write(now_connect_status.value);
-    }
+    };
     
     // 终端设置
     const doSettings = (type) => {
@@ -291,7 +287,7 @@ export default {
         fileBlockRef.value.DialogVisilble = true;
         fileBlockRef.value.getInitDir();
       }
-    }
+    };
 
     // websocket心跳续约 (25秒)
     let timer = null;
@@ -303,15 +299,19 @@ export default {
           }
         },25000);
       }
-    }
+    };
 
     // 关闭文件模块
     const closeFileBlock = () => {
       fileBlockRef.value.txtPreviewRef.DialogVisilble = false;
       fileBlockRef.value.txtPreviewRef.resetEditor();
+      fileBlockRef.value.mkFileRef.DialogVisilble = false;
+      fileBlockRef.value.fileAttrRef.DialogVisilble = false;
       fileBlockRef.value.DialogVisilble = false;
       fileBlockRef.value.dir = '';
-    }
+      fileBlockRef.value.aimFileInfo = null;
+      fileBlockRef.value.renameFile = null;
+    };
 
     onMounted(() => {
       // 连接服务器
@@ -336,6 +336,7 @@ export default {
       if(term && terminal.value) {
         terminal.value.removeEventListener('contextmenu', doPaste);
         terminal.value.removeEventListener('compositionend', putChinese);
+        terminal.value.removeEventListener('click', doClick);
       }
       if(timer) clearInterval(timer);
     });
