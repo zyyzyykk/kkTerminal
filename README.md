@@ -62,7 +62,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ![kkterminal](https://img.kkbapps.com/terminal/301-2.png)
 
-![kkterminal](https://img.kkbapps.com/terminal/301-3.png)
+![kkterminal](https://img.kkbapps.com/terminal/301-3-2.png)
 
 ![kkterminal](https://img.kkbapps.com/terminal/301-4.png)
 
