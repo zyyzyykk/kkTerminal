@@ -107,7 +107,7 @@ import { Refresh, Fold, Download, Upload } from '@element-plus/icons';
 import NoData from '@/components/NoData';
 import TxtPreview from './preview/TxtPreview';
 import MkFile from './MkFile';
-import FileAttr from './FileAttr'
+import FileAttr from './FileAttr';
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
