@@ -31,7 +31,7 @@
 docker pull zyyzyykk/kkterminal
 ```
 
-2.创建并运行容器，默认监听3000端口：
+2.创建并运行容器，默认监听3000端口：`-p 端口号:3000`
 
 ```sh
 docker run -d --name kkterminal -p 3000:3000 zyyzyykk/kkterminal
