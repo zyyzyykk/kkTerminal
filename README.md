@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-02-21
+> 更新时间：2024-02-25
 >
 
 ### **⚡** 快速引入
@@ -62,7 +62,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ![kkterminal](https://img.kkbapps.com/terminal/301-2.png)
 
-![kkterminal](https://img.kkbapps.com/terminal/301-3-2.png)
+![kkterminal](https://img.kkbapps.com/terminal/301-3-3.png)
 
 ![kkterminal](https://img.kkbapps.com/terminal/301-4.png)
 
@@ -94,6 +94,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 ##### zyyzyykk/kkterminal:3.0.1：latest
 
 - 优化文字溢出省略等样式
+- 修复部分文件无法显示属性模块的bug
 
 ##### zyyzyykk/kkterminal:3.0.0：
 
