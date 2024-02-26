@@ -204,6 +204,7 @@ export default {
     const putChinese = (event) => {
       event.preventDefault();
       sendMessage(event.target.value);
+      event.target.value = '';
     };
 
     // 右键事件函数
