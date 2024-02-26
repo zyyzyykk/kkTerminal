@@ -35,7 +35,7 @@
       <div class="kk-flex">
         <div class="no-select" style="text-align: left; width: 100px;">大小：</div>
         <div>
-          {{ fileInfo.attributes.size + ' 字节' }}
+          {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size + ' 字节' }})
         </div>
       </div>
       <div class="kk-border" ></div>
@@ -74,6 +74,7 @@ import { calcPriority } from '../Utils/CalcPriority';
 import { ElMessage } from 'element-plus';
 import useClipboard from "vue-clipboard3";
 import { DocumentCopy } from '@element-plus/icons';
+import { calcSize } from '../Utils/CalcSize';
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
@@ -155,6 +156,7 @@ export default {
       rename,
       formatDate,
       calcPriority,
+      calcSize,
       doCopy,
 
     }
