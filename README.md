@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-02-25
+> 更新时间：2024-02-27
 >
 
 ### **⚡** 快速引入
@@ -31,7 +31,7 @@
 docker pull zyyzyykk/kkterminal
 ```
 
-2.创建并运行容器，默认监听3000端口：`-p 端口号:3000`
+2.创建并运行容器，进行端口映射：`-p 端口号:3000`
 
 ```sh
 docker run -d --name kkterminal -p 3000:3000 zyyzyykk/kkterminal
@@ -91,7 +91,12 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 > 核心功能已全部开发完成，后续更新主要针对bug修复、逻辑优化等方面
 
-##### zyyzyykk/kkterminal:3.0.1：latest
+##### zyyzyykk/kkterminal:3.0.3：latest
+
+- 修改滚动条样式，优化文件大小属性展示
+- 修复bug：部分文件权限属性错误、终端中文输入混乱
+
+##### zyyzyykk/kkterminal:3.0.1：
 
 - 优化文字溢出省略等样式
 - 修复部分文件无法显示属性模块的bug
@@ -101,11 +106,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 优化文件上传逻辑，压缩打包体积
 - 实现文件拖拽上传，将文件拖拽至显示区即可上传
 - 新增文件菜单，右键文件或空白区查看菜单项
-
-##### zyyzyykk/kkterminal:2.9.7：
-
-- 优化显示细节
-- 文本编辑器由 `Monaco` 替换为更轻量的 `Ace`
 
 ##### [历史更新记录](./UPDATE.md)
 
