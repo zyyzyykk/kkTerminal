@@ -35,7 +35,8 @@ const permissionMap = {
 const getAttrs = (attrs) => {
   let symbol = '---------';
   // 将权限数组转换为对应的权限值总和
-  let permissionValue = attrs.reduce((acc, attr) => acc + permissionMap[attr], 0);
+  let permissionValue = 0;
+  for(let i=0;i<attrs.length;i++) if(permissionMap[attrs[i]]) permissionValue += permissionMap[attrs[i]];
 
   // 设置用户权限
   symbol = setPermissionSymbol(symbol, 0, permissionValue & permissionMap['USR_R'], 'r');
