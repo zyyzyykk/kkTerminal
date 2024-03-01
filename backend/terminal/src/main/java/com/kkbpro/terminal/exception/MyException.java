@@ -12,7 +12,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class MyException extends RuntimeException{
     private Result result;
-    public MyException(String message){
-        super(message);
+    public MyException(Result result){
+        super(result.getInfo());
+        this.result = result;
     }
 }
