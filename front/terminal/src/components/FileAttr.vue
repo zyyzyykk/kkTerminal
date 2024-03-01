@@ -100,6 +100,7 @@ export default {
     const confirm = () => {
       // 校验
       if(fileInfo.value.name == rename.value) {
+        DialogVisilble.value = false;
         return;
       }
       if(!(rename.value && rename.value.trim().length > 0)) {

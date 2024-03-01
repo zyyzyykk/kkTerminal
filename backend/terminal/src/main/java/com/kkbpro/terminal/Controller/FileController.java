@@ -95,7 +95,7 @@ public class FileController {
                 fileInfo.setAttributes(file.getAttributes());
                 fileInfoList.add(fileInfo);
             }
-        } catch (net.schmizz.sshj.sftp.SFTPException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return Result.setError(500,"目录不存在",map);
         }
@@ -137,6 +137,9 @@ public class FileController {
         try (SFTPClient sftp = ssh.newSFTPClient()) {
             if(isDirectory) rmFloder(sftp,path);
             else sftp.rm(path);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500, "删除失败", null);
         }
         return Result.setSuccess(200, "删除成功", null);
     }
@@ -163,6 +166,8 @@ public class FileController {
         }
         try (SFTPClient sftp = ssh.newSFTPClient()) {
             sftp.mkdir(path);
+        } catch (Exception e) {
+            return Result.setError(500, "文件夹新建失败", null);
         }
         return Result.setSuccess(200, "文件夹新建成功", null);
     }
@@ -179,6 +184,9 @@ public class FileController {
         }
         try (SFTPClient sftp = ssh.newSFTPClient()) {
             sftp.rename(oldPath,newPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500,"重命名失败");
         }
         return Result.setSuccess(200, "重命名成功", null);
     }
@@ -262,7 +270,7 @@ public class FileController {
                 } finally {
                     // 删除临时文件
                     FileUtil.tmpFloderDelete(temporaryFolder);
-                    WebSocketServer.fileUploadingMap.remove(folderPath);
+                    WebSocketServer.fileUploadingMap.remove(sshKey + "-" + id);
                 }
             });
             FileThread.start();
