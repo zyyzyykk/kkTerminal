@@ -21,6 +21,11 @@ export default {
       if(aceEditor.value) aceEditor.value.selection.clearSelection();
     };
 
+    // 清空撤销历史
+    const reset = () => {
+      if(aceEditor.value) aceEditor.value.getSession().getUndoManager().reset();
+    }
+
     const CtrlS = (event) => {
       if (event.ctrlKey || event.metaKey) {
         switch (String.fromCharCode(event.which).toLowerCase()) {
@@ -71,6 +76,7 @@ export default {
       aceEditor,
       setValue,
       CtrlS,
+      reset,
     }
   }
 }

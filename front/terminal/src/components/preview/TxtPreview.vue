@@ -63,6 +63,7 @@ export default {
           if(url == fileUrl.value)
           {
             codeEditorRef.value.setValue(resp);
+            codeEditorRef.value.reset();
             modifyTag.value = '';
             loading.value = false;
           }
@@ -92,8 +93,12 @@ export default {
       modifyTag.value = '';
     }
 
+    // 重置编辑器
     const resetEditor = () => {
-      if(codeEditorRef.value) codeEditorRef.value.setValue('');
+      if(codeEditorRef.value) {
+        codeEditorRef.value.setValue('');
+        codeEditorRef.value.reset();
+      }
       modifyTag.value = '';
     }
 

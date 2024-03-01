@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-02-27
+> 更新时间：2024-03-01
 >
 
 ### **⚡** 快速引入
@@ -76,7 +76,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 4.支持自定义偏好设置，可选择终端的背/前景色、字体字号、光标显示样式
 
-5.支持重启：当修改ssh设置或自定义偏好设置后会自动重启，也可在ssh连接断开后手动进行重启
+5.支持重启：当修改ssh连接设置或自定义偏好设置后会自动重启，也可在ssh连接断开后手动进行重启
 
 6.支持复制粘贴：
 
@@ -89,9 +89,14 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 👨‍💻 更新记录
 
-> 核心功能已全部开发完成，后续更新主要针对bug修复、逻辑优化等方面
+> 核心功能全部开发完成，后续更新主要针对bug修复、逻辑优化等方面
 
-##### zyyzyykk/kkterminal:3.0.3：latest
+##### zyyzyykk/kkterminal:3.0.5：latest
+
+- 优化文本编辑器撤销历史
+- 完善请求异常错误处理
+
+##### zyyzyykk/kkterminal:3.0.3：
 
 - 修改滚动条样式，优化文件大小属性展示
 - 修复bug：部分文件权限属性错误、终端中文输入混乱
@@ -100,12 +105,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 - 优化文字溢出省略等样式
 - 修复部分文件无法显示属性模块的bug
-
-##### zyyzyykk/kkterminal:3.0.0：
-
-- 优化文件上传逻辑，压缩打包体积
-- 实现文件拖拽上传，将文件拖拽至显示区即可上传
-- 新增文件菜单，右键文件或空白区查看菜单项
 
 ##### [历史更新记录](./UPDATE.md)
 
