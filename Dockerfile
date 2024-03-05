@@ -1,6 +1,6 @@
 # 基础java镜像
 FROM openjdk:8-alpine
-
+# wtm 来啦
 # 自定义环境变量
 ENV TITLE="kkbapps"
 
