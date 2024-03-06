@@ -80,7 +80,7 @@ public class FileUtil {
     }
 
     /**
-     * 删除文件夹
+     * 删除文件/文件夹
      */
     public static void tmpFloderDelete(File directory) {
         if (directory.isDirectory()) {
