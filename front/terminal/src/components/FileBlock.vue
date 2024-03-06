@@ -263,92 +263,101 @@ export default {
     // 上传文件
     const chunkSize = 1024 * 517;   // 每一片大小517kB
     const doUpload = async (fileData, pathVal, alert) => {
-      if(isShowDirInput.value == true) return;
-      let file = fileData.file;
-      if(!file) return;
-      // 文件切片
-      const fileName = file.name;
-      const fileSize = file.size;
-      // 允许上传空文件
-      const chunks = parseInt(Math.ceil(fileSize / chunkSize)) == 0 ? 1 : parseInt(Math.ceil(fileSize / chunkSize));
-      const fileId = file.uid;
-      let chunkIndex = 1;
-      const path = pathVal ? pathVal : dir.value;
+      try {
+        if(isShowDirInput.value == true) return;
+        let file = fileData.file;
+        if(!file) return;
+        // 文件切片
+        const fileName = file.name;
+        const fileSize = file.size;
+        // 允许上传空文件
+        const chunks = parseInt(Math.ceil(fileSize / chunkSize)) == 0 ? 1 : parseInt(Math.ceil(fileSize / chunkSize));
+        const fileId = file.uid;
+        let chunkIndex = 1;
+        const path = pathVal ? pathVal : dir.value;
 
-      // 分片上传
-      for(let chunk=chunkIndex;chunk<=chunks;chunk++) {
-        // 上传逻辑
-        let start = (chunk-1) * chunkSize;
-        let end = start + chunkSize >= fileSize ? fileSize : start + chunkSize;
-        let chunkFile = file.slice(start, end);
-        let formData = new FormData();
-        formData.append('file',chunkFile);
-        formData.append('fileName',fileName);
-        formData.append('chunks',chunks);
-        formData.append('chunk',chunk);
-        formData.append('totalSize',fileSize);
-        formData.append('id',fileId);
-        formData.append('sshKey',props.sshKey);
-        formData.append('path',path);
+        // 分片上传
+        for(let chunk=chunkIndex;chunk<=chunks;chunk++) {
+          // 上传逻辑
+          let start = (chunk-1) * chunkSize;
+          let end = start + chunkSize >= fileSize ? fileSize : start + chunkSize;
+          let chunkFile = file.slice(start, end);
+          let formData = new FormData();
+          formData.append('file',chunkFile);
+          formData.append('fileName',fileName);
+          formData.append('chunks',chunks);
+          formData.append('chunk',chunk);
+          formData.append('totalSize',fileSize);
+          formData.append('id',fileId);
+          formData.append('sshKey',props.sshKey);
+          formData.append('path',path);
 
-        await $.ajax({
-          url: http_base_url + '/upload',
-          type:'post',
-          data: formData,
-          contentType : false,
-          processData : false,
-          success(resp){
-            // 文件后台上传中
-            if(resp.code == 202) {
-              ElMessage({
-                message: alert ? alert : resp.info,
-                type: resp.status,
-                grouping: true,
-              });
-            }
-            // 文件片上传成功
-            // else if(resp.code == 203) {
+          await $.ajax({
+            url: http_base_url + '/upload',
+            type:'post',
+            data: formData,
+            contentType : false,
+            processData : false,
+            success(resp){
+              // 文件后台上传中
+              if(resp.code == 202) {
+                ElMessage({
+                  message: alert ? alert : resp.info,
+                  type: resp.status,
+                  grouping: true,
+                });
+              }
+              // 文件片上传成功
+              // else if(resp.code == 203) {
 
-            // }
-            // 文件片上传失败
-            else if(resp.code == 502) {
-              ElMessage({
-                message: resp.info,
-                type: resp.status,
-                grouping: true,
-              })
-              chunk = chunks + 1;
-            }
-            // 文件片缺失
-            else if(resp.code == 503) {
-              ElMessage({
-                message: resp.info,
-                type: resp.status,
-                grouping: true,
-              })
-              chunk = chunks + 1;
-            }
-            // 上传文件大小不一致
-            else if(resp.code == 504) {
-              ElMessage({
-                message: resp.info,
-                type: resp.status,
-                grouping: true,
-              })
-              chunk = chunks + 1;
-            }
-            // ssh连接断开
-            else if(resp.code == 602) {
-              ElMessage({
-                message: resp.info,
-                type: resp.status,
-                grouping: true,
-              })
-              chunk = chunks + 1;
-            }
-          },
-        });
+              // }
+              // 文件片上传失败
+              else if(resp.code == 502) {
+                ElMessage({
+                  message: resp.info,
+                  type: resp.status,
+                  grouping: true,
+                })
+                chunk = chunks + 1;
+              }
+              // 文件片缺失
+              else if(resp.code == 503) {
+                ElMessage({
+                  message: resp.info,
+                  type: resp.status,
+                  grouping: true,
+                })
+                chunk = chunks + 1;
+              }
+              // 上传文件大小不一致
+              else if(resp.code == 504) {
+                ElMessage({
+                  message: resp.info,
+                  type: resp.status,
+                  grouping: true,
+                })
+                chunk = chunks + 1;
+              }
+              // ssh连接断开
+              else if(resp.code == 602) {
+                ElMessage({
+                  message: resp.info,
+                  type: resp.status,
+                  grouping: true,
+                })
+                chunk = chunks + 1;
+              }
+            },
+          });
+        }
+      } catch (error) {
+        ElMessage({
+          message: "不支持上传文件夹",
+          type: "warning",
+          grouping: true,
+        })
       }
+      
     }
 
     const doShowDirInput = () => {
@@ -405,6 +414,14 @@ export default {
       for(let i=0;i<filesArray.length;i++)
       {
         let file = filesArray[i];
+        if(!(file && file.size > 0)) {
+          ElMessage({
+            message: "不支持拖拽文件夹或空文件",
+            type: "warning",
+            grouping: true,
+          });
+          continue;
+        }
         file.uid = Math.random().toString(36).substring(2);
         doUpload({file:file},dir.value);
       }
