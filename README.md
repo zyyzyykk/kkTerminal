@@ -93,7 +93,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ##### zyyzyykk/kkterminal:3.0.6：latest
 
-- 处理拖拽上传无法识别文件夹的问题，修改为不支持拖拽上传文件夹或空文件
+- 解决拖拽上传无法识别文件夹的问题，最终修改为不支持拖拽上传文件夹或空文件
 
 ##### zyyzyykk/kkterminal:3.0.5：
 
@@ -104,11 +104,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 - 修改滚动条样式，优化文件大小属性展示
 - 修复bug：部分文件权限属性错误、终端中文输入混乱
-
-##### zyyzyykk/kkterminal:3.0.1：
-
-- 优化文字溢出省略等样式
-- 修复部分文件无法显示属性模块的bug
 
 ##### [历史更新记录](./UPDATE.md)
 
