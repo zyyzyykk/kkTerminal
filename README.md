@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-03-01
+> 更新时间：2024-03-12
 >
 
 ### **⚡** 快速引入
@@ -91,7 +91,11 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 > 核心功能全部开发完成，后续更新主要针对bug修复、逻辑优化等方面
 
-##### zyyzyykk/kkterminal:3.0.5：latest
+##### zyyzyykk/kkterminal:3.0.6：latest
+
+- 处理拖拽上传无法识别文件夹的问题，修改为不支持拖拽上传文件夹或空文件
+
+##### zyyzyykk/kkterminal:3.0.5：
 
 - 优化文本编辑器撤销历史
 - 完善请求异常错误处理

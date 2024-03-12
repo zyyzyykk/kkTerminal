@@ -26,6 +26,7 @@ export default {
       if(aceEditor.value) aceEditor.value.getSession().getUndoManager().reset();
     }
 
+    // 保存
     const CtrlS = (event) => {
       if (event.ctrlKey || event.metaKey) {
         switch (String.fromCharCode(event.which).toLowerCase()) {
