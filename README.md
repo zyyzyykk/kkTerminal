@@ -27,25 +27,25 @@
 
 1.拉取镜像：
 
-```sh
+```bash
 docker pull zyyzyykk/kkterminal
 ```
 
 2.创建并运行容器，进行端口映射：`-p 端口号:3000`
 
-```sh
+```bash
 docker run -d --name kkterminal -p 3000:3000 zyyzyykk/kkterminal
 ```
 
 3.挂载数据卷：`-v 数据卷路径:/data`
 
-```sh
+```bash
 docker run -d --name kkterminal -p 3000:3000 -v /data:/data zyyzyykk/kkterminal
 ```
 
 4.自定义艺术字：`-e TITLE="自定义艺术字"`
 
-```sh
+```bash
 docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kkterminal
 ```
 
