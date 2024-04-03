@@ -14,7 +14,7 @@
       <div v-if="Object.keys(sshOptions).length > 0" class="kk-border">
         <div v-for="(value, key) in sshOptions" :key="key" >
           <div :class="['item-class', (aimOption == key) ? 'item-selected' : '']" @click="aimOption = key">
-            <FileIcons name="kk.txt" width="20" height="20" :isFloder="false" />
+            <FileIcons name="kk.txt" width="20" height="20" :isFolder="false" />
             <div class="ellipsis" style="margin: 0 10px;">{{ key }}</div>
           </div>
         </div>

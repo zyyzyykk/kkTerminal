@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-03-12
+> 更新时间：2024-04-03
 >
 
 ### **⚡** 快速引入
@@ -91,7 +91,11 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 > 核心功能全部开发完成，后续更新主要针对bug修复、逻辑优化等方面
 
-##### zyyzyykk/kkterminal:3.0.6：latest
+##### zyyzyykk/kkterminal:3.0.7：latest
+
+- 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.2.6` 版本，后续不再进行更新
+
+##### zyyzyykk/kkterminal:3.0.6：
 
 - 解决拖拽上传无法识别文件夹的问题，最终修改为不支持拖拽上传文件夹或空文件
 
@@ -99,11 +103,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 - 优化文本编辑器撤销历史
 - 完善请求异常错误处理
-
-##### zyyzyykk/kkterminal:3.0.3：
-
-- 修改滚动条样式，优化文件大小属性展示
-- 修复bug：部分文件权限属性错误、终端中文输入混乱
 
 ##### [历史更新记录](./UPDATE.md)
 
