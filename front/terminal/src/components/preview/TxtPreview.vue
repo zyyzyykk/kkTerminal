@@ -10,7 +10,7 @@
   >
     <template #title>
       <div class="kk-flex">
-        <FileIcons :name="fileName" width="25" height="25" :isFloder="false" />
+        <FileIcons :name="fileName" width="25" height="25" :isFolder="false" />
         <div class="ellipsis" style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
       </div>
     </template>
