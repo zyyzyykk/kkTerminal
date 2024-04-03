@@ -40,7 +40,7 @@
               <div v-for="item in files" :key="item.id" >
                 <template v-if="item.isDirectory == true">
                   <div :class="['item-class', (aimFileInfo && item.id == aimFileInfo.id) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="aimFileInfo = item" >
-                    <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
+                    <FileIcons :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
                     <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                       <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
                     </div>
@@ -49,7 +49,7 @@
                 </template>
                 <template v-else>
                   <div :class="['item-class', (aimFileInfo && item.id == aimFileInfo.id) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="preViewFile(item.name)" @contextmenu="aimFileInfo = item" >
-                    <FileIcons :name="item.name" width="20" height="20" :isFloder="item.isDirectory" />
+                    <FileIcons :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
                     <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                       <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
                     </div>
