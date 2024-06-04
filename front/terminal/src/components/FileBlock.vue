@@ -102,7 +102,7 @@ import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
 import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/Utils/BaseUrl';
-import { Refresh, Fold, Download, Upload } from '@element-plus/icons';
+import { Refresh, Fold, Download, Upload } from '@element-plus/icons-vue';
 
 import NoData from '@/components/NoData';
 import TxtPreview from './preview/TxtPreview';
@@ -262,7 +262,7 @@ export default {
     }
     // 上传文件
     const chunkSize = 1024 * 517;   // 每一片大小517kB
-    const doUpload = async (fileData, pathVal, alert) => {
+    const doUpload = async (fileData, data) => {
       try {
         if(isShowDirInput.value == true) return;
         let file = fileData.file;
@@ -274,7 +274,16 @@ export default {
         const chunks = parseInt(Math.ceil(fileSize / chunkSize)) == 0 ? 1 : parseInt(Math.ceil(fileSize / chunkSize));
         const fileId = file.uid;
         let chunkIndex = 1;
-        const path = pathVal ? pathVal : dir.value;
+        const path = data.pathVal ? data.pathVal : dir.value;
+
+        // 大文件开始上传提示
+        if(fileSize > 20*1024*1024) {
+          ElMessage({
+            message: data.startUpLoad ? data.startUpLoad : '开始上传',
+            type: 'success',
+            grouping: true,
+          });
+        }
 
         // 分片上传
         for(let chunk=chunkIndex;chunk<=chunks;chunk++) {
@@ -302,10 +311,15 @@ export default {
               // 文件后台上传中
               if(resp.code == 202) {
                 ElMessage({
-                  message: alert ? alert : resp.info,
+                  message: data.alert ? data.alert : resp.info,
                   type: resp.status,
                   grouping: true,
                 });
+                if(data.alert) {
+                  setTimeout(() => {
+                    getDirList();
+                  }, 500);
+                }
               }
               // 文件片上传成功
               // else if(resp.code == 203) {
@@ -399,7 +413,7 @@ export default {
       // 创建File对象
       const file = new File([blob], name);
       file.uid = Math.random().toString(36).substring(2);
-      doUpload({file:file}, urlParams.path);
+      doUpload({file:file}, {pathVal: urlParams.path, startUpLoad:"修改保存中"});
     };
 
     // 文件拖拽
@@ -423,7 +437,7 @@ export default {
           continue;
         }
         file.uid = Math.random().toString(36).substring(2);
-        doUpload({file:file},dir.value);
+        doUpload({file:file}, {pathVal: dir.value});
       }
     };
 
@@ -447,12 +461,21 @@ export default {
           break;
         // 复制路径
         case 3:
-          await toClipboard(dir.value);
-          ElMessage({
-            message: '复制成功',
-            type: 'success',
-            grouping: true,
-          });
+          if(!(dir.value && dir.value.length > 0)) {
+            ElMessage({
+              message: '内容为空',
+              type: 'warning',
+              grouping: true,
+            });
+          }
+          else {
+            await toClipboard(dir.value);
+            ElMessage({
+              message: '复制成功',
+              type: 'success',
+              grouping: true,
+            });
+          }
           break;
         // 下载
         case 4:
@@ -527,7 +550,7 @@ export default {
           message: "文件名不能含有 /",
           type: "warning",
           grouping: true,
-        })
+        });
         renameFile.value = null;
         return;
       }
@@ -559,6 +582,14 @@ export default {
     const handlePopConfirm = () => {
       isShowMenu.value = false;
       isShowPop.value = false;
+      // 目录删除提示
+      if(aimFileInfo.value.isDirectory) {
+        ElMessage({
+          message: "目录删除中",
+          type: "success",
+          grouping: true,
+        });
+      }
       $.ajax({
         url: http_base_url + '/rm',
         type:'post',
@@ -598,7 +629,7 @@ export default {
         // 创建File对象
         const file = new File([blob], name);
         file.uid = Math.random().toString(36).substring(2);
-        doUpload({file:file},nowDir,"文件新建成功");
+        doUpload({file:file},{pathVal:nowDir, alert:"文件新建成功"});
       }
       // 文件夹
       else {

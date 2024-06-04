@@ -23,13 +23,14 @@
       </div>
       <div class="item-class" style="margin-bottom: 15px;">
         <div class="no-select">主机ip：</div>
-          <div>
-            <el-input :disabled="isForbidInput" v-model="setInfo.server_ip" class="w-50 m-2" placeholder="输入主机ip">
-              <template #prefix>
-                <el-icon><HomeFilled /></el-icon>
-              </template>
-            </el-input>
+        <div>
+          <el-input :disabled="isForbidInput" v-model="setInfo.server_ip" class="w-50 m-2" placeholder="输入主机ip">
+            <template #prefix>
+              <el-icon><HomeFilled /></el-icon>
+            </template>
+          </el-input>
         </div>
+        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_ip)"><el-icon size="15"><DocumentCopy /></el-icon></div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;">
         <div class="no-select">端口号：</div>
@@ -40,6 +41,7 @@
             </template>
           </el-input>
         </div>
+        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_port)"><el-icon size="15"><DocumentCopy /></el-icon></div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;">
         <div class="no-select">用户名：</div>
@@ -50,16 +52,19 @@
             </template>
           </el-input>
         </div>
+        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_user)"><el-icon size="15"><DocumentCopy /></el-icon></div>
       </div>
       <div class="item-class" style="margin-bottom: 5px;">
         <div class="no-select">密 &nbsp; 码：</div>
         <div>
-          <el-input :disabled="isForbidInput" v-model="setInfo.server_password" type="password" class="w-50 m-2" placeholder="输入密码">
+          <el-input :disabled="isForbidInput" v-model="setInfo.server_password" :type="isShowPassword ? 'text': 'password'" class="w-50 m-2" placeholder="输入密码">
             <template #prefix>
               <el-icon class="el-input__icon"><Lock /></el-icon>
             </template>
           </el-input>
         </div>
+        <div v-if="isShowPassword == true" style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = false"><el-icon size="15"><View /></el-icon></div>
+        <div v-else style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = true"><el-icon size="15"><Hide /></el-icon></div>
       </div>
     </div>
     <div class="errInfo no-select"> {{ err_msg }} </div>
@@ -78,8 +83,10 @@
 
 <script>
 import { ref } from 'vue';
+import useClipboard from "vue-clipboard3";
+import { ElMessage } from 'element-plus';
 import OptionBlock from './OptionBlock';
-import { HomeFilled, Paperclip, User, Lock } from '@element-plus/icons';
+import { HomeFilled, Paperclip, User, Lock, DocumentCopy, View, Hide } from '@element-plus/icons-vue';
 
 export default {
   name:'ConnectSetting',
@@ -89,6 +96,9 @@ export default {
     Paperclip,
     User,
     Lock,
+    DocumentCopy,
+    View,
+    Hide,
   },
   props:['env','sshOptions'],
   setup(props,context) {
@@ -176,11 +186,36 @@ export default {
       DialogVisilble.value = false;
     }
 
+    // 拷贝
+    const { toClipboard } = useClipboard();
+
+    // 复制
+    const doCopy = async (content) => {
+      content += '';
+      if(!(content && content.length > 0)) {
+        ElMessage({
+          message: '内容为空',
+          type: 'warning',
+          grouping: true,
+        });
+        return;
+      }
+      await toClipboard(content);
+      ElMessage({
+        message: '复制成功',
+        type: 'success',
+        grouping: true,
+      });
+    };
+
+    const isShowPassword = ref(false);
+
     // 关闭
     const closeDialog = (done) => {
       optionBlockRef.value.DialogVisilble = false;
       setTimeout(() => {
         err_msg.value = '';
+        isShowPassword.value = false;
         setInfo.value = {
           server_ip: props.env.server_ip,
           server_port: props.env.server_port,
@@ -206,6 +241,8 @@ export default {
       isForbidInput,
       newOp,
       closeDialog,
+      doCopy,
+      isShowPassword,
 
     }
   }
