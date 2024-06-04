@@ -90,7 +90,7 @@
 
 <script>
 import { ref } from 'vue';
-import { ArrowDown } from '@element-plus/icons';
+import { ArrowDown } from '@element-plus/icons-vue';
 
 export default {
   name:'StyleSetting',
