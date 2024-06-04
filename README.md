@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-04-22
+> 更新时间：2024-06-04
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://img.kkbapps.com/logo/terminal.png" alt="kkterminal logo"></a></p>
@@ -70,7 +70,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 🌐 国内服务器访问：https://ssh.kkbpro.com/
 - 🌍 国外服务器访问：https://ssh.kkbapps.com/
 
-![kkterminal](https://img.kkbapps.com/terminal/303-1.png)
+![kkterminal](https://img.kkbapps.com/terminal/309-1.png)
 
 ![kkterminal](https://img.kkbapps.com/terminal/303-2.png)
 
@@ -103,18 +103,18 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 > 核心功能全部开发完成，后续更新主要针对bug修复、逻辑优化等方面
 
-##### zyyzyykk/kkterminal:3.0.7：latest
+##### zyyzyykk/kkterminal:3.0.9：latest
+
+- 连接设置模块新增主机ip复制、密码显示与隐藏等功能
+- 文件管理模块新增大文件上传等提示信息
+
+##### zyyzyykk/kkterminal:3.0.7：
 
 - 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.2.6` 版本，后续不再进行更新
 
 ##### zyyzyykk/kkterminal:3.0.6：
 
 - 解决拖拽上传无法识别文件夹的问题，最终修改为不支持拖拽上传文件夹或空文件
-
-##### zyyzyykk/kkterminal:3.0.5：
-
-- 优化文本编辑器撤销历史
-- 完善请求异常错误处理
 
 ##### [历史更新记录](./UPDATE.md)
 

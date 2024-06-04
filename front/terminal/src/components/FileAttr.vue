@@ -73,7 +73,7 @@ import { formatDate } from '../Utils/FormatDate';
 import { calcPriority } from '../Utils/CalcPriority';
 import { ElMessage } from 'element-plus';
 import useClipboard from "vue-clipboard3";
-import { DocumentCopy } from '@element-plus/icons';
+import { DocumentCopy } from '@element-plus/icons-vue';
 import { calcSize } from '../Utils/CalcSize';
 
 // 引入文件图标组件
@@ -139,6 +139,15 @@ export default {
 
     // 复制
     const doCopy = async (content) => {
+      content += '';
+      if(!(content && content.length > 0)) {
+        ElMessage({
+          message: '内容为空',
+          type: 'warning',
+          grouping: true,
+        });
+        return;
+      }
       await toClipboard(content);
       ElMessage({
         message: '复制成功',
