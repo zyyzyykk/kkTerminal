@@ -1,6 +1,7 @@
 <template>
-  <div class="no-data">
+  <div class="no-data" :style="viewStyle" >
     <div>
+      <slot name="myslot" ></slot>
       <div>
         <img src="../assets/no_data.png" alt="暂无数据" style="width: 120px;">
       </div>
@@ -10,22 +11,46 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+
 export default {
   name:'NoData',
   components: {
   },
-  props:{
-    msg: String,
+  props: {
+    msg: {
+      type:String,
+      required:false,
+      default: '暂无数据',
+    },
+    width:{
+      type:String,
+      required:false,
+    },
+    height:{
+      type:String,
+      required:false,
+    },
   },
+  setup(props) {
 
+    const viewStyle = computed(() => {
+      return {
+        width: props.width ? props.width + 'px' : '100%',
+        height: props.height ? props.height + 'px' : '30vh',
+      }
+    });
+
+    return {
+      viewStyle,
+    }
+  },
 }
 </script>
 
 <style scoped>
 .no-data {
   text-align: center;
-  width: 100%;
-  height: 30vh;
   display: flex;
   align-items: center;
   justify-content: center;

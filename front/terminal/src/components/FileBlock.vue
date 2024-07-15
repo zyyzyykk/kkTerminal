@@ -315,11 +315,9 @@ export default {
                   type: resp.status,
                   grouping: true,
                 });
-                if(data.alert) {
-                  setTimeout(() => {
-                    getDirList();
-                  }, 500);
-                }
+                setTimeout(() => {
+                  getDirList();
+                }, 500);
               }
               // 文件片上传成功
               // else if(resp.code == 203) {
@@ -466,6 +464,7 @@ export default {
               message: '内容为空',
               type: 'warning',
               grouping: true,
+              repeatNum: Number.MIN_SAFE_INTEGER,
             });
           }
           else {
@@ -474,6 +473,7 @@ export default {
               message: '复制成功',
               type: 'success',
               grouping: true,
+              repeatNum: Number.MIN_SAFE_INTEGER,
             });
           }
           break;

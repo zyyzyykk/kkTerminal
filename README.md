@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-06-04
+> 更新时间：2024-07-15
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://img.kkbapps.com/logo/terminal.png" alt="kkterminal logo"></a></p>
@@ -25,7 +25,6 @@
   <a href="https://www.apache.org/licenses/"><img src="https://img.shields.io/badge/licence-Apache-red" alt="Apache Licence"></a>
   <a href="https://github.com/zyyzyykk/kkTerminal"><img src="https://img.shields.io/badge/gitHub_star-10+-yellow" alt="GitHub"></a>
 </p>
-
 
 
 ### **⚡** 快速引入
@@ -71,13 +70,15 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 🌐 国内服务器访问：https://ssh.kkbpro.com/
 - 🌍 国外服务器访问：https://ssh.kkbapps.com/
 
-![kkterminal](https://img.kkbapps.com/terminal/309-1.png)
+![connect](https://img.kkbapps.com/terminal/3.1.2-1.png)
 
-![kkterminal](https://img.kkbapps.com/terminal/303-2.png)
+![prefer](https://img.kkbapps.com/terminal/3.1.2-2.png)
 
-![kkterminal](https://img.kkbapps.com/terminal/303-3.png)
+![file](https://img.kkbapps.com/terminal/3.1.2-3.png)
 
-![kkterminal](https://img.kkbapps.com/terminal/303-4.png)
+![editor](https://img.kkbapps.com/terminal/3.1.2-4.png)
+
+[**更多模块预览**](./MODULE.md)
 
 ### 💡 功能说明
 
@@ -100,11 +101,16 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 8.支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
 
+9.支持 [TCode (事务代码)](./TCODE.md)，能够通过自定义TCode实现类似Shell脚本的自动化Workflow
+
 ### 👨‍💻 更新记录
 
-> 核心功能全部开发完成，后续更新主要针对bug修复、逻辑优化等方面
+##### zyyzyykk/kkterminal:3.1.2：latest
 
-##### zyyzyykk/kkterminal:3.0.9：latest
+- 文件编辑器支持常见文件类型的代码高亮与智能提示
+- 新增 [TCode (事务代码)](./TCODE.md)，实现功能模块的快速访问与特定事务流程的执行
+
+##### zyyzyykk/kkterminal:3.0.9：
 
 - 连接设置模块新增主机ip复制、密码显示与隐藏等功能
 - 文件管理模块新增大文件上传等提示信息
@@ -112,10 +118,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 ##### zyyzyykk/kkterminal:3.0.7：
 
 - 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.2.6` 版本，后续不再进行更新
-
-##### zyyzyykk/kkterminal:3.0.6：
-
-- 解决拖拽上传无法识别文件夹的问题，最终修改为不支持拖拽上传文件夹或空文件
 
 ##### [历史更新记录](./UPDATE.md)
 

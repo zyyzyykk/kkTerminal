@@ -145,6 +145,7 @@ export default {
           message: '内容为空',
           type: 'warning',
           grouping: true,
+          repeatNum: Number.MIN_SAFE_INTEGER,
         });
         return;
       }
@@ -153,6 +154,7 @@ export default {
         message: '复制成功',
         type: 'success',
         grouping: true,
+        repeatNum: Number.MIN_SAFE_INTEGER,
       });
     }
 
