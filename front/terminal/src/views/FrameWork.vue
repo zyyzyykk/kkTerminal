@@ -12,6 +12,36 @@
         <img src="../assets/logo.png" alt="终端" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
       <div style="user-select: none; font-size: 14px;" ><span>kk Terminal</span></div>
+      <div style="flex: 1;"></div>
+      <div v-if="env.tCode" style="display: flex; align-items: center;" >
+        <div style="font-size: 12px; color: #313131; user-select: none;" > TCode </div>
+        <div style="margin-left: 7px;" ></div>
+        <div>
+          <el-input
+            v-model="tcode"
+            ref="tCodeInputRef"
+            :style="{ width: '100px', height: '20px', fontSize: '12px'}"
+            @change="handleTcode"
+          >
+          </el-input>
+        </div>
+        <div style="cursor: pointer; margin-left: 5px;" >
+          <el-popover placement="bottom-end" :width="220" trigger="hover" >
+            <template #reference>
+              <el-icon :style="{ color: '#606266' }" ><QuestionFilled /></el-icon>
+            </template>
+            <div style="font-size: 12px; color: #313131;" >
+              <div style="user-select: none; font-size: 14px; font-weight: bold;" >什么是 TCode (事务代码) ？</div>
+              <div style="user-select: none; margin-top: 5px;">TCode（事务代码）是用于访问和执行特定事务流程的快捷方式</div>
+              <div style="user-select: none; margin-top: 5px;">
+                输入 
+                <span style="background-color: #f3f4f4; user-select: text;" >/H</span>
+                并按下回车，查看帮助信息</div>
+            </div>
+          </el-popover>
+        </div>
+        <div style="margin-left: 20px;" ></div>
+      </div>
     </div>
     <!-- terminal主体 -->
     <div ref="terminal" class="terminal-class" ></div>
@@ -23,16 +53,21 @@
   <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" ></StyleSetting>
   <!-- 文件管理 -->
   <FileBlock ref="fileBlockRef" :sshKey="sshKey" ></FileBlock>
+  <!-- 用户TCode -->
+  <UserTcode ref="userTcodeRef" @importTCodes="importTCodes" @exportTcodes="exportTcodes" ></UserTcode>
+
+  <HelpTcode ref="helpTcodeRef" :userTCodes="tcodes" ></HelpTcode>
 
 </template>
 
 <script>
 import useClipboard from "vue-clipboard3";
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, getCurrentInstance } from 'vue';
 import { encrypt, decrypt } from '@/Utils/Encrypt';
+import { ElMessage } from 'element-plus';
 
 import { Terminal } from 'xterm';
-import { FitAddon } from 'xterm-addon-fit'
+import { FitAddon } from 'xterm-addon-fit';
 import "xterm/css/xterm.css";
 
 import { default_env } from '@/Utils/Env';
@@ -42,6 +77,12 @@ import { changeStr } from '@/Utils/StringUtil';
 import ConnectSetting from '@/components/ConnectSetting.vue';
 import StyleSetting from '@/components/StyleSetting.vue';
 import FileBlock from "@/components/FileBlock.vue";
+import UserTcode from '@/components/tcode/UserTcode.vue';
+import HelpTcode from "@/components/tcode/HelpTcode.vue";
+
+import { QuestionFilled } from '@element-plus/icons-vue';
+
+import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/Utils/Tcode";
 
 export default {
   name: "FrameWork",
@@ -49,8 +90,14 @@ export default {
     ConnectSetting,
     StyleSetting,
     FileBlock,
+    UserTcode,
+    HelpTcode,
+    QuestionFilled,
   },
   setup() {
+
+    // 获取当前组件实例
+    const instance = getCurrentInstance();
 
     // 拷贝
     const { toClipboard } = useClipboard();
@@ -59,13 +106,28 @@ export default {
     const fitAddon = new FitAddon();
 
     // 加载环境变量
-    const env = ref(null);
     const options = ref({});
     const loadOps = () => {
       if(localStorage.getItem('options')) options.value = JSON.parse(decrypt(localStorage.getItem('options')));
       else options.value = {};
     };
     loadOps();
+    const tcodes = ref({});
+    const loadTCodes = () => {
+      tcodes.value = {};
+      if(localStorage.getItem('tcodes')) {
+        tcodes.value = JSON.parse(decrypt(localStorage.getItem('tcodes')));
+        for (const key in tcodes.value) {
+          let textflow = tcodes.value[key].workflow.toString();
+          tcodes.value[key].workflow = new Function('kkTerminal', `return (async function() { ${textflow} })()`);
+        }
+      }
+      setTimeout(() => {
+        helpTcodeRef.value.userTCodes = {...tcodes.value};
+      },1);
+    }
+    loadTCodes();
+    const env = ref(null);
     const loadEnv = () => {
       if(localStorage.getItem('env')) {
         env.value = JSON.parse(decrypt(localStorage.getItem('env')));
@@ -158,7 +220,9 @@ export default {
         }
         // 输出
         if(result.code == 1) {
-          term.write(decrypt(result.info));
+          let output = decrypt(result.info);
+          if(UserTcodeExecutor.active) UserTcodeExecutor.outArray.push(output);
+          if(!(UserTcodeExecutor.active && !UserTcodeExecutor.display)) term.write(output);
           // 设置回滚量
           term.options.scrollback += term._core.buffer.lines.length;
         }
@@ -170,6 +234,7 @@ export default {
           now_connect_status.value = connect_status.value['Disconnected'];
           term.write("\r\n" + now_connect_status.value);
         }
+        userTcodeExecutorReset();
       }
     };
 
@@ -189,14 +254,14 @@ export default {
     };
 
     // 文本消息发送
-    const sendMessage = (text) => {
+    const sendMessage = (text, mode=false) => {
       if(socket.value) {
         // 重启后第一次输入
         if(isFirst.value) {
           termFit();
           isFirst.value = false;
         }
-        socket.value.send(encrypt(JSON.stringify({type:0,content:text,rows:0,cols:0})));
+        if(UserTcodeExecutor.active === mode) socket.value.send(encrypt(JSON.stringify({type:0,content:text,rows:0,cols:0})));
       }
     };
 
@@ -266,7 +331,7 @@ export default {
         isShowSetting.value = false;
         connectSettingRef.value.DialogVisilble = true;
       }
-      // 样式设置
+      // 偏好设置
       else if (type == 2) {
         isShowSetting.value = false;
         styleSettingRef.value.DialogVisilble = true;
@@ -314,6 +379,77 @@ export default {
       fileBlockRef.value.renameFile = null;
     };
 
+    // 处理事务代码
+    const tcode = ref('');
+    const handleTcode = async () => {
+      if(!tcode.value || tcode.value.length < 2) return;
+      let transTcode = tcode.value.toUpperCase();
+      tcode.value = '';
+      // 功能TCode
+      if(transTcode[0] == '/' && FuncTcode[transTcode]) FuncTcode[transTcode].execFlow(instance);
+      // 系统TCode
+      else if(transTcode[0] == 'S' && SysTcode[transTcode]) SysTcode[transTcode].execFlow(instance);
+      // 用户TCode
+      else if(transTcode[0] == 'U' && tcodes.value[transTcode]) {
+        if(!UserTcodeExecutor.writeOnly) UserTcodeExecutor.writeOnly = sendMessage;
+        // 激活
+        if(UserTcodeExecutor.active == false) {
+          UserTcodeExecutor.active = true;
+          try {
+            await tcodes.value[transTcode].workflow(UserTcodeExecutor);
+            ElMessage({
+              message: 'TCode-' + transTcode + ' Workflow Over',
+              type: 'success',
+              grouping: true,
+            });
+          } catch(error) {
+            ElMessage({
+              message: 'TCode-' + transTcode + ' Workflow Error: ' + error,
+              type: 'error',
+              grouping: true,
+            });
+          } finally {
+            userTcodeExecutorReset();
+          }
+        }
+      }
+    }
+    // 重置用户TCode执行器
+    const userTcodeExecutorReset = () => {
+      UserTcodeExecutor.active = false;
+      UserTcodeExecutor.display = true;
+      UserTcodeExecutor.outArray = [];
+      UserTcodeExecutor.cnt = 0;
+    }
+    const userTcodeRef = ref();
+    // 批量导入TCode
+    const importTCodes = (data) => {
+      let tCodeData = {};
+      if(localStorage.getItem('tcodes')) tCodeData = JSON.parse(decrypt(localStorage.getItem('tcodes')));
+      tCodeData = {...tCodeData,...data};
+      localStorage.setItem('tcodes',encrypt(JSON.stringify(tCodeData)));
+      loadTCodes();
+    };
+    // 批量导出TCode
+    const exportTcodes = () => {
+      let content = {};
+      if(localStorage.getItem('tcodes')) content = JSON.parse(decrypt(localStorage.getItem('tcodes')));
+      // 创建 Blob 对象
+      const blob = new Blob([JSON.stringify(content, null, 4)], { type: 'text/plain' });
+      // 创建指向 Blob 的 URL
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'TCode.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      // 释放 URL 对象
+      URL.revokeObjectURL(url);
+    }
+    // 帮助
+    const helpTcodeRef = ref();
+
     onMounted(() => {
       // 连接服务器
       doSSHConnect();
@@ -346,6 +482,7 @@ export default {
       env,
       options,
       now_connect_status,
+      connect_status,
       terminal,
       doSSHConnect,
       socket,
@@ -359,6 +496,16 @@ export default {
       sshKey,
       doHeartBeat,
       saveOp,
+      tcode,
+      handleTcode,
+      closeFileBlock,
+      resetTerminal,
+      tcodes,
+      userTcodeRef,
+      sendMessage,
+      importTCodes,
+      exportTcodes,
+      helpTcodeRef,
     }
 
   }

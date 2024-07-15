@@ -64,6 +64,7 @@ export default {
           {
             codeEditorRef.value.setValue(resp);
             codeEditorRef.value.reset();
+            codeEditorRef.value.setLanguage(fileName.value);
             modifyTag.value = '';
             loading.value = false;
           }

@@ -77,6 +77,15 @@
           </div>
         </div>
       </div>
+      <div class="item-class" style="margin-bottom: 5px;">
+        <div style="margin-right: 10px;">快捷：</div>
+        <div class="item-class">
+          <div>TCode</div>
+          <div style="margin: 0 20px;" >
+            <el-switch v-model="setInfo.tCode" />
+          </div>
+        </div>
+      </div>
     </div>
     <div style="margin-bottom: 5px;"></div>
     <div style="display: flex; border-top: 1px solid #f1f2f4;">
@@ -118,6 +127,7 @@ export default {
       fontSize: props.env.fontSize,
       cursorStyle: props.env.cursorStyle,
       cursorBlink: props.env.cursorBlink,
+      tCode: props.env.tCode,
     });
     const confirm = () => {
       context.emit('callback',setInfo.value);

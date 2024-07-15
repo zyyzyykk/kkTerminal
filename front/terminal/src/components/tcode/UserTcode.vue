@@ -1,0 +1,294 @@
+<template>
+  <el-dialog
+    v-model="DialogVisilble"
+    :before-close="closeDialog"
+    destroy-on-close
+    :width="550"
+    title="自定义TCode"
+    :modal="false"
+    modal-class="kk-dialog-class"
+    align-center
+    draggable
+  >
+    <div style="margin-top: -32px;"></div>
+    <div>
+      <div class="kk-flex">
+        <div class="no-select nowrap" >TCode：</div>
+        <div class="no-select nowrap" style="background-color: #f3f4f4; margin-right: 8px;" >U</div>
+        <el-input size="small" :style="{width: '130px'}" v-model="userTcodeInfo.name" class="w-50 m-2" placeholder="输入TCode" maxlength="5" minlength="1" >
+          <template #prefix>
+            <el-icon><CollectionTag /></el-icon>
+          </template>
+        </el-input>
+        <div style="flex: 1;" ></div>
+        <div>
+          <el-upload
+            :show-file-list="false"
+            :with-credentials="false"
+            :http-request="importTcodes"
+            :multiple="false"
+            >
+            <el-button size="small" type="primary" >
+              <el-icon class="el-icon--left"><Upload /></el-icon> 导入
+            </el-button>
+          </el-upload>
+        </div>
+      </div>
+      <div class="kk-flex">
+        <div class="no-select nowrap" style="margin-right: 2px;" >描 &nbsp; 述：</div>
+        <el-input size="small" :style="{width: '148px'}" v-model="userTcodeInfo.desc" class="w-50 m-2" placeholder="输入TCode描述" >
+          <template #prefix>
+            <el-icon><EditPen /></el-icon>
+          </template>
+        </el-input>
+        <div style="flex: 1;" ></div>
+        <div>
+          <el-button size="small" type="primary" @click="exportTcodes" >
+            <el-icon class="el-icon--left"><Download /></el-icon> 导出
+          </el-button>
+        </div>
+      </div>
+      <div class="kk-border" ></div>
+      <div class="kk-flex" style="margin: 7px 0;" >
+        <div class="no-select nowrap">Workflow</div>
+        <div style="flex: 1;" ></div>
+        <div @click="workflowTab(1)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" ><el-icon><Refresh /></el-icon></div>
+        <div @click="workflowTab(2)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" ><el-icon><DocumentDelete /></el-icon></div>
+        <div @click="workflowTab(3)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" ><el-icon><Finished /></el-icon></div>
+      </div>
+      <div element-loading-text="Loading..." v-loading="loading" style="padding: 0px 5px; width: 100%; height: 30vh;">
+        <AceEditor ref="userTcodeEditorRef" @handleSave="handleSave" ></AceEditor>
+      </div>
+    </div>
+    <div style="display: flex;">
+      <div style="flex: 1;"></div>
+      <el-button size="small" type="primary" @click="confirm" style="margin-bottom: -15px; margin-top: 10px;">
+        确定
+      </el-button>
+    </div>
+  </el-dialog>
+</template>
+
+<script>
+import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
+import AceEditor from '../preview/AceEditor';
+import { CollectionTag, EditPen, Upload, Download, Refresh, Finished, DocumentDelete } from '@element-plus/icons-vue';
+
+export default {
+  name: 'UserTcode',
+  components: {
+    AceEditor,
+    CollectionTag,
+    EditPen,
+    Upload,
+    Download,
+    Refresh,
+    Finished,
+    DocumentDelete,
+  },
+  setup(props,context)
+  {
+    // 控制Dialog显示
+    const DialogVisilble = ref(false);
+    const loading = ref(false);
+
+    const workflowTemplate = `await kkTerminal.write('cd /root/terminal');
+await kkTerminal.write('lsof -i :3000', 500);
+let resultArr = kkTerminal.getOut();
+if(resultArr.length >= 3) {
+    let pid = resultArr[2].replace(/\\s+/g, ' ').split(' ')[1];
+	if(pid) await kkTerminal.write('kill -9 ' + pid);
+}
+let jar = 'kkTerminal.jar';
+await kkTerminal.write('java -jar ./' + jar + ' > ./out.log &');
+alert('TCode Workflow Over!');`;
+
+    const userTcodeEditorRef = ref();
+    const userTcodeInfo = ref({
+      name:'',
+      desc:'',
+    });
+
+    // 保存
+    const handleSave = (text) => {
+      localStorage.setItem('tcode-draft', text);
+      ElMessage({
+        message: '保存成功',
+        type: 'success',
+        grouping: true,
+        repeatNum: Number.MIN_SAFE_INTEGER,
+      });
+    }
+    const setValue = (text) => {
+      userTcodeEditorRef.value.setValue(text);
+      userTcodeEditorRef.value.reset();
+    }
+
+    const initText = () => {
+      // Workflow仅支持JS语法
+      userTcodeEditorRef.value.setLanguage('kk.js');
+      // 加载Draft
+      if(localStorage.getItem('tcode-draft')) {
+        userTcodeEditorRef.value.setValue(localStorage.getItem('tcode-draft'));
+        userTcodeEditorRef.value.reset();
+      }
+    }
+
+    // 导入导出Tcode
+    const importTcodes = (data) => {
+      let file = data.file;
+      const fileReader = new FileReader();
+      fileReader.onload = () => {
+        try {
+          const tcodes = JSON.parse(fileReader.result);
+          let data = {};
+          for (const key in tcodes) {
+            if(key && key.length >= 2 && key.length <= 6 && (key[0] == 'U' || key[0] == 'u')) {
+              data[key.toUpperCase()] = {
+                ...tcodes[key],
+              };
+            }
+          }
+          context.emit('importTCodes', data);
+          ElMessage({
+            message: '导入成功',
+            type: 'success',
+            grouping: true,
+          });
+          reset();
+        } catch(error) {
+          ElMessage({
+            message: '导入失败：格式错误',
+            type: 'error',
+            grouping: true,
+          });
+        } finally {
+          loading.value = false;
+        }
+      };
+      fileReader.onerror = () => {
+        ElMessage({
+          message: '导入失败：文件读取失败',
+          type: 'error',
+          grouping: true,
+        });
+        loading.value = false;
+      };
+      loading.value = true;
+      fileReader.readAsText(file);
+    }
+    const exportTcodes = () => {
+      context.emit('exportTcodes');
+      ElMessage({
+        message: '导出成功',
+        type: 'success',
+        grouping: true,
+      });
+    }
+
+    // 处理workflowTab
+    const workflowTab = (type) => {
+      switch(type) {
+        case 1:
+          // 刷新
+          localStorage.removeItem('tcode-draft');
+          setValue(workflowTemplate);
+          break;
+        case 2:
+          // 删除
+          localStorage.removeItem('tcode-draft');
+          setValue('');
+          break;
+        case 3:
+          // 保存
+          handleSave(userTcodeEditorRef.value.getValue());
+          break;
+      }
+    }
+    
+    // 确定
+    const confirm = () => {
+      if(!(userTcodeInfo.value.name && userTcodeInfo.value.name.length >= 1 && userTcodeInfo.value.name.length <= 5)) {
+        ElMessage({
+          message: 'TCode不能为空',
+          type: 'error',
+          grouping: true,
+          repeatNum: Number.MIN_SAFE_INTEGER,
+        });
+        return;
+      }
+      let data = {};
+      data['U' + userTcodeInfo.value.name.toUpperCase()] = {
+        desc: userTcodeInfo.value.desc,
+        workflow: userTcodeEditorRef.value.getValue(),
+      };      
+      context.emit('importTCodes', data);
+      ElMessage({
+        message: '添加成功',
+        type: 'success',
+        grouping: true,
+      });
+      localStorage.removeItem('tcode-draft');
+      reset();
+    }
+
+    // 关闭
+    const closeDialog = (done) => {
+      reset();
+      done();
+    }
+
+    const reset = () => {
+      setTimeout(() => {
+        loading.value = false;
+        userTcodeInfo.value.name = '';
+        userTcodeInfo.value.desc = '';
+        userTcodeEditorRef.value.setValue('');
+        userTcodeEditorRef.value.reset();
+      },200);
+      DialogVisilble.value = false;
+    };
+
+    return {
+      DialogVisilble,
+      confirm,
+      closeDialog,
+      reset,
+      userTcodeEditorRef,
+      handleSave,
+      initText,
+      loading,
+      userTcodeInfo,
+      importTcodes,
+      exportTcodes,
+      setValue,
+      workflowTab,
+
+    }
+  }
+}
+</script>
+
+<style scoped>
+.kk-flex {
+  display: flex; 
+  align-items: center;
+  margin-top: 15px;
+}
+
+.kk-border {
+  margin-top: 3px;
+  margin-bottom: 3px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ececec;
+}
+
+.no-select {
+  user-select: none;
+}
+/* 不换行 */
+.nowrap {
+  white-space: nowrap;
+}
+</style>

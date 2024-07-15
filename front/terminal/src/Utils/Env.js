@@ -12,4 +12,5 @@ export const default_env = {
   fontSize: 16,
   cursorStyle: 'block',
   cursorBlink: true,
+  tCode: true,
 };
