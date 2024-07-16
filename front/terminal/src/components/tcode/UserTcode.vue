@@ -134,6 +134,11 @@ alert('TCode Workflow Over!');`;
         userTcodeEditorRef.value.reset();
       }
     }
+    // 仅有数字字母组成
+    const isAlphaNumeric = (str) => {
+      const regex = /^[A-Za-z0-9]+$/;
+      return regex.test(str);
+    }
 
     // 导入导出Tcode
     const importTcodes = (data) => {
@@ -143,23 +148,55 @@ alert('TCode Workflow Over!');`;
         try {
           const tcodes = JSON.parse(fileReader.result);
           let data = {};
+          // 统计成功/失败数
+          let scnt = 0;
+          let fcnt = 0;
           for (const key in tcodes) {
-            if(key && key.length >= 2 && key.length <= 6 && (key[0] == 'U' || key[0] == 'u')) {
+            if(key && key.length >= 2 && key.length <= 6 && (key[0] == 'U' || key[0] == 'u') && isAlphaNumeric(key)) {
               data[key.toUpperCase()] = {
                 ...tcodes[key],
               };
+              scnt++;
+            }
+            else {
+              ElMessage({
+                message: 'TCode-' + key + '：名称非法',
+                type: 'error',
+                grouping: true,
+              });
+              fcnt++;
             }
           }
-          context.emit('importTCodes', data);
-          ElMessage({
-            message: '导入成功',
-            type: 'success',
-            grouping: true,
-          });
-          reset();
+          // 全部成功
+          if(fcnt == 0) {
+            context.emit('importTCodes', data);
+            ElMessage({
+              message: '导入成功',
+              type: 'success',
+              grouping: true,
+            });
+            reset();
+          }
+          // 全部失败
+          else if(scnt == 0) {
+            ElMessage({
+              message: '导入失败：无合法TCode',
+              type: 'error',
+              grouping: true,
+            });
+          }
+          // 部分成功
+          else {
+            context.emit('importTCodes', data);
+            ElMessage({
+              message: '导入成功：' + scnt + '个' + '，导入失败：' + fcnt + '个',
+              type: 'warning',
+              grouping: true,
+            });
+          }
         } catch(error) {
           ElMessage({
-            message: '导入失败：格式错误',
+            message: '导入失败：json格式错误',
             type: 'error',
             grouping: true,
           });
@@ -212,6 +249,15 @@ alert('TCode Workflow Over!');`;
       if(!(userTcodeInfo.value.name && userTcodeInfo.value.name.length >= 1 && userTcodeInfo.value.name.length <= 5)) {
         ElMessage({
           message: 'TCode不能为空',
+          type: 'error',
+          grouping: true,
+          repeatNum: Number.MIN_SAFE_INTEGER,
+        });
+        return;
+      }
+      if(!isAlphaNumeric(userTcodeInfo.value.name)) {
+        ElMessage({
+          message: 'TCode只能由字母和数字组成',
           type: 'error',
           grouping: true,
           repeatNum: Number.MIN_SAFE_INTEGER,
