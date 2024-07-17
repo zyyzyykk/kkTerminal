@@ -11,6 +11,6 @@ COPY terminal.jar /terminal.jar
 ENTRYPOINT java -jar /terminal.jar --kk.title=$TITLE
 
 # 添加镜像元数据
-LABEL maintainer="zyyzyykk@126.com"
+LABEL org.opencontainers.image.authors="zyyzyykk@126.com"
 LABEL org.opencontainers.image.source="https://github.com/zyyzyykk/kkTerminal"
-LABEL org.opencontainers.image.icon="https://img.kkbapps.com/logo/terminal.png"
+LABEL org.opencontainers.image.licenses="Apache"
