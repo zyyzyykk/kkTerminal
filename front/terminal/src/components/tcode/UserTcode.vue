@@ -154,7 +154,9 @@ alert('TCode Workflow Over!');`;
           for (const key in tcodes) {
             if(key && key.length >= 2 && key.length <= 6 && (key[0] == 'U' || key[0] == 'u') && isAlphaNumeric(key)) {
               data[key.toUpperCase()] = {
-                ...tcodes[key],
+                desc: tcodes[key].desc || '',
+                workflow:  tcodes[key].workflow || '',
+                status: 'Not Used',
               };
               scnt++;
             }
@@ -244,7 +246,7 @@ alert('TCode Workflow Over!');`;
       }
     }
     
-    // 确定
+    // 确定(添加TCode)
     const confirm = () => {
       if(!(userTcodeInfo.value.name && userTcodeInfo.value.name.length >= 1 && userTcodeInfo.value.name.length <= 5)) {
         ElMessage({
@@ -268,6 +270,7 @@ alert('TCode Workflow Over!');`;
       data['U' + userTcodeInfo.value.name.toUpperCase()] = {
         desc: userTcodeInfo.value.desc,
         workflow: userTcodeEditorRef.value.getValue(),
+        status: 'Not Used',
       };      
       context.emit('importTCodes', data);
       ElMessage({

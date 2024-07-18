@@ -144,3 +144,9 @@ const filterANSI = (str) => {
     // eslint-disable-next-line
     return stripAnsi(str).replace(/[\x00-\x1F\x7F]/g, '');
 }
+
+// 用户TCode状态枚举
+// 加载失败: Load Error
+// 执行失败: Execute Error
+// 未被使用: Not Used
+// 执行成功: Execute Success
