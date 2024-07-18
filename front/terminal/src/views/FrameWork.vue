@@ -55,7 +55,7 @@
   <FileBlock ref="fileBlockRef" :sshKey="sshKey" ></FileBlock>
   <!-- 用户TCode -->
   <UserTcode ref="userTcodeRef" @importTCodes="importTCodes" @exportTcodes="exportTcodes" ></UserTcode>
-
+  <!-- 帮助TCode -->
   <HelpTcode ref="helpTcodeRef" :userTCodes="tcodes" ></HelpTcode>
 
 </template>
@@ -117,10 +117,6 @@ export default {
       tcodes.value = {};
       if(localStorage.getItem('tcodes')) {
         tcodes.value = JSON.parse(decrypt(localStorage.getItem('tcodes')));
-        for (const key in tcodes.value) {
-          let textflow = tcodes.value[key].workflow.toString();
-          tcodes.value[key].workflow = new Function('kkTerminal', `return (async function() { ${textflow} })()`);
-        }
       }
       setTimeout(() => {
         helpTcodeRef.value.userTCodes = {...tcodes.value};
@@ -254,14 +250,14 @@ export default {
     };
 
     // 文本消息发送
-    const sendMessage = (text, mode=false) => {
+    const sendMessage = (text, active=false) => {
       if(socket.value) {
         // 重启后第一次输入
         if(isFirst.value) {
           termFit();
           isFirst.value = false;
         }
-        if(UserTcodeExecutor.active === mode) socket.value.send(encrypt(JSON.stringify({type:0,content:text,rows:0,cols:0})));
+        if(UserTcodeExecutor.active === active) socket.value.send(encrypt(JSON.stringify({type:0,content:text,rows:0,cols:0})));
       }
     };
 
@@ -379,6 +375,11 @@ export default {
       fileBlockRef.value.renameFile = null;
     };
 
+    const setTcodeStatus = (transTcode, state) => {
+      tcodes.value[transTcode].status = state;
+      localStorage.setItem('tcodes',encrypt(JSON.stringify(tcodes.value)));
+    }
+
     // 处理事务代码
     const tcode = ref('');
     const handleTcode = async () => {
@@ -392,22 +393,41 @@ export default {
       // 用户TCode
       else if(transTcode[0] == 'U' && tcodes.value[transTcode]) {
         if(!UserTcodeExecutor.writeOnly) UserTcodeExecutor.writeOnly = sendMessage;
-        // 激活
+        // 未激活
         if(UserTcodeExecutor.active == false) {
+          userTcodeExecutorReset();
           UserTcodeExecutor.active = true;
+          // 执行流未被定义
+          if(!tcodes.value[transTcode].execFlow || !(tcodes.value[transTcode].execFlow instanceof Function)) {
+            let textflow = tcodes.value[transTcode].workflow.toString();
+            try {
+              tcodes.value[transTcode].execFlow = new Function('kkTerminal', `return (async function() { ${textflow} })()`);
+            } catch (error) {
+              setTcodeStatus(transTcode, 'Load Error');
+              ElMessage({
+                message: 'TCode-' + transTcode + ' Load Error: ' + error,
+                type: 'error',
+                grouping: true,
+              });
+              userTcodeExecutorReset();
+              return;
+            }
+          }
           try {
-            await tcodes.value[transTcode].workflow(UserTcodeExecutor);
+            await tcodes.value[transTcode].execFlow(UserTcodeExecutor);
             ElMessage({
               message: 'TCode-' + transTcode + ' Workflow Over',
               type: 'success',
               grouping: true,
             });
+            setTcodeStatus(transTcode, 'Execute Success');
           } catch(error) {
             ElMessage({
-              message: 'TCode-' + transTcode + ' Workflow Error: ' + error,
+              message: 'TCode-' + transTcode + ' Execute Error: ' + error,
               type: 'error',
               grouping: true,
             });
+            setTcodeStatus(transTcode, 'Execute Error');
           } finally {
             userTcodeExecutorReset();
           }
@@ -425,8 +445,7 @@ export default {
     // 批量导入TCode
     const importTCodes = (data) => {
       let tCodeData = {};
-      if(localStorage.getItem('tcodes')) tCodeData = JSON.parse(decrypt(localStorage.getItem('tcodes')));
-      tCodeData = {...tCodeData,...data};
+      tCodeData = {...tcodes.value,...data};
       localStorage.setItem('tcodes',encrypt(JSON.stringify(tCodeData)));
       loadTCodes();
     };
