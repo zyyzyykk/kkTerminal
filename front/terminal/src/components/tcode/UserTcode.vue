@@ -52,9 +52,21 @@
       <div class="kk-flex" style="margin: 7px 0;" >
         <div class="no-select nowrap">Workflow</div>
         <div style="flex: 1;" ></div>
-        <div @click="workflowTab(1)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" ><el-icon><Refresh /></el-icon></div>
-        <div @click="workflowTab(2)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" ><el-icon><DocumentDelete /></el-icon></div>
-        <div @click="workflowTab(3)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" ><el-icon><Finished /></el-icon></div>
+        <div @click="workflowTab(1)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
+          <el-tooltip content="默认模板" placement="top">
+            <el-icon><Refresh /></el-icon>
+          </el-tooltip>
+        </div>
+        <div @click="workflowTab(2)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
+          <el-tooltip content="清空" placement="top">
+            <el-icon><DocumentDelete /></el-icon>
+          </el-tooltip>
+        </div>
+        <div @click="workflowTab(3)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
+          <el-tooltip content="保存" placement="top">
+            <el-icon><Finished /></el-icon>
+          </el-tooltip>
+        </div>
       </div>
       <div element-loading-text="Loading..." v-loading="loading" style="padding: 0px 5px; width: 100%; height: 30vh;">
         <AceEditor ref="userTcodeEditorRef" @handleSave="handleSave" ></AceEditor>
@@ -156,7 +168,7 @@ alert('TCode Workflow Over!');`;
               data[key.toUpperCase()] = {
                 desc: tcodes[key].desc || '',
                 workflow:  tcodes[key].workflow || '',
-                status: 'Not Used',
+                status: 'Not Active',
               };
               scnt++;
             }
@@ -270,8 +282,8 @@ alert('TCode Workflow Over!');`;
       data['U' + userTcodeInfo.value.name.toUpperCase()] = {
         desc: userTcodeInfo.value.desc,
         workflow: userTcodeEditorRef.value.getValue(),
-        status: 'Not Used',
-      };      
+        status: 'Not Active',
+      };
       context.emit('importTCodes', data);
       ElMessage({
         message: '添加成功',

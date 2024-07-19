@@ -19,6 +19,7 @@
         <div>
           <el-input
             v-model="tcode"
+            id="kkterminalTcode"
             ref="tCodeInputRef"
             :style="{ width: '100px', height: '20px', fontSize: '12px'}"
             @change="handleTcode"
@@ -36,7 +37,13 @@
               <div style="user-select: none; margin-top: 5px;">
                 输入 
                 <span style="background-color: #f3f4f4; user-select: text;" >/H</span>
-                并按下回车，查看帮助信息</div>
+                并按下回车，查看帮助信息
+              </div>
+              <div style="user-select: none; margin-top: 5px;">
+                输入 
+                <span style="background-color: #f3f4f4; user-select: text;" >/A</span>
+                并按下回车，自定义TCode
+              </div>
             </div>
           </el-popover>
         </div>
@@ -56,7 +63,7 @@
   <!-- 用户TCode -->
   <UserTcode ref="userTcodeRef" @importTCodes="importTCodes" @exportTcodes="exportTcodes" ></UserTcode>
   <!-- 帮助TCode -->
-  <HelpTcode ref="helpTcodeRef" :userTCodes="tcodes" ></HelpTcode>
+  <HelpTcode ref="helpTcodeRef" :userTCodes="tcodes" @handleSaveTCode="handleSaveTCode" ></HelpTcode>
 
 </template>
 
@@ -378,6 +385,9 @@ export default {
     const setTcodeStatus = (transTcode, state) => {
       tcodes.value[transTcode].status = state;
       localStorage.setItem('tcodes',encrypt(JSON.stringify(tcodes.value)));
+      setTimeout(() => {
+        helpTcodeRef.value.userTCodes = {...tcodes.value};
+      },1);
     }
 
     // 处理事务代码
@@ -468,6 +478,15 @@ export default {
     }
     // 帮助
     const helpTcodeRef = ref();
+    const handleSaveTCode = (name, content) => {
+      let data = {};
+      data[name] = {
+        desc: tcodes.value[name].desc || '',
+        workflow: content || '',
+        status: 'Not Active',
+      };
+      importTCodes(data);
+    }
 
     onMounted(() => {
       // 连接服务器
@@ -525,6 +544,7 @@ export default {
       importTCodes,
       exportTcodes,
       helpTcodeRef,
+      handleSaveTCode,
     }
 
   }

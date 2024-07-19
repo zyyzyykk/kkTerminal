@@ -39,11 +39,33 @@
               <div style="height: 210px; overflow-y: auto; padding: 10px 0" >
                 <template v-if="userTCodes && Object.keys(userTCodes).length > 0" >
                   <template v-if="nowTCode && nowTCode.length >= 2 && nowTCode.length <= 6" >
-                    <div style="display: inline-block; margin-bottom: 12px; margin-top: -10px;" >
-                      <div @click="toOverview" style="display: inline-block; margin-right: 10px; cursor: pointer; font-size: 16px;" ><el-icon><ArrowLeft /></el-icon></div>
-                      <div style="display: inline-block; margin-top: 3px;" > {{ nowTCode }} </div>
+                    <div class="kk-flex" style="margin-bottom: 12px; margin-top: -10px;" >
+                      <div @click="toOverview" style="margin-right: 10px; cursor: pointer; font-size: 16px;" ><el-icon><ArrowLeft /></el-icon></div>
+                      <div style="margin-top: 3px;" > {{ nowTCode }} </div>
+                      <div style="cursor: pointer; margin-left: 10px;" >
+                        <el-tooltip :content="TCodeStatusEnum[userTCodes[nowTCode].status]" placement="top">
+                          <TcodeStatus :style="{fontSize: '18px'}" :status="userTCodes[nowTCode].status" ></TcodeStatus>
+                        </el-tooltip>
+                      </div>
+                      <div style="flex: 1;" ></div>
+                      <div @click="doModifyTCode" v-if="mode == false" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
+                        <el-tooltip content="编辑" placement="top">
+                          <el-icon><Edit /></el-icon>
+                        </el-tooltip>
+                      </div>
+                      <div @click="doOnlyRead" v-if="mode == true" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
+                        <el-tooltip content="只读" placement="top">
+                          <el-icon><View /></el-icon>
+                        </el-tooltip>
+                      </div>
+                      <div @click="doSaveTCode" v-if="mode == true" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
+                        <el-tooltip content="保存修改" placement="top">
+                          <el-icon><Finished /></el-icon>
+                        </el-tooltip>
+                      </div>
+                      <div style="margin-left: 10px;" ></div>
                     </div>
-                    <div style="width: 100%; height: 168px;">
+                    <div style="width: 100%; height: 166px;">
                       <AceEditor ref="userTcodeEditorRef" ></AceEditor>
                     </div>
                   </template>
@@ -52,10 +74,18 @@
                     <div class="kk-border" ></div>
                     <div v-for="(item, key) in userTCodes" :key="key" >
                       <div class="kk-flex tocde-item" style="padding: 12px 10px;" >
-                        <div style="background-color: #f3f4f4;" >{{ key }}</div>
-                        <div class="ellipsis" style="margin-left: 25px;" >{{ item.desc }}</div>
+                        <div class="kk-flex" style="width: 60px;">
+                          <div style="background-color: #f3f4f4;" >{{ key }}</div>
+                          <div style="flex: 1;" ></div>
+                        </div>
+                        <div class="ellipsis" style="margin-left: 10px;" >{{ item.desc }}</div>
                         <div style="flex: 1;" ></div>
-                        <div @click="toWorkflow(key)" style="margin-left: 10px; cursor: pointer;font-size: 16px;" ><el-icon><ArrowRight /></el-icon></div>
+                        <div @click="toWorkflow(key)" style="cursor: pointer; margin-left: 10px;" >
+                          <el-tooltip :content="TCodeStatusEnum[item.status]" placement="top">
+                            <TcodeStatus :style="{fontSize: '18px'}" :status="item.status" ></TcodeStatus>
+                          </el-tooltip>
+                        </div>
+                        <div @click="toWorkflow(key)" style="margin-left: 15px; cursor: pointer; font-size: 16px;" ><el-icon><ArrowRight /></el-icon></div>
                       </div>
                     </div>
                   </template>
@@ -78,44 +108,75 @@
 
 <script>
 import { ref } from 'vue';
-import { FuncTcode, SysTcode } from "@/Utils/Tcode";
+import { ElMessage } from 'element-plus';
+import { FuncTcode, SysTcode, TCodeStatusEnum } from "@/Utils/Tcode";
 import NoData from '../NoData.vue';
-import { ArrowRight, ArrowLeft } from '@element-plus/icons-vue';
+import { ArrowRight, ArrowLeft, Edit, View, Finished } from '@element-plus/icons-vue';
 import AceEditor from '../preview/AceEditor.vue';
 import { decrypt } from '@/Utils/Encrypt';
+import TcodeStatus from './TcodeStatus.vue';
 
 export default {
   name:'HelpTcode',
   components: {
     NoData,
+    TcodeStatus,
     AceEditor,
     ArrowRight,
     ArrowLeft,
+    Edit,
+    View,
+    Finished,
   },
-  setup() {
+  setup(props, context) {
 
     // 控制Dialog显示
     const DialogVisilble = ref(false);
 
     const userTCodes = ref({});
     const nowTCode = ref('');
+    const mode = ref(false);
     const toWorkflow = (tcode) => {
       nowTCode.value = tcode;
+      mode.value = false;
       setTimeout(() => {
-        initTcodeEditor();
+        initTcodeEditor(true);
       },1);
     }
     const toOverview = () => {
+      mode.value = false;
       nowTCode.value = '';
     }
 
     // 编辑器(只读)
     const userTcodeEditorRef = ref();
-    const initTcodeEditor = () => {
+    const initTcodeEditor = (mode) => {
       userTcodeEditorRef.value.setLanguage('kk.js');
       userTcodeEditorRef.value.setValue(JSON.parse(decrypt(localStorage.getItem('tcodes')))[nowTCode.value].workflow || '');
       userTcodeEditorRef.value.reset();
-      userTcodeEditorRef.value.setReadOnly(true);
+      userTcodeEditorRef.value.setReadOnly(mode);
+    }
+
+    // 启用编辑
+    const doModifyTCode = () => {
+      mode.value = true;
+      initTcodeEditor(false);
+    }
+    // 只读模式
+    const doOnlyRead = () => {
+      mode.value = false;
+      initTcodeEditor(true);
+    }
+
+    // 修改TCode的Workflow
+    const doSaveTCode = () => {
+      context.emit('handleSaveTCode', nowTCode.value, userTcodeEditorRef.value.getValue());
+      doOnlyRead();
+      ElMessage({
+        message: '修改成功',
+        type: 'success',
+        grouping: true,
+      });
     }
 
     return {
@@ -128,7 +189,11 @@ export default {
       userTCodes,
       userTcodeEditorRef,
       initTcodeEditor,
-
+      TCodeStatusEnum,
+      mode,
+      doModifyTCode,
+      doOnlyRead,
+      doSaveTCode,
     }
   }
 

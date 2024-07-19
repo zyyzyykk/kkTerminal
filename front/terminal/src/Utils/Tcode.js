@@ -148,5 +148,11 @@ const filterANSI = (str) => {
 // 用户TCode状态枚举
 // 加载失败: Load Error
 // 执行失败: Execute Error
-// 未被使用: Not Used
+// 未被使用: Not Active
 // 执行成功: Execute Success
+export const TCodeStatusEnum = {
+    'Load Error': '加载失败',
+    'Execute Error':'执行失败',
+    'Not Active': '未被使用',
+    'Execute Success': '执行成功',
+}
