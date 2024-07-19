@@ -82,7 +82,12 @@ export default {
     };
     // 设置只读模式
     const setReadOnly = (isReadOnly) => {
-      if (aceEditor.value) aceEditor.value.setReadOnly(isReadOnly);
+      if (aceEditor.value) {
+        aceEditor.value.setReadOnly(isReadOnly);
+        // 只读时设置背景色，非只读时恢复默认
+        const backgroundColor = isReadOnly ? '#f0f0f0' : '';
+        aceEditorRef.value.style.backgroundColor = backgroundColor;
+      }
     };
 
     // 保存代码
