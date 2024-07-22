@@ -78,7 +78,7 @@
         </div>
       </div>
       <div class="item-class" style="margin-bottom: 5px;">
-        <div style="margin-right: 10px;">快捷：</div>
+        <div style="margin-right: 10px;">功能：</div>
         <div class="item-class">
           <div>TCode</div>
           <div style="margin: 0 20px;" >

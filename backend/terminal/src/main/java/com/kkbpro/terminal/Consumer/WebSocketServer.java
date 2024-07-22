@@ -13,6 +13,7 @@ import com.kkbpro.terminal.utils.AesUtil;
 import com.kkbpro.terminal.utils.FileUtil;
 import com.kkbpro.terminal.utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,9 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketServer {
     public static ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
 
-    public static ConcurrentHashMap<String, EnvInfo> envInfoMap = new ConcurrentHashMap<>();
-
     public static ConcurrentHashMap<String, String> fileUploadingMap = new ConcurrentHashMap<>();
+
+    public static ConcurrentHashMap<String, SFTPClient> sftpClientMap = new ConcurrentHashMap<>();
 
     private static AppConfig appConfig;
 
@@ -80,7 +81,6 @@ public class WebSocketServer {
             sshClient.addHostKeyVerifier(new PromiscuousVerifier());    // 不验证主机密钥
             sshClient.connect(host,port);
             sshClient.authPassword(user_name, password);                // 使用用户名和密码进行身份验证
-
         } catch (Exception e) {
             e.printStackTrace();
             sendMessage(sessionSocket,"连接服务器失败","fail", ResultCodeEnum.CONNECT_FAIL.getState());
@@ -93,8 +93,7 @@ public class WebSocketServer {
         // 连接成功，生成key标识
         sshKey = UUID.randomUUID().toString();
         sendMessage(sessionSocket, sshKey,"success", ResultCodeEnum.CONNECT_SUCCESS.getState());
-        sshClientMap.put(sshKey,sshClient);
-        envInfoMap.put(sshKey,envInfo);
+        sshClientMap.put(sshKey, sshClient);
         // 欢迎语
         sendMessage(sessionSocket, appConfig.getWelcome() + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
         // github源地址
@@ -169,6 +168,7 @@ public class WebSocketServer {
         sessionSocket = null;
         if(sshKey != null) {
             sshClientMap.remove(sshKey);
+            sftpClientMap.remove(sshKey);
             sshKey = null;
         }
     }

@@ -262,7 +262,7 @@ export default {
     }
     // 上传文件
     const chunkSize = 1024 * 517;   // 每一片大小517kB
-    const doUpload = async (fileData, data) => {
+    const doUpload = async (fileData, data={}) => {
       try {
         if(isShowDirInput.value == true) return;
         let file = fileData.file;
@@ -315,9 +315,11 @@ export default {
                   type: resp.status,
                   grouping: true,
                 });
-                setTimeout(() => {
-                  getDirList();
-                }, 500);
+                if(path == dir.value) {
+                  setTimeout(() => {
+                    getDirList();
+                  }, Math.min(1000, 500 + chunks * 10));
+                }
               }
               // 文件片上传成功
               // else if(resp.code == 203) {
@@ -364,8 +366,8 @@ export default {
         }
       } catch (error) {
         ElMessage({
-          message: "不支持上传文件夹",
-          type: "warning",
+          message: "文件上传失败",
+          type: "error",
           grouping: true,
         })
       }
@@ -414,30 +416,91 @@ export default {
       doUpload({file:file}, {pathVal: urlParams.path, startUpLoad:"修改保存中"});
     };
 
-    // 文件拖拽
+    // 文件/文件夹拖拽
     const fileAreaRef = ref();
     const preventDefault = (event) => {
       event.preventDefault();
     };
     const handleFileDrag = (event) => {
       event.preventDefault();
-      let filesArray = event.dataTransfer.files;
-      if(!(filesArray && filesArray.length > 0)) return;
-      for(let i=0;i<filesArray.length;i++)
-      {
-        let file = filesArray[i];
-        if(!(file && file.size > 0)) {
-          ElMessage({
-            message: "不支持拖拽文件夹或空文件",
-            type: "warning",
-            grouping: true,
+      // 文件/文件夹项
+      const items = event.dataTransfer.items;
+      if(!(items && items.length > 0)) return;
+      for (let i = 0; i < items.length; i++) {
+        let item = items[i].webkitGetAsEntry();
+        // 文件类型
+        if(item.isFile && !item.isDirectory) {
+          item.file(file => {
+            file.uid = Math.random().toString(36).substring(2);
+            doUpload({file:file}, {pathVal: dir.value});
           });
-          continue;
         }
-        file.uid = Math.random().toString(36).substring(2);
-        doUpload({file:file}, {pathVal: dir.value});
+        // 文件夹类型
+        else if(!item.isFile && item.isDirectory) {
+          const nowPath = dir.value + item.name;
+          $.ajax({
+            url: http_base_url + '/mkdir',
+            type:'post',
+            data:{
+              sshKey:props.sshKey,
+              path: nowPath,
+            },
+            success(resp){
+              if(resp.code == 200) {
+                getDirList();
+                folderUpload(item, nowPath + '/');
+              }
+              else {
+                ElMessage({
+                  message: resp.info,
+                  type: resp.status,
+                  grouping: true,
+                });
+              }
+            }
+          });
+        }
       }
     };
+    const folderUpload = (directoryEntry, basePath) => {
+      const reader = directoryEntry.createReader();
+      reader.readEntries((entries) => {
+        for (let i = 0; i < entries.length; i++) {
+          const item = entries[i];
+          // 文件类型
+          if(item.isFile && !item.isDirectory) {
+            item.file(file => {
+              file.uid = Math.random().toString(36).substring(2);
+              doUpload({file:file}, {pathVal: basePath});
+            });
+          }
+          // 文件夹类型
+          else if(!item.isFile && item.isDirectory) {
+            const nowPath = basePath + item.name;
+            $.ajax({
+              url: http_base_url + '/mkdir',
+              type:'post',
+              data:{
+                sshKey:props.sshKey,
+                path: nowPath,
+              },
+              success(resp){
+                if(resp.code == 200) {
+                  folderUpload(item, nowPath + '/');
+                }
+                else {
+                  ElMessage({
+                    message: resp.info,
+                    type: resp.status,
+                    grouping: true,
+                  });
+                }
+              }
+            });
+          }
+       }
+      });
+    }
 
     // 菜单项
     const isShowMenu = ref(false);
@@ -591,7 +654,7 @@ export default {
         });
       }
       $.ajax({
-        url: http_base_url + '/rm',
+        url: http_base_url + '/rm-rf',
         type:'post',
         data:{
           sshKey:props.sshKey,
@@ -610,9 +673,9 @@ export default {
     };
     // 新建文件
     const mkFileRef = ref();
-    const handleMkFile = (type, name, nowDir) => {
+    const handleMkFile = (isFolder, name, nowDir) => {
       // 文件
-      if(type == false) {
+      if(isFolder == false) {
         // 防止覆盖
         for(let i=0;i<files.value.length;i++) {
           if(files.value[i].name == name && dir.value == nowDir) {
@@ -712,6 +775,7 @@ export default {
       handleMkFile,
       doRename,
       fileAttrRef,
+      folderUpload,
 
     }
   }

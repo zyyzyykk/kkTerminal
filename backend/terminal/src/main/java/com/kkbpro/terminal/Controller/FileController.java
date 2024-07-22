@@ -9,6 +9,7 @@ import com.kkbpro.terminal.pojo.vo.FileInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.FileUtil;
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.sftp.*;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,7 +129,7 @@ public class FileController {
      * 删除文件/文件夹
      */
     @PostMapping("/rm")
-    public Result rm(String sshKey, Boolean isDirectory, String path) throws IOException {
+    public Result rm(String sshKey, Boolean isDirectory, String path) {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
@@ -154,11 +155,37 @@ public class FileController {
         sftp.rmdir(path);
     }
 
+
+    /**
+     * rm -rf 快速删除
+     */
+    @PostMapping("/rm-rf")
+    public Result rmRf(String sshKey, String path) {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
+        }
+        try(Session session = ssh.startSession()) {
+            String command = "rm -rf " + path;
+            Session.Command cmd = session.exec(command);
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.setError(500, "删除失败", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500, "删除失败", null);
+        }
+        return Result.setSuccess(200, "删除成功", null);
+    }
+
+
     /**
      * 新建文件夹
      */
     @PostMapping("/mkdir")
-    public Result mkdir(String sshKey, String path) throws IOException {
+    public Result mkdir(String sshKey, String path) {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
@@ -176,7 +203,7 @@ public class FileController {
      * 文件/文件夹重命名
      */
     @PostMapping("/rename")
-    public Result rename(String sshKey, String oldPath, String newPath) throws IOException {
+    public Result rename(String sshKey, String oldPath, String newPath) {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
@@ -199,7 +226,8 @@ public class FileController {
 
         String sshKey = fileUploadInfo.getSshKey();
         // 判断连接状态
-        if(WebSocketServer.sshClientMap.get(sshKey) == null) {
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件上传失败");
         }
 
@@ -245,27 +273,25 @@ public class FileController {
         if(chunk.equals(chunks))
         {
             WebSocketServer.fileUploadingMap.put(sshKey + "-" + id, "kkterminal");
-            EnvInfo envInfo = WebSocketServer.envInfoMap.get(sshKey);
             Thread FileThread = new Thread(() -> {
                 // 将文件片合并
                 if(!chunks.equals(1))
                     FileUtil.fileChunkMerge(folderPath,fileName,chunks,totalSize);
-                // 与服务器建立连接
-                String host = envInfo.getServer_ip();
-                int port = envInfo.getServer_port();
-                String user_name = envInfo.getServer_user();
-                String password = envInfo.getServer_password();
-
-                try(SSHClient sshFileClient = new SSHClient()) {
-                    sshFileClient.setConnectTimeout(appConfig.getSshMaxTimeout());
-                    sshFileClient.addHostKeyVerifier(new PromiscuousVerifier());    // 不验证主机密钥
-                    sshFileClient.connect(host,port);
-                    sshFileClient.authPassword(user_name, password);                // 使用用户名和密码进行身份验证
+                try {
                     // 上传到服务器
-                    try (SFTPClient sftpFileClient = sshFileClient.newSFTPClient()) {
-                        sftpFileClient.put(folderPath + "/" + fileName, path + fileName);
+                    // 单例-懒汉
+                    if(WebSocketServer.sftpClientMap.get(sshKey) == null) {
+                        synchronized (ssh) {
+                            if(WebSocketServer.sftpClientMap.get(sshKey) == null) {
+                                SFTPClient sftpClient = ssh.newSFTPClient();
+                                WebSocketServer.sftpClientMap.put(sshKey, sftpClient);
+                            }
+                        }
                     }
+                    SFTPClient sftpFileClient = WebSocketServer.sftpClientMap.get(sshKey);
+                    sftpFileClient.put(folderPath + "/" + fileName, path + fileName);
                 } catch (Exception e) {
+                    System.out.println("文件上传失败");
                     e.printStackTrace();
                 } finally {
                     // 删除临时文件
