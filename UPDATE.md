@@ -1,5 +1,9 @@
 ### 👨‍💻 历史更新记录
 
+##### zyyzyykk/kkterminal:3.0.7：
+
+- 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.2.6` 版本，后续不再进行更新
+
 ##### zyyzyykk/kkterminal:3.0.6：
 
 - 解决拖拽上传无法识别文件夹的问题，最终修改为不支持拖拽上传文件夹或空文件
