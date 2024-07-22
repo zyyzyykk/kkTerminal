@@ -1,18 +1,15 @@
 package com.kkbpro.terminal.controller;
 
-import com.kkbpro.terminal.config.AppConfig;
 import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
 import com.kkbpro.terminal.consumer.WebSocketServer;
+import com.kkbpro.terminal.exception.MyException;
 import com.kkbpro.terminal.pojo.dto.FileUploadInfo;
-import com.kkbpro.terminal.pojo.vo.EnvInfo;
 import com.kkbpro.terminal.pojo.vo.FileInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.FileUtil;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.sftp.*;
-import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,33 +27,28 @@ import java.util.*;
 @RequestMapping("/api")
 public class FileController {
 
-    @Autowired
-    private AppConfig appConfig;
-
     /**
      * 下载文件
      */
     @GetMapping("/download/{fileName}")
     public void downloadFile(HttpServletResponse response, String sshKey, String path, @PathVariable String fileName) throws IOException {
 
-        SSHClient sshClient = WebSocketServer.sshClientMap.get(sshKey);
+        SFTPClient sftpClient = getSftpClient(sshKey);
         String remoteFilePath = path + fileName;
 
         // 构建 HTTP 响应，触发文件下载
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName,"UTF-8"));
-        readRemoteFile(sshClient, remoteFilePath, response);
+        readRemoteFile(sftpClient, remoteFilePath, response);
     }
-    private void readRemoteFile(SSHClient ssh, String remoteFilePath, HttpServletResponse response) throws IOException {
-        try (SFTPClient sftp = ssh.newSFTPClient()) {
-            try (RemoteFile file = sftp.open(remoteFilePath)) {
-                try (InputStream is = file.new RemoteFileInputStream()) {
-                    byte[] buffer = new byte[8096];
-                    int bytesRead;
-                    while ((bytesRead = is.read(buffer)) != -1) {
-                        // 逐块传输至前端
-                        response.getOutputStream().write(buffer, 0, bytesRead);
-                    }
+    private void readRemoteFile(SFTPClient sftp, String remoteFilePath, HttpServletResponse response) throws IOException {
+        try (RemoteFile file = sftp.open(remoteFilePath)) {
+            try (InputStream is = file.new RemoteFileInputStream()) {
+                byte[] buffer = new byte[8096];
+                int bytesRead;
+                while ((bytesRead = is.read(buffer)) != -1) {
+                    // 逐块传输至前端
+                    response.getOutputStream().write(buffer, 0, bytesRead);
                 }
             }
         }
@@ -73,7 +65,8 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"文件列表获取失败",map);
         }
-        try (SFTPClient sftp = ssh.newSFTPClient()) {
+        try {
+            SFTPClient sftp = getSftpClient(sshKey);
             List<RemoteResourceInfo> files = sftp.ls(path);
             for(RemoteResourceInfo file : files) {
                 FileInfo fileInfo = new FileInfo();
@@ -118,9 +111,8 @@ public class FileController {
             map.put("path", path);
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件路径获取失败",map);
         }
-        try (SFTPClient sftp = ssh.newSFTPClient()) {
-            path = sftp.canonicalize(".");
-        }
+        SFTPClient sftp = getSftpClient(sshKey);
+        path = sftp.canonicalize(".");
         map.put("path", path);
         return Result.setSuccess(200, "首次路径", map);
     }
@@ -135,7 +127,8 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
         }
-        try (SFTPClient sftp = ssh.newSFTPClient()) {
+        try {
+            SFTPClient sftp = getSftpClient(sshKey);
             if(isDirectory) rmFloder(sftp,path);
             else sftp.rm(path);
         } catch (Exception e) {
@@ -191,7 +184,8 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件夹新建失败",null);
         }
-        try (SFTPClient sftp = ssh.newSFTPClient()) {
+        try {
+            SFTPClient sftp = getSftpClient(sshKey);
             sftp.mkdir(path);
         } catch (Exception e) {
             return Result.setError(500, "文件夹新建失败", null);
@@ -209,7 +203,8 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹重命名失败",null);
         }
-        try (SFTPClient sftp = ssh.newSFTPClient()) {
+        try {
+            SFTPClient sftp = getSftpClient(sshKey);
             sftp.rename(oldPath,newPath);
         } catch (Exception e) {
             e.printStackTrace();
@@ -279,16 +274,7 @@ public class FileController {
                     FileUtil.fileChunkMerge(folderPath,fileName,chunks,totalSize);
                 try {
                     // 上传到服务器
-                    // 单例-懒汉
-                    if(WebSocketServer.sftpClientMap.get(sshKey) == null) {
-                        synchronized (ssh) {
-                            if(WebSocketServer.sftpClientMap.get(sshKey) == null) {
-                                SFTPClient sftpClient = ssh.newSFTPClient();
-                                WebSocketServer.sftpClientMap.put(sshKey, sftpClient);
-                            }
-                        }
-                    }
-                    SFTPClient sftpFileClient = WebSocketServer.sftpClientMap.get(sshKey);
+                    SFTPClient sftpFileClient = getSftpClient(sshKey);
                     sftpFileClient.put(folderPath + "/" + fileName, path + fileName);
                 } catch (Exception e) {
                     System.out.println("文件上传失败");
@@ -305,6 +291,24 @@ public class FileController {
         else {
             return Result.setSuccess(FileBlockStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功", map);
         }
+    }
+
+
+    private SFTPClient getSftpClient(String sshKey) throws IOException {
+        SSHClient sshClient = WebSocketServer.sshClientMap.get(sshKey);
+        if(sshClient == null) {
+            throw new MyException(Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开", null));
+        }
+        // 单例-懒汉
+        if(WebSocketServer.sftpClientMap.get(sshKey) == null) {
+            synchronized (sshClient) {
+                if(WebSocketServer.sftpClientMap.get(sshKey) == null) {
+                    SFTPClient sftpClient = sshClient.newSFTPClient();
+                    WebSocketServer.sftpClientMap.put(sshKey, sftpClient);
+                }
+            }
+        }
+        return WebSocketServer.sftpClientMap.get(sshKey);
     }
 
 }

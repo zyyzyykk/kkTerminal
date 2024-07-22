@@ -70,9 +70,9 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 🌐 国内服务器访问：https://ssh.kkbpro.com/
 - 🌍 国外服务器访问：https://ssh.kkbapps.com/
 
-![connect](https://img.kkbapps.com/terminal/3.1.2-1.png)
+![connect](https://img.kkbapps.com/terminal/315-1.png)
 
-![prefer](https://img.kkbapps.com/terminal/3.1.2-2.png)
+![prefer](https://img.kkbapps.com/terminal/315-2.png)
 
 ![file](https://img.kkbapps.com/terminal/3.1.2-3.png)
 
@@ -97,7 +97,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 复制同 `git` 终端，选中文本会自动进行复制
 - 粘贴同 `cmd` 终端，单击鼠标右键进行粘贴（需要浏览器打开权限）
 
-7.支持文件管理，打开文件管理模块进行文件的查看、上传与下载
+7.支持文件管理，打开文件管理模块进行文件/文件夹的查看、上传与下载
 
 8.支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
 
@@ -105,7 +105,14 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.1.2：latest
+##### zyyzyykk/kkterminal:3.1.5：latest
+
+- 修复无法通过input框上传文件的bug
+
+- 支持文件夹上传，优化文件批量上传逻辑
+- 新增TCode状态信息，优化TCode显示
+
+##### zyyzyykk/kkterminal:3.1.2：
 
 - 文件编辑器支持常见文件类型的代码高亮与智能提示
 - 新增 [TCode (事务代码)](./TCODE.md)，实现功能模块的快速访问与特定事务流程的执行
@@ -114,10 +121,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 - 连接设置模块新增主机ip复制、密码显示与隐藏等功能
 - 文件管理模块新增大文件上传等提示信息
-
-##### zyyzyykk/kkterminal:3.0.7：
-
-- 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.2.6` 版本，后续不再进行更新
 
 ##### [历史更新记录](./UPDATE.md)
 
