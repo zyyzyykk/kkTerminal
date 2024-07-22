@@ -41,7 +41,7 @@
                   <template v-if="nowTCode && nowTCode.length >= 2 && nowTCode.length <= 6" >
                     <div class="kk-flex" style="margin-bottom: 12px; margin-top: -10px;" >
                       <div @click="toOverview" style="margin-right: 10px; cursor: pointer; font-size: 16px;" ><el-icon><ArrowLeft /></el-icon></div>
-                      <div style="margin-top: 3px;" > {{ nowTCode }} </div>
+                      <div style="margin-top: 3px;" > {{ modifyTag + nowTCode }} </div>
                       <div style="cursor: pointer; margin-left: 10px;" >
                         <el-tooltip :content="TCodeStatusEnum[userTCodes[nowTCode].status]" placement="top">
                           <TcodeStatus :style="{fontSize: '18px'}" :status="userTCodes[nowTCode].status" ></TcodeStatus>
@@ -66,7 +66,7 @@
                       <div style="margin-left: 10px;" ></div>
                     </div>
                     <div style="width: 100%; height: 166px;">
-                      <AceEditor ref="userTcodeEditorRef" ></AceEditor>
+                      <AceEditor ref="userTcodeEditorRef" @handleChange="handleChange" @handleSave="doSaveTCode" ></AceEditor>
                     </div>
                   </template>
                   <template v-else >
@@ -132,10 +132,12 @@ export default {
 
     // 控制Dialog显示
     const DialogVisilble = ref(false);
+    const modifyTag = ref('');
 
     const userTCodes = ref({});
     const nowTCode = ref('');
     const mode = ref(false);
+    // 查看Workflow
     const toWorkflow = (tcode) => {
       nowTCode.value = tcode;
       mode.value = false;
@@ -143,9 +145,11 @@ export default {
         initTcodeEditor(true);
       },1);
     }
+    // 返回
     const toOverview = () => {
       mode.value = false;
       nowTCode.value = '';
+      modifyTag.value = '';
     }
 
     // 编辑器(只读)
@@ -155,6 +159,7 @@ export default {
       userTcodeEditorRef.value.setValue(JSON.parse(decrypt(localStorage.getItem('tcodes')))[nowTCode.value].workflow || '');
       userTcodeEditorRef.value.reset();
       userTcodeEditorRef.value.setReadOnly(mode);
+      modifyTag.value = '';
     }
 
     // 启用编辑
@@ -170,6 +175,7 @@ export default {
 
     // 修改TCode的Workflow
     const doSaveTCode = () => {
+      if(modifyTag.value != '*') return;
       context.emit('handleSaveTCode', nowTCode.value, userTcodeEditorRef.value.getValue());
       doOnlyRead();
       ElMessage({
@@ -177,6 +183,11 @@ export default {
         type: 'success',
         grouping: true,
       });
+      modifyTag.value = '';
+    }
+
+    const handleChange = () => {
+      modifyTag.value = '*';
     }
 
     return {
@@ -194,6 +205,8 @@ export default {
       doModifyTCode,
       doOnlyRead,
       doSaveTCode,
+      handleChange,
+      modifyTag,
     }
   }
 
