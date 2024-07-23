@@ -7,8 +7,8 @@ export const default_env = {
   option:'',
   // 样式相关
   bg:'#0c0c0c',
-  fg:'#f2f2f2',
-  fontFamily: 'Monospace',
+  fg:'#cccccc',
+  fontFamily: 'Consolas',
   fontSize: 16,
   cursorStyle: 'block',
   cursorBlink: true,

@@ -113,7 +113,7 @@ export default {
     const DialogVisilble = ref(false);
 
     // 字体列表
-    const fontFamilyList = ['Monospace','Consolas','Courier','Lucida Console'];
+    const fontFamilyList = ['Consolas','Monospace','Courier','Lucida Console'];
     // 字号列表
     const fontSizeList = [12,14,16,18,20];
     // 光标样式列表
