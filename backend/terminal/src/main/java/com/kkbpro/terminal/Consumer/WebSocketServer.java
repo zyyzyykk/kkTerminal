@@ -30,10 +30,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ServerEndpoint("/socket/ssh/{env}")  // 注意不要以'/'结尾
 public class WebSocketServer {
+
     public static ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
 
     public static ConcurrentHashMap<String, String> fileUploadingMap = new ConcurrentHashMap<>();
-
     public static ConcurrentHashMap<String, SFTPClient> sftpClientMap = new ConcurrentHashMap<>();
 
     private static AppConfig appConfig;
@@ -162,6 +162,8 @@ public class WebSocketServer {
             shellInputStream.close();
         if(shell != null)
             shell.close();
+        if(sftpClientMap.get(sshKey) != null)
+            sftpClientMap.get(sshKey).close();
         if(sshClient != null)
             sshClient.disconnect();
         this.sessionSocket.close();
@@ -182,7 +184,7 @@ public class WebSocketServer {
 
         // 改变虚拟终端大小
         if(MessageInfoTypeRnum.SIZE_CHANGE.getState().equals(messageInfo.getType())) {
-             shell.changeWindowDimensions(messageInfo.getCols(),messageInfo.getRows(),0,0);
+            shell.changeWindowDimensions(messageInfo.getCols(),messageInfo.getRows(),0,0);
         }
 
         // 文本命令

@@ -176,7 +176,7 @@ export default {
           cursor: "help",                                     // 设置光标
         },
         lineHeight: 1.2,
-        fontFamily: env.value.fontFamily,                     // 设置字体为 Monospace
+        fontFamily: env.value.fontFamily,                     // 设置字体为 Consolas
         fontSize: env.value.fontSize,                         // 设置字号为 16
       });
       term.loadAddon(fitAddon);
