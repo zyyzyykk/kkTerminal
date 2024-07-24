@@ -82,6 +82,12 @@
         </dependency>
 
 
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.70</version> <!-- 使用最新的稳定版本 -->
+        </dependency>
+
     </dependencies>
 
     <build>
