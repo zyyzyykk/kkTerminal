@@ -9,7 +9,7 @@ public class BouncyCastleConfig {
 
     @PostConstruct
     public void setup() {
-        // 添加Bouncy Castle作为安全提供程序（适配MacOS开发）
+        // 添加Bouncy Castle作为安全提供程序
         Security.addProvider(new BouncyCastleProvider());
     }
 

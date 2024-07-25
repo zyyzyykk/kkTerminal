@@ -81,11 +81,11 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
-
+        <!--加密与安全-->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.70</version> <!-- 使用最新的稳定版本 -->
+            <version>1.70</version>
         </dependency>
 
     </dependencies>
