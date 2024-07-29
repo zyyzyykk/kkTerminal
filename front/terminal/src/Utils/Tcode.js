@@ -1,9 +1,12 @@
 // 功能TCode, 以 / 开头
 export const FuncTcode = {
-    '/C': {
-        desc: '关闭窗口',
-        execFlow() {
-            window.close();
+    '/A': {
+        desc: '自定义TCode',
+        execFlow(context) {
+            setTimeout(() => {
+                context.proxy.userTcodeRef.initText();
+            },1);
+            context.proxy.userTcodeRef.DialogVisilble = true;
         }
     },
     '/O': {
@@ -11,6 +14,18 @@ export const FuncTcode = {
         execFlow() {
             let _url = window.location.href;
             window.open(_url, '_blank');
+        }
+    },
+    '/C': {
+        desc: '关闭窗口',
+        execFlow() {
+            window.close();
+        }
+    },
+    '/E': {
+        desc: '退出登录',
+        execFlow(context) {
+            if(context.proxy.socket) context.proxy.socket.close(3131);
         }
     },
     '/R': {
@@ -23,21 +38,6 @@ export const FuncTcode = {
         desc: '帮助',
         execFlow(context) {
             context.proxy.helpTcodeRef.DialogVisilble = true;
-        }
-    },
-    '/E': {
-        desc: '退出登录',
-        execFlow(context) {
-            if(context.proxy.socket) context.proxy.socket.close(3131);
-        }
-    },
-    '/A': {
-        desc: '自定义TCode',
-        execFlow(context) {
-            setTimeout(() => {
-                context.proxy.userTcodeRef.initText();
-            },1);
-            context.proxy.userTcodeRef.DialogVisilble = true;
         }
     },
 }
