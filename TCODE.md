@@ -65,7 +65,8 @@ alert('TCode Workflow Over!');
 {
     "UJAR": {
         "desc": "start jar",
-        "workflow": "await kkTerminal.write('cd /root/terminal');\r\nawait kkTerminal.write('lsof -i :3000', 500);\r\nlet resultArr = kkTerminal.getOut();\r\nif(resultArr.length >= 3) {\r\n    let pid = resultArr[2].replace(/\\s+/g, ' ').split(' ')[1];\r\n\tif(pid) await kkTerminal.write('kill -9 ' + pid);\r\n}\r\nlet jar = 'kkTerminal.jar';\r\nawait kkTerminal.write('java -jar ./' + jar + ' > ./out.log &');\r\nalert('TCode Workflow Over!');"
+        "workflow": "await kkTerminal.write('cd /root/terminal');\nawait kkTerminal.write('lsof -i :3000', 500);\nlet resultArr = kkTerminal.getOut();\nif(resultArr.length >= 3) {\n    let pid = resultArr[2].replace(/\\s+/g, ' ').split(' ')[1];\n\tif(pid) await kkTerminal.write('kill -9 ' + pid);\n}\nlet jar = 'kkTerminal.jar';\nawait kkTerminal.write('java -jar ./' + jar + ' > ./out.log &');\nalert('TCode Workflow Over!');",
+        "status": "Not Active"
     }
 }
 ```

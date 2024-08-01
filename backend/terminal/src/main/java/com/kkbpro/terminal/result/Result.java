@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 
 /**
  * 返回结果的信息类
@@ -43,7 +42,7 @@ public class Result {
     }
 
     // 成功返回
-    public static Result setSuccess(Integer code, String info, Map<String,Object> data) {
+    public static Result setSuccess(Integer code, String info, Object data) {
         Result result = new Result();
         result.setStatus("success");
         result.setCode(code);
@@ -59,6 +58,11 @@ public class Result {
         return result;
     }
 
+
+    public static Result setSuccess(String info, Object data) {
+        return Result.setSuccess(200, info, data);
+    }
+
     // 错误返回
     public static Result setError(Integer code,String info)
     {
@@ -72,7 +76,7 @@ public class Result {
     }
 
 
-    public static Result setError(Integer code, String info, Map<String,Object> data) {
+    public static Result setError(Integer code, String info, Object data) {
         Result result = new Result();
         result.setStatus("error");
         result.setCode(code);

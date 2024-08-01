@@ -44,4 +44,10 @@ public class AppConfig {
     private Integer MaxIdleTimeout;
 
 
+    /**
+     * PC端启用窗口
+     */
+    @Value("${kk.pc.window}")
+    private Boolean PcWindowTag = false;
+
 }

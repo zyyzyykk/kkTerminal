@@ -21,7 +21,7 @@ import java.net.URLEncoder;
 import java.util.*;
 
 /**
- * 文件上传下载接口类
+ * 文件管理接口类
  */
 @RestController
 @RequestMapping("/api")
