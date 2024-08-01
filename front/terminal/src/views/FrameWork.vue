@@ -77,9 +77,11 @@ import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import "xterm/css/xterm.css";
 
+import $ from 'jquery';
 import { default_env } from '@/Utils/Env';
 import { ws_base_url } from '@/Utils/BaseUrl';
 import { changeStr } from '@/Utils/StringUtil';
+import { http_base_url } from '@/Utils/BaseUrl';
 
 import ConnectSetting from '@/components/ConnectSetting.vue';
 import StyleSetting from '@/components/StyleSetting.vue';
@@ -113,6 +115,7 @@ export default {
     const fitAddon = new FitAddon();
 
     // 加载环境变量
+    const osInfo = ref({});
     const options = ref({});
     const loadOps = () => {
       if(localStorage.getItem('options')) options.value = JSON.parse(decrypt(localStorage.getItem('options')));
@@ -366,6 +369,18 @@ export default {
           if(socket.value && socket.value.readyState == WebSocket.OPEN) {
             socket.value.send(encrypt(JSON.stringify({type:2,content:"",rows:0,cols:0})));
           }
+          // PC端
+          if(osInfo.value.serverOS != "Linux") {
+            $.ajax({
+              url: http_base_url + '/beat',
+              type:'post',
+              data:{
+                windowId:osInfo.value.windowId,
+              },
+              success() {
+              }
+            });
+          }
         },25000);
       }
     };
@@ -423,6 +438,7 @@ export default {
               return;
             }
           }
+          // 执行Workflow
           try {
             await tcodes.value[transTcode].execFlow(UserTcodeExecutor);
             ElMessage({
@@ -489,22 +505,29 @@ export default {
     }
 
     onMounted(() => {
-      // 连接服务器
-      doSSHConnect();
 
       // 启动终端
       resetTerminal();
 
-      // 监听窗口大小变化事件，自动调整终端大小
-      window.addEventListener('resize', () => {
-        if(fileBlockRef.value) {
-          fileBlockRef.value.isShowMenu = false;
-          fileBlockRef.value.isShowPop = false;
-        }
-        termFit();
+      $.ajax({
+        url: http_base_url + '/init',
+        type:'get',
+        success(resp){
+          osInfo.value = {...resp.data};
+          // 连接服务器
+          doSSHConnect();
+          // 监听窗口大小变化事件，自动调整终端大小
+          window.addEventListener('resize', () => {
+            if(fileBlockRef.value) {
+              fileBlockRef.value.isShowMenu = false;
+              fileBlockRef.value.isShowPop = false;
+            }
+            termFit();
+          });
+          // 心跳
+          doHeartBeat();
+        },
       });
-
-      doHeartBeat();
     });
 
     onUnmounted(() => {
@@ -545,6 +568,7 @@ export default {
       exportTcodes,
       helpTcodeRef,
       handleSaveTCode,
+      osInfo,
     }
 
   }
