@@ -10,9 +10,7 @@ import java.util.Properties;
 
 @SpringBootApplication
 public class TerminalApplication {
-
     private static final Properties properties;
-
     static {
         properties = new Properties();
         InputStream inputStream = TerminalApplication.class.getClassLoader().getResourceAsStream("application.properties");
@@ -23,31 +21,40 @@ public class TerminalApplication {
         }
     }
     public static void main(String[] args) {
+        setServerOS();
         // 打开Web浏览器
         if(Boolean.parseBoolean(properties.getProperty("kk.pc.window")))
             openWebPage();
         SpringApplication.run(TerminalApplication.class, args);
     }
 
-    private static void openWebPage() {
+    private static void setServerOS() {
         // 支持PC端：Windows和Mac
         String os = System.getProperty("os.name").toLowerCase();
+        // e.g. mac os x
+        if (os.contains("mac")) {
+            SystemController.serverOS = "Mac";
+        }
+        // e.g. windows 10
+        else if (os.contains("win")) {
+            SystemController.serverOS = "Windows";
+        }
+        else {
+            SystemController.serverOS = "Linux";
+        }
+    }
+    private static void openWebPage() {
         Runtime runtime = Runtime.getRuntime();
         try {
             // e.g. mac os x
-            if (os.contains("mac")) {
+            if ("Mac".equals(SystemController.serverOS)) {
                 runtime.exec("open " + getUrl());
-                SystemController.serverOS = "Mac";
                 startOnceMonitor();
             }
             // e.g. windows 10
-            else if (os.contains("win")) {
+            else if ("Windows".equals(SystemController.serverOS)) {
                 runtime.exec("rundll32 url.dll,FileProtocolHandler " + getUrl());
-                SystemController.serverOS = "Windows";
                 startOnceMonitor();
-            }
-            else {
-                SystemController.serverOS = "Linux";
             }
         } catch (Exception e) {
             e.printStackTrace();

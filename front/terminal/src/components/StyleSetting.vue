@@ -98,7 +98,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { ArrowDown } from '@element-plus/icons-vue';
 
 export default {
@@ -106,14 +106,22 @@ export default {
   components: {
     ArrowDown,
   },
-  props:['env'],
+  props:['env','os'],
   setup(props,context) {
 
     // 控制Dialog显示
     const DialogVisilble = ref(false);
 
     // 字体列表
-    const fontFamilyList = ['Consolas','Monospace','Courier','Lucida Console'];
+    const fontFamilyList = computed(() => {
+      if(props.os == "Windows") {
+        return ['Courier New','Consolas','Monospace','Lucida Console'];
+      }
+      else if(props.os == "Mac" || props.os == "iOS") {
+        return ['Courier New','Menlo','Monaco','Courier'];
+      }
+      else return ['Courier New','Consolas','Monospace','Lucida Console'];
+    })
     // 字号列表
     const fontSizeList = [12,14,16,18,20];
     // 光标样式列表

@@ -8,7 +8,7 @@ export const default_env = {
   // 样式相关
   bg:'#0c0c0c',
   fg:'#cccccc',
-  fontFamily: 'Consolas',
+  fontFamily: 'Courier New',
   fontSize: 16,
   cursorStyle: 'block',
   cursorBlink: true,

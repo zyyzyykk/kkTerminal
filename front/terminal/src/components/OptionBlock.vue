@@ -30,7 +30,7 @@
         </div>
         <div style="margin-left: 10px;">
           <el-button size="small" type="primary" @click="confirm" >
-            {{ opType ? '保存' : '导入'}}
+            {{ opType ? '保存' : '选择'}}
           </el-button>
         </div>
       </div>

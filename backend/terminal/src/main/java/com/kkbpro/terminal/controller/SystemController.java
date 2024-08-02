@@ -102,8 +102,8 @@ public class SystemController {
      */
     @PostMapping ("/beat")
     public Result beat(String windowId) {
-        if(!"Linux".equals(serverOS) && appConfig.getPcWindowTag())
-            windowActiveMap.put(windowId, new Date().getTime());
+        if(!"Linux".equals(serverOS) && appConfig.getPcWindowTag() && windowId != null)
+            windowActiveMap.replace(windowId, new Date().getTime());
         return Result.setSuccess("窗口心跳续约成功", null);
     }
 
