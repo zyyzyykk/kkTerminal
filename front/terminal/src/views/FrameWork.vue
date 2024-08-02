@@ -57,7 +57,7 @@
   <!-- 连接设置 -->
   <ConnectSetting ref="connectSettingRef" :env="env" :sshOptions="options" @saveOp="saveOp" @callback="saveEnv"></ConnectSetting>
   <!-- 样式设置 -->
-  <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" ></StyleSetting>
+  <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" :os="osInfo.clientOS" ></StyleSetting>
   <!-- 文件管理 -->
   <FileBlock ref="fileBlockRef" :sshKey="sshKey" ></FileBlock>
   <!-- 用户TCode -->
@@ -377,7 +377,7 @@ export default {
               data:{
                 windowId:osInfo.value.windowId,
               },
-              success() {
+              success(){
               }
             });
           }

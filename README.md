@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-07-15
+> 更新时间：2024-08-02
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://img.kkbapps.com/logo/terminal.png" alt="kkterminal logo"></a></p>
@@ -70,7 +70,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 🌐 国内服务器访问：https://ssh.kkbpro.com/
 - 🌍 国外服务器访问：https://ssh.kkbapps.com/
 
-![connect](https://img.kkbapps.com/terminal/315-1.png)
+![connect](https://img.kkbapps.com/terminal/3.1.7-1.png)
 
 ![prefer](https://img.kkbapps.com/terminal/315-2.png)
 
@@ -84,11 +84,11 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 1.kkTerminal是一个web端ssh远程连接服务器的工具，点击左上角的终端图标，选择连接设置进行ssh连接
 
-2.支持在网页中使用 `iframe` 标签引入，可快速集成到第三方网站中
+2.支持在网页中使用 `iframe` 标签引入，可快速集成到第三方网站中；支持本地PC端部署，启动时会自动打开浏览器窗口
 
 3.支持窗口大小自适应，支持中文输入
 
-4.支持自定义偏好设置，可选择终端的背/前景色、字体字号、光标显示样式
+4.支持自定义偏好设置，可选择终端的背/前景色、字体字号、光标显示样式、启用TCode
 
 5.支持重启：当修改ssh连接设置或自定义偏好设置后会自动重启，也可在ssh连接断开后手动进行重启
 
@@ -105,22 +105,23 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.1.5：latest
+##### zyyzyykk/kkterminal:3.1.7：latest
+
+- 适配默认字体、优化TCode状态显示
+
+- 支持本地PC端部署，自动打开浏览器窗口
+
+##### zyyzyykk/kkterminal:3.1.5：
 
 - 修复无法通过input框上传文件的bug
 
-- 支持文件夹上传，优化文件批量上传逻辑
+- 支持文件夹上传、优化文件批量上传逻辑
 - 新增TCode状态信息，优化TCode显示
 
 ##### zyyzyykk/kkterminal:3.1.2：
 
 - 文件编辑器支持常见文件类型的代码高亮与智能提示
 - 新增 [TCode (事务代码)](./TCODE.md)，实现功能模块的快速访问与特定事务流程的执行
-
-##### zyyzyykk/kkterminal:3.0.9：
-
-- 连接设置模块新增主机ip复制、密码显示与隐藏等功能
-- 文件管理模块新增大文件上传等提示信息
 
 ##### [历史更新记录](./UPDATE.md)
 

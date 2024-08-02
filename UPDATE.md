@@ -1,5 +1,10 @@
 ### 👨‍💻 历史更新记录
 
+##### zyyzyykk/kkterminal:3.0.9：
+
+- 连接设置模块新增主机ip复制、密码显示与隐藏等功能
+- 文件管理模块新增大文件上传等提示信息
+
 ##### zyyzyykk/kkterminal:3.0.7：
 
 - 文件图标库 [file-icons-vue](https://github.com/zyyzyykk/file-icons-vue) 更新至 `1.2.6` 版本，后续不再进行更新

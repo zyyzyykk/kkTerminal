@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class OSInfo {
     private String serverOS;
     private String clientOS;
-
     private String windowId;
+
 }

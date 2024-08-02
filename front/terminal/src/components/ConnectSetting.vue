@@ -17,7 +17,7 @@
         <div class="no-select nowrap">配 &nbsp; 置：</div>
         <div class="ellipsis" style="user-select: none;" :class="!(setInfo.option && setInfo.option.length > 0) ? 'new-option': 'old-option'" >{{ !(setInfo.option && setInfo.option.length > 0) ? '新建配置' : setInfo.option }}</div>
         <div style="flex: 1;"></div>
-        <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Upload /></el-icon>导入</el-button></div>
+        <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Switch /></el-icon>切换</el-button></div>
         <div><el-button v-if="isForbidInput == false" size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Finished /></el-icon>保存</el-button></div>
         <div><el-button v-if="isForbidInput == true" size="small" type="primary" @click="newOp" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Edit /></el-icon>新建</el-button></div>
       </div>
@@ -86,7 +86,7 @@ import { ref } from 'vue';
 import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
 import OptionBlock from './OptionBlock';
-import { HomeFilled, Paperclip, User, Lock, DocumentCopy, View, Hide, Edit, Finished, Upload } from '@element-plus/icons-vue';
+import { HomeFilled, Paperclip, User, Lock, DocumentCopy, View, Hide, Edit, Finished, Switch } from '@element-plus/icons-vue';
 
 export default {
   name:'ConnectSetting',
@@ -101,7 +101,7 @@ export default {
     Hide,
     Edit,
     Finished,
-    Upload,
+    Switch,
   },
   props:['env','sshOptions'],
   setup(props,context) {
@@ -163,7 +163,7 @@ export default {
     const isForbidInput = ref(false);
     if(setInfo.value.option != '') isForbidInput.value = true;
     const doOption = (option) => {
-      // 导入
+      // 切换
       if(optionBlockType.value == 0)
       {
         setInfo.value = {...setInfo.value, ...props.sshOptions[option]};
