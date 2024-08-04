@@ -70,7 +70,7 @@ public class TerminalApplication {
     private static void startOnceMonitor() {
         new Thread(() -> {
             try {
-                Thread.sleep(1000 * 6);
+                Thread.sleep(1000 * 18);
                 if(!SystemController.isEnableMonitor()) System.exit(0); // 结束进程
             } catch (InterruptedException e) {
                 e.printStackTrace();

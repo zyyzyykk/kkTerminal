@@ -100,6 +100,8 @@
 import { ref, onUnmounted, onMounted, watch } from 'vue';
 import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/Utils/BaseUrl';
 import { Refresh, Fold, Download, Upload } from '@element-plus/icons-vue';
@@ -111,6 +113,7 @@ import FileAttr from './FileAttr';
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
+import { binary } from 'jszip/lib/defaults';
 
 export default {
   name:'FileBlock',
@@ -143,7 +146,7 @@ export default {
       if(dir.value == '' || dir.value[0] != '/') dir.value = '/' + dir.value;
       if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
       dir.value = dir.value.replace(/\/{2,}/g, '/');
-    }
+    };
 
     // 获取初始目录
     const isShowDirInput = ref(false);
@@ -163,7 +166,7 @@ export default {
           getDirList();
         }
       });
-    }
+    };
     
     // 获取当前路径下的文件列表
     const noDataMsg = ref('暂无文件');
@@ -197,12 +200,12 @@ export default {
           if(now_dir == dir.value) loading.value = false;
         }
       });
-    }
+    };
 
     // 获取文件url
-    const getFileUrl = (name) => {
-      return http_base_url + '/download/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&path=' + dir.value;
-    }
+    const getFileUrl = (name, path) => {
+      return http_base_url + '/download/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&path=' + (path ? path : dir.value);
+    };
 
     // 解析url的path
     const parseUrl = (url) => {
@@ -212,7 +215,7 @@ export default {
       if(indexKey != -1 && indexPath != -1) urlParams.key = url.substring(indexKey + 8, indexPath);
       if(indexPath != -1) urlParams.path = url.substring(indexPath + 6);
       return urlParams;
-    }
+    };
 
     // 下载文件
     const downloadFile = (name) => {
@@ -222,7 +225,121 @@ export default {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+    };
+
+    // 下载文件夹
+    const downloadDir = (name) => {
+      ElMessage({
+        message: '开始下载',
+        type: 'success',
+        grouping: true,
+      });
+      resetZip();
+      const baseDir = dir.value;
+      zipInfo.zipName = name;
+      let zip = new JSZip();
+      // 统计文件数目
+      $.ajax({
+        url: http_base_url + '/find',
+        type:'post',
+        data:{
+          sshKey:props.sshKey,
+          path:baseDir + name,
+        },
+        success(resp){
+          // 统计数目失败
+          if(resp.code != 200) {
+            ElMessage({
+              message: resp.info,
+              type: resp.status,
+              grouping: true,
+            });
+            return;
+          }
+          zipInfo.totalCntDirZip = parseInt(resp.data, 10);
+          $.ajax({
+            url: http_base_url + '/ls',
+            type:'get',
+            data:{
+              sshKey:props.sshKey,
+              path:baseDir + name,
+            },
+            success(resp){
+              let rootFolder = zip.folder(name);
+              zipInfo.nowCntDirZip++;
+              getDirZip(zip,resp.data.files,rootFolder,baseDir + name + '/');
+            },
+          });
+        },
+      });
+    };
+
+    let zipInfo = {
+      totalCntDirZip:0,
+      nowCntDirZip:0,
+      zipName:'',
     }
+    const getDirZip = (zip,items,zipFolder,baseDir) => {
+      for(let i=0;i<items.length;i++) {
+        const item = items[i];
+        // 文件
+        if(item.isDirectory == false) {          
+          $.ajax({
+            url: getFileUrl(item.name,baseDir),
+            method: 'GET',
+            dataType: 'text',
+            dataFilter(resp) {
+              return resp;
+            },
+            success(resp) {
+              zipFolder.file(item.name, resp);
+              zipInfo.nowCntDirZip++;
+              // 下载完成
+              if(zipInfo.totalCntDirZip == zipInfo.nowCntDirZip) generateZip(zip,zipInfo.zipName);
+            },
+            error() {
+              ElMessage({
+                message: '文件下载失败',
+                type: 'error',
+                grouping: true,
+              });
+              resetZip();
+            }
+          });
+        }
+        // 文件夹
+        else {
+          const subFolder = zipFolder.folder(item.name);
+          $.ajax({
+            url: http_base_url + '/ls',
+            type:'get',
+            data:{
+              sshKey:props.sshKey,
+              path:baseDir + item.name,
+            },
+            success(resp){
+              zipInfo.nowCntDirZip++;
+              getDirZip(zip,resp.data.files,subFolder,baseDir + item.name + '/');
+            },
+          });
+        }
+      }
+    };
+
+    // 生成ZIP并下载
+    const generateZip = (zip, name) => {
+      zip.generateAsync({ type: "blob" }).then(function (content) {
+        saveAs(content, name);
+        resetZip();
+      });
+    };
+
+    // 重置ZIP相关
+    const resetZip = () => {
+      zipInfo.totalCntDirZip = 0;
+      zipInfo.nowCntDirZip = 0;
+      zipInfo.zipName = '';
+    };
 
     // 更新目录路径
     const changeDir = (new_dir) => {
@@ -230,7 +347,7 @@ export default {
       dir.value = new_dir;
       aimFileInfo.value = null;
       getDirList();
-    }
+    };
 
     // 更改路径回调
     const dirInputCallback = () => {
@@ -244,7 +361,7 @@ export default {
     const doRefresh = () => {
       isShowDirInput.value = false;
       getDirList();
-    }
+    };
     // 返回上一级
     const doReturn = () => {
       if(isShowDirInput.value == true) return;
@@ -254,12 +371,13 @@ export default {
       if(index != -1) dir.value = dir.value.substring(0,index + 1);
       aimFileInfo.value = null;
       doRefresh();
-    }
-    // 下载文件
+    };
+    // 下载文件/文件夹
     const doDownload = () => {
       if(isShowDirInput.value == true) return;
+      if(aimFileInfo.value && aimFileInfo.value.name && aimFileInfo.value.isDirectory) downloadDir(aimFileInfo.value.name);
       if(aimFileInfo.value && aimFileInfo.value.name && !aimFileInfo.value.isDirectory) downloadFile(aimFileInfo.value.name);
-    }
+    };
     // 上传文件
     const chunkSize = 1024 * 517;   // 每一片大小517kB
     const doUpload = async (fileData, data={}) => {
@@ -372,14 +490,14 @@ export default {
         })
       }
       
-    }
+    };
 
     const doShowDirInput = () => {
       isShowDirInput.value = true;
       setTimeout(() => {
         document.querySelector('#aimDirInput').focus();
       },1);
-    }
+    };
 
     // 控制Dialog显示
     const DialogVisilble = ref(false);
@@ -500,7 +618,7 @@ export default {
           }
        }
       });
-    }
+    };
 
     // 菜单项
     const isShowMenu = ref(false);
@@ -646,13 +764,13 @@ export default {
       isShowMenu.value = false;
       isShowPop.value = false;
       // 目录删除提示
-      if(aimFileInfo.value.isDirectory) {
-        ElMessage({
-          message: "目录删除中",
-          type: "success",
-          grouping: true,
-        });
-      }
+      // if(aimFileInfo.value.isDirectory) {
+      //   ElMessage({
+      //     message: "目录删除中",
+      //     type: "success",
+      //     grouping: true,
+      //   });
+      // }
       $.ajax({
         url: http_base_url + '/rm-rf',
         type:'post',
@@ -745,6 +863,7 @@ export default {
       getInitDir,
       getDirList,
       downloadFile,
+      downloadDir,
       changeDir,
       dirInputCallback,
       noDataMsg,
