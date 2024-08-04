@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -97,6 +95,37 @@ public class FileController {
 
         return Result.setSuccess(200,"文件列表",map);
     }
+
+
+    /**
+     * 统计所有文件/文件夹数目
+     */
+    @PostMapping("/find")
+    public Result find(String sshKey, String path) {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
+        }
+        String num;
+        try(Session session = ssh.startSession()) {
+            String command = "find " + path + " | wc -l";
+            Session.Command cmd = session.exec(command);
+            // 读取命令执行结果
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
+                num = reader.readLine();
+            }
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.setError(500, "统计数目失败", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500, "统计数目失败", null);
+        }
+        return Result.setSuccess(200, "统计数目成功", num);
+    }
+
 
     /**
      * 获取当前路径 pwd (首次有效)
