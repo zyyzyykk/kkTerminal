@@ -117,7 +117,7 @@ public class WebSocketServer {
             try {
                 while ((len = shellInputStream.read(buffer)) != -1) {
                     String shellOut = new String(buffer, 0, len, StandardCharsets.UTF_8);
-                    System.out.println(shellOut);
+//                    System.out.println(shellOut);
                     sendMessage(sessionSocket, shellOut,
                             "success", ResultCodeEnum.OUT_TEXT.getState());
                 }

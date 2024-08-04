@@ -1,9 +1,11 @@
 package com.kkbpro.terminal;
 
 import com.kkbpro.terminal.controller.SystemController;
+import com.kkbpro.terminal.utils.FileUtil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -21,6 +23,10 @@ public class TerminalApplication {
         }
     }
     public static void main(String[] args) {
+        // 清除文件数据残留
+        File data = new File(FileUtil.folderBasePath);
+        if(data.exists()) FileUtil.tmpFloderDelete(data);
+        // 设置服务器OS
         setServerOS();
         // 打开Web浏览器
         if(Boolean.parseBoolean(properties.getProperty("kk.pc.window")))
