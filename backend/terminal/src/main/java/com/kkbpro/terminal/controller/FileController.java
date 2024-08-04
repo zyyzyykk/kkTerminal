@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -26,10 +28,10 @@ import java.util.*;
 public class FileController {
 
     /**
-     * 下载文件
+     * 下载远程文件
      */
-    @GetMapping("/download/{fileName}")
-    public void downloadFile(HttpServletResponse response, String sshKey, String path, @PathVariable String fileName) throws IOException {
+    @GetMapping("/download/remote/{fileName}")
+    public void downloadRemoteFile(HttpServletResponse response, String sshKey, String path, @PathVariable String fileName) throws IOException {
 
         SFTPClient sftpClient = getSftpClient(sshKey);
         String remoteFilePath = path + fileName;
@@ -43,14 +45,40 @@ public class FileController {
         try (RemoteFile file = sftp.open(remoteFilePath)) {
             try (InputStream is = file.new RemoteFileInputStream()) {
                 byte[] buffer = new byte[8096];
-                int bytesRead;
-                while ((bytesRead = is.read(buffer)) != -1) {
+                int len;
+                while ((len = is.read(buffer)) != -1) {
                     // 逐块传输至前端
-                    response.getOutputStream().write(buffer, 0, bytesRead);
+                    response.getOutputStream().write(buffer, 0, len);
                 }
             }
         }
     }
+
+    /**
+     * 下载本地文件
+     */
+    @GetMapping("/download/local/{fileName}")
+    public void downloadLocalFile(HttpServletResponse response, String sshKey, String id, @PathVariable String fileName) throws IOException {
+
+        String folderPath = FileUtil.folderBasePath + "/" + sshKey + "-" + id;
+        File file = new File(folderPath + "/" + fileName);
+        // 文件不存在
+        if(!file.exists()) return;
+
+        // 构建 HTTP 响应，触发文件下载
+        response.setHeader("Content-Type", "application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName,"UTF-8"));
+
+        try(InputStream is = Files.newInputStream(file.toPath())) {
+            byte[] buffer = new byte[8096];
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                // 逐块传输至前端
+                response.getOutputStream().write(buffer, 0, len);
+            }
+        }
+    }
+
 
     /**
      * 获取文件信息列表 ls
@@ -124,6 +152,56 @@ public class FileController {
             return Result.setError(500, "统计数目失败", null);
         }
         return Result.setSuccess(200, "统计数目成功", num);
+    }
+
+
+    /**
+     * 打包压缩文件夹
+     */
+    @PostMapping("/tar")
+    public Result tar(String sshKey, String path, String name) {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
+        }
+        String id = UUID.randomUUID().toString().replace("-", "");
+        try(Session session = ssh.startSession()) {
+
+            // 进入目录并打包
+            String command = "cd " + path + "&& tar -czvf - " + name + " | less";
+            Session.Command cmd = session.exec(command);
+
+            // 创建本地目录
+            String folderPath = FileUtil.folderBasePath + "/" + sshKey + "-" + id;
+            File temporaryFolder = new File(folderPath);
+            File temporaryFile = new File(folderPath + "/" + name + ".tar.gz");
+            // 如果文件夹不存在则创建
+            if (!temporaryFolder.exists()) {
+                temporaryFolder.mkdirs();
+            }
+            // 如果文件存在则删除
+            if (temporaryFile.exists()) {
+                temporaryFile.delete();
+            }
+            try (InputStream tarStream = cmd.getInputStream();
+                 FileOutputStream fos = new FileOutputStream(temporaryFile)) {
+                byte[] buffer = new byte[8192];
+                int len;
+                while ((len = tarStream.read(buffer)) != -1) {
+                    fos.write(buffer, 0, len);
+                }
+            }
+
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.setError(500, "压缩文件夹失败", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500, "压缩文件夹失败", null);
+        }
+        return Result.setSuccess(200, "压缩文件夹成功", id);
     }
 
 

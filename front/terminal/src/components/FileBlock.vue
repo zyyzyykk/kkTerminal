@@ -21,7 +21,8 @@
         <div style="display: flex; align-items: center;">
           <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
           <div class="hover-class" @click="doReturn" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
-          <div class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
+          <div v-if="aimFileInfo" class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
+          <div v-else class="disabled-download" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
           <div class="hover-class" @click="doUpload" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
             <el-upload
               :show-file-list="false"
@@ -74,7 +75,7 @@
     <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(1)" key="1" >刷新</div>
     <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >打开</div>
     <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(3)" key="3" >复制路径</div>
-    <div :class="['kk-menu-item', !(aimFileInfo && aimFileInfo.isDirectory == false) ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >下载</div>
+    <div :class="['kk-menu-item', !(aimFileInfo) ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >下载</div>
     <div class="kk-menu-item" @click="handleMenuSelect(5)" key="5" >新建</div>
     <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >重命名</div>
     <a-popconfirm :open="isShowMenu && isShowPop" :overlayStyle="{zIndex: 3466,marginLeft: '10px'}" placement="rightBottom" ok-text="确定" cancel-text="取消" >
@@ -100,8 +101,6 @@
 import { ref, onUnmounted, onMounted, watch } from 'vue';
 import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
-import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
 import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/Utils/BaseUrl';
 import { Refresh, Fold, Download, Upload } from '@element-plus/icons-vue';
@@ -113,7 +112,6 @@ import FileAttr from './FileAttr';
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
-import { binary } from 'jszip/lib/defaults';
 
 export default {
   name:'FileBlock',
@@ -202,9 +200,13 @@ export default {
       });
     };
 
-    // 获取文件url
-    const getFileUrl = (name, path) => {
-      return http_base_url + '/download/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&path=' + (path ? path : dir.value);
+    // 获取远程文件url
+    const getRemoteFileUrl = (name, path) => {
+      return http_base_url + '/download/remote/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&path=' + (path ? path : dir.value);
+    };
+    // 获取本地文件url
+    const getLocalFileUrl = (name, id) => {
+      return http_base_url + '/download/local/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&id=' + id;
     };
 
     // 解析url的path
@@ -217,11 +219,11 @@ export default {
       return urlParams;
     };
 
-    // 下载文件
-    const downloadFile = (name) => {
+    // 下载远程文件
+    const downloadRemoteFile = (name) => {
       if(isShowDirInput.value == true) return;
       let a = document.createElement('a');
-      a.href = getFileUrl(name);
+      a.href = getRemoteFileUrl(name);
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -230,115 +232,44 @@ export default {
     // 下载文件夹
     const downloadDir = (name) => {
       ElMessage({
-        message: '开始下载',
+        message: '开始打包',
         type: 'success',
         grouping: true,
       });
-      resetZip();
-      const baseDir = dir.value;
-      zipInfo.zipName = name;
-      let zip = new JSZip();
-      // 统计文件数目
+      // 先将文件夹打成tar包
       $.ajax({
-        url: http_base_url + '/find',
+        url: http_base_url + '/tar',
         type:'post',
         data:{
           sshKey:props.sshKey,
-          path:baseDir + name,
+          path:dir.value,
+          name:name,
         },
         success(resp){
-          // 统计数目失败
-          if(resp.code != 200) {
+          if(resp.status == 'success') {
+            // 下载tar包
+            let a = document.createElement('a');
+            a.href = getLocalFileUrl(name + '.tar.gz',resp.data);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          }
+          else {
             ElMessage({
-              message: resp.info,
-              type: resp.status,
+              message: '打包失败',
+              type: 'error',
               grouping: true,
             });
-            return;
           }
-          zipInfo.totalCntDirZip = parseInt(resp.data, 10);
-          $.ajax({
-            url: http_base_url + '/ls',
-            type:'get',
-            data:{
-              sshKey:props.sshKey,
-              path:baseDir + name,
-            },
-            success(resp){
-              let rootFolder = zip.folder(name);
-              zipInfo.nowCntDirZip++;
-              getDirZip(zip,resp.data.files,rootFolder,baseDir + name + '/');
-            },
+        },
+        error() {
+          ElMessage({
+            message: '打包失败',
+            type: 'error',
+            grouping: true,
           });
         },
       });
-    };
-
-    let zipInfo = {
-      totalCntDirZip:0,
-      nowCntDirZip:0,
-      zipName:'',
-    }
-    const getDirZip = (zip,items,zipFolder,baseDir) => {
-      for(let i=0;i<items.length;i++) {
-        const item = items[i];
-        // 文件
-        if(item.isDirectory == false) {          
-          $.ajax({
-            url: getFileUrl(item.name,baseDir),
-            method: 'GET',
-            dataType: 'text',
-            dataFilter(resp) {
-              return resp;
-            },
-            success(resp) {
-              zipFolder.file(item.name, resp);
-              zipInfo.nowCntDirZip++;
-              // 下载完成
-              if(zipInfo.totalCntDirZip == zipInfo.nowCntDirZip) generateZip(zip,zipInfo.zipName);
-            },
-            error() {
-              ElMessage({
-                message: '文件下载失败',
-                type: 'error',
-                grouping: true,
-              });
-              resetZip();
-            }
-          });
-        }
-        // 文件夹
-        else {
-          const subFolder = zipFolder.folder(item.name);
-          $.ajax({
-            url: http_base_url + '/ls',
-            type:'get',
-            data:{
-              sshKey:props.sshKey,
-              path:baseDir + item.name,
-            },
-            success(resp){
-              zipInfo.nowCntDirZip++;
-              getDirZip(zip,resp.data.files,subFolder,baseDir + item.name + '/');
-            },
-          });
-        }
-      }
-    };
-
-    // 生成ZIP并下载
-    const generateZip = (zip, name) => {
-      zip.generateAsync({ type: "blob" }).then(function (content) {
-        saveAs(content, name);
-        resetZip();
-      });
-    };
-
-    // 重置ZIP相关
-    const resetZip = () => {
-      zipInfo.totalCntDirZip = 0;
-      zipInfo.nowCntDirZip = 0;
-      zipInfo.zipName = '';
     };
 
     // 更新目录路径
@@ -376,7 +307,7 @@ export default {
     const doDownload = () => {
       if(isShowDirInput.value == true) return;
       if(aimFileInfo.value && aimFileInfo.value.name && aimFileInfo.value.isDirectory) downloadDir(aimFileInfo.value.name);
-      if(aimFileInfo.value && aimFileInfo.value.name && !aimFileInfo.value.isDirectory) downloadFile(aimFileInfo.value.name);
+      if(aimFileInfo.value && aimFileInfo.value.name && !aimFileInfo.value.isDirectory) downloadRemoteFile(aimFileInfo.value.name);
     };
     // 上传文件
     const chunkSize = 1024 * 517;   // 每一片大小517kB
@@ -517,7 +448,7 @@ export default {
     const txtPreviewRef = ref();
     const preViewFile = (name) => {
       txtPreviewRef.value.fileName = name;
-      txtPreviewRef.value.fileUrl = getFileUrl(name);
+      txtPreviewRef.value.fileUrl = getRemoteFileUrl(name);
       txtPreviewRef.value.loading = true;
       txtPreviewRef.value.initText();
       txtPreviewRef.value.DialogVisilble = true;
@@ -564,7 +495,7 @@ export default {
               path: nowPath,
             },
             success(resp){
-              if(resp.code == 200) {
+              if(resp.status == 'success') {
                 getDirList();
                 folderUpload(item, nowPath + '/');
               }
@@ -660,7 +591,7 @@ export default {
           break;
         // 下载
         case 4:
-          if(aimFileInfo.value && aimFileInfo.value.isDirectory == false) doDownload();
+          if(aimFileInfo.value) doDownload();
           break;
         // 新建
         case 5:
@@ -862,7 +793,7 @@ export default {
       files,
       getInitDir,
       getDirList,
-      downloadFile,
+      downloadRemoteFile,
       downloadDir,
       changeDir,
       dirInputCallback,
@@ -895,6 +826,7 @@ export default {
       doRename,
       fileAttrRef,
       folderUpload,
+      getLocalFileUrl,
 
     }
   }
@@ -986,5 +918,11 @@ export default {
   color: #a8abb2;
   pointer-events: none;
 }
+
+.disabled-download {
+  color: #a8abb2;
+  pointer-events: none;
+}
+
 
 </style>
