@@ -20,10 +20,11 @@
         </div>
         <div style="display: flex; align-items: center;">
           <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
-          <div class="hover-class" @click="doReturn" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
+          <div v-if="dir && dir != '/'" class="hover-class" @click="doReturn" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
+          <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
           <div v-if="aimFileInfo" class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
-          <div v-else class="disabled-download" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
-          <div class="hover-class" @click="doUpload" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
+          <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
+          <div v-if="dirStatus == 0" class="hover-class" @click="doUpload" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
             <el-upload
               :show-file-list="false"
               :with-credentials="true"
@@ -33,10 +34,13 @@
               <el-icon><Upload /></el-icon>
             </el-upload>
           </div>
+          <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
         </div>
       </div>
       <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select" 
-         @contextmenu="handleContextMenu" @dragover="preventDefault" @drop="handleFileDrag" @scroll="handleScroll" >
+         @contextmenu="handleContextMenu" @scroll="handleScroll" 
+         @dragover="preventDefault" @drop="handleFileDrag" 
+         @keydown="handleShortcutKeys" >
           <div v-if="files.length != 0" >
               <div v-for="item in files" :key="item.id" >
                 <template v-if="item.isDirectory == true">
@@ -76,7 +80,7 @@
     <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >打开</div>
     <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(3)" key="3" >复制路径</div>
     <div :class="['kk-menu-item', !(aimFileInfo) ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >下载</div>
-    <div class="kk-menu-item" @click="handleMenuSelect(5)" key="5" >新建</div>
+    <div :class="['kk-menu-item', dirStatus == 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >新建</div>
     <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >重命名</div>
     <a-popconfirm :open="isShowMenu && isShowPop" :overlayStyle="{zIndex: 3466,marginLeft: '10px'}" placement="rightBottom" ok-text="确定" cancel-text="取消" >
       <template #title>
@@ -168,6 +172,8 @@ export default {
     
     // 获取当前路径下的文件列表
     const noDataMsg = ref('暂无文件');
+    // 目录状态：0 正常 / 1 目录不存在
+    const dirStatus = ref(0);
     const getDirList = () => {
       let now_dir = dir.value;
       $.ajax({
@@ -187,10 +193,12 @@ export default {
             if(resp.status == 'success') {
               files.value = resp.data.files;
               noDataMsg.value = '暂无文件';
+              dirStatus.value = 0;
             }
             else {
               files.value = [];
               noDataMsg.value = resp.info;
+              dirStatus.value = 1;
             }
           }
         },
@@ -247,6 +255,11 @@ export default {
         },
         success(resp){
           if(resp.status == 'success') {
+            ElMessage({
+              message: '开始下载',
+              type: 'success',
+              grouping: true,
+            });
             // 下载tar包
             let a = document.createElement('a');
             a.href = getLocalFileUrl(name + '.tar.gz',resp.data);
@@ -534,7 +547,7 @@ export default {
                 path: nowPath,
               },
               success(resp){
-                if(resp.code == 200) {
+                if(resp.status == 'success') {
                   folderUpload(item, nowPath + '/');
                 }
                 else {
@@ -580,7 +593,8 @@ export default {
             });
           }
           else {
-            await toClipboard(dir.value);
+            const path = dir.value + (aimFileInfo.value ? aimFileInfo.value.name : '');
+            await toClipboard(path);
             ElMessage({
               message: '复制成功',
               type: 'success',
@@ -730,7 +744,7 @@ export default {
           if(files.value[i].name == name && dir.value == nowDir) {
             ElMessage({
               message: '存在同名文件或目录',
-              type: 'error',
+              type: 'warning',
               grouping: true,
             });
             return;
@@ -767,6 +781,35 @@ export default {
       if(mkFileRef.value) mkFileRef.value.reset();
     });
 
+    // 文件快捷键操作
+    const fileClipboard = ref({
+      path:'/',
+      files:{},
+    });
+    const handleShortcutKeys = (event) => {
+      event.preventDefault();
+      if (event.ctrlKey || event.metaKey) {
+        switch (String.fromCharCode(event.which).toLowerCase()) {
+          // 全选
+          case 'a':
+            
+            break;
+          // 复制
+          case 'c':
+            
+            break;
+          // 粘贴
+          case 'v':
+            
+            break;
+          // 剪切
+          case 'x':
+            
+            break;
+        }
+      }
+    }
+
     onMounted(() => {
       document.addEventListener('mousedown', (event) => {
         if (menuBlockRef.value && menuBlockRef.value.contains(event.target)) return;
@@ -782,6 +825,7 @@ export default {
         fileAreaRef.value.removeEventListener('dragover', preventDefault);
         fileAreaRef.value.removeEventListener('drop', handleFileDrag);
         fileAreaRef.value.removeEventListener('scroll', handleScroll);
+        fileAreaRef.value.removeEventListener('keydown', handleShortcutKeys);
       }
     });
 
@@ -826,8 +870,9 @@ export default {
       doRename,
       fileAttrRef,
       folderUpload,
-      getLocalFileUrl,
-
+      dirStatus,
+      handleShortcutKeys,
+      fileClipboard,
     }
   }
 
@@ -919,7 +964,7 @@ export default {
   pointer-events: none;
 }
 
-.disabled-download {
+.disabled-function {
   color: #a8abb2;
   pointer-events: none;
 }
