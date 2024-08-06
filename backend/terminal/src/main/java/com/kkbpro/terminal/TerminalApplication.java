@@ -26,6 +26,7 @@ public class TerminalApplication {
         // 清除文件数据残留
         File data = new File(FileUtil.folderBasePath);
         if(data.exists()) FileUtil.tmpFloderDelete(data);
+        data.mkdirs();
         // 设置服务器OS
         setServerOS();
         // 打开Web浏览器
