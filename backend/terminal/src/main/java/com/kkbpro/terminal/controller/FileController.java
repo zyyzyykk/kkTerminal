@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -94,8 +93,10 @@ public class FileController {
         try {
             SFTPClient sftp = getSftpClient(sshKey);
             List<RemoteResourceInfo> files = sftp.ls(path);
+            int index = 0;
             for(RemoteResourceInfo file : files) {
                 FileInfo fileInfo = new FileInfo();
+                fileInfo.setIndex(index++);
                 fileInfo.setId(UUID.randomUUID().toString());
                 fileInfo.setName(file.getName());
 
@@ -169,7 +170,7 @@ public class FileController {
         try(Session session = ssh.startSession()) {
 
             // 进入目录并打包
-            String command = "cd " + path + "&& tar -czvf - " + name + " | less";
+            String command = "cd " + path + " && tar -czvf - " + name + " | less";
             Session.Command cmd = session.exec(command);
 
             // 创建本地目录
@@ -257,17 +258,17 @@ public class FileController {
 
 
     /**
-     * rm -rf 快速删除
+     * rm -rf 快速批量删除
      */
     @PostMapping("/rm-rf")
-    public Result rmRf(String sshKey, String path) {
+    public Result rmRf(String sshKey, String path, String items) {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
         }
         try(Session session = ssh.startSession()) {
-            String command = "rm -rf " + path;
+            String command = "cd " + path + " && rm -rf " + items;
             Session.Command cmd = session.exec(command);
             // 等待命令执行完毕
             cmd.join();
@@ -278,6 +279,55 @@ public class FileController {
             return Result.setError(500, "删除失败", null);
         }
         return Result.setSuccess(200, "删除成功", null);
+    }
+
+    /**
+     * cp 批量复制
+     */
+    @PostMapping("/cp")
+    public Result cp(String sshKey, String src, String dst, String items) {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
+        }
+        try(Session session = ssh.startSession()) {
+            String command = "cd " + src + " && cp -n " + items + " " + dst;
+            Session.Command cmd = session.exec(command);
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.setError(500, "复制失败", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500, "复制失败", null);
+        }
+        return Result.setSuccess(200, "复制成功", null);
+    }
+
+
+    /**
+     * mv 批量移动
+     */
+    @PostMapping("/mv")
+    public Result mv(String sshKey, String src, String dst, String items) {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
+        }
+        try(Session session = ssh.startSession()) {
+            String command = "cd " + src + " && mv -n " + items + " " + dst;
+            Session.Command cmd = session.exec(command);
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.setError(500, "移动失败", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500, "移动失败", null);
+        }
+        return Result.setSuccess(200, "移动成功", null);
     }
 
 

@@ -22,7 +22,7 @@
           <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
           <div v-if="dir && dir != '/'" class="hover-class" @click="doReturn" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
           <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
-          <div v-if="aimFileInfo" class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
+          <div v-if="selectedFiles.length == 1" class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
           <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
           <div v-if="dirStatus == 0" class="hover-class" @click="doUpload" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
             <el-upload
@@ -40,12 +40,12 @@
       <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select" 
          @contextmenu="handleContextMenu" @scroll="handleScroll" 
          @dragover="preventDefault" @drop="handleFileDrag" 
-         @keydown="handleShortcutKeys" >
+         tabindex="0" @keydown="handleShortcutKeys" >
           <div v-if="files.length != 0" >
               <div v-for="item in files" :key="item.id" >
                 <template v-if="item.isDirectory == true">
-                  <div :class="['item-class', (aimFileInfo && item.id == aimFileInfo.id) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="aimFileInfo = item" >
-                    <FileIcons :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
+                  <div :class="['item-class', isSelected(item.id) != -1 ? 'item-selected' : '']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
+                    <FileIcons :style="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
                     <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                       <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
                     </div>
@@ -53,8 +53,8 @@
                   </div>
                 </template>
                 <template v-else>
-                  <div :class="['item-class', (aimFileInfo && item.id == aimFileInfo.id) ? 'item-selected' : '']" @click="aimFileInfo = item" @dblclick="preViewFile(item.name)" @contextmenu="aimFileInfo = item" >
-                    <FileIcons :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
+                  <div :class="['item-class', isSelected(item.id) != -1 ? 'item-selected' : '']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
+                    <FileIcons :style="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
                     <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                       <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
                     </div>
@@ -64,7 +64,7 @@
               </div>
           </div>
           <div v-else>
-            <NoData @contextmenu="aimFileInfo = null" v-if="loading == false" :msg="noDataMsg"></NoData>
+            <NoData @contextmenu="selectedFiles = []" v-if="loading == false" :msg="noDataMsg"></NoData>
           </div>
       </div>
     </div>
@@ -77,11 +77,11 @@
 
   <div ref="menuBlockRef" @contextmenu="preventDefault" v-show="isShowMenu" class="kk-menu no-select">
     <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(1)" key="1" >刷新</div>
-    <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >打开</div>
-    <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(3)" key="3" >复制路径</div>
-    <div :class="['kk-menu-item', !(aimFileInfo) ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >下载</div>
+    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >打开</div>
+    <div style="border-bottom: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length > 1 ? 'disabled':'']" @click="handleMenuSelect(3)" key="3" >复制路径</div>
+    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >下载</div>
     <div :class="['kk-menu-item', dirStatus == 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >新建</div>
-    <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >重命名</div>
+    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >重命名</div>
     <a-popconfirm :open="isShowMenu && isShowPop" :overlayStyle="{zIndex: 3466,marginLeft: '10px'}" placement="rightBottom" ok-text="确定" cancel-text="取消" >
       <template #title>
         <div class="no-select" style="font-size: 13px; margin-top: 4px;" >确定删除此文件/文件夹吗?</div>
@@ -92,11 +92,11 @@
       <template #cancelButton>
         <el-button size="small" text >取消</el-button>
       </template>
-      <div :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" key="7" >
+      <div :class="['kk-menu-item', selectedFiles.length == 0 ? 'disabled':'']" key="7" >
         <div @click="handleMenuSelect(7)" >删除</div>
       </div>
     </a-popconfirm>
-    <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', aimFileInfo == null ? 'disabled':'']" @click="handleMenuSelect(8)" key="8" >属性</div>
+    <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(8)" key="8" >属性</div>
   </div>
 
 </template>
@@ -139,8 +139,58 @@ export default {
     // 拷贝
     const { toClipboard } = useClipboard();
 
-    const aimFileInfo = ref(null);
     const files = ref([]);
+    const selectedFiles = ref([]);
+    let lastSelectedIndex = -1;
+    const addSelectFile = (event, item, click=true) => {
+      event.preventDefault();
+      const index = isSelected(item.id);
+      // 右键
+      if(!click) {
+        if(index == -1) {
+          lastSelectedIndex = item.index;
+          selectedFiles.value = [];
+          selectedFiles.value.push(item);
+        }
+        return;
+      }
+      // 单击
+      // shift
+      if(event.shiftKey) {
+        if(selectedFiles.value.length == 0 || lastSelectedIndex == -1 || lastSelectedIndex >= files.value.length) {
+          for(let i=0;i<=item.index;i++) selectedFiles.value.push({...files.value[i]});
+        }
+        else {
+          selectedFiles.value = [];
+          const start = Math.min(item.index,lastSelectedIndex);
+          const end = Math.max(item.index,lastSelectedIndex);
+          for(let i=start;i<=end;i++) selectedFiles.value.push({...files.value[i]});
+        }
+      }
+      // ctrl
+      else if(event.ctrlKey) {
+        lastSelectedIndex = item.index;
+        if(index != -1) selectedFiles.value.splice(index, 1);
+        else selectedFiles.value.push(item);
+      }
+      else {
+        lastSelectedIndex = item.index;
+        selectedFiles.value = [];
+        selectedFiles.value.push(item);
+      }
+    };
+    const isSelected = (id) => {
+      for(let i=0;i<selectedFiles.value.length;i++) {
+        if(id == selectedFiles.value[i].id) return i;
+      }
+      return -1;
+    };
+    const isClipboard = (id) => {
+      for(let i=0;i<fileClipboard.value.files.length;i++) {
+        if(id == fileClipboard.value.files[i].id) return i;
+      }
+      return -1;
+    };
 
     const dir = ref('');
     // 保证路径正确
@@ -163,7 +213,7 @@ export default {
         success(resp){
           dir.value = resp.data.path;
           confirmDirCorrect();
-          aimFileInfo.value = null;
+          selectedFiles.value = [];
           files.value = [];
           getDirList();
         }
@@ -189,7 +239,7 @@ export default {
         },
         success(resp){
           if(now_dir == dir.value) {
-            aimFileInfo.value = null;
+            selectedFiles.value = [];
             if(resp.status == 'success') {
               files.value = resp.data.files;
               noDataMsg.value = '暂无文件';
@@ -289,7 +339,7 @@ export default {
     const changeDir = (new_dir) => {
       if(isShowDirInput.value == true) return;
       dir.value = new_dir;
-      aimFileInfo.value = null;
+      selectedFiles.value = [];
       getDirList();
     };
 
@@ -297,7 +347,7 @@ export default {
     const dirInputCallback = () => {
       isShowDirInput.value = false;
       confirmDirCorrect();
-      aimFileInfo.value = null;
+      selectedFiles.value = [];
       getDirList();
     };
 
@@ -313,14 +363,14 @@ export default {
       if(dir.value[dir.value.length - 1] == '/') dir.value = dir.value.substring(0,dir.value.length - 1);
       let index = dir.value.lastIndexOf('/');
       if(index != -1) dir.value = dir.value.substring(0,index + 1);
-      aimFileInfo.value = null;
+      selectedFiles.value = [];
       doRefresh();
     };
     // 下载文件/文件夹
     const doDownload = () => {
       if(isShowDirInput.value == true) return;
-      if(aimFileInfo.value && aimFileInfo.value.name && aimFileInfo.value.isDirectory) downloadDir(aimFileInfo.value.name);
-      if(aimFileInfo.value && aimFileInfo.value.name && !aimFileInfo.value.isDirectory) downloadRemoteFile(aimFileInfo.value.name);
+      if(selectedFiles.value.length == 1 && selectedFiles.value[0].name && selectedFiles.value[0].isDirectory) downloadDir(selectedFiles.value[0].name);
+      if(selectedFiles.value.length == 1 && selectedFiles.value[0].name && !selectedFiles.value[0].isDirectory) downloadRemoteFile(selectedFiles.value[0].name);
     };
     // 上传文件
     const chunkSize = 1024 * 517;   // 每一片大小517kB
@@ -448,8 +498,8 @@ export default {
 
     // 关闭
     const closeDialog = (done) => {
-      aimFileInfo.value = null;
-      renameFile.value = null;
+      selectedFiles.value = [];
+      renameFile.value = {};
       txtPreviewRef.value.DialogVisilble = false;
       mkFileRef.value.DialogVisilble = false;
       mkFileRef.value.reset();
@@ -568,7 +618,7 @@ export default {
     const isShowMenu = ref(false);
     const isShowPop = ref(false);
     const isShowRenameInput = ref(false);
-    const renameFile = ref(null);
+    const renameFile = ref({});
     const fileAttrRef = ref();
     // 菜单选择
     const handleMenuSelect = async (type) => {
@@ -579,8 +629,8 @@ export default {
           break;
         // 打开
         case 2:
-          if(aimFileInfo.value && aimFileInfo.value.isDirectory == true) changeDir(dir.value + aimFileInfo.value.name + '/');
-          else if(aimFileInfo.value && aimFileInfo.value.isDirectory == false) preViewFile(aimFileInfo.value.name);
+          if(selectedFiles.value.length == 1 && selectedFiles.value[0].isDirectory == true) changeDir(dir.value + selectedFiles.value[0].name + '/');
+          else if(selectedFiles.value.length == 1 && selectedFiles.value[0].isDirectory == false) preViewFile(selectedFiles.value[0].name);
           break;
         // 复制路径
         case 3:
@@ -593,7 +643,7 @@ export default {
             });
           }
           else {
-            const path = dir.value + (aimFileInfo.value ? aimFileInfo.value.name : '');
+            const path = dir.value + (selectedFiles.value.length == 1 ? selectedFiles.value[0].name : '');
             await toClipboard(path);
             ElMessage({
               message: '复制成功',
@@ -605,7 +655,7 @@ export default {
           break;
         // 下载
         case 4:
-          if(aimFileInfo.value) doDownload();
+          if(selectedFiles.value.length == 1) doDownload();
           break;
         // 新建
         case 5:
@@ -614,11 +664,13 @@ export default {
           break;
         // 重命名
         case 6:
-          renameFile.value = {...aimFileInfo.value};
-          isShowRenameInput.value = true;
-          setTimeout(() => {
-            document.querySelector('#rename').focus();
-          },1);
+          if(selectedFiles.value.length == 1) {
+            renameFile.value = {...selectedFiles.value[0]};
+            isShowRenameInput.value = true;
+            setTimeout(() => {
+              document.querySelector('#rename').focus();
+            },1);
+          }
           break;
         // 删除
         case 7:
@@ -626,10 +678,12 @@ export default {
           break;
         // 属性
         case 8:
-          fileAttrRef.value.fileInfo = {...aimFileInfo.value};
-          fileAttrRef.value.fileDir = dir.value;
-          fileAttrRef.value.rename = aimFileInfo.value.name;
-          fileAttrRef.value.DialogVisilble = true;
+          if(selectedFiles.value.length == 1) {
+            fileAttrRef.value.fileInfo = {...selectedFiles.value[0]};
+            fileAttrRef.value.fileDir = dir.value;
+            fileAttrRef.value.rename = selectedFiles.value[0].name;
+            fileAttrRef.value.DialogVisilble = true;
+          }
           break;
         default:
           break;
@@ -647,7 +701,7 @@ export default {
     // 右键显示
     const handleContextMenu = (event) => {
       // 点击空白处
-      if(event.target.id == 'fileArea') aimFileInfo.value = null;
+      if(event.target.id == 'fileArea') selectedFiles.value = [];
       menuBlockRef.value.style.top = event.clientY - 135 + 'px';
       menuBlockRef.value.style.left = event.clientX + 1 + 'px';
       isShowMenu.value = true;
@@ -659,7 +713,7 @@ export default {
       isShowRenameInput.value = false;
       // 校验
       if(item.name == renameFile.value.name) {
-        renameFile.value = null;
+        renameFile.value = {};
         return;
       }
       if(!(renameFile.value.name && renameFile.value.name.trim().length > 0)) {
@@ -668,7 +722,7 @@ export default {
           type: "warning",
           grouping: true,
         })
-        renameFile.value = null;
+        renameFile.value = {};
         return;
       }
       if(renameFile.value.name.indexOf('/') != -1) {
@@ -677,12 +731,12 @@ export default {
           type: "warning",
           grouping: true,
         });
-        renameFile.value = null;
+        renameFile.value = {};
         return;
       }
       let oldPath = dir.value + item.name;
       let newPath = dir.value + renameFile.value.name;
-      renameFile.value = null;
+      renameFile.value = {};
       doRename(oldPath,newPath);
     };
     const doRename = (oldPath,newPath) => {
@@ -704,25 +758,18 @@ export default {
         }
       });
     }
-    // 删除文件
+    // 批量删除文件/文件夹
     const handlePopConfirm = () => {
       isShowMenu.value = false;
       isShowPop.value = false;
-      // 目录删除提示
-      // if(aimFileInfo.value.isDirectory) {
-      //   ElMessage({
-      //     message: "目录删除中",
-      //     type: "success",
-      //     grouping: true,
-      //   });
-      // }
+      if(selectedFiles.value.length == 0) return;
       $.ajax({
         url: http_base_url + '/rm-rf',
         type:'post',
         data:{
           sshKey:props.sshKey,
-          isDirectory:aimFileInfo.value.isDirectory,
-          path:dir.value + aimFileInfo.value.name,
+          path:dir.value,
+          items: selectedFiles.value.map(e => e.name).join(' '),
         },
         success(resp){
           ElMessage({
@@ -784,36 +831,83 @@ export default {
     // 文件快捷键操作
     const fileClipboard = ref({
       path:'/',
-      files:{},
+      files:[],
     });
+    const isCtrlx = ref(false);
     const handleShortcutKeys = (event) => {
+      const renameDom = document.querySelector('#rename');
+      if(renameDom && renameDom.contains(event.target)) return;
       event.preventDefault();
       if (event.ctrlKey || event.metaKey) {
         switch (String.fromCharCode(event.which).toLowerCase()) {
           // 全选
           case 'a':
-            
+            selectedFiles.value = [];
+            for(let i=0;i<files.value.length;i++) selectedFiles.value.push({...files.value[i]});
             break;
           // 复制
           case 'c':
-            
+            if(selectedFiles.value.length > 0) {
+              fileClipboard.value.path = dir.value;
+              fileClipboard.value.files = selectedFiles.value.slice(0);
+              isCtrlx.value = false;
+            }
             break;
           // 粘贴
           case 'v':
-            
+            if(fileClipboard.value.files.length == 0) return;
+            fileCopyMove(isCtrlx.value ? 'mv' : 'cp');
+            if(isCtrlx.value) {
+              isCtrlx.value = false;
+              fileClipboard.value = {
+                path:'/',
+                files:[],
+              };
+            }
             break;
           // 剪切
           case 'x':
-            
+            fileClipboard.value.path = dir.value;
+            fileClipboard.value.files = selectedFiles.value.slice(0);
+            isCtrlx.value = true;
             break;
         }
       }
-    }
+    };
+
+    // 文件复制/剪切
+    const fileCopyMove = (mode) => {
+      if(fileClipboard.value.path == dir.value) return;
+      $.ajax({
+        url: http_base_url + '/' + mode,
+        type:'post',
+        data:{
+          sshKey:props.sshKey,
+          src:fileClipboard.value.path,
+          dst:dir.value,
+          items: fileClipboard.value.files.map(e => e.name).join(' '),
+        },
+        success(resp){
+          if(resp.status == 'success') getDirList();
+          else {
+            ElMessage({
+              message: resp.info,
+              type: resp.status,
+              grouping: true,
+            });
+          }
+        }
+      });
+    };
 
     onMounted(() => {
       document.addEventListener('mousedown', (event) => {
+        if(fileAreaRef.value && fileAreaRef.value.contains(event.target)) {
+          fileAreaRef.value.tabindex = '0';
+          fileAreaRef.value.focus();
+        }
         if (menuBlockRef.value && menuBlockRef.value.contains(event.target)) return;
-        let sureDelFileBtn = document.querySelector('#sureDelFileBtn');
+        const sureDelFileBtn = document.querySelector('#sureDelFileBtn');
         if (sureDelFileBtn && sureDelFileBtn.contains(event.target)) return;
         isShowMenu.value = false;
         isShowPop.value = false;
@@ -846,7 +940,7 @@ export default {
       doReturn,
       doDownload,
       doUpload,
-      aimFileInfo,
+      selectedFiles,
       loading,
       txtPreviewRef,
       preViewFile,
@@ -873,6 +967,11 @@ export default {
       dirStatus,
       handleShortcutKeys,
       fileClipboard,
+      addSelectFile,
+      isSelected,
+      isClipboard,
+      isCtrlx,
+      fileCopyMove,
     }
   }
 
