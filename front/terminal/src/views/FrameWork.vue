@@ -393,8 +393,13 @@ export default {
       fileBlockRef.value.fileAttrRef.DialogVisilble = false;
       fileBlockRef.value.DialogVisilble = false;
       fileBlockRef.value.dir = '';
-      fileBlockRef.value.aimFileInfo = null;
+      fileBlockRef.value.selectedFiles = [];
       fileBlockRef.value.renameFile = null;
+      fileBlockRef.value.fileClipboard = {
+        path:'/',
+        files:[],
+      };
+      fileBlockRef.value.isCtrlx = false;
     };
 
     const setTcodeStatus = (transTcode, state) => {

@@ -100,6 +100,12 @@ export const UserTcodeExecutor = {
     write(content, time = 200) {
         return this.writeAndWait(content, time);
     },
+    read() {
+        return filter(this.outArray.slice(this.cnt));
+    },
+    readAll() {
+        return filter(this.outArray.slice(0));
+    },
     getAllOut() {
         return filter(this.outArray.slice(0));
     },
@@ -113,7 +119,7 @@ export const UserTcodeExecutor = {
     // 显示
     show() {
         this.display = true;
-    }
+    },
 }
 
 // 处理过滤输出
