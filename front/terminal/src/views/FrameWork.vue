@@ -22,7 +22,8 @@
             id="kkterminalTcode"
             ref="tCodeInputRef"
             :style="{ width: '100px', height: '20px', fontSize: '12px'}"
-            @change="handleTcode"
+            @keydown.enter="handleTcode"
+            maxlength="6"
           >
           </el-input>
         </div>
@@ -462,6 +463,13 @@ export default {
           } finally {
             userTcodeExecutorReset();
           }
+        }
+        else {
+          ElMessage({
+            message: 'Another TCode is executing',
+            type: 'warning',
+            grouping: true,
+          });
         }
       }
     }
