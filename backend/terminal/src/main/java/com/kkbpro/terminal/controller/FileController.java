@@ -29,7 +29,7 @@ public class FileController {
     /**
      * 下载远程文件
      */
-    @GetMapping("/download/remote/{fileName}")
+    @GetMapping("/download/remote/file/{fileName}")
     public void downloadRemoteFile(HttpServletResponse response, String sshKey, String path, @PathVariable String fileName) throws IOException {
 
         SFTPClient sftpClient = getSftpClient(sshKey);
@@ -53,8 +53,40 @@ public class FileController {
         }
     }
 
+
+    /**
+     * 下载远程文件夹
+     */
+    @GetMapping("/download/remote/folder/{folderName}")
+    public void downloadRemoteFolder(HttpServletResponse response, String sshKey, String path, @PathVariable String folderName) throws IOException {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) return;
+        // 构建 HTTP 响应，触发文件下载
+        response.setHeader("Content-Type", "application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(folderName + ".tar.gz","UTF-8"));
+        try(Session session = ssh.startSession()) {
+            // 进入目录并打包
+            String command = "cd " + path + " && tar -czvf - " + folderName + " | less";
+            Session.Command cmd = session.exec(command);
+            try (InputStream tarStream = cmd.getInputStream()) {
+                byte[] buffer = new byte[8192];
+                int len;
+                while ((len = tarStream.read(buffer)) != -1) {
+                    response.getOutputStream().write(buffer, 0, len);
+                }
+            }
+            // 等待命令执行完毕
+            cmd.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     /**
      * 下载本地文件
+     * --方法未使用--
      */
     @GetMapping("/download/local/{fileName}")
     public void downloadLocalFile(HttpServletResponse response, String sshKey, String id, @PathVariable String fileName) throws IOException {
@@ -116,9 +148,12 @@ public class FileController {
                 fileInfo.setAttributes(file.getAttributes());
                 fileInfoList.add(fileInfo);
             }
-        } catch (Exception e) {
+        } catch (net.schmizz.sshj.sftp.SFTPException e) {
             e.printStackTrace();
-            return Result.setError(500,"目录不存在",map);
+            String errorMessage = e.getMessage();
+            if("Permission denied".equals(errorMessage))
+                return Result.setError(500,"无权访问此目录",map);
+            else return Result.setError(500,"目录不存在",map);
         }
         map.put("files",fileInfoList);
 
@@ -128,6 +163,7 @@ public class FileController {
 
     /**
      * 统计所有文件/文件夹数目
+     * --方法未使用--
      */
     @PostMapping("/find")
     public Result find(String sshKey, String path) {
@@ -157,56 +193,6 @@ public class FileController {
 
 
     /**
-     * 打包压缩文件夹
-     */
-    @PostMapping("/tar")
-    public Result tar(String sshKey, String path, String name) {
-
-        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
-        if(ssh == null) {
-            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
-        }
-        String id = UUID.randomUUID().toString().replace("-", "");
-        try(Session session = ssh.startSession()) {
-
-            // 进入目录并打包
-            String command = "cd " + path + " && tar -czvf - " + name + " | less";
-            Session.Command cmd = session.exec(command);
-
-            // 创建本地目录
-            String folderPath = FileUtil.folderBasePath + "/" + sshKey + "-" + id;
-            File temporaryFolder = new File(folderPath);
-            File temporaryFile = new File(folderPath + "/" + name + ".tar.gz");
-            // 如果文件夹不存在则创建
-            if (!temporaryFolder.exists()) {
-                temporaryFolder.mkdirs();
-            }
-            // 如果文件存在则删除
-            if (temporaryFile.exists()) {
-                temporaryFile.delete();
-            }
-            try (InputStream tarStream = cmd.getInputStream();
-                 FileOutputStream fos = new FileOutputStream(temporaryFile)) {
-                byte[] buffer = new byte[8192];
-                int len;
-                while ((len = tarStream.read(buffer)) != -1) {
-                    fos.write(buffer, 0, len);
-                }
-            }
-
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
-            if (exitStatus != 0) return Result.setError(500, "压缩文件夹失败", null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.setError(500, "压缩文件夹失败", null);
-        }
-        return Result.setSuccess(200, "压缩文件夹成功", id);
-    }
-
-
-    /**
      * 获取当前路径 pwd (首次有效)
      */
     @GetMapping("/pwd")
@@ -227,6 +213,7 @@ public class FileController {
 
     /**
      * 删除文件/文件夹
+     * --方法未使用--
      */
     @PostMapping("/rm")
     public Result rm(String sshKey, Boolean isDirectory, String path) {
@@ -328,6 +315,31 @@ public class FileController {
             return Result.setError(500, "移动失败", null);
         }
         return Result.setSuccess(200, "移动成功", null);
+    }
+
+
+    /**
+     * 新建文件
+     */
+    @PostMapping("/touch")
+    public Result touch(String sshKey, String path) {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件夹新建失败",null);
+        }
+        try(Session session = ssh.startSession()) {
+            String command = "touch " + path;
+            Session.Command cmd = session.exec(command);
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.setError(500, "文件新建失败", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500, "文件新建失败", null);
+        }
+        return Result.setSuccess(200, "文件新建成功", null);
     }
 
 

@@ -80,7 +80,7 @@
                         </div>
                         <div class="ellipsis" style="margin-left: 10px;" >{{ item.desc }}</div>
                         <div style="flex: 1;" ></div>
-                        <div @click="toWorkflow(key)" style="cursor: pointer; margin-left: 10px;" >
+                        <div style="cursor: pointer; margin-left: 10px;" >
                           <el-tooltip :content="TCodeStatusEnum[item.status]" placement="top">
                             <TcodeStatus :style="{fontSize: '18px'}" :status="item.status" ></TcodeStatus>
                           </el-tooltip>

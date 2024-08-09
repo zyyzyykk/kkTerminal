@@ -5,6 +5,7 @@ import com.kkbpro.terminal.utils.FileUtil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +22,13 @@ public class TerminalApplication {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @PreDestroy
+    public void cleanData() {
+        // 清除文件数据残留
+        File data = new File(FileUtil.folderBasePath);
+        if(data.exists()) FileUtil.tmpFloderDelete(data);
     }
     public static void main(String[] args) {
         // 清除文件数据残留

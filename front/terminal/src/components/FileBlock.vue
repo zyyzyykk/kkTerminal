@@ -44,7 +44,7 @@
           <div v-if="files.length != 0" >
               <div v-for="item in files" :key="item.id" >
                 <template v-if="item.isDirectory == true">
-                  <div :class="['item-class', isSelected(item.id) != -1 ? 'item-selected' : '']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
+                  <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
                     <FileIcons :style="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
                     <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                       <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
@@ -53,7 +53,7 @@
                   </div>
                 </template>
                 <template v-else>
-                  <div :class="['item-class', isSelected(item.id) != -1 ? 'item-selected' : '']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
+                  <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
                     <FileIcons :style="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
                     <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                       <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
@@ -158,7 +158,9 @@ export default {
       // shift
       if(event.shiftKey) {
         if(selectedFiles.value.length == 0 || lastSelectedIndex == -1 || lastSelectedIndex >= files.value.length) {
+          selectedFiles.value = [];
           for(let i=0;i<=item.index;i++) selectedFiles.value.push({...files.value[i]});
+          lastSelectedIndex = -1;
         }
         else {
           selectedFiles.value = [];
@@ -260,11 +262,11 @@ export default {
 
     // 获取远程文件url
     const getRemoteFileUrl = (name, path) => {
-      return http_base_url + '/download/remote/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&path=' + (path ? path : dir.value);
+      return http_base_url + '/download/remote/file/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&path=' + (path ? path : dir.value);
     };
-    // 获取本地文件url
-    const getLocalFileUrl = (name, id) => {
-      return http_base_url + '/download/local/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&id=' + id;
+    // 获取远程文件夹url
+    const getRemoteFolderUrl = (name, path) => {
+      return http_base_url + '/download/remote/folder/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&path=' + (path ? path : dir.value);
     };
 
     // 解析url的path
@@ -289,50 +291,13 @@ export default {
 
     // 下载文件夹
     const downloadDir = (name) => {
-      ElMessage({
-        message: '开始打包',
-        type: 'success',
-        grouping: true,
-      });
-      // 先将文件夹打成tar包
-      $.ajax({
-        url: http_base_url + '/tar',
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
-          path:dir.value,
-          name:name,
-        },
-        success(resp){
-          if(resp.status == 'success') {
-            ElMessage({
-              message: '开始下载',
-              type: 'success',
-              grouping: true,
-            });
-            // 下载tar包
-            let a = document.createElement('a');
-            a.href = getLocalFileUrl(name + '.tar.gz',resp.data);
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          }
-          else {
-            ElMessage({
-              message: '打包失败',
-              type: 'error',
-              grouping: true,
-            });
-          }
-        },
-        error() {
-          ElMessage({
-            message: '打包失败',
-            type: 'error',
-            grouping: true,
-          });
-        },
-      });
+      if(isShowDirInput.value == true) return;
+      let a = document.createElement('a');
+      console.log(getRemoteFolderUrl(name));
+      // a.href = getRemoteFolderUrl(name);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     };
 
     // 更新目录路径
@@ -525,7 +490,7 @@ export default {
       // 创建File对象
       const file = new File([blob], name);
       file.uid = Math.random().toString(36).substring(2);
-      doUpload({file:file}, {pathVal: urlParams.path, startUpLoad:"修改保存中"});
+      doUpload({file:file}, {pathVal: urlParams.path, startUpLoad:"修改保存中",alert:'文件后台保存中'});
     };
 
     // 文件/文件夹拖拽
@@ -781,48 +746,27 @@ export default {
         }
       });
     };
-    // 新建文件
+    // 新建文件/文件夹
     const mkFileRef = ref();
     const handleMkFile = (isFolder, name, nowDir) => {
-      // 文件
-      if(isFolder == false) {
-        // 防止覆盖
-        for(let i=0;i<files.value.length;i++) {
-          if(files.value[i].name == name && dir.value == nowDir) {
-            ElMessage({
-              message: '存在同名文件或目录',
-              type: 'warning',
-              grouping: true,
-            });
-            return;
-          }
+      console.log(http_base_url);
+      
+      $.ajax({
+        url: http_base_url + (isFolder ? '/mkdir' : '/touch'),
+        type:'post',
+        data:{
+          sshKey:props.sshKey,
+          path:nowDir + name,
+        },
+        success(resp){
+          ElMessage({
+            message: resp.info,
+            type: resp.status,
+            grouping: true,
+          });
+          getDirList();
         }
-        // 创建Blob对象
-        const blob = new Blob([''], {type:'text/plain'});
-        // 创建File对象
-        const file = new File([blob], name);
-        file.uid = Math.random().toString(36).substring(2);
-        doUpload({file:file},{pathVal:nowDir, alert:"文件新建成功"});
-      }
-      // 文件夹
-      else {
-        $.ajax({
-          url: http_base_url + '/mkdir',
-          type:'post',
-          data:{
-            sshKey:props.sshKey,
-            path:nowDir + name,
-          },
-          success(resp){
-            ElMessage({
-              message: resp.info,
-              type: resp.status,
-              grouping: true,
-            });
-            getDirList();
-          }
-        });
-      }
+      });
     };
     watch(dir,() => {
       if(mkFileRef.value) mkFileRef.value.reset();
@@ -889,12 +833,17 @@ export default {
         },
         success(resp){
           if(resp.status == 'success') getDirList();
+          // 复制剪切失败
           else {
             ElMessage({
               message: resp.info,
               type: resp.status,
               grouping: true,
             });
+            fileClipboard.value = {
+              path:'/',
+              files:[],
+            };
           }
         }
       });
@@ -1000,7 +949,7 @@ export default {
   display: flex;
   align-items: center;
   padding: 5px 10px;
-  border-bottom: 1px solid #ececec;
+  border-bottom: 1px solid #efefef;
   cursor: pointer;
   width: 100%;
 }
@@ -1016,7 +965,8 @@ export default {
 
 .item-selected
 {
-  background-color: #f3f3f3;
+  background-color: #efefef !important;
+  border-bottom: 1px solid #d8d8d8;
 }
 
 /* 文本不可选中 */
