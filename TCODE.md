@@ -1,10 +1,10 @@
-### ⌨️ TCode 事务代码
+### ⌨️ TCode 终端代码
 
 ##### Tcode简介
 
-Tcode（事务代码）是用于访问和执行特定事务流程的快捷方式
+TCode（Terminal Code, 终端代码）是用于访问和执行特定操作流程的快捷方式
 
-Tcode 不区分大小写；长度为 2~6 位，其中第一位表示 TCode 类型
+TCode 不区分大小写；长度为 2~6 位，其中第一位表示 TCode 类型
 
 ##### TCode类型
 
@@ -20,7 +20,7 @@ Tcode 不区分大小写；长度为 2~6 位，其中第一位表示 TCode 类�
 
 1. 在TCode输入框中输入 `/A` ，并按下回车
 2. 在自定义TCode对话框中，输入TCode名称与描述，并编辑对应的Workflow（js语法）
-3. 点击确定，添加 Tcode
+3. 点击确定，添加 TCode
 
 ###### Workflow
 

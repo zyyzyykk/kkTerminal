@@ -33,8 +33,8 @@
               <el-icon :style="{ color: '#606266' }" ><QuestionFilled /></el-icon>
             </template>
             <div style="font-size: 12px; color: #313131;" >
-              <div style="user-select: none; font-size: 14px; font-weight: bold;" >什么是 TCode (事务代码) ？</div>
-              <div style="user-select: none; margin-top: 5px;">TCode（事务代码）是用于访问和执行特定事务流程的快捷方式</div>
+              <div style="user-select: none; font-size: 14px; font-weight: bold;" >什么是 TCode (终端代码) ？</div>
+              <div style="user-select: none; margin-top: 5px;">TCode（终端代码）是用于访问和执行特定操作流程的快捷方式</div>
               <div style="user-select: none; margin-top: 5px;">
                 输入 
                 <span style="background-color: #f3f4f4; user-select: text;" >/H</span>
@@ -411,7 +411,7 @@ export default {
       },1);
     }
 
-    // 处理事务代码
+    // 处理终端代码
     const tcode = ref('');
     const handleTcode = async () => {
       if(!tcode.value || tcode.value.length < 2) return;
