@@ -87,6 +87,28 @@ export const UserTcodeExecutor = {
     display: true,
     outArray: [],
     cnt: 0,
+    // 变量
+    variables: {
+        session(key,value) {
+            if(value != undefined) sessionStorage.setItem(key,JSON.stringify(value));
+            else {
+                if(sessionStorage.getItem(key)) return JSON.parse(sessionStorage.getItem(key));
+                else return null;
+            }
+        },
+        global(key,value) {
+            const storageKey = 'tcode-global-vars';
+            let tcodeGlobalVars = {};
+            if(localStorage.getItem(storageKey)) {
+                tcodeGlobalVars = JSON.parse(localStorage.getItem(storageKey));
+            }
+            if(value != undefined) {
+                tcodeGlobalVars[key] = value;
+                localStorage.setItem(storageKey,JSON.stringify(tcodeGlobalVars));
+            }
+            else return tcodeGlobalVars[key];
+        },
+    },
     // 仅向terminal写入，不等待
     writeOnly: null,
     // 向terminal写入并等待
@@ -131,7 +153,7 @@ const filter = (arr) => {
         if(str && str != '') ret.push(str);
     }
     return ret;
-}
+};
 
 // 以 \r\n 分割
 const filterRN = (arr) => {
@@ -143,13 +165,13 @@ const filterRN = (arr) => {
         }
     }
     return ret;
-}
+};
 // 过滤 ANSI 等终端字符
 import stripAnsi from 'strip-ansi';
 const filterANSI = (str) => {
     // eslint-disable-next-line
     return stripAnsi(str).replace(/[\x00-\x1F\x7F]/g, '');
-}
+};
 
 // 用户TCode状态枚举
 // Error-加载失败: Load Error
