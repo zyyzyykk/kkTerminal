@@ -106,7 +106,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 10.支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
 
-11.支持 [TCode (事务代码)](./TCODE.md)，能够通过自定义TCode实现类似Shell脚本的自动化Workflow
+11.支持 [TCode (终端代码)](./TCODE.md)，能够通过自定义TCode实现类似Shell脚本的自动化Workflow
 
 ### 👨‍💻 更新记录
 
