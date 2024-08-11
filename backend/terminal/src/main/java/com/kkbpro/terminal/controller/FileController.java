@@ -152,7 +152,7 @@ public class FileController {
             e.printStackTrace();
             String errorMessage = e.getMessage();
             if("Permission denied".equals(errorMessage))
-                return Result.setError(500,"无权访问此目录",map);
+                return Result.setError(500,"目录拒绝访问",map);
             else return Result.setError(500,"目录不存在",map);
         }
         map.put("files",fileInfoList);

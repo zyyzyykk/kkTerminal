@@ -130,7 +130,7 @@ export default {
     Download,
     Upload,
   },
-  props:['sshKey'],
+  props:['sshKey','os'],
   setup(props) {
 
     // 加载
@@ -153,7 +153,7 @@ export default {
           selectedFiles.value.push(item);
         }
         return;
-      }
+      }      
       // 单击
       // shift
       if(event.shiftKey) {
@@ -170,7 +170,7 @@ export default {
         }
       }
       // ctrl
-      else if(event.ctrlKey) {
+      else if((props.os == "Windows" && event.ctrlKey) || ((props.os == "Mac" || props.os == "iOS") && event.metaKey)) {
         lastSelectedIndex = item.index;
         if(index != -1) selectedFiles.value.splice(index, 1);
         else selectedFiles.value.push(item);
@@ -782,7 +782,7 @@ export default {
       const renameDom = document.querySelector('#rename');
       if(renameDom && renameDom.contains(event.target)) return;
       event.preventDefault();
-      if (event.ctrlKey || event.metaKey) {
+      if ((props.os == "Windows" && event.ctrlKey) || ((props.os == "Mac" || props.os == "iOS") && event.metaKey)) {
         switch (String.fromCharCode(event.which).toLowerCase()) {
           // 全选
           case 'a':

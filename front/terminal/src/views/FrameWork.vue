@@ -60,7 +60,7 @@
   <!-- 样式设置 -->
   <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" :os="osInfo.clientOS" ></StyleSetting>
   <!-- 文件管理 -->
-  <FileBlock ref="fileBlockRef" :sshKey="sshKey" ></FileBlock>
+  <FileBlock ref="fileBlockRef" :sshKey="sshKey" :os="osInfo.clientOS" ></FileBlock>
   <!-- 用户TCode -->
   <UserTcode ref="userTcodeRef" @importTCodes="importTCodes" @exportTcodes="exportTcodes" ></UserTcode>
   <!-- 帮助TCode -->
