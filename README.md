@@ -12,7 +12,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-08-10
+> 更新时间：2024-08-14
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://img.kkbapps.com/logo/terminal.png" alt="kkterminal logo"></a></p>
@@ -110,7 +110,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.2.0：latest
+##### zyyzyykk/kkterminal:3.2.2：latest
+
+- TCode支持 会话级/本地级 变量的存取
+- 文本编辑器新增TCode原生对象 `kkTerminal` 的智能提示
+- 文件管理模块快捷键适配MacOS
+
+##### zyyzyykk/kkterminal:3.2.0：
 
 - 文件管理模块支持快捷键操作：多选/全选、复制粘贴、剪切等
 
@@ -123,13 +129,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 适配默认字体、优化TCode状态显示
 
 - 支持本地PC端部署，自动打开浏览器窗口
-
-##### zyyzyykk/kkterminal:3.1.5：
-
-- 修复无法通过input框上传文件的bug
-
-- 支持文件夹上传、优化文件批量上传逻辑
-- 新增TCode状态信息，优化TCode显示
 
 ##### [历史更新记录](./UPDATE.md)
 

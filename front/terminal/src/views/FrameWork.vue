@@ -456,7 +456,7 @@ export default {
           } catch(error) {
             ElMessage({
               message: 'TCode-' + transTcode + ' Execute Error: ' + error,
-              type: 'error',
+              type: 'warning',
               grouping: true,
             });
             setTcodeStatus(transTcode, 'Execute Error');

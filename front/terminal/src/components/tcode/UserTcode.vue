@@ -107,7 +107,7 @@ export default {
 
     const workflowTemplate = `await kkTerminal.write('cd /root/terminal');
 await kkTerminal.write('lsof -i :3000', 500);
-let resultArr = kkTerminal.getOut();
+let resultArr = kkTerminal.read();
 if(resultArr.length >= 3) {
     let pid = resultArr[2].replace(/\\s+/g, ' ').split(' ')[1];
 	if(pid) await kkTerminal.write('kill -9 ' + pid);
@@ -131,12 +131,11 @@ alert('TCode Workflow Over!');`;
         grouping: true,
         repeatNum: Number.MIN_SAFE_INTEGER,
       });
-    }
+    };
     const setValue = (text) => {
       userTcodeEditorRef.value.setValue(text);
       userTcodeEditorRef.value.reset();
-    }
-
+    };
     const initText = () => {
       // Workflow仅支持JS语法
       userTcodeEditorRef.value.setLanguage('kk.js');
@@ -145,12 +144,12 @@ alert('TCode Workflow Over!');`;
         userTcodeEditorRef.value.setValue(localStorage.getItem('tcode-draft'));
         userTcodeEditorRef.value.reset();
       }
-    }
+    };
     // 仅有数字字母组成
     const isAlphaNumeric = (str) => {
       const regex = /^[A-Za-z0-9]+$/;
       return regex.test(str);
-    }
+    };
 
     // 导入导出Tcode
     const importTcodes = (data) => {
@@ -228,7 +227,7 @@ alert('TCode Workflow Over!');`;
       };
       loading.value = true;
       fileReader.readAsText(file);
-    }
+    };
     const exportTcodes = () => {
       context.emit('exportTcodes');
       ElMessage({
@@ -236,7 +235,7 @@ alert('TCode Workflow Over!');`;
         type: 'success',
         grouping: true,
       });
-    }
+    };
 
     // 处理workflowTab
     const workflowTab = (type) => {
@@ -256,7 +255,7 @@ alert('TCode Workflow Over!');`;
           handleSave(userTcodeEditorRef.value.getValue());
           break;
       }
-    }
+    };
     
     // 确定(添加TCode)
     const confirm = () => {
@@ -292,13 +291,13 @@ alert('TCode Workflow Over!');`;
       });
       localStorage.removeItem('tcode-draft');
       reset();
-    }
+    };
 
     // 关闭
     const closeDialog = (done) => {
       reset();
       done();
-    }
+    };
 
     const reset = () => {
       setTimeout(() => {

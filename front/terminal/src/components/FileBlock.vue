@@ -293,8 +293,7 @@ export default {
     const downloadDir = (name) => {
       if(isShowDirInput.value == true) return;
       let a = document.createElement('a');
-      console.log(getRemoteFolderUrl(name));
-      // a.href = getRemoteFolderUrl(name);
+      a.href = getRemoteFolderUrl(name);
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -748,9 +747,7 @@ export default {
     };
     // 新建文件/文件夹
     const mkFileRef = ref();
-    const handleMkFile = (isFolder, name, nowDir) => {
-      console.log(http_base_url);
-      
+    const handleMkFile = (isFolder, name, nowDir) => {      
       $.ajax({
         url: http_base_url + (isFolder ? '/mkdir' : '/touch'),
         type:'post',

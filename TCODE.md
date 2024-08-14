@@ -1,6 +1,6 @@
 ### ⌨️ TCode 终端代码
 
-##### Tcode简介
+##### TCode简介
 
 TCode（Terminal Code, 终端代码）是用于访问和执行特定操作流程的快捷方式
 
@@ -25,12 +25,11 @@ TCode 不区分大小写；长度为 2~6 位，其中第一位表示 TCode 类�
 ###### Workflow
 
 1. Workflow仅支持 javaScript (js) 语法格式
-
 2. Workflow中存在 `kkTerminal` 对象，可以**直接使用**对象中的方法
 3.  `kkTerminal` 包含如下方法：
    - 写入内容并等待输出结果：`await kkTerminal.write('写入内容'[, 获取结果延时=200ms])`
-   - 获取从上次写入命令开始的全部输出结果数组：`kkTerminal.getOut()`
-   - 获取从Workflow执行开始的全部输出结果数组：`kkTerminal.getAllOut()`
+   - 获取从上次写入命令开始的全部输出结果数组：`kkTerminal.read()`
+   - 获取从Workflow执行开始的全部输出结果数组：`kkTerminal.readAll()`
    - 在终端中隐藏/显示Workflow执行过程：`kkTerminal.hide()/kkTerminal.show()`
 4. 注意事项：
    - Workflow中**不能**添加注释信息
@@ -42,7 +41,7 @@ TCode 不区分大小写；长度为 2~6 位，其中第一位表示 TCode 类�
 ```js
 await kkTerminal.write('cd /root/terminal');
 await kkTerminal.write('lsof -i :3000', 500);
-let resultArr = kkTerminal.getOut();
+let resultArr = kkTerminal.read();
 if(resultArr.length >= 3) {
     let pid = resultArr[2].replace(/\s+/g, ' ').split(' ')[1];
 	if(pid) await kkTerminal.write('kill -9 ' + pid);
@@ -65,7 +64,7 @@ alert('TCode Workflow Over!');
 {
     "UJAR": {
         "desc": "start jar",
-        "workflow": "await kkTerminal.write('cd /root/terminal');\nawait kkTerminal.write('lsof -i :3000', 500);\nlet resultArr = kkTerminal.getOut();\nif(resultArr.length >= 3) {\n    let pid = resultArr[2].replace(/\\s+/g, ' ').split(' ')[1];\n\tif(pid) await kkTerminal.write('kill -9 ' + pid);\n}\nlet jar = 'kkTerminal.jar';\nawait kkTerminal.write('java -jar ./' + jar + ' > ./out.log &');\nalert('TCode Workflow Over!');",
+        "workflow": "await kkTerminal.write('cd /root/terminal');\nawait kkTerminal.write('lsof -i :3000', 500);\nlet resultArr = kkTerminal.read();\nif(resultArr.length >= 3) {\n    let pid = resultArr[2].replace(/\\s+/g, ' ').split(' ')[1];\n\tif(pid) await kkTerminal.write('kill -9 ' + pid);\n}\nlet jar = 'kkTerminal.jar';\nawait kkTerminal.write('java -jar ./' + jar + ' > ./out.log &');\nalert('TCode Workflow Over!');",
         "status": "Not Active"
     }
 }
