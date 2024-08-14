@@ -53,6 +53,7 @@ import 'ace-builds/src-noconflict/snippets/xml';
 import 'ace-builds/src-noconflict/snippets/yaml';
 
 import langToMode from './Lang';
+import { userTcodeExecutorCompleter } from '@/Utils/Tcode';
 
 export default {
   name: 'AceEditor',
@@ -116,6 +117,8 @@ export default {
         theme: 'ace/theme/chrome',                            // 主题
         mode: 'ace/mode/text',                                // 高亮
       });
+      // 自定义智能提示
+      aceEditor.value.completers.push(userTcodeExecutorCompleter);
 
       // 禁用 Web Workers
       aceEditor.value.session.setOption("useWorker", false);

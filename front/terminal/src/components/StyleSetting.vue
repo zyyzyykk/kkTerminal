@@ -121,7 +121,7 @@ export default {
         return ['Courier New','Menlo','Monaco','Courier'];
       }
       else return ['Courier New','Consolas','Monospace','Lucida Console'];
-    })
+    });
     // 字号列表
     const fontSizeList = [12,14,16,18,20];
     // 光标样式列表
@@ -140,7 +140,7 @@ export default {
     const confirm = () => {
       context.emit('callback',setInfo.value);
       DialogVisilble.value = false;
-    }
+    };
 
     return {
       fontFamilyList,

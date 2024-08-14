@@ -6,6 +6,7 @@
     title="帮助"
     :modal="false"
     modal-class="kk-dialog-class"
+    :before-close="closeDialog"
     draggable
   >
     <div style="margin-top: -27px;"></div>
@@ -144,13 +145,13 @@ export default {
       setTimeout(() => {
         initTcodeEditor(true);
       },1);
-    }
+    };
     // 返回
     const toOverview = () => {
       mode.value = false;
       nowTCode.value = '';
       modifyTag.value = '';
-    }
+    };
 
     // 编辑器(只读)
     const userTcodeEditorRef = ref();
@@ -160,18 +161,18 @@ export default {
       userTcodeEditorRef.value.reset();
       userTcodeEditorRef.value.setReadOnly(mode);
       modifyTag.value = '';
-    }
+    };
 
     // 启用编辑
     const doModifyTCode = () => {
       mode.value = true;
       initTcodeEditor(false);
-    }
+    };
     // 只读模式
     const doOnlyRead = () => {
       mode.value = false;
       initTcodeEditor(true);
-    }
+    };
 
     // 修改TCode的Workflow
     const doSaveTCode = () => {
@@ -184,11 +185,19 @@ export default {
         grouping: true,
       });
       modifyTag.value = '';
-    }
+    };
 
     const handleChange = () => {
       modifyTag.value = '*';
-    }
+    };
+
+    // 关闭
+    const closeDialog = (done) => {
+      setTimeout(() => {
+        toOverview();
+      },300);
+      done();
+    };
 
     return {
       DialogVisilble,
@@ -207,6 +216,7 @@ export default {
       doSaveTCode,
       handleChange,
       modifyTag,
+      closeDialog,
     }
   }
 

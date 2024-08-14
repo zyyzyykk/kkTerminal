@@ -35,9 +35,9 @@ export default {
       'Execute Error': -1,
       'Not Active': 0,
       'Execute Success': 1,
-    }
+    };
 
-    const statusColor = ['#f56c6c','#e6a23c','#909399','#67c23a']
+    const statusColor = ['#f56c6c','#e6a23c','#909399','#67c23a'];
 
     const statusType = computed(() => {
       return statusTypeMap[props.status] || 0;

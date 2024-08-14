@@ -68,13 +68,13 @@ export default {
       if(aimOption.value == '' || aimOption.value.trim() == '') return;
       context.emit('callback',aimOption.value.trim());
       DialogVisilble.value = false;
-    }
+    };
 
     // 关闭
     const closeDialog = (done) => {
       aimOption.value = '';
       done();
-    }
+    };
 
     return {
       DialogVisilble,

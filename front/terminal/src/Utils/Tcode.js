@@ -1,3 +1,6 @@
+import { encrypt, decrypt } from './Encrypt';
+const storageKey = 'tcode-local-vars';
+
 // 功能TCode, 以 / 开头
 export const FuncTcode = {
     '/A': {
@@ -96,18 +99,31 @@ export const UserTcodeExecutor = {
                 else return null;
             }
         },
-        global(key,value) {
-            const storageKey = 'tcode-global-vars';
-            let tcodeGlobalVars = {};
+        local(key,value) {
+            let tcodeLocalVars = {};
             if(localStorage.getItem(storageKey)) {
-                tcodeGlobalVars = JSON.parse(localStorage.getItem(storageKey));
+                tcodeLocalVars = JSON.parse(decrypt(localStorage.getItem(storageKey)));
             }
             if(value != undefined) {
-                tcodeGlobalVars[key] = value;
-                localStorage.setItem(storageKey,JSON.stringify(tcodeGlobalVars));
+                tcodeLocalVars[key] = value;
+                localStorage.setItem(storageKey,encrypt(JSON.stringify(tcodeLocalVars)));
             }
-            else return tcodeGlobalVars[key];
+            else return tcodeLocalVars[key];
         },
+        clean() {
+            if(arguments.length == 0) {
+                localStorage.removeItem(storageKey);
+                return;
+            }
+            let tcodeLocalVars = {};
+            if(localStorage.getItem(storageKey)) {
+                tcodeLocalVars = JSON.parse(decrypt(localStorage.getItem(storageKey)));
+            }
+            for (let i = 0; i < arguments.length; i++) {
+                delete tcodeLocalVars[arguments[i]];
+            }
+            localStorage.setItem(storageKey,encrypt(JSON.stringify(tcodeLocalVars)));
+        }
     },
     // 仅向terminal写入，不等待
     writeOnly: null,
@@ -122,17 +138,13 @@ export const UserTcodeExecutor = {
     write(content, time = 200) {
         return this.writeAndWait(content, time);
     },
+    // 读取输出
     read() {
         return filter(this.outArray.slice(this.cnt));
     },
+    // 读取全部输出
     readAll() {
         return filter(this.outArray.slice(0));
-    },
-    getAllOut() {
-        return filter(this.outArray.slice(0));
-    },
-    getOut() {
-        return filter(this.outArray.slice(this.cnt));
     },
     // 隐藏
     hide() {
@@ -184,3 +196,91 @@ export const TCodeStatusEnum = {
     'Not Active': 'Inactive',
     'Execute Success': 'Success',
 }
+
+
+// 编辑器添加kkTerminal智能提示
+export const userTcodeExecutorCompleter = {
+  getCompletions: function(editor, session, pos, prefix, callback) {
+    const userTcodeExecutorCompletions = [
+      {
+        name: "kkTerminal",
+        value: "kkTerminal",
+        meta: "kkTerminal",
+        description: "kkTerminal API",
+        score: 1000,
+      },
+      {
+        name: "variables",
+        value: "variables",
+        meta: "kkTerminal",
+        description: "access variables",
+        score: 1000,
+      },
+      {
+        name: "session",
+        value: "session()",
+        meta: "kkTerminal",
+        description: "get or set session variables",
+        score: 1000,
+      },
+      {
+          name: "local",
+          value: "local()",
+          meta: "kkTerminal",
+          description: "get or set local variables",
+          score: 1000,
+      },
+      {
+        name: "clean",
+        value: "clean()",
+        meta: "kkTerminal",
+        description: "remove local variables",
+        score: 1000,
+      },
+      {
+        name: "write",
+        value: "write()",
+        meta: "kkTerminal",
+        description: "write to terminal",
+        score: 1000,
+      },
+      {
+        name: "read",
+        value: "read()",
+        meta: "kkTerminal",
+        description: "read lastest from terminal",
+        score: 1000,
+      },
+      {
+        name: "readAll",
+        value: "readAll()",
+        meta: "kkTerminal",
+        description: "read all from terminal",
+        score: 1000,
+      },
+      {
+        name: "hide",
+        value: "hide()",
+        meta: "kkTerminal",
+        description: "hide TCode display",
+        score: 1000,
+      },
+      {
+        name: "show",
+        value: "show()",
+        meta: "kkTerminal",
+        description: "show TCode display",
+        score: 1000,
+      }
+    ];
+
+    callback(null, userTcodeExecutorCompletions.map((completion) => {
+      return {
+        caption: completion.caption || completion.name,
+        value: completion.value,
+        meta: completion.meta,
+        description: completion.description || ''
+      };
+    }));
+  }
+};
