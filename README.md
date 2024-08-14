@@ -119,15 +119,12 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 ##### zyyzyykk/kkterminal:3.2.0：
 
 - 文件管理模块支持快捷键操作：多选/全选、复制粘贴、剪切等
-
 - 支持文件夹下载
-
 - 重构部分逻辑，优化显示
 
 ##### zyyzyykk/kkterminal:3.1.7：
 
 - 适配默认字体、优化TCode状态显示
-
 - 支持本地PC端部署，自动打开浏览器窗口
 
 ##### [历史更新记录](./UPDATE.md)
