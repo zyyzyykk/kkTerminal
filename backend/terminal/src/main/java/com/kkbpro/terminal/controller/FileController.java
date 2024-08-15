@@ -150,10 +150,17 @@ public class FileController {
             }
         } catch (net.schmizz.sshj.sftp.SFTPException e) {
             e.printStackTrace();
-            String errorMessage = e.getMessage();
-            if("Permission denied".equals(errorMessage))
+            Response.StatusCode statusCode  = e.getStatusCode();
+            System.out.println(statusCode);
+            if(Response.StatusCode.NO_SUCH_FILE.equals(statusCode)) {
+                return Result.setError(500,"目录不存在",map);
+            }
+            else if(Response.StatusCode.PERMISSION_DENIED.equals(statusCode)) {
                 return Result.setError(500,"目录拒绝访问",map);
-            else return Result.setError(500,"目录不存在",map);
+            }
+            else {
+                return Result.setError(500,"文件获取失败",map);
+            }
         }
         map.put("files",fileInfoList);
 
