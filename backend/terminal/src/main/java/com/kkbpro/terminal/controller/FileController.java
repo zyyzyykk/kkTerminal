@@ -159,7 +159,7 @@ public class FileController {
                 return Result.setError(500,"目录拒绝访问",map);
             }
             else {
-                return Result.setError(500,"文件获取失败",map);
+                return Result.setError(500,"文件列表获取失败",map);
             }
         }
         map.put("files",fileInfoList);
@@ -177,7 +177,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，统计数目失败",null);
         }
         String num;
         try(Session session = ssh.startSession()) {
@@ -283,7 +283,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，复制失败",null);
         }
         try(Session session = ssh.startSession()) {
             String command = "cd " + src + " && cp -n " + items + " " + dst;
@@ -308,7 +308,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，移动失败",null);
         }
         try(Session session = ssh.startSession()) {
             String command = "cd " + src + " && mv -n " + items + " " + dst;
@@ -333,7 +333,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件夹新建失败",null);
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件新建失败",null);
         }
         try(Session session = ssh.startSession()) {
             String command = "touch " + path;
