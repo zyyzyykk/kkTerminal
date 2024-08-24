@@ -472,6 +472,13 @@ export default {
           });
         }
       }
+      else {
+        ElMessage({
+          message: 'TCode-' + transTcode + ' 不存在',
+          type: 'warning',
+          grouping: true,
+        });
+      }
     }
     // 重置用户TCode执行器
     const userTcodeExecutorReset = () => {

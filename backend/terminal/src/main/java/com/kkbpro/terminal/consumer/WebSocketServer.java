@@ -83,7 +83,7 @@ public class WebSocketServer {
             sshClient.authPassword(user_name, password);                // 使用用户名和密码进行身份验证
         } catch (Exception e) {
             e.printStackTrace();
-            sendMessage(sessionSocket,"连接服务器失败","fail", ResultCodeEnum.CONNECT_FAIL.getState());
+            sendMessage(sessionSocket,"远程服务器连接失败","fail", ResultCodeEnum.CONNECT_FAIL.getState());
             return;
         }
 
@@ -117,7 +117,6 @@ public class WebSocketServer {
             try {
                 while ((len = shellInputStream.read(buffer)) != -1) {
                     String shellOut = new String(buffer, 0, len, StandardCharsets.UTF_8);
-//                    System.out.println(shellOut);
                     sendMessage(sessionSocket, shellOut,
                             "success", ResultCodeEnum.OUT_TEXT.getState());
                 }
