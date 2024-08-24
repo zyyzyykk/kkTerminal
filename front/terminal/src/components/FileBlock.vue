@@ -14,7 +14,7 @@
       <div class="title" style="display: flex; align-items: center;" >
         <div class="ellipsis" style="flex: 1;">
           <div v-if="isShowDirInput == true" >
-            <el-input id="aimDirInput" v-model="dir" placeholder="输入目录路径" size="small" @blur="dirInputCallback" />
+            <el-input id="aimDirInput" v-model="dir" placeholder="输入目录路径" size="small" @blur="isShowDirInput = false;" @change="dirInputCallback" />
           </div>
           <div class="no-select ellipsis" v-else @dblclick="doShowDirInput" >{{ dir }}</div>
         </div>

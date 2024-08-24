@@ -120,7 +120,7 @@ public class FileController {
         List<FileInfo> fileInfoList = new ArrayList<>();
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"文件列表获取失败",map);
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接已断开",map);
         }
         try {
             SFTPClient sftp = getSftpClient(sshKey);
