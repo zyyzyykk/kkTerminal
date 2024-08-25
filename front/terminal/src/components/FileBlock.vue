@@ -14,7 +14,7 @@
       <div class="title" style="display: flex; align-items: center;" >
         <div class="ellipsis" style="flex: 1;">
           <div v-if="isShowDirInput == true" >
-            <el-input id="aimDirInput" v-model="dir" placeholder="输入目录路径" size="small" @blur="isShowDirInput = false;" @change="dirInputCallback" />
+            <el-input id="aimDirInput" v-model="dir" placeholder="输入目录路径" size="small" @keydown.enter="isShowDirInput = false;" @blur="isShowDirInput = false;" @change="dirInputCallback" />
           </div>
           <div class="no-select ellipsis" v-else @dblclick="doShowDirInput" >{{ dir }}</div>
         </div>
@@ -47,7 +47,7 @@
                   <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
                     <FileIcons :style="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
                     <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
-                      <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
+                      <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @change="handleRename(item)" />
                     </div>
                     <div v-else class="ellipsis" style="margin: 0 10px;">{{ item.name }}</div>
                   </div>
@@ -56,7 +56,7 @@
                   <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
                     <FileIcons :style="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
                     <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
-                      <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @blur="handleRename(item)" />
+                      <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @change="handleRename(item)" />
                     </div>
                     <div v-else class="ellipsis" style="margin: 0 10px;">{{ item.name }}</div>
                   </div>
