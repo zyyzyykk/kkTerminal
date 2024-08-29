@@ -67,7 +67,7 @@ export default {
       }
       context.emit('callback', isDirectory.value, name.value, nowDir.value);
       reset();
-    }
+    };
 
     // 关闭
     const closeDialog = (done) => {
@@ -83,7 +83,7 @@ export default {
       name.value = '';
       nowDir.value = '';
       DialogVisilble.value = false;
-    }
+    };
 
     return {
       DialogVisilble,

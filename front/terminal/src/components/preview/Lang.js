@@ -40,7 +40,7 @@ const getSuffix = (name) => {
       if(index != -1) suffix = name.substring(index + 1);
     }
     return suffix;
-}
+};
 
 export default function langToMode(name) {
     return langs[getSuffix(name)] || "text";
