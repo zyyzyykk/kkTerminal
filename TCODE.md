@@ -43,7 +43,7 @@ TCode 不区分大小写；长度为 2~6 位，其中第一位表示 TCode 类�
 
 4. 注意事项：
    - Workflow中**不能**添加注释信息
-   - Workflow中**不能**双引号 `""` ，**只能**使用单引号 `''`
+   - Workflow中**不能**使用双引号 `""` ，**只能**使用单引号 `''`
    - 使用 `kkTerminal.write()` 方法时**必须**在前面加 `await` 关键字
 
 ###### Workflow示例：使用自定义TCode完成Jar包的启动与部署
@@ -54,7 +54,7 @@ await kkTerminal.write('lsof -i :3000', 500);
 let resultArr = kkTerminal.read();
 if(resultArr.length >= 3) {
     let pid = resultArr[2].replace(/\s+/g, ' ').split(' ')[1];
-	if(pid) await kkTerminal.write('kill -9 ' + pid);
+    if(pid) await kkTerminal.write('kill -9 ' + pid);
 }
 let jar = 'kkTerminal.jar';
 await kkTerminal.write('java -jar ./' + jar + ' > ./out.log &');
