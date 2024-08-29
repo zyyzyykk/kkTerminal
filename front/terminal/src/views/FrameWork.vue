@@ -532,6 +532,9 @@ export default {
       $.ajax({
         url: http_base_url + '/init',
         type:'get',
+        data: {
+          time: new Date().getTime(),
+        },
         success(resp){
           osInfo.value = {...resp.data};
           // 连接服务器

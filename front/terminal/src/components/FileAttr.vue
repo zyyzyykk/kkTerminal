@@ -123,12 +123,12 @@ export default {
       let newPath = fileDir.value + rename.value;
       context.emit('callback',oldPath,newPath);
       DialogVisilble.value = false;
-    }
+    };
 
     // 关闭
     const closeDialog = (done) => {
       done();
-    }
+    };
 
     const reset = () => {
       fileInfo.value = {};
@@ -156,7 +156,7 @@ export default {
         grouping: true,
         repeatNum: Number.MIN_SAFE_INTEGER,
       });
-    }
+    };
 
     return {
       DialogVisilble,

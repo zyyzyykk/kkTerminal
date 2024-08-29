@@ -210,6 +210,7 @@ export default {
         url: http_base_url + '/pwd',
         type:'get',
         data:{
+          time: new Date().getTime(),
           sshKey:props.sshKey,
         },
         success(resp){
@@ -232,6 +233,7 @@ export default {
         url: http_base_url + '/ls',
         type:'get',
         data:{
+          time: new Date().getTime(),
           sshKey:props.sshKey,
           path:now_dir,
         },

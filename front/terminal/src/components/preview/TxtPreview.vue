@@ -82,17 +82,17 @@ export default {
           }
         }
       });
-    }
+    };
 
     const handleChange = () => {
       modifyTag.value = '*';
-    }
+    };
 
     const handleSave = (text) => {
       if(modifyTag.value != '*') return;
       context.emit('doSave',fileName.value, fileUrl.value, text);
       modifyTag.value = '';
-    }
+    };
 
     // 重置编辑器
     const resetEditor = () => {
@@ -101,14 +101,14 @@ export default {
         codeEditorRef.value.reset();
       }
       modifyTag.value = '';
-    }
+    };
 
     const closeDialog = (done) => {
       setTimeout(() => {
         resetEditor();
       },200);
       done();
-    }
+    };
     
 
     return {
