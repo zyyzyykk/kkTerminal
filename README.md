@@ -18,15 +18,14 @@
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://img.kkbapps.com/logo/terminal.png" alt="kkterminal logo"></a></p>
 
 <p align="center">
-  <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/badge/docker_pull-140+-blue" alt="Docker Image"></a>
+  <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/badge/docker_pull-170+-blue" alt="Docker Image"></a>
   <a href="https://www.oracle.com/cn/java/technologies/downloads/#java8-windows"><img src="https://img.shields.io/badge/jdk-1.8-orange" alt="JDK Version"></a>
   <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/springboot-2.7.15-green?color=6db33f" alt="SpringBoot Version"></a>
   <a href="https://cn.vuejs.org/"><img src="https://img.shields.io/badge/vue-3.x-green?color=42b883" alt="Vue Version"></a>
   <a href="https://www.apache.org/licenses/"><img src="https://img.shields.io/badge/licence-Apache-red" alt="Apache Licence"></a>
-  <a href="https://github.com/zyyzyykk/kkTerminal"><img src="https://img.shields.io/badge/gitHub_star-10+-yellow" alt="GitHub"></a>
+  <a href="https://github.com/zyyzyykk/kkTerminal"><img src="https://img.shields.io/badge/gitHub_star-50+-yellow" alt="GitHub"></a>
 </p>
-
-
+<p align="center">简体中文 ｜ <a href="./EN/README.md" >English</a></p>
 
 ### **⚡** 快速引入
 
@@ -100,7 +99,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 复制同 `git` 终端，选中文本会自动进行复制
 - 粘贴同 `cmd` 终端，单击鼠标右键进行粘贴（需要浏览器打开权限）
 
-8.支持文件管理，打开文件管理模块进行文件/文件夹的查看、上传与下载；
+8.支持文件管理，打开文件管理模块进行文件/文件夹的查看、上传与下载
 
 9.支持文件多选/全选、复制粘贴、剪切等快捷键操作
 
