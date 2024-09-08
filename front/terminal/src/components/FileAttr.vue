@@ -17,7 +17,7 @@
       </div>
     </template>
     <div style="margin-top: -32px;"></div>
-    <div>
+    <div element-loading-text="Loading..." v-loading="loading" >
       <div class="kk-flex">
         <div style="margin-right: 10px;" ><FileIcons :name="fileInfo.name" width="32" height="32" :isFolder="fileInfo.isDirectory" /></div>
         <div>
@@ -32,10 +32,22 @@
         </div>
         <div style="cursor: pointer; margin-left: 5px;" @click="doCopy(fileDir + fileInfo.name)"><el-icon size="15"><DocumentCopy /></el-icon></div>
       </div>
-      <div class="kk-flex">
+      <div v-if="fileInfo.isDirectory" class="kk-flex">
+        <div class="no-select" style="text-align: left; width: 100px;">包含：</div>
+        <div>
+          {{ includeInfo }}
+        </div>
+        <div v-if="unreliable" style="margin-left: 10px;" >
+          <el-tag size="small" type="danger">不可信</el-tag>
+        </div>
+      </div>
+      <div v-else class="kk-flex">
         <div class="no-select" style="text-align: left; width: 100px;">大小：</div>
         <div>
           {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size + ' 字节' }})
+        </div>
+        <div v-if="unreliable" style="margin-left: 10px;" >
+          <el-tag size="small" type="danger">不可信</el-tag>
         </div>
       </div>
       <div class="kk-border" ></div>
@@ -69,6 +81,8 @@
 
 <script>
 import { ref } from 'vue';
+import $ from 'jquery';
+import { http_base_url } from '@/Utils/BaseUrl';
 import { formatDate } from '../Utils/FormatDate';
 import { calcPriority } from '../Utils/CalcPriority';
 import { ElMessage } from 'element-plus';
@@ -95,6 +109,61 @@ export default {
     const fileInfo = ref({});
     const fileDir = ref('');
     const rename = ref('');
+
+    // 加载
+    const loading = ref(true);
+    // 不可靠标识
+    const unreliable = ref(false);
+    // 包含信息
+    const includeInfo = ref('0 个文件，0 个文件夹');
+
+    // 获取文件大小
+    const getFileSize = (sshKey) => {
+      $.ajax({
+        url: http_base_url + '/du',
+        type:'get',
+        data:{
+          time: new Date().getTime(),
+          sshKey:sshKey,
+          path:fileDir.value + fileInfo.value.name,
+        },
+        beforeSend: function() { // 发送请求前执行的方法
+          loading.value = true;
+        },
+        success(resp){
+          if(resp.status == 'success') fileInfo.value.attributes.size = parseInt(resp.data, 10);
+          else unreliable.value = true;
+        },
+        complete: function() { // 发送请求完成后执行的方法
+          loading.value = false;
+        }
+      });
+    };
+
+    // 获取文件夹包含信息
+    const getFolderInclude = (sshKey) => {
+      $.ajax({
+        url: http_base_url + '/find',
+        type:'get',
+        data:{
+          time: new Date().getTime(),
+          sshKey:sshKey,
+          path:fileDir.value + fileInfo.value.name,
+        },
+        beforeSend: function() { // 发送请求前执行的方法
+          loading.value = true;
+        },
+        success(resp){
+          if(resp.status == 'success') {
+            includeInfo.value = resp.data[0] + ' 个文件，' + (Math.max(0,parseInt(resp.data[1], 10) - 1)) + ' 个文件夹';
+          }
+          else unreliable.value = true;
+        },
+        complete: function() { // 发送请求完成后执行的方法
+          loading.value = false;
+        }
+      });
+    };
     
     // 确定
     const confirm = () => {
@@ -134,6 +203,9 @@ export default {
       fileInfo.value = {};
       rename.value = '';
       fileDir.value = '';
+      loading.value = false;
+      unreliable.value = false;
+      includeInfo.value = '0 个文件，0 个文件夹';
       DialogVisilble.value = false;
     };
 
@@ -170,6 +242,11 @@ export default {
       calcPriority,
       calcSize,
       doCopy,
+      loading,
+      unreliable,
+      includeInfo,
+      getFileSize,
+      getFolderInclude,
 
     }
   }

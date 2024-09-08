@@ -645,10 +645,13 @@ export default {
         // 属性
         case 8:
           if(selectedFiles.value.length == 1) {
+            fileAttrRef.value.reset();
             fileAttrRef.value.fileInfo = {...selectedFiles.value[0]};
             fileAttrRef.value.fileDir = dir.value;
             fileAttrRef.value.rename = selectedFiles.value[0].name;
             fileAttrRef.value.DialogVisilble = true;
+            if(selectedFiles.value[0].isDirectory) fileAttrRef.value.getFolderInclude(props.sshKey);
+            else fileAttrRef.value.getFileSize(props.sshKey);
           }
           break;
         default:
@@ -922,8 +925,6 @@ export default {
       fileCopyMove,
     }
   }
-
-
 }
 </script>
 
