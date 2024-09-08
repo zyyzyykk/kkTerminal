@@ -169,10 +169,9 @@ public class FileController {
 
 
     /**
-     * 统计所有文件/文件夹数目
-     * --方法未使用--
+     * 统计文件夹中包含的文件/文件夹数目（文件数@文件夹数）
      */
-    @PostMapping("/find")
+    @GetMapping("/find")
     public Result find(String sshKey, String path) {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
@@ -180,8 +179,9 @@ public class FileController {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，统计数目失败",null);
         }
         String num;
+        String[] nums;
         try(Session session = ssh.startSession()) {
-            String command = "find " + path + " | wc -l";
+            String command = "echo \"$(find " + path + " -type f | wc -l)@$(find " + path + " -type d | wc -l)\"";
             Session.Command cmd = session.exec(command);
             // 读取命令执行结果
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
@@ -191,13 +191,45 @@ public class FileController {
             cmd.join();
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.setError(500, "统计数目失败", null);
+            nums = num.split("@");
+            for (String s : nums) Integer.parseInt(s);
         } catch (Exception e) {
             e.printStackTrace();
             return Result.setError(500, "统计数目失败", null);
         }
-        return Result.setSuccess(200, "统计数目成功", num);
+        return Result.setSuccess(200, "统计数目成功", nums);
     }
 
+
+    /**
+     * 获取文件/文件夹大小（字节）
+     */
+    @GetMapping("/du")
+    public Result du(String sshKey, String path) {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，获取大小失败",null);
+        }
+        String size;
+        try(Session session = ssh.startSession()) {
+            String command = "du -sb " + path + " | head -n 1 | cut -f1";
+            Session.Command cmd = session.exec(command);
+            // 读取命令执行结果
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
+                size = reader.readLine();
+            }
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.setError(500, "获取大小失败", null);
+            Integer.parseInt(size);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500, "获取大小失败", null);
+        }
+        return Result.setSuccess(200, "获取大小成功", size);
+    }
 
     /**
      * 获取当前路径 pwd (首次有效)
@@ -220,7 +252,7 @@ public class FileController {
 
     /**
      * 删除文件/文件夹
-     * --方法未使用--
+     * --方法已弃用--
      */
     @PostMapping("/rm")
     public Result rm(String sshKey, Boolean isDirectory, String path) {
@@ -239,7 +271,6 @@ public class FileController {
         }
         return Result.setSuccess(200, "删除成功", null);
     }
-
     private void rmFloder(SFTPClient sftp, String path) throws IOException {
         List<RemoteResourceInfo> files = sftp.ls(path);
         for(RemoteResourceInfo file : files) {
