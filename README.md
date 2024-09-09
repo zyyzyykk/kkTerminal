@@ -18,18 +18,18 @@
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://img.kkbapps.com/logo/terminal.png" alt="kkterminal logo"></a></p>
 
 <p align="center">
-  <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/badge/docker_pull-170+-blue" alt="Docker Image"></a>
+  <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/docker/pulls/zyyzyykk/kkterminal" alt="Docker Image"></a>
   <a href="https://www.oracle.com/cn/java/technologies/downloads/#java8-windows"><img src="https://img.shields.io/badge/jdk-1.8-orange" alt="JDK Version"></a>
   <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/springboot-2.7.15-green?color=6db33f" alt="SpringBoot Version"></a>
   <a href="https://cn.vuejs.org/"><img src="https://img.shields.io/badge/vue-3.x-green?color=42b883" alt="Vue Version"></a>
   <a href="https://www.apache.org/licenses/"><img src="https://img.shields.io/badge/licence-Apache-red" alt="Apache Licence"></a>
-  <a href="https://github.com/zyyzyykk/kkTerminal"><img src="https://img.shields.io/badge/gitHub_star-50+-yellow" alt="GitHub"></a>
+  <a href="https://github.com/zyyzyykk/kkTerminal"><img src="https://img.shields.io/github/stars/zyyzyykk/kkterminal" alt="GitHub"></a>
 </p>
 <p align="center">简体中文 ｜ <a href="./EN/README.md" >English</a></p>
 
-### **⚡** 快速引入
+### **⚡** 快速集成
 
-在html网页中使用 `iframe` 标签实现快速引入：
+在html网页中使用 `iframe` 标签实现快速集成：
 
 ```html
 <iframe src="https://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
