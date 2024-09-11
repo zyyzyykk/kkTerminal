@@ -38,10 +38,12 @@ public class FileController {
         // 构建 HTTP 响应，触发文件下载
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName,"UTF-8"));
-        readRemoteFile(sftpClient, remoteFilePath, response);
+        readRemoteFile(sshKey, sftpClient, remoteFilePath, response);
     }
-    private void readRemoteFile(SFTPClient sftp, String remoteFilePath, HttpServletResponse response) throws IOException {
+    private void readRemoteFile(String sshKey, SFTPClient sftp, String remoteFilePath, HttpServletResponse response) throws IOException {
+        String id = UUID.randomUUID().toString();
         try (RemoteFile file = sftp.open(remoteFilePath)) {
+            WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
             try (InputStream is = file.new RemoteFileInputStream()) {
                 byte[] buffer = new byte[8096];
                 int len;
@@ -50,6 +52,10 @@ public class FileController {
                     response.getOutputStream().write(buffer, 0, len);
                 }
             }
+        } finally {
+            WebSocketServer.fileUploadingMap.get(sshKey).remove(id);
+            // 释放资源
+            sshClose(sshKey);
         }
     }
 
@@ -65,7 +71,10 @@ public class FileController {
         // 构建 HTTP 响应，触发文件下载
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(folderName + ".tar.gz","UTF-8"));
+
+        String id = UUID.randomUUID().toString();
         try(Session session = ssh.startSession()) {
+            WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
             // 进入目录并打包
             String command = "cd " + path + " && tar -czvf - " + folderName + " | less";
             Session.Command cmd = session.exec(command);
@@ -80,6 +89,10 @@ public class FileController {
             cmd.join();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            WebSocketServer.fileUploadingMap.get(sshKey).remove(id);
+            // 释放资源
+            sshClose(sshKey);
         }
     }
 
@@ -202,7 +215,7 @@ public class FileController {
 
 
     /**
-     * 获取文件/文件夹大小（字节）
+     * 获取文件大小（字节）
      */
     @GetMapping("/du")
     public Result du(String sshKey, String path) {
@@ -474,7 +487,7 @@ public class FileController {
         // 上传完毕
         if(chunk.equals(chunks))
         {
-            WebSocketServer.fileUploadingMap.put(sshKey + "-" + id, "kkterminal");
+            WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
             Thread FileThread = new Thread(() -> {
                 // 将文件片合并
                 if(!chunks.equals(1))
@@ -489,7 +502,9 @@ public class FileController {
                 } finally {
                     // 删除临时文件
                     FileUtil.tmpFloderDelete(temporaryFolder);
-                    WebSocketServer.fileUploadingMap.remove(sshKey + "-" + id);
+                    WebSocketServer.fileUploadingMap.get(sshKey).remove(id);
+                    // 释放资源
+                    sshClose(sshKey);
                 }
             });
             FileThread.start();
@@ -516,6 +531,22 @@ public class FileController {
             }
         }
         return WebSocketServer.sftpClientMap.get(sshKey);
+    }
+
+    private void sshClose(String sshKey) {
+        if(WebSocketServer.webSessionMap.get(sshKey) == null && WebSocketServer.fileUploadingMap.get(sshKey).isEmpty()) {
+            try {
+                WebSocketServer.fileUploadingMap.remove(sshKey);
+                if(WebSocketServer.sftpClientMap.get(sshKey) != null)
+                    WebSocketServer.sftpClientMap.get(sshKey).close();
+                WebSocketServer.sftpClientMap.remove(sshKey);
+                if(WebSocketServer.sshClientMap.get(sshKey) != null)
+                    WebSocketServer.sshClientMap.get(sshKey).close();
+                WebSocketServer.sshClientMap.remove(sshKey);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
