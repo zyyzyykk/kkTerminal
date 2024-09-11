@@ -31,9 +31,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint("/socket/ssh/{env}")  // 注意不要以'/'结尾
 public class WebSocketServer {
 
+    public static ConcurrentHashMap<String, Session> webSessionMap = new ConcurrentHashMap<>();
+
     public static ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
 
-    public static ConcurrentHashMap<String, String> fileUploadingMap = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, ConcurrentHashMap<String, String>> fileUploadingMap = new ConcurrentHashMap<>();
+
     public static ConcurrentHashMap<String, SFTPClient> sftpClientMap = new ConcurrentHashMap<>();
 
     private static AppConfig appConfig;
@@ -93,7 +96,9 @@ public class WebSocketServer {
         // 连接成功，生成key标识
         sshKey = UUID.randomUUID().toString();
         sendMessage(sessionSocket, sshKey,"success", ResultCodeEnum.CONNECT_SUCCESS.getState());
+        webSessionMap.put(sshKey, sessionSocket);
         sshClientMap.put(sshKey, sshClient);
+        fileUploadingMap.put(sshKey, new ConcurrentHashMap<>());
         // 欢迎语
         sendMessage(sessionSocket, appConfig.getWelcome() + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
         // github源地址
@@ -146,7 +151,7 @@ public class WebSocketServer {
                 // 判断是否是本次ssh对应的临时文件夹
                 if (file.isDirectory() && StringUtil.isPrefix(key, file.getName())) {
                     // 忽略正在进行文件上传的文件夹
-                    if(fileUploadingMap.get(file.getName()) == null)
+                    if(fileUploadingMap.get(key).get(file.getName().substring(key.length() + 1)) == null)
                         FileUtil.tmpFloderDelete(file);
                 }
             }
@@ -161,15 +166,19 @@ public class WebSocketServer {
             shellInputStream.close();
         if(shell != null)
             shell.close();
-        if(sftpClientMap.get(sshKey) != null)
-            sftpClientMap.get(sshKey).close();
-        if(sshClient != null)
-            sshClient.disconnect();
-        this.sessionSocket.close();
+        if(webSessionMap.get(key) != null)
+            webSessionMap.get(key).close();
+        webSessionMap.remove(key);
         sessionSocket = null;
-        if(sshKey != null) {
-            sshClientMap.remove(sshKey);
-            sftpClientMap.remove(sshKey);
+        if(fileUploadingMap.get(key).isEmpty()) {
+            fileUploadingMap.remove(key);
+            if(sftpClientMap.get(key) != null)
+                sftpClientMap.get(key).close();
+            sftpClientMap.remove(key);
+            if(sshClientMap.get(key) != null)
+                sshClientMap.get(key).close();
+            sshClientMap.remove(key);
+            sshClient = null;
             sshKey = null;
         }
     }
