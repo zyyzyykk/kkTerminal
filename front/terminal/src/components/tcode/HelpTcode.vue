@@ -110,11 +110,11 @@
 <script>
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
-import { FuncTcode, SysTcode, TCodeStatusEnum } from "@/Utils/Tcode";
+import { FuncTcode, SysTcode, TCodeStatusEnum } from "@/utils/Tcode";
 import NoData from '../NoData.vue';
 import { ArrowRight, ArrowLeft, Edit, View, Finished } from '@element-plus/icons-vue';
 import AceEditor from '../preview/AceEditor.vue';
-import { decrypt } from '@/Utils/Encrypt';
+import { decrypt } from '@/utils/Encrypt';
 import TcodeStatus from './TcodeStatus.vue';
 
 export default {

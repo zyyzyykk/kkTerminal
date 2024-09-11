@@ -71,7 +71,7 @@
 <script>
 import useClipboard from "vue-clipboard3";
 import { ref, onMounted, onUnmounted, getCurrentInstance } from 'vue';
-import { encrypt, decrypt } from '@/Utils/Encrypt';
+import { encrypt, decrypt } from '@/utils/Encrypt';
 import { ElMessage } from 'element-plus';
 
 import { Terminal } from 'xterm';
@@ -79,10 +79,10 @@ import { FitAddon } from 'xterm-addon-fit';
 import "xterm/css/xterm.css";
 
 import $ from 'jquery';
-import { default_env } from '@/Utils/Env';
-import { ws_base_url } from '@/Utils/BaseUrl';
-import { changeStr } from '@/Utils/StringUtil';
-import { http_base_url } from '@/Utils/BaseUrl';
+import { default_env } from '@/utils/Env';
+import { ws_base_url } from '@/utils/BaseUrl';
+import { changeStr } from '@/utils/StringUtil';
+import { http_base_url } from '@/utils/BaseUrl';
 
 import ConnectSetting from '@/components/ConnectSetting.vue';
 import StyleSetting from '@/components/StyleSetting.vue';
@@ -92,7 +92,7 @@ import HelpTcode from "@/components/tcode/HelpTcode.vue";
 
 import { QuestionFilled } from '@element-plus/icons-vue';
 
-import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/Utils/Tcode";
+import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/utils/Tcode";
 
 export default {
   name: "FrameWork",

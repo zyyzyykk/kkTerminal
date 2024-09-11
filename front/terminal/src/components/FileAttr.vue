@@ -82,13 +82,13 @@
 <script>
 import { ref } from 'vue';
 import $ from 'jquery';
-import { http_base_url } from '@/Utils/BaseUrl';
-import { formatDate } from '../Utils/FormatDate';
-import { calcPriority } from '../Utils/CalcPriority';
+import { http_base_url } from '@/utils/BaseUrl';
+import { formatDate } from '@/utils/FormatDate';
+import { calcPriority } from '@/utils/CalcPriority';
 import { ElMessage } from 'element-plus';
 import useClipboard from "vue-clipboard3";
 import { DocumentCopy } from '@element-plus/icons-vue';
-import { calcSize } from '../Utils/CalcSize';
+import { calcSize } from '@/utils/CalcSize';
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';

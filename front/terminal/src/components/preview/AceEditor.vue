@@ -53,7 +53,7 @@ import 'ace-builds/src-noconflict/snippets/xml';
 import 'ace-builds/src-noconflict/snippets/yaml';
 
 import langToMode from './Lang';
-import { userTcodeExecutorCompleter } from '@/Utils/Tcode';
+import { userTcodeExecutorCompleter } from '@/utils/Tcode';
 
 export default {
   name: 'AceEditor',
