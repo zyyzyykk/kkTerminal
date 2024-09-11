@@ -106,7 +106,7 @@ import { ref, onUnmounted, onMounted, watch } from 'vue';
 import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
 import { ElMessage } from 'element-plus';
-import { http_base_url } from '@/Utils/BaseUrl';
+import { http_base_url } from '@/utils/BaseUrl';
 import { Refresh, Fold, Download, Upload } from '@element-plus/icons-vue';
 
 import NoData from '@/components/NoData';

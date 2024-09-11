@@ -1,6 +1,6 @@
 // jQuery配置Ajax全局响应拦截，进行数据解密
 import $ from 'jquery';
-import { decrypt } from './Utils/Encrypt';
+import { decrypt } from '@/utils/Encrypt';
 
 $.ajaxSetup({
     processData: true,
