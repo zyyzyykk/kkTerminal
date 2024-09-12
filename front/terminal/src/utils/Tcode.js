@@ -43,7 +43,7 @@ export const FuncTcode = {
             context.proxy.helpTcodeRef.DialogVisilble = true;
         }
     },
-}
+};
 
 // 系统TCode, 以 S 开头
 export const SysTcode = {
@@ -82,7 +82,7 @@ export const SysTcode = {
             context.proxy.resetTerminal();
         }
     }
-}
+};
 
 // 用户TCode, 以 U 开头
 export const UserTcodeExecutor = {
@@ -154,7 +154,7 @@ export const UserTcodeExecutor = {
     show() {
         this.display = true;
     },
-}
+};
 
 // 处理过滤输出
 const filter = (arr) => {
@@ -195,7 +195,7 @@ export const TCodeStatusEnum = {
     'Execute Error':'Interrupted',
     'Not Active': 'Inactive',
     'Execute Success': 'Success',
-}
+};
 
 
 // 编辑器添加kkTerminal智能提示

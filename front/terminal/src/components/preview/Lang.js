@@ -30,7 +30,7 @@ const langs = {
     "xslt": "xml",
     "yaml": "yaml",
     "yml": "yaml"
-}
+};
 
 // 获取文件名后缀
 const getSuffix = (name) => {

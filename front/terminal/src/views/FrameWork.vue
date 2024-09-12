@@ -132,7 +132,7 @@ export default {
       setTimeout(() => {
         helpTcodeRef.value.userTCodes = {...tcodes.value};
       },1);
-    }
+    };
     loadTCodes();
     const env = ref(null);
     const loadEnv = () => {
@@ -184,7 +184,7 @@ export default {
         fontSize: env.value.fontSize,                         // 设置字号为 16
       });
       term.loadAddon(fitAddon);
-    }
+    };
 
     // 终端视高自适应
     const termFit = () => {
@@ -409,7 +409,7 @@ export default {
       setTimeout(() => {
         helpTcodeRef.value.userTCodes = {...tcodes.value};
       },1);
-    }
+    };
 
     // 处理终端代码
     const tcode = ref('');
@@ -479,14 +479,14 @@ export default {
           grouping: true,
         });
       }
-    }
+    };
     // 重置用户TCode执行器
     const userTcodeExecutorReset = () => {
       UserTcodeExecutor.active = false;
       UserTcodeExecutor.display = true;
       UserTcodeExecutor.outArray = [];
       UserTcodeExecutor.cnt = 0;
-    }
+    };
     const userTcodeRef = ref();
     // 批量导入TCode
     const importTCodes = (data) => {
@@ -511,7 +511,7 @@ export default {
       document.body.removeChild(a);
       // 释放 URL 对象
       URL.revokeObjectURL(url);
-    }
+    };
     // 帮助
     const helpTcodeRef = ref();
     const handleSaveTCode = (name, content) => {
@@ -522,7 +522,7 @@ export default {
         status: 'Not Active',
       };
       importTCodes(data);
-    }
+    };
 
     onMounted(() => {
 

@@ -448,8 +448,7 @@ export default {
           type: "error",
           grouping: true,
         })
-      }
-      
+      }  
     };
 
     const doShowDirInput = () => {
@@ -726,7 +725,7 @@ export default {
           getDirList();
         }
       });
-    }
+    };
     // 批量删除文件/文件夹
     const handlePopConfirm = () => {
       isShowMenu.value = false;
