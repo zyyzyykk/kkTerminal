@@ -17,4 +17,4 @@ export const calcSize = (sizeRaw) => {
         return sizeStr.substring(0, index) + sizeStr.substring(index + 3)
     }
     return size;
-}
+};

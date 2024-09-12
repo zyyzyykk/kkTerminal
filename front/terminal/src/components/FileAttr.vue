@@ -38,7 +38,7 @@
           {{ includeInfo }}
         </div>
         <div v-if="unreliable" style="margin-left: 10px;" >
-          <el-tag size="small" type="danger">不可信</el-tag>
+          <el-tag size="small" type="danger">unsure</el-tag>
         </div>
       </div>
       <div v-else class="kk-flex">
@@ -47,7 +47,7 @@
           {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size + ' 字节' }})
         </div>
         <div v-if="unreliable" style="margin-left: 10px;" >
-          <el-tag size="small" type="danger">不可信</el-tag>
+          <el-tag size="small" type="danger">unsure</el-tag>
         </div>
       </div>
       <div class="kk-border" ></div>

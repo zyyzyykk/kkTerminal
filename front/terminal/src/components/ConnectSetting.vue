@@ -145,7 +145,7 @@ export default {
       }
 
       return true;
-    }
+    };
 
     // 配置选项
     const optionBlockRef = ref();
@@ -158,7 +158,7 @@ export default {
       optionBlockType.value = type;
       optionBlockRef.value.DialogVisilble = true;
       optionBlockRef.value.aimOption = '';
-    }
+    };
 
     const isForbidInput = ref(false);
     if(setInfo.value.option != '') isForbidInput.value = true;
@@ -176,18 +176,18 @@ export default {
         context.emit('saveOp', option, setInfo.value);
         isForbidInput.value = true;
       }
-    }
+    };
 
     const newOp = () => {
       isForbidInput.value = false;
       setInfo.value.option = '';
-    }
+    };
 
     const confirm = () => {
       if(verifyParams() == false) return;
       context.emit('callback',setInfo.value);
       DialogVisilble.value = false;
-    }
+    };
 
     // 拷贝
     const { toClipboard } = useClipboard();
@@ -232,7 +232,7 @@ export default {
         else isForbidInput.value = false;
       },200);
       done();
-    }
+    };
 
     return {
       setInfo,

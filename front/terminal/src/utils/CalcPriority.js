@@ -1,6 +1,6 @@
 export const calcPriority = (type,attrs) => {
   return getType(type) + getAttrs(attrs);
-}
+};
 
 const fileTypeSymbols = {
   'BLOCK_SPECIAL': 'b',
@@ -15,7 +15,7 @@ const fileTypeSymbols = {
 
 const getType = (type) => {
   return fileTypeSymbols[type];
-}
+};
 
 const permissionMap = {
   'USR_R': 256,
@@ -54,11 +54,11 @@ const getAttrs = (attrs) => {
   symbol = setPermissionSymbol(symbol, 8, permissionValue & permissionMap['OTH_X'], 'x', permissionValue & permissionMap['STICKY'], 't', 'T');
 
   return symbol;
-}
+};
 
 // 设置权限符号
-function setPermissionSymbol(symbol, index, attr, char, specialPermission = 0, specialChar = '', noPermissionChar = '-') {
+const setPermissionSymbol = (symbol, index, attr, char, specialPermission = 0, specialChar = '', noPermissionChar = '-') => {
   if (specialPermission) symbol = symbol.substring(0, index) + (attr ? specialChar : noPermissionChar) + symbol.substring(index + 1);
   else symbol = symbol.substring(0, index) + (attr ? char : symbol[index]) + symbol.substring(index + 1);
   return symbol;
-}
+};

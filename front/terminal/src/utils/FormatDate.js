@@ -16,4 +16,4 @@ export const formatDate = (time) => {
     if(seconds < 10) seconds = "0" + seconds;
 
     return year + "年" + month + "月" + day + "日，" + hour + ":" + min + ":" + seconds;
-}
+};
