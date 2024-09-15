@@ -202,7 +202,6 @@ public class WebSocketServer {
         }
         // 心跳续约
         if(MessageInfoTypeRnum.HEART_BEAT.getState().equals(messageInfo.getType())) {
-            System.out.println("心跳续约");
             shellOutputStream.write("".getBytes(StandardCharsets.UTF_8));
             shellOutputStream.flush();
         }

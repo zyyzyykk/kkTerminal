@@ -8,3 +8,16 @@ export const changeStr = (str) => {
   
   return result;
 };
+
+// 转义字符串(路径)
+const pathChars = /[ !"#$&'()*,:;<=>?@[\]^`]/g;
+export const escapePath = (str) => {
+  return str.replace(pathChars, function(match) {
+    return '\\' + match;
+  });
+};
+
+// 转义字符串(文件项)
+export const escapeItem = (str) => {
+  return escapePath(str);
+};

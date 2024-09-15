@@ -1,20 +1,23 @@
 package com.kkbpro.terminal.utils;
 
 import org.apache.commons.lang3.StringUtils;
-import sun.misc.BASE64Decoder;
+import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
-import org.apache.commons.codec.binary.Base64;
 
 
 public class AesUtil {
 
-    // 密钥 (需要前端和后端保持一致)
+    /**
+     * 密钥 (需要前端和后端保持一致)
+     */
     private static final String SECRET_KEY = "P5P1SIqVe6kaOxMX";
 
-    // 加密算法
+    /**
+     * 加密算法
+     */
     private static final String ALGORITHMSTR = "AES/ECB/PKCS5Padding";
 
     /**
@@ -63,7 +66,7 @@ public class AesUtil {
      * @return 编码后的base 64 code
      */
     public static String base64Encode(byte[] bytes){
-        return Base64.encodeBase64String(bytes);
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
     /**
@@ -73,7 +76,7 @@ public class AesUtil {
      * @throws Exception
      */
     public static byte[] base64Decode(String base64Code) throws Exception{
-        return StringUtils.isEmpty(base64Code) ? null : new BASE64Decoder().decodeBuffer(base64Code);
+        return StringUtils.isEmpty(base64Code) ? null : Base64.getDecoder().decode(base64Code);
     }
 
 
