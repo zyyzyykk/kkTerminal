@@ -108,6 +108,7 @@ import $ from 'jquery';
 import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/utils/BaseUrl';
 import { Refresh, Fold, Download, Upload } from '@element-plus/icons-vue';
+import { escapeItem, escapePath } from '@/utils/StringUtil';
 
 import NoData from '@/components/NoData';
 import TxtPreview from './preview/TxtPreview';
@@ -202,30 +203,38 @@ export default {
       dir.value = dir.value.replace(/\/{2,}/g, '/');
     };
 
-    // 获取初始目录
+    // 获取初始家目录
     const isShowDirInput = ref(false);
     const getInitDir = () => {
       if(dir.value != '') return;
       $.ajax({
-        url: http_base_url + '/pwd',
+        url: http_base_url + '/home',
         type:'get',
         data:{
-          time: new Date().getTime(),
+          time:new Date().getTime(),
           sshKey:props.sshKey,
         },
         success(resp){
-          dir.value = resp.data.path;
-          confirmDirCorrect();
-          selectedFiles.value = [];
-          files.value = [];
-          getDirList();
+          if(resp.status == 'success') {
+            noDataMsg.value = '暂无文件';
+            dirStatus.value = 0;
+            dir.value = resp.data.path;
+            confirmDirCorrect();
+            selectedFiles.value = [];
+            files.value = [];
+            getDirList();
+          }
+          else {
+            noDataMsg.value = resp.info;
+            dirStatus.value = 1;
+          }
         }
       });
     };
     
     // 获取当前路径下的文件列表
     const noDataMsg = ref('暂无文件');
-    // 目录状态：0 正常 / 1 目录不存在
+    // 目录状态：0 正常 / 1 目录不存在、无权限等
     const dirStatus = ref(0);
     const getDirList = () => {
       let now_dir = dir.value;
@@ -233,7 +242,7 @@ export default {
         url: http_base_url + '/ls',
         type:'get',
         data:{
-          time: new Date().getTime(),
+          time:new Date().getTime(),
           sshKey:props.sshKey,
           path:now_dir,
         },
@@ -262,13 +271,14 @@ export default {
       });
     };
 
+    // 远程url参数规范: sshKey不能是第一个参数，path必须是最后一个参数，sshKey和path必须连在一起
     // 获取远程文件url
     const getRemoteFileUrl = (name, path) => {
-      return http_base_url + '/download/remote/file/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&path=' + (path ? path : dir.value);
+      return http_base_url + '/download/remote/file' + '?time=' + new Date().getTime() + '&fileName=' + encodeURIComponent(name) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(path ? path : dir.value);
     };
     // 获取远程文件夹url
     const getRemoteFolderUrl = (name, path) => {
-      return http_base_url + '/download/remote/folder/' + name + '?time=' + new Date().getTime() + '&sshKey=' + props.sshKey + '&path=' + (path ? path : dir.value);
+      return http_base_url + '/download/remote/folder' + '?time=' + new Date().getTime() + '&folderName=' + encodeURIComponent(name) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(path ? path : dir.value);
     };
 
     // 解析url的path
@@ -520,7 +530,8 @@ export default {
             type:'post',
             data:{
               sshKey:props.sshKey,
-              path: nowPath,
+              path:escapePath(dir.value),
+              item:escapeItem(item.name),
             },
             success(resp){
               if(resp.status == 'success') {
@@ -559,7 +570,8 @@ export default {
               type:'post',
               data:{
                 sshKey:props.sshKey,
-                path: nowPath,
+                path:escapePath(basePath),
+                item:escapeItem(item.name),
               },
               success(resp){
                 if(resp.status == 'success') {
@@ -736,8 +748,8 @@ export default {
         type:'post',
         data:{
           sshKey:props.sshKey,
-          path:dir.value,
-          items: selectedFiles.value.map(e => e.name).join(' '),
+          path:escapePath(dir.value),
+          items:selectedFiles.value.map(e => escapeItem(e.name)).join(' '),
         },
         success(resp){
           ElMessage({
@@ -757,7 +769,8 @@ export default {
         type:'post',
         data:{
           sshKey:props.sshKey,
-          path:nowDir + name,
+          path:escapePath(nowDir),
+          item:escapeItem(name),
         },
         success(resp){
           ElMessage({
@@ -828,9 +841,9 @@ export default {
         type:'post',
         data:{
           sshKey:props.sshKey,
-          src:fileClipboard.value.path,
-          dst:dir.value,
-          items: fileClipboard.value.files.map(e => e.name).join(' '),
+          src:escapePath(fileClipboard.value.path),
+          dst:escapePath(dir.value),
+          items: fileClipboard.value.files.map(e => escapeItem(e.name)).join(' '),
         },
         success(resp){
           if(resp.status == 'success') getDirList();

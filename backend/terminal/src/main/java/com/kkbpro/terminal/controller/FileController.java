@@ -29,8 +29,8 @@ public class FileController {
     /**
      * 下载远程文件
      */
-    @GetMapping("/download/remote/file/{fileName}")
-    public void downloadRemoteFile(HttpServletResponse response, String sshKey, String path, @PathVariable String fileName) throws IOException {
+    @GetMapping("/download/remote/file")
+    public void downloadRemoteFile(HttpServletResponse response, String sshKey, String path, String fileName) throws IOException {
 
         SFTPClient sftpClient = getSftpClient(sshKey);
         String remoteFilePath = path + fileName;
@@ -63,8 +63,8 @@ public class FileController {
     /**
      * 下载远程文件夹
      */
-    @GetMapping("/download/remote/folder/{folderName}")
-    public void downloadRemoteFolder(HttpServletResponse response, String sshKey, String path, @PathVariable String folderName) throws IOException {
+    @GetMapping("/download/remote/folder")
+    public void downloadRemoteFolder(HttpServletResponse response, String sshKey, String path, String folderName) throws IOException {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) return;
@@ -101,8 +101,8 @@ public class FileController {
      * 下载本地文件
      * --方法未使用--
      */
-    @GetMapping("/download/local/{fileName}")
-    public void downloadLocalFile(HttpServletResponse response, String sshKey, String id, @PathVariable String fileName) throws IOException {
+    @GetMapping("/download/local")
+    public void downloadLocalFile(HttpServletResponse response, String sshKey, String id, String fileName) throws IOException {
 
         String folderPath = FileUtil.folderBasePath + "/" + sshKey + "-" + id;
         File file = new File(folderPath + "/" + fileName);
@@ -164,7 +164,6 @@ public class FileController {
         } catch (net.schmizz.sshj.sftp.SFTPException e) {
             e.printStackTrace();
             Response.StatusCode statusCode  = e.getStatusCode();
-            System.out.println(statusCode);
             if(Response.StatusCode.NO_SUCH_FILE.equals(statusCode)) {
                 return Result.setError(500,"目录不存在",map);
             }
@@ -185,20 +184,20 @@ public class FileController {
      * 统计文件夹中包含的文件/文件夹数目（文件数@文件夹数）
      */
     @GetMapping("/find")
-    public Result find(String sshKey, String path) {
+    public Result find(String sshKey, String path, String item) {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，统计数目失败",null);
         }
-        String num;
+        String num = "";
         String[] nums;
         try(Session session = ssh.startSession()) {
-            String command = "echo \"$(find " + path + " -type f | wc -l)@$(find " + path + " -type d | wc -l)\"";
+            String command = "cd " + path + " && echo \"$(find " + item + " -type f | wc -l)@$(find " + item + " -type d | wc -l)\"";
             Session.Command cmd = session.exec(command);
             // 读取命令执行结果
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
-                num = reader.readLine();
+                num += reader.readLine();
             }
             // 等待命令执行完毕
             cmd.join();
@@ -218,19 +217,19 @@ public class FileController {
      * 获取文件大小（字节）
      */
     @GetMapping("/du")
-    public Result du(String sshKey, String path) {
+    public Result du(String sshKey, String path, String item) {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，获取大小失败",null);
         }
-        String size;
+        String size = "";
         try(Session session = ssh.startSession()) {
-            String command = "du -sb " + path + " | head -n 1 | cut -f1";
+            String command = "cd " + path + " && du -sb " + item + " | head -n 1 | cut -f1";
             Session.Command cmd = session.exec(command);
             // 读取命令执行结果
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
-                size = reader.readLine();
+                size += reader.readLine();
             }
             // 等待命令执行完毕
             cmd.join();
@@ -245,22 +244,51 @@ public class FileController {
     }
 
     /**
-     * 获取当前路径 pwd (首次有效)
+     * 获取家路径 (首次有效)
      */
-    @GetMapping("/pwd")
-    public Result pwd(String sshKey) throws IOException {
+    @GetMapping("/home")
+    public Result home(String sshKey) throws IOException {
 
         Map<String, Object> map = new HashMap<>();
         String path = "/";
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            map.put("path", path);
-            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件路径获取失败",map);
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接已断开",map);
         }
         SFTPClient sftp = getSftpClient(sshKey);
         path = sftp.canonicalize(".");
         map.put("path", path);
-        return Result.setSuccess(200, "首次路径", map);
+        return Result.setSuccess(200, "家路径", map);
+    }
+
+    /**
+     * 获取当前目录（pwd）
+     * --方法未使用--
+     */
+    @GetMapping("/pwd")
+    public Result pwd(String sshKey) {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，获取当前目录失败",null);
+        }
+        String path = "";
+        try(Session session = ssh.startSession()) {
+            String command = "pwd";
+            Session.Command cmd = session.exec(command);
+            // 读取命令执行结果
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
+                path += reader.readLine();
+            }
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.setError(500, "获取当前目录失败", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500, "获取当前目录失败", null);
+        }
+        return Result.setSuccess(200, "获取当前目录成功", path);
     }
 
     /**
@@ -373,14 +401,14 @@ public class FileController {
      * 新建文件
      */
     @PostMapping("/touch")
-    public Result touch(String sshKey, String path) {
+    public Result touch(String sshKey, String path, String item) {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件新建失败",null);
         }
         try(Session session = ssh.startSession()) {
-            String command = "touch " + path;
+            String command = "cd " + path + " && touch " + item;
             Session.Command cmd = session.exec(command);
             // 等待命令执行完毕
             cmd.join();
@@ -398,16 +426,21 @@ public class FileController {
      * 新建文件夹
      */
     @PostMapping("/mkdir")
-    public Result mkdir(String sshKey, String path) {
+    public Result mkdir(String sshKey, String path, String item) {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件夹新建失败",null);
         }
-        try {
-            SFTPClient sftp = getSftpClient(sshKey);
-            sftp.mkdir(path);
+        try(Session session = ssh.startSession()) {
+            String command = "cd " + path + " && mkdir " + item;
+            Session.Command cmd = session.exec(command);
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.setError(500, "文件夹新建失败", null);
         } catch (Exception e) {
+            e.printStackTrace();
             return Result.setError(500, "文件夹新建失败", null);
         }
         return Result.setSuccess(200, "文件夹新建成功", null);
@@ -466,9 +499,9 @@ public class FileController {
         File temporaryFolder = new File(folderPath);
         File temporaryFile = null;
         if(!chunks.equals(1)) {
-            temporaryFile = new File(folderPath + "/" + fileName + "-" + chunk);
+            temporaryFile = new File(folderPath + "/" + id + "-" + chunk);
         }
-        else temporaryFile = new File(folderPath + "/" + fileName);
+        else temporaryFile = new File(folderPath + "/" + id);
         // 如果文件夹不存在则创建
         if (!temporaryFolder.exists()) {
             temporaryFolder.mkdirs();
@@ -491,11 +524,11 @@ public class FileController {
             Thread FileThread = new Thread(() -> {
                 // 将文件片合并
                 if(!chunks.equals(1))
-                    FileUtil.fileChunkMerge(folderPath,fileName,chunks,totalSize);
+                    FileUtil.fileChunkMerge(folderPath,id,chunks,totalSize);
                 try {
                     // 上传到服务器
                     SFTPClient sftpFileClient = getSftpClient(sshKey);
-                    sftpFileClient.put(folderPath + "/" + fileName, path + fileName);
+                    sftpFileClient.put(folderPath + "/" + id, path + fileName);
                 } catch (Exception e) {
                     System.out.println("文件上传失败");
                     e.printStackTrace();

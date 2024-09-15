@@ -89,6 +89,7 @@ import { ElMessage } from 'element-plus';
 import useClipboard from "vue-clipboard3";
 import { DocumentCopy } from '@element-plus/icons-vue';
 import { calcSize } from '@/utils/CalcSize';
+import { escapeItem, escapePath } from '@/utils/StringUtil';
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
@@ -123,9 +124,10 @@ export default {
         url: http_base_url + '/du',
         type:'get',
         data:{
-          time: new Date().getTime(),
+          time:new Date().getTime(),
           sshKey:sshKey,
-          path:fileDir.value + fileInfo.value.name,
+          path:escapePath(fileDir.value),
+          item:escapeItem(fileInfo.value.name),
         },
         beforeSend: function() { // 发送请求前执行的方法
           loading.value = true;
@@ -146,9 +148,10 @@ export default {
         url: http_base_url + '/find',
         type:'get',
         data:{
-          time: new Date().getTime(),
+          time:new Date().getTime(),
           sshKey:sshKey,
-          path:fileDir.value + fileInfo.value.name,
+          path:escapePath(fileDir.value),
+          item:escapeItem(fileInfo.value.name),
         },
         beforeSend: function() { // 发送请求前执行的方法
           loading.value = true;
