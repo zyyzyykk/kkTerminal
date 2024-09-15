@@ -278,16 +278,16 @@ export default {
     };
     // 获取远程文件夹url
     const getRemoteFolderUrl = (name, path) => {
-      return http_base_url + '/download/remote/folder' + '?time=' + new Date().getTime() + '&folderName=' + encodeURIComponent(name) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(path ? path : dir.value);
+      return http_base_url + '/download/remote/folder' + '?time=' + new Date().getTime() + '&folderName=' + encodeURIComponent(escapeItem(name)) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(escapePath(path ? path : dir.value));
     };
 
-    // 解析url的path
+    // 解析文件url的path
     const parseUrl = (url) => {
       let urlParams = {key:'', path:null};
       let indexKey = url.indexOf('&sshKey=');
       let indexPath = url.indexOf('&path=');
       if(indexKey != -1 && indexPath != -1) urlParams.key = url.substring(indexKey + 8, indexPath);
-      if(indexPath != -1) urlParams.path = url.substring(indexPath + 6);
+      if(indexPath != -1) urlParams.path = decodeURIComponent(url.substring(indexPath + 6));
       return urlParams;
     };
 
