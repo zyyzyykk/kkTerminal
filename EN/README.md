@@ -10,17 +10,17 @@
 >
 > Preview: https://ssh.kkbpro.com/	(For domestic servers)	or	https://ssh.kkbapps.com/	(For foreign servers)
 >
-> Update Time: 2024-08-14
+> Update Time: 2024-09-16
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://img.kkbapps.com/logo/terminal.png" alt="kkterminal logo"></a></p>
 
 <p align="center">
-  <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/docker/pulls/zyyzyykk/kkterminal" alt="Docker Image"></a>
-  <a href="https://www.oracle.com/cn/java/technologies/downloads/#java8-windows"><img src="https://img.shields.io/badge/jdk-1.8-orange" alt="JDK Version"></a>
-  <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/springboot-2.7.15-green?color=6db33f" alt="SpringBoot Version"></a>
-  <a href="https://cn.vuejs.org/"><img src="https://img.shields.io/badge/vue-3.x-green?color=42b883" alt="Vue Version"></a>
-  <a href="https://www.apache.org/licenses/"><img src="https://img.shields.io/badge/licence-Apache-red" alt="Apache Licence"></a>
+  <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/docker/pulls/zyyzyykk/kkterminal?logo=docker" alt="Docker Image"></a>
+  <a href="https://www.oracle.com/cn/java/technologies/downloads/#java8-windows"><img src="https://img.shields.io/badge/jdk-1.8-orange?logo=openjdk&logoColor=%23e3731c" alt="JDK Version"></a>
+  <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/springboot-2.7.15-green?color=6db33f&logo=springboot" alt="SpringBoot Version"></a>
+  <a href="https://cn.vuejs.org/"><img src="https://img.shields.io/badge/vue-3.x-green?color=42b883&logo=vue.js" alt="Vue Version"></a>
+  <a href="https://www.apache.org/licenses/"><img src="https://img.shields.io/badge/licence-Apache-red?logo=apache&logoColor=%23D22128" alt="Apache Licence"></a>
   <a href="https://github.com/zyyzyykk/kkTerminal"><img src="https://img.shields.io/github/stars/zyyzyykk/kkterminal" alt="GitHub"></a>
 </p>
 <p align="center"><a href="../README.md" >简体中文</a> ｜ English</p>
@@ -68,13 +68,13 @@ Visit the following website:
 - 🌐 For domestic servers: https://ssh.kkbpro.com/
 - 🌍 For foreign servers: https://ssh.kkbapps.com/
 
-![connect](https://img.kkbapps.com/terminal/3.1.7-1.png)
+![connect](https://img.kkbapps.com/terminal/3.2.6-1.png)
 
-![prefer](https://img.kkbapps.com/terminal/315-2.png)
+![prefer](https://img.kkbapps.com/terminal/3.2.6-2.png)
 
-![file](https://img.kkbapps.com/terminal/3.2.0-3.png)
+![file](https://img.kkbapps.com/terminal/3.2.6-3.png)
 
-![editor](https://img.kkbapps.com/terminal/3.1.2-4.png)
+![editor](https://img.kkbapps.com/terminal/3.2.6-4.png)
 
 [**More Module Previews**](./MODULE.md)
 
@@ -107,7 +107,14 @@ Visit the following website:
 
 ### 👨‍💻 Update Records
 
-##### zyyzyykk/kkterminal:3.2.2: latest
+##### zyyzyykk/kkterminal:3.2.6: latest
+
+- Fix bugs related to special character operations in files
+- Optimize file upload and download
+- File Attribute Module: Folder addition includes attributes, file size attributes, and real-time refresh
+- Optimize display logic and standardize coding
+
+##### zyyzyykk/kkterminal:3.2.2:
 
 - TCode supports Get/Set to Session/Local Level variables
 - Text editor adds intelligent prompts for TCode native object `kkTerminal`
@@ -118,11 +125,6 @@ Visit the following website:
 - The File Management Module supports shortcut key operations such as multiple/all selection, copy and paste, cut, etc
 - Support folder download
 - Refactoring some logic and optimizing display
-
-##### zyyzyykk/kkterminal:3.1.7 :
-
-- Adapt to default fonts and optimize TCode status display
-- Support local PC deployment, automatically open browser window
 
 ##### [History Update Records](./UPDATE.md)
 

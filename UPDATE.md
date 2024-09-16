@@ -1,5 +1,10 @@
 ### 👨‍💻 历史更新记录
 
+##### zyyzyykk/kkterminal:3.1.7：
+
+- 适配默认字体、优化TCode状态显示
+- 支持本地PC端部署，自动打开浏览器窗口
+
 ##### zyyzyykk/kkterminal:3.1.5：
 
 - 修复无法通过input框上传文件的bug
