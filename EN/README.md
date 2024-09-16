@@ -126,7 +126,7 @@ Visit the following website:
 - Support folder download
 - Refactoring some logic and optimizing display
 
-##### [History Update Records](./UPDATE.md)
+[**History Update Records**](./UPDATE.md)
 
 ### 🧬 Architecture
 

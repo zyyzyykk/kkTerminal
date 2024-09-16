@@ -128,7 +128,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 支持文件夹下载
 - 重构部分逻辑，优化显示
 
-##### [历史更新记录](./UPDATE.md)
+[**历史更新记录**](./UPDATE.md)
 
 ### 🧬 架构
 
