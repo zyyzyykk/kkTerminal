@@ -76,7 +76,7 @@ export default {
     // 清空撤销历史
     const reset = () => {
       if(aceEditor.value) aceEditor.value.getSession().getUndoManager().reset();
-    }
+    };
     // 设置语言
     const setLanguage = (name) => {
       if(aceEditor.value) aceEditor.value.getSession().setMode(`ace/mode/${langToMode(name)}`);
