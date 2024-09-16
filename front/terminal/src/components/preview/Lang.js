@@ -29,7 +29,7 @@ const langs = {
     "xsl": "xml",
     "xslt": "xml",
     "yaml": "yaml",
-    "yml": "yaml"
+    "yml": "yaml",
 };
 
 // 获取文件名后缀
@@ -42,6 +42,9 @@ const getSuffix = (name) => {
     return suffix;
 };
 
-export default function langToMode(name) {
+// 文件名 => 语言
+const langToMode = (name) => {
     return langs[getSuffix(name)] || "text";
-}
+};
+
+export default langToMode;

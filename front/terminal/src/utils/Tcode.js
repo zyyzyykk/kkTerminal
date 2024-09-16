@@ -1,5 +1,6 @@
 import { encrypt, decrypt } from './Encrypt';
-const storageKey = 'tcode-local-vars';
+const storageLocalKey = 'tcode-local-vars';
+const storageSessionPrefix = 'tcode-session-vars-';
 
 // 功能TCode, 以 / 开头
 export const FuncTcode = {
@@ -93,36 +94,36 @@ export const UserTcodeExecutor = {
     // 变量
     variables: {
         session(key,value) {
-            if(value != undefined) sessionStorage.setItem(key,JSON.stringify(value));
+            if(value != undefined) sessionStorage.setItem(storageSessionPrefix + key,JSON.stringify(value));
             else {
-                if(sessionStorage.getItem(key)) return JSON.parse(sessionStorage.getItem(key));
+                if(sessionStorage.getItem(storageSessionPrefix + key)) return JSON.parse(sessionStorage.getItem(storageSessionPrefix + key));
                 else return null;
             }
         },
         local(key,value) {
             let tcodeLocalVars = {};
-            if(localStorage.getItem(storageKey)) {
-                tcodeLocalVars = JSON.parse(decrypt(localStorage.getItem(storageKey)));
+            if(localStorage.getItem(storageLocalKey)) {
+                tcodeLocalVars = JSON.parse(decrypt(localStorage.getItem(storageLocalKey)));
             }
             if(value != undefined) {
                 tcodeLocalVars[key] = value;
-                localStorage.setItem(storageKey,encrypt(JSON.stringify(tcodeLocalVars)));
+                localStorage.setItem(storageLocalKey,encrypt(JSON.stringify(tcodeLocalVars)));
             }
             else return tcodeLocalVars[key];
         },
         clean() {
             if(arguments.length == 0) {
-                localStorage.removeItem(storageKey);
+                localStorage.removeItem(storageLocalKey);
                 return;
             }
             let tcodeLocalVars = {};
-            if(localStorage.getItem(storageKey)) {
-                tcodeLocalVars = JSON.parse(decrypt(localStorage.getItem(storageKey)));
+            if(localStorage.getItem(storageLocalKey)) {
+                tcodeLocalVars = JSON.parse(decrypt(localStorage.getItem(storageLocalKey)));
             }
             for (let i = 0; i < arguments.length; i++) {
                 delete tcodeLocalVars[arguments[i]];
             }
-            localStorage.setItem(storageKey,encrypt(JSON.stringify(tcodeLocalVars)));
+            localStorage.setItem(storageLocalKey,encrypt(JSON.stringify(tcodeLocalVars)));
         }
     },
     // 仅向terminal写入，不等待
