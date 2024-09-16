@@ -1,5 +1,10 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.1.7 :
+
+- Adapt to default fonts and optimize TCode status display
+- Support local PC deployment, automatically open browser window
+
 ##### zyyzyykk/kkterminal:3.1.5 :
 
 - Fix bug where files cannot be uploaded through the input box
