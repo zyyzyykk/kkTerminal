@@ -10,7 +10,7 @@ export const changeStr = (str) => {
 };
 
 // 转义字符串(路径)
-const pathChars = /[ !"#$&'()*,:;<=>?@[\]^`]/g;
+const pathChars = /[ !"#$&'()*,:;<=>?@[\\\]^`{}~]/g;
 export const escapePath = (str) => {
   return str.replace(pathChars, function(match) {
     return '\\' + match;
