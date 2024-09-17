@@ -61,8 +61,9 @@ export default {
         err_msg.value = '文件名不能为空';
         return;
       }
-      if(name.value.indexOf('/') != -1) {
-        err_msg.value = '文件名不能含有 /';
+      const invalidNameRe = /[\/|]/;
+      if(invalidNameRe.test(name.value)) {
+        err_msg.value = "文件名不能含有 /,|";
         return;
       }
       context.emit('callback', isDirectory.value, name.value, nowDir.value);

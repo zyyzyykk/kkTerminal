@@ -183,9 +183,10 @@ export default {
         })
         return;
       }
-      if(rename.value.indexOf('/') != -1) {
+      const invalidNameRe = /[\/|]/;
+      if(invalidNameRe.test(rename.value)) {
         ElMessage({
-          message: "文件名不能含有 /",
+          message: "文件名不能含有 /,|",
           type: "warning",
           grouping: true,
         })

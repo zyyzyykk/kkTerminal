@@ -705,9 +705,10 @@ export default {
         renameFile.value = {};
         return;
       }
-      if(renameFile.value.name.indexOf('/') != -1) {
+      const invalidNameRe = /[\/|]/;
+      if(invalidNameRe.test(renameFile.value.name)) {
         ElMessage({
-          message: "文件名不能含有 /",
+          message: "文件名不能含有 /,|",
           type: "warning",
           grouping: true,
         });
