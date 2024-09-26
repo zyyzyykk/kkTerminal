@@ -22,7 +22,7 @@
         </div>
         <div style="width: 10px;"></div>
         <div style="flex: 1;">
-          <el-input size="small" v-model="name" class="w-50 m-2" placeholder="">
+          <el-input size="small" v-model="name" @keydown.enter="confirm" class="w-50 m-2" placeholder="">
           </el-input>
         </div>
         <div style="margin-left: 10px;">
@@ -61,9 +61,9 @@ export default {
         err_msg.value = '文件名不能为空';
         return;
       }
-      const invalidNameRe = /[\/|]/;
+      const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(name.value)) {
-        err_msg.value = "文件名不能含有 /,|";
+        err_msg.value = "文件名不能含有 |,/";
         return;
       }
       context.emit('callback', isDirectory.value, name.value, nowDir.value);
