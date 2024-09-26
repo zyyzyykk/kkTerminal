@@ -408,7 +408,7 @@ public class FileController {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件新建失败",null);
         }
         try(Session session = ssh.startSession()) {
-            String command = "cd " + path + " && touch " + item;
+            String command = "cd " + path + " && test ! -e " + item + " && touch " + item;
             Session.Command cmd = session.exec(command);
             // 等待命令执行完毕
             cmd.join();
@@ -433,7 +433,7 @@ public class FileController {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件夹新建失败",null);
         }
         try(Session session = ssh.startSession()) {
-            String command = "cd " + path + " && mkdir " + item;
+            String command = "cd " + path + " && test ! -e " + item + " && mkdir " + item;
             Session.Command cmd = session.exec(command);
             // 等待命令执行完毕
             cmd.join();
@@ -464,6 +464,31 @@ public class FileController {
             return Result.setError(500,"重命名失败");
         }
         return Result.setSuccess(200, "重命名成功", null);
+    }
+
+
+    /**
+     * wget 文件URL上传
+     */
+    @PostMapping("/wget")
+    public Result wget(String sshKey, String path, String item, String url) {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件URL上传失败",null);
+        }
+        try(Session session = ssh.startSession()) {
+            String command = "cd " + path + " && wget -O " + item + " " + url;
+            Session.Command cmd = session.exec(command);
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.setError(500, "文件URL上传失败", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500, "文件URL上传失败", null);
+        }
+        return Result.setSuccess(200, "文件URL上传成功", null);
     }
 
     /**

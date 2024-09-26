@@ -28,11 +28,11 @@
           </el-input>
         </div>
         <div style="cursor: pointer; margin-left: 5px;" >
-          <el-popover placement="bottom-end" :width="220" trigger="hover" >
+          <el-popover v-if="env.tCode" placement="bottom-end" :width="220" trigger="click" >
             <template #reference>
               <el-icon :style="{ color: '#606266' }" ><QuestionFilled /></el-icon>
             </template>
-            <div style="font-size: 12px; color: #313131;" >
+            <div v-if="env.tCode" style="font-size: 12px; color: #313131;" >
               <div style="user-select: none; font-size: 14px; font-weight: bold;" >什么是 TCode (终端代码) ？</div>
               <div style="user-select: none; margin-top: 5px;">TCode（终端代码）是用于访问和执行特定操作流程的快捷方式</div>
               <div style="user-select: none; margin-top: 5px;">

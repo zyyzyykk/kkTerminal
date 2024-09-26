@@ -21,7 +21,7 @@
       <div class="kk-flex">
         <div style="margin-right: 10px;" ><FileIcons :name="fileInfo.name" width="32" height="32" :isFolder="fileInfo.isDirectory" /></div>
         <div>
-          <el-input v-model="rename" placeholder="" />
+          <el-input @keydown.enter="confirm" v-model="rename" placeholder="" />
         </div>
       </div>
       <div class="kk-border" ></div>
@@ -183,10 +183,10 @@ export default {
         })
         return;
       }
-      const invalidNameRe = /[\/|]/;
+      const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(rename.value)) {
         ElMessage({
-          message: "文件名不能含有 /,|",
+          message: "文件名不能含有 |,/",
           type: "warning",
           grouping: true,
         })

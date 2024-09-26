@@ -1,12 +1,14 @@
 <template>
   <div class="no-data" :style="viewStyle" >
-    <div>
-      <slot name="myslot" ></slot>
+    <div style="flex: 1;" ></div>
+    <slot name="myslot" ></slot>
+    <div style="display: flex; align-items: center;" >
       <div>
         <img src="../assets/no_data.png" alt="暂无数据" style="width: 120px;">
       </div>
-      <div class="msg">{{ msg }}</div>
     </div>
+    <div class="msg">{{ msg }}</div>
+    <div style="flex: 1;" ></div>
   </div>
 </template>
 
@@ -31,13 +33,18 @@ export default {
       type:String,
       required:false,
     },
+    minHeight:{
+      type:String,
+      required:false,
+    },
   },
   setup(props) {
 
     const viewStyle = computed(() => {
       return {
-        width: props.width ? props.width + 'px' : '100%',
-        height: props.height ? props.height + 'px' : '30vh',
+        width: props.width ? props.width : '100%',
+        height: props.height ? props.height : '100%',
+        minHeight: props.minHeight ? props.minHeight : '',
       }
     });
 
@@ -52,6 +59,7 @@ export default {
 .no-data {
   text-align: center;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }

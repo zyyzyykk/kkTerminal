@@ -24,57 +24,94 @@
           <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
           <div v-if="selectedFiles.length == 1" class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
           <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
-          <div v-if="dirStatus == 0" class="hover-class" @click="doUpload" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
-            <el-upload
-              :show-file-list="false"
-              :with-credentials="true"
-              :http-request="doUpload"
-              :multiple="true"
-              >
-              <el-icon><Upload /></el-icon>
-            </el-upload>
+          <div v-if="dirStatus == 0" class="hover-class" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
+            <el-dropdown v-show="DialogVisilble" style="line-height: unset;" placement="bottom-end" size="small" trigger="click" >
+              <div class="hover-class" style="font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
+              <template #dropdown>
+                <el-dropdown-menu v-show="DialogVisilble" class="no-select" style="text-align: center;">
+                  <el-dropdown-item @click="fileUploadTypeChoose(0)" >
+                    <div style="display: flex; align-items: center;" >
+                      <div><el-icon><DocumentAdd /></el-icon></div>
+                      <div>文件</div>
+                    </div>
+                  </el-dropdown-item>
+                  <el-dropdown-item @click="fileUploadTypeChoose(1)" >
+                    <div style="display: flex; align-items: center;" >
+                      <div><el-icon><FolderAdd /></el-icon></div>
+                      <div>文件夹</div>
+                    </div>
+                  </el-dropdown-item>
+                  <el-dropdown-item @click="fileUploadTypeChoose(2)" >
+                    <div style="display: flex; align-items: center;" >
+                      <div><el-icon><Link /></el-icon></div>
+                      <div>URL</div>
+                    </div>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </div>
           <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
         </div>
       </div>
       <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select" 
-         @contextmenu="handleContextMenu" @scroll="handleScroll" 
-         @dragover="preventDefault" @drop="handleFileDrag" 
-         tabindex="0" @keydown="handleShortcutKeys" >
-          <div v-if="files.length != 0" >
-              <div v-for="item in files" :key="item.id" >
-                <template v-if="item.isDirectory == true">
-                  <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
-                    <FileIcons :style="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
-                    <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
-                      <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @mousedown.stop @dblclick.stop @change="handleRename(item)" />
-                    </div>
-                    <div v-else class="ellipsis" style="margin: 0 10px;">{{ item.name }}</div>
-                  </div>
-                </template>
-                <template v-else>
-                  <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
-                    <FileIcons :style="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
-                    <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
-                      <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @mousedown.stop @dblclick.stop @change="handleRename(item)" />
-                    </div>
-                    <div v-else class="ellipsis" style="margin: 0 10px;">{{ item.name }}</div>
-                  </div>
-                </template>
+        @contextmenu="handleContextMenu" @scroll="handleScroll" 
+        @dragover="preventDefault" @drop="handleFileDrag" 
+        tabindex="0" @keydown="handleShortcutKeys" >
+        <div v-if="files.length != 0" >
+          <div v-for="item in files" :key="item.id" >
+            <template v-if="item.isDirectory == true">
+              <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
+                <FileIcons :style="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
+                <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
+                  <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @mousedown.stop @dblclick.stop @change="handleRename(item)" />
+                </div>
+                <div v-else class="ellipsis" style="margin: 0 10px;">{{ item.name }}</div>
               </div>
+            </template>
+            <template v-else>
+              <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
+                <FileIcons :style="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" width="20" height="20" :isFolder="item.isDirectory" />
+                <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
+                  <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @mousedown.stop @dblclick.stop @change="handleRename(item)" />
+                </div>
+                <div v-else class="ellipsis" style="margin: 0 10px;">{{ item.name }}</div>
+              </div>
+            </template>
           </div>
-          <div v-else>
-            <NoData @contextmenu="selectedFiles = []" v-if="loading == false" :msg="noDataMsg"></NoData>
-          </div>
+        </div>
+        <div v-else>
+          <NoData height="30vh" minHeight="200px" @contextmenu="selectedFiles = []" v-if="loading == false" :msg="noDataMsg"></NoData>
+        </div>
       </div>
     </div>
     <div style="margin-top: -12px;"></div>
   </el-dialog>
 
+  <!-- 文件上传 -->
+  <el-upload
+    v-show="false"
+    :show-file-list="false"
+    :with-credentials="true"
+    :http-request="doUpload"
+    :multiple="true"
+  >
+    <el-button v-show="false" size="small" type="primary" id="fileUploadInputButton" ></el-button>
+  </el-upload>
+  <!-- 文件夹上传 -->
+  <input
+    v-show="false"
+    type="file"
+    webkitdirectory
+    @change="folderInputUploadPrehandle"
+    id="folderUploadInput"
+  />
+
   <TxtPreview ref="txtPreviewRef" @doSave="doSave" ></TxtPreview>
   <MkFile ref="mkFileRef" @callback="handleMkFile" ></MkFile>
   <FileAttr ref="fileAttrRef" @callback="doRename" ></FileAttr>
 
+  <!-- 菜单项 -->
   <div ref="menuBlockRef" @contextmenu="preventDefault" v-show="isShowMenu" class="kk-menu no-select">
     <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(1)" key="1" >刷新</div>
     <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >打开</div>
@@ -107,7 +144,7 @@ import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
 import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/utils/BaseUrl';
-import { Refresh, Fold, Download, Upload } from '@element-plus/icons-vue';
+import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
 
 import NoData from '@/components/NoData';
@@ -130,6 +167,9 @@ export default {
     Fold,
     Download,
     Upload,
+    DocumentAdd,
+    FolderAdd,
+    Link,
   },
   props:['sshKey','os'],
   setup(props) {
@@ -550,6 +590,7 @@ export default {
         }
       }
     };
+    // 文件夹拖拽递归上传
     const folderUpload = (directoryEntry, basePath) => {
       const reader = directoryEntry.createReader();
       reader.readEntries((entries) => {
@@ -705,10 +746,10 @@ export default {
         renameFile.value = {};
         return;
       }
-      const invalidNameRe = /[\/|]/;
+      const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(renameFile.value.name)) {
         ElMessage({
-          message: "文件名不能含有 /,|",
+          message: "文件名不能含有 |,/",
           type: "warning",
           grouping: true,
         });
@@ -864,6 +905,82 @@ export default {
       });
     };
 
+    // 文件上传类型
+    const fileUploadTypeChoose = (type) => {
+      // 文件上传
+      if(type == 0) {
+        document.querySelector('#fileUploadInputButton').click();
+      }
+      // 文件夹上传
+      else if(type == 1) {
+        document.querySelector('#folderUploadInput').value = '';
+        document.querySelector('#folderUploadInput').click();
+      }
+      // URL上传
+      else if(type == 2) {
+        document.querySelector('#fileUploadInputButton').click();
+      }
+    };
+    // 文件夹input框上传预处理
+    const folderInputUploadPrehandle = (event) => {
+      let filesGroupByPath = {};
+      // 根据文件路径进行分类
+      for(let i=0;i<event.target.files['length'];i++) {
+        let file = event.target.files[i];
+        let fullPath = file['webkitRelativePath'];
+        let index = fullPath.lastIndexOf('/');
+        let filePath = fullPath.substring(0,index+1);
+        if(!filesGroupByPath[filePath]) {
+          filesGroupByPath[filePath] = {
+            path:filePath,
+            files:[],
+          }
+        }
+        filesGroupByPath[filePath].files.push(file);
+      }
+      // 根据文件路径长度进行升序排序，确保文件父目录存在
+      let filesArr = [];
+      for(let key in filesGroupByPath) {
+        filesArr.push(filesGroupByPath[key]);
+      }
+      filesArr.sort((a, b) => a.path.length - b.path.length);
+      folderInputUpload(filesArr,0);
+    };
+    // 文件夹input框上传
+    const folderInputUpload = (filesArr,now) => {
+      // 父目录创建
+      const fileObj = filesArr[now];
+      $.ajax({
+        url: http_base_url + '/mkdir',
+        type:'post',
+        data:{
+          sshKey:props.sshKey,
+          path:escapePath(dir.value),
+          item:escapeItem(fileObj.path),
+        },
+        success(resp){
+          if(resp.status == 'success') {
+            if(now == 0) getDirList();
+            if(now < filesArr.length - 1) folderInputUpload(filesArr, now+1);
+            // 文件上传
+            for(let i=0;i<fileObj.files.length;i++) {
+              const file = fileObj.files[i];
+              file.uid = Math.random().toString(36).substring(2);
+              doUpload({file:file}, {pathVal: dir.value + fileObj.path});
+            }
+          }
+          else {
+            ElMessage({
+              message: resp.info,
+              type: resp.status,
+              grouping: true,
+            });
+          }
+        }
+      });
+    };
+
+
     onMounted(() => {
       document.addEventListener('mousedown', (event) => {
         if(fileAreaRef.value && fileAreaRef.value.contains(event.target)) {
@@ -936,6 +1053,8 @@ export default {
       isClipboard,
       isCtrlx,
       fileCopyMove,
+      fileUploadTypeChoose,
+      folderInputUploadPrehandle,
     }
   }
 }
@@ -954,6 +1073,7 @@ export default {
 
 .list-class {
   height: 30vh;
+  min-height: 200px;
   overflow-y: scroll;
   width: 100%;
 }

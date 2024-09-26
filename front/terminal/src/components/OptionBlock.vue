@@ -25,7 +25,7 @@
       <div class="kk-flex">
         <div>配置名：</div>
         <div style="flex: 1;">
-          <el-input size="small" v-model="aimOption" :disabled="opType == 0" class="w-50 m-2" placeholder="">
+          <el-input size="small" v-model="aimOption" :disabled="opType == 0" @keydown.enter="confirm" class="w-50 m-2" placeholder="">
           </el-input>
         </div>
         <div style="margin-left: 10px;">
