@@ -73,11 +73,12 @@ public class FileController {
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(folderName + ".tar.gz","UTF-8"));
 
         String id = UUID.randomUUID().toString();
-        try(Session session = ssh.startSession()) {
-            WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
-            // 进入目录并打包
-            String command = "cd " + path + " && tar -czvf - " + folderName + " | less";
-            Session.Command cmd = session.exec(command);
+        // 进入目录并打包
+        String command = "cd " + path + " && tar -czvf - " + folderName + " | less";
+        WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
             try (InputStream tarStream = cmd.getInputStream()) {
                 byte[] buffer = new byte[8192];
                 int len;
@@ -192,9 +193,10 @@ public class FileController {
         }
         String num = "";
         String[] nums;
-        try(Session session = ssh.startSession()) {
-            String command = "cd " + path + " && echo \"$(find " + item + " -type f | wc -l)@$(find " + item + " -type d | wc -l)\"";
-            Session.Command cmd = session.exec(command);
+        String command = "cd " + path + " && echo \"$(find " + item + " -type f | wc -l)@$(find " + item + " -type d | wc -l)\"";
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
             // 读取命令执行结果
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
                 num += reader.readLine();
@@ -224,9 +226,10 @@ public class FileController {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，获取大小失败",null);
         }
         String size = "";
-        try(Session session = ssh.startSession()) {
-            String command = "cd " + path + " && du -sb " + item + " | head -n 1 | cut -f1";
-            Session.Command cmd = session.exec(command);
+        String command = "cd " + path + " && du -sb " + item + " | head -n 1 | cut -f1";
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
             // 读取命令执行结果
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
                 size += reader.readLine();
@@ -273,9 +276,10 @@ public class FileController {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，获取当前目录失败",null);
         }
         String path = "";
-        try(Session session = ssh.startSession()) {
-            String command = "pwd";
-            Session.Command cmd = session.exec(command);
+        String command = "pwd";
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
             // 读取命令执行结果
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
                 path += reader.readLine();
@@ -333,9 +337,10 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件/文件夹删除失败",null);
         }
-        try(Session session = ssh.startSession()) {
-            String command = "cd " + path + " && rm -rf " + items;
-            Session.Command cmd = session.exec(command);
+        String command = "cd " + path + " && rm -rf " + items;
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
             // 等待命令执行完毕
             cmd.join();
             int exitStatus = cmd.getExitStatus();
@@ -357,9 +362,10 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，复制失败",null);
         }
-        try(Session session = ssh.startSession()) {
-            String command = "cd " + src + " && cp -n " + items + " " + dst;
-            Session.Command cmd = session.exec(command);
+        String command = "cd " + src + " && cp -n " + items + " " + dst;
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
             // 等待命令执行完毕
             cmd.join();
             int exitStatus = cmd.getExitStatus();
@@ -382,9 +388,10 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，移动失败",null);
         }
-        try(Session session = ssh.startSession()) {
-            String command = "cd " + src + " && mv -n " + items + " " + dst;
-            Session.Command cmd = session.exec(command);
+        String command = "cd " + src + " && mv -n " + items + " " + dst;
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
             // 等待命令执行完毕
             cmd.join();
             int exitStatus = cmd.getExitStatus();
@@ -407,9 +414,10 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件新建失败",null);
         }
-        try(Session session = ssh.startSession()) {
-            String command = "cd " + path + " && test ! -e " + item + " && touch " + item;
-            Session.Command cmd = session.exec(command);
+        String command = "cd " + path + " && test ! -e " + item + " && touch " + item;
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
             // 等待命令执行完毕
             cmd.join();
             int exitStatus = cmd.getExitStatus();
@@ -432,9 +440,10 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件夹新建失败",null);
         }
-        try(Session session = ssh.startSession()) {
-            String command = "cd " + path + " && test ! -e " + item + " && mkdir " + item;
-            Session.Command cmd = session.exec(command);
+        String command = "cd " + path + " && test ! -e " + item + " && mkdir " + item;
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
             // 等待命令执行完毕
             cmd.join();
             int exitStatus = cmd.getExitStatus();
@@ -477,9 +486,10 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件URL上传失败",null);
         }
-        try(Session session = ssh.startSession()) {
-            String command = "cd " + path + " && wget -O " + item + " " + url;
-            Session.Command cmd = session.exec(command);
+        String command = "cd " + path + " && wget -O " + item + " " + url;
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
             // 等待命令执行完毕
             cmd.join();
             int exitStatus = cmd.getExitStatus();
