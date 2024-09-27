@@ -77,13 +77,16 @@ public class FileController {
         String command = "cd " + path + " && tar -czvf - " + folderName + " | less";
         WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
         try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
+            Session.Command cmd = session.exec(command);
+            InputStream tarStream = cmd.getInputStream())
         {
-            try (InputStream tarStream = cmd.getInputStream()) {
-                byte[] buffer = new byte[8192];
-                int len;
-                while ((len = tarStream.read(buffer)) != -1) {
-                    response.getOutputStream().write(buffer, 0, len);
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = tarStream.read(buffer)) != -1) {
+                try {
+                    if(response != null) response.getOutputStream().write(buffer, 0, len);
+                } catch (Exception e) {
+                    response = null;
                 }
             }
             // 等待命令执行完毕
