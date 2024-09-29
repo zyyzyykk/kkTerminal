@@ -37,10 +37,16 @@ public class TerminalApplication {
         data.mkdirs();
         // 设置服务器OS
         setServerOS();
+        // 启动后端
+        boolean enableOnceMonitor = true;
+        try {
+            SpringApplication.run(TerminalApplication.class, args);
+        } catch (Exception e) {
+            enableOnceMonitor = false;
+        }
         // 打开Web浏览器
         if(Boolean.parseBoolean(properties.getProperty("kk.pc.window")))
-            openWebPage();
-        SpringApplication.run(TerminalApplication.class, args);
+            openWebPage(enableOnceMonitor);
     }
 
     private static void setServerOS() {
@@ -58,18 +64,20 @@ public class TerminalApplication {
             SystemController.serverOS = "Linux";
         }
     }
-    private static void openWebPage() {
+    private static void openWebPage(boolean enableOnceMonitor) {
         Runtime runtime = Runtime.getRuntime();
         try {
             // e.g. mac os x
             if ("Mac".equals(SystemController.serverOS)) {
                 runtime.exec("open " + getUrl());
-                startOnceMonitor();
+                if(enableOnceMonitor) startOnceMonitor();
+                else System.exit(0); // 结束进程
             }
             // e.g. windows 10
             else if ("Windows".equals(SystemController.serverOS)) {
                 runtime.exec("rundll32 url.dll,FileProtocolHandler " + getUrl());
-                startOnceMonitor();
+                if(enableOnceMonitor) startOnceMonitor();
+                else System.exit(0); // 结束进程
             }
         } catch (Exception e) {
             e.printStackTrace();

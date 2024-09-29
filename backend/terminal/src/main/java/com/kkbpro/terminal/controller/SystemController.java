@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,13 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @RestController
 @RequestMapping("/api")
 public class SystemController {
-
     public static String serverOS = "Linux";
-
     private static volatile Thread monitor;
-
     private static ConcurrentHashMap<String, Long> windowActiveMap = new ConcurrentHashMap<>();
-
 
     @Autowired
     private AppConfig appConfig;
@@ -75,14 +69,8 @@ public class SystemController {
                     monitor = new Thread(() -> {
                         try {
                             while (!windowActiveMap.isEmpty()) {
-                                Iterator<Map.Entry<String, Long>> iterator = windowActiveMap.entrySet().iterator();
-                                while (iterator.hasNext()) {
-                                    Map.Entry<String, Long> entry = iterator.next();
-                                    // 超过33s则移除（判定为窗口已关闭）
-                                    if (new Date().getTime() - entry.getValue() > 1000L * 33) {
-                                        iterator.remove();
-                                    }
-                                }
+                                // 超过33s则移除（判定为窗口已关闭）
+                                windowActiveMap.entrySet().removeIf(entry -> new Date().getTime() - entry.getValue() > 1000L * 33);
                                 Thread.sleep(1000); // 每隔1秒处理一次
                             }
                             System.exit(0); // 结束进程
