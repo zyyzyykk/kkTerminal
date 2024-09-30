@@ -434,9 +434,9 @@ export default {
             try {
               tcodes.value[transTcode].execFlow = new Function('kkTerminal', `return (async function() { ${textflow} })()`);
             } catch (error) {
-              setTcodeStatus(transTcode, 'Load Error');
+              setTcodeStatus(transTcode, 'Compile Error');
               ElMessage({
-                message: 'TCode-' + transTcode + ' Load Error: ' + error,
+                message: 'TCode-' + transTcode + ' Compile Error: ' + error,
                 type: 'error',
                 grouping: true,
               });
@@ -455,11 +455,11 @@ export default {
             setTcodeStatus(transTcode, 'Execute Success');
           } catch(error) {
             ElMessage({
-              message: 'TCode-' + transTcode + ' Execute Error: ' + error,
+              message: 'TCode-' + transTcode + ' Execute Interrupt: ' + error,
               type: 'warning',
               grouping: true,
             });
-            setTcodeStatus(transTcode, 'Execute Error');
+            setTcodeStatus(transTcode, 'Execute Interrupt');
           } finally {
             userTcodeExecutorReset();
           }

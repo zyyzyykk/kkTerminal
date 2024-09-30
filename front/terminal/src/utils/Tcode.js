@@ -187,13 +187,13 @@ const filterANSI = (str) => {
 };
 
 // 用户TCode状态枚举
-// Error-加载失败: Load Error
-// Interrupted-执行失败: Execute Error
+// Error-编译失败: Compile Error
+// Interrupted-执行中断: Execute Interrupt
 // Inactive-未被使用: Not Active
 // Success-执行成功: Execute Success
 export const TCodeStatusEnum = {
-    'Load Error': 'Error',
-    'Execute Error':'Interrupted',
+    'Compile Error': 'Error',
+    'Execute Interrupt':'Interrupted',
     'Not Active': 'Inactive',
     'Execute Success': 'Success',
 };
