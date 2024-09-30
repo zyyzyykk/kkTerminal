@@ -227,8 +227,8 @@ export default {
 <style scoped>
 
 .kk-flex {
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
 }
 
 .kk-border {
@@ -250,6 +250,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 18px;
 }
 
 /* 不换行 */

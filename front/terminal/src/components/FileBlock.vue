@@ -405,7 +405,7 @@ export default {
         const path = data.pathVal ? data.pathVal : dir.value;
 
         // 大文件开始上传提示
-        if(fileSize > 20*1024*1024) {
+        if(fileSize > 20*1024*1024 && !data.noStartUpLoad) {
           ElMessage({
             message: data.startUpLoad ? data.startUpLoad : '开始上传',
             type: 'success',
@@ -600,7 +600,7 @@ export default {
           if(item.isFile && !item.isDirectory) {
             item.file(file => {
               file.uid = Math.random().toString(36).substring(2);
-              doUpload({file:file}, {pathVal: basePath});
+              doUpload({file:file}, {pathVal: basePath, noStartUpLoad: true});
             });
           }
           // 文件夹类型
@@ -962,18 +962,19 @@ export default {
           if(resp.status == 'success') {
             if(now == 0) getDirList();
             if(now < filesArr.length - 1) folderInputUpload(filesArr, now+1);
-            // 文件上传
+            // 子文件上传
             for(let i=0;i<fileObj.files.length;i++) {
               const file = fileObj.files[i];
               file.uid = Math.random().toString(36).substring(2);
-              doUpload({file:file}, {pathVal: dir.value + fileObj.path});
+              doUpload({file:file}, {pathVal: dir.value + fileObj.path, noStartUpLoad: true});
             }
           }
           else {
             ElMessage({
-              message: resp.info,
+              message: "文件夹上传失败",
               type: resp.status,
               grouping: true,
+              repeatNum: Number.MIN_SAFE_INTEGER,
             });
           }
         }
@@ -1112,6 +1113,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 18px;
 }
 
 .kk-menu

@@ -31,8 +31,8 @@ export default {
   setup(props) {
 
     const statusTypeMap = {
-      'Load Error': -2,
-      'Execute Error': -1,
+      'Compile Error': -2,
+      'Execute Interrupt': -1,
       'Not Active': 0,
       'Execute Success': 1,
     };

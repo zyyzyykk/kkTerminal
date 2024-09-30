@@ -443,7 +443,7 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件夹新建失败",null);
         }
-        String command = "cd " + path + " && test ! -e " + item + " && mkdir " + item;
+        String command = "cd " + path + " && test ! -e " + item + " && mkdir -p " + item;
         try(Session session = ssh.startSession();
             Session.Command cmd = session.exec(command))
         {
