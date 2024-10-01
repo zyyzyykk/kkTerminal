@@ -109,7 +109,7 @@
 
   <TxtPreview ref="txtPreviewRef" @doSave="doSave" ></TxtPreview>
   <MkFile ref="mkFileRef" @callback="handleMkFile" ></MkFile>
-  <FileAttr ref="fileAttrRef" @callback="doRename" ></FileAttr>
+  <FileAttr :sshKey="sshKey" ref="fileAttrRef" @callback="doRename" ></FileAttr>
 
   <!-- 菜单项 -->
   <div ref="menuBlockRef" @contextmenu="preventDefault" v-show="isShowMenu" class="kk-menu no-select">
@@ -702,8 +702,8 @@ export default {
             fileAttrRef.value.fileDir = dir.value;
             fileAttrRef.value.rename = selectedFiles.value[0].name;
             fileAttrRef.value.DialogVisilble = true;
-            if(selectedFiles.value[0].isDirectory) fileAttrRef.value.getFolderInclude(props.sshKey);
-            else fileAttrRef.value.getFileSize(props.sshKey);
+            if(selectedFiles.value[0].isDirectory) fileAttrRef.value.getFolderInclude();
+            else fileAttrRef.value.getFileSize();
           }
           break;
         default:

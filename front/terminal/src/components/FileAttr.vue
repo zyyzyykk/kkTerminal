@@ -17,7 +17,7 @@
       </div>
     </template>
     <div style="margin-top: -32px;"></div>
-    <div element-loading-text="Loading..." v-loading="loading" >
+    <div class="no-select" element-loading-text="Loading..." v-loading="loading" >
       <div class="kk-flex">
         <div style="margin-right: 10px;" ><FileIcons :name="fileInfo.name" width="32" height="32" :isFolder="fileInfo.isDirectory" /></div>
         <div>
@@ -26,46 +26,54 @@
       </div>
       <div class="kk-border" ></div>
       <div class="kk-flex nowrap">
-        <div class="no-select" style="text-align: left; width: 100px;">位置：</div>
+        <div style="text-align: left; width: 100px;">位置：</div>
         <div class="ellipsis">
           {{ fileDir + fileInfo.name }}
         </div>
-        <div style="cursor: pointer; margin-left: 5px;" @click="doCopy(fileDir + fileInfo.name)"><el-icon size="15"><DocumentCopy /></el-icon></div>
+        <div style="cursor: pointer; margin-left: 5px;" @click="doCopy(fileDir + fileInfo.name)">
+          <el-icon size="16"><DocumentCopy /></el-icon>
+        </div>
       </div>
       <div v-if="fileInfo.isDirectory" class="kk-flex">
-        <div class="no-select" style="text-align: left; width: 100px;">包含：</div>
-        <div>
+        <div style="text-align: left; width: 100px;">包含：</div>
+        <div class="ellipsis" >
           {{ includeInfo }}
         </div>
         <div v-if="unreliable" style="margin-left: 10px;" >
           <el-tag size="small" type="danger">unsure</el-tag>
         </div>
+        <div style="cursor: pointer; margin-left: 5px;" @click="getFolderInclude" >
+          <el-icon size="16"><Refresh /></el-icon>
+        </div>
       </div>
       <div v-else class="kk-flex">
-        <div class="no-select" style="text-align: left; width: 100px;">大小：</div>
-        <div>
+        <div style="text-align: left; width: 100px;">大小：</div>
+        <div class="ellipsis" >
           {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size + ' 字节' }})
         </div>
         <div v-if="unreliable" style="margin-left: 10px;" >
           <el-tag size="small" type="danger">unsure</el-tag>
         </div>
+        <div style="cursor: pointer; margin-left: 5px;" @click="getFileSize" >
+          <el-icon size="16"><Refresh /></el-icon>
+        </div>
       </div>
       <div class="kk-border" ></div>
       <div class="kk-flex">
-        <div class="no-select" style="text-align: left; width: 100px;">修改时间：</div>
+        <div style="text-align: left; width: 100px;">修改时间：</div>
         <div>
           {{ formatDate(fileInfo.attributes.mtime) }}
         </div>
       </div>
       <div class="kk-flex">
-        <div class="no-select" style="text-align: left; width: 100px;">访问时间：</div>
+        <div style="text-align: left; width: 100px;">访问时间：</div>
         <div>
           {{ formatDate(fileInfo.attributes.atime) }}
         </div>
       </div>
       <div class="kk-border" ></div>
       <div class="kk-flex">
-        <div class="no-select" style="text-align: left; width: 100px;">权限：</div>
+        <div style="text-align: left; width: 100px;">权限：</div>
         <div>
           {{ calcPriority(fileInfo.attributes.mode.type,fileInfo.attributes.permissions) }}
         </div>
@@ -87,7 +95,7 @@ import { formatDate } from '@/utils/FormatDate';
 import { calcPriority } from '@/utils/CalcPriority';
 import { ElMessage } from 'element-plus';
 import useClipboard from "vue-clipboard3";
-import { DocumentCopy } from '@element-plus/icons-vue';
+import { DocumentCopy, Refresh } from '@element-plus/icons-vue';
 import { calcSize } from '@/utils/CalcSize';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
 
@@ -99,7 +107,9 @@ export default {
   components: {
     FileIcons,
     DocumentCopy,
+    Refresh,
   },
+  props:['sshKey'],
   setup(props,context)
   {
     // 拷贝
@@ -119,13 +129,13 @@ export default {
     const includeInfo = ref('0 个文件，0 个文件夹');
 
     // 获取文件大小
-    const getFileSize = (sshKey) => {
+    const getFileSize = () => {
       $.ajax({
         url: http_base_url + '/du',
         type:'get',
         data:{
           time:new Date().getTime(),
-          sshKey:sshKey,
+          sshKey:props.sshKey,
           path:escapePath(fileDir.value),
           item:escapeItem(fileInfo.value.name),
         },
@@ -143,13 +153,13 @@ export default {
     };
 
     // 获取文件夹包含信息
-    const getFolderInclude = (sshKey) => {
+    const getFolderInclude = () => {
       $.ajax({
         url: http_base_url + '/find',
         type:'get',
         data:{
           time:new Date().getTime(),
-          sshKey:sshKey,
+          sshKey:props.sshKey,
           path:escapePath(fileDir.value),
           item:escapeItem(fileInfo.value.name),
         },
