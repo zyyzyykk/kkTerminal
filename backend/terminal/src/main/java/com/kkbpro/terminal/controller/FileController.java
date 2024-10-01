@@ -42,8 +42,8 @@ public class FileController {
     }
     private void readRemoteFile(String sshKey, SFTPClient sftp, String remoteFilePath, HttpServletResponse response) throws IOException {
         String id = UUID.randomUUID().toString();
+        WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
         try (RemoteFile file = sftp.open(remoteFilePath)) {
-            WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
             try (InputStream is = file.new RemoteFileInputStream()) {
                 byte[] buffer = new byte[8096];
                 int len;
@@ -560,10 +560,10 @@ public class FileController {
         {
             WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
             Thread FileThread = new Thread(() -> {
-                // 将文件片合并
-                if(!chunks.equals(1))
-                    FileUtil.fileChunkMerge(folderPath,id,chunks,totalSize);
                 try {
+                    // 将文件片合并
+                    if(!chunks.equals(1))
+                        FileUtil.fileChunkMerge(folderPath,id,chunks,totalSize);
                     // 上传到服务器
                     SFTPClient sftpFileClient = getSftpClient(sshKey);
                     sftpFileClient.put(folderPath + "/" + id, path + fileName);

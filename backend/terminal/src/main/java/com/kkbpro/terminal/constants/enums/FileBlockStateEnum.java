@@ -12,6 +12,8 @@ public enum FileBlockStateEnum {
 
     UPLOAD_SIZE_DIFF(504,"上传文件大小不一致"),
 
+    CHUNK_MERGE_ERROR(505,"文件片合并失败"),
+
     SSH_NOT_EXIST(602,"ssh连接断开");
 
     private Integer state;

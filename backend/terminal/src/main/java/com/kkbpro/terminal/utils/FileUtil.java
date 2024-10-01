@@ -22,12 +22,9 @@ public class FileUtil {
         File finalFile = new File(folderPath + "/" + fileName);
         // 获取暂存切片文件的文件夹中的所有文件
         File[] files = folder.listFiles();
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
         if(files != null)
         {
-            try {
-                outputStream = new FileOutputStream(finalFile, true);
+            try(OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(finalFile, true))) {
 
                 List<File> list = new ArrayList<>();
                 for (File file : files) {
@@ -48,35 +45,24 @@ public class FileUtil {
                 })).collect(Collectors.toList());
                 // 根据排序的顺序依次将文件合并到新的文件中
                 for (File file : fileListCollect) {
-                    inputStream = new FileInputStream(file);
-                    int len = 0;
-                    byte[] bytes = new byte[2 * 1024 * 1024];
-                    while ((len = inputStream.read(bytes)) != -1) {
-                        outputStream.write(bytes, 0, len);
+                    try(InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+                        int len = 0;
+                        byte[] bytes = new byte[2 * 1024 * 1024];
+                        while ((len = inputStream.read(bytes)) != -1) {
+                            outputStream.write(bytes, 0, len);
+                        }
+                        outputStream.flush();
                     }
-                    inputStream.close();
-                    outputStream.flush();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                try {
-                    if (inputStream != null) inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    if (outputStream != null) outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                throw new MyException(Result.setError(FileBlockStateEnum.CHUNK_MERGE_ERROR.getState(), "文件片合并失败"));
             }
         }
         // 产生的文件大小和前端一开始上传的文件不一致
         if (finalFile.length() != totalSize) {
             throw new MyException(Result.setError(FileBlockStateEnum.UPLOAD_SIZE_DIFF.getState(), "上传文件大小不一致"));
         }
-
     }
 
     /**
