@@ -1,0 +1,127 @@
+<template>
+  <el-dialog
+    v-model="DialogVisilble"
+    :before-close="closeDialog"
+    :width="320"
+    :modal="false"
+    title="URL上传"
+    modal-class="kk-dialog-class"
+    draggable
+  >
+    <div style="margin-top: -32px;"></div>
+    <div class="no-select">
+      <div class="kk-flex" >
+        <div style="width: 56px;" >URL：</div>
+        <div style="flex: 1;">
+          <el-input size="small" v-model="url" class="w-50 m-2" placeholder="请输入文件URL">
+            <template #prefix>
+              <el-icon><Connection /></el-icon>
+            </template>
+          </el-input>
+        </div>
+      </div>
+      <div v-if="err_msg && err_msg.length > 0" class="errInfo no-select"> {{ err_msg }} </div>
+      <div v-else style="height: 7px;" ></div>
+      <div class="kk-flex">
+        <div style="width: 56px;" >文件名：</div>
+        <div style="flex: 1;">
+          <el-input size="small" v-model="name" @keydown.enter="confirm" class="w-50 m-2" placeholder="">
+            <template #prefix>
+              <el-icon><Document /></el-icon>
+            </template>
+          </el-input>
+        </div>
+        <div style="margin-left: 10px;">
+          <el-button size="small" type="primary" @click="confirm" >确定</el-button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: -10px;"></div>
+  </el-dialog>
+</template>
+
+<script>
+import { ref } from 'vue';
+import { Connection, Document } from '@element-plus/icons-vue';
+
+export default {
+  name: 'FileUrl',
+  components: {
+    Connection,
+    Document,
+  },
+  setup(props,context)
+  {
+    // 控制Dialog显示
+    const DialogVisilble = ref(false);
+    const err_msg = ref('');
+    const name = ref(''); 
+    const url = ref('');
+    
+    // 确定
+    const confirm = () => {
+      // 校验
+      err_msg.value = '';
+      if(!(url.value && url.value.trim().length > 0)) {
+        err_msg.value = 'URL不能为空';
+        return;
+      }
+      if(!(name.value && name.value.trim().length > 0)) {
+        err_msg.value = '文件名不能为空';
+        return;
+      }
+      const invalidNameRe = /[/|]/;
+      if(invalidNameRe.test(name.value)) {
+        err_msg.value = "文件名不能含有 |,/";
+        return;
+      }
+      context.emit('callback',url.value, name.value);
+      reset();
+    };
+
+    // 关闭
+    const closeDialog = (done) => {
+      setTimeout(() => {
+        reset();
+      },200);
+      done();
+    };
+
+    const reset = () => {
+      err_msg.value = '';
+      name.value = '';
+      url.value = '';
+      DialogVisilble.value = false;
+    };
+
+    return {
+      DialogVisilble,
+      err_msg,
+      name,
+      url,
+      confirm,
+      closeDialog,
+      reset,
+    }
+  }
+}
+</script>
+
+<style scoped>
+.kk-flex {
+  display: flex; 
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* 文本不可选中 */
+.no-select {
+  user-select: none;
+}
+
+.errInfo{
+  font-size: 12px;
+  color: rgb(234, 80, 80);
+  margin-top: 8px;
+}
+</style>

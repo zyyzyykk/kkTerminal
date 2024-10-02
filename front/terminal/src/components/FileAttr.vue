@@ -31,7 +31,7 @@
           {{ fileDir + fileInfo.name }}
         </div>
         <div style="cursor: pointer; margin-left: 5px;" @click="doCopy(fileDir + fileInfo.name)">
-          <el-icon size="16"><DocumentCopy /></el-icon>
+          <el-icon size="18"><DocumentCopy /></el-icon>
         </div>
       </div>
       <div v-if="fileInfo.isDirectory" class="kk-flex">
@@ -42,8 +42,8 @@
         <div v-if="unreliable" style="margin-left: 10px;" >
           <el-tag size="small" type="danger">unsure</el-tag>
         </div>
-        <div style="cursor: pointer; margin-left: 5px;" @click="getFolderInclude" >
-          <el-icon size="16"><Refresh /></el-icon>
+        <div style="cursor: pointer; margin-left: 7px;" @click="getFolderInclude" >
+          <el-icon size="18"><Refresh /></el-icon>
         </div>
       </div>
       <div v-else class="kk-flex">
@@ -54,8 +54,8 @@
         <div v-if="unreliable" style="margin-left: 10px;" >
           <el-tag size="small" type="danger">unsure</el-tag>
         </div>
-        <div style="cursor: pointer; margin-left: 5px;" @click="getFileSize" >
-          <el-icon size="16"><Refresh /></el-icon>
+        <div style="cursor: pointer; margin-left: 7px;" @click="getFileSize" >
+          <el-icon size="18"><Refresh /></el-icon>
         </div>
       </div>
       <div class="kk-border" ></div>

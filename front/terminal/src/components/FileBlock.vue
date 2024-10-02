@@ -106,7 +106,8 @@
     @change="folderInputUploadPrehandle"
     id="folderUploadInput"
   />
-
+  <!-- 文件URL上传 -->
+  <FileUrl ref="fileUrlRef" @callback="fileUrlUpload" ></FileUrl> 
   <TxtPreview ref="txtPreviewRef" @doSave="doSave" ></TxtPreview>
   <MkFile ref="mkFileRef" @callback="handleMkFile" ></MkFile>
   <FileAttr :sshKey="sshKey" ref="fileAttrRef" @callback="doRename" ></FileAttr>
@@ -151,6 +152,7 @@ import NoData from '@/components/NoData';
 import TxtPreview from './preview/TxtPreview';
 import MkFile from './MkFile';
 import FileAttr from './FileAttr';
+import FileUrl from './FileUrl';
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
@@ -163,6 +165,7 @@ export default {
     TxtPreview,
     MkFile,
     FileAttr,
+    FileUrl,
     Refresh,
     Fold,
     Download,
@@ -826,6 +829,7 @@ export default {
     };
     watch(dir,() => {
       if(mkFileRef.value) mkFileRef.value.reset();
+      if(fileUrlRef.value) fileUrlRef.value.reset();
     });
 
     // 文件快捷键操作
@@ -918,7 +922,7 @@ export default {
       }
       // URL上传
       else if(type == 2) {
-        document.querySelector('#fileUploadInputButton').click();
+        fileUrlRef.value.DialogVisilble = true;
       }
     };
     // 文件夹input框上传预处理
@@ -981,6 +985,28 @@ export default {
       });
     };
 
+    // 文件URL上传
+    const fileUrlRef = ref();
+    const fileUrlUpload = (url,fileName) => {
+      $.ajax({
+        url: http_base_url + '/wget',
+        type:'post',
+        data:{
+          sshKey:props.sshKey,
+          path:escapePath(dir.value),
+          item:escapeItem(fileName),
+          url:encodeURI(url),
+        },
+        success(resp){
+          ElMessage({
+            message: resp.info,
+            type: resp.status,
+            grouping: true,
+          });
+          getDirList();
+        }
+      });
+    };
 
     onMounted(() => {
       document.addEventListener('mousedown', (event) => {
@@ -1056,6 +1082,8 @@ export default {
       fileCopyMove,
       fileUploadTypeChoose,
       folderInputUploadPrehandle,
+      fileUrlRef,
+      fileUrlUpload,
     }
   }
 }
