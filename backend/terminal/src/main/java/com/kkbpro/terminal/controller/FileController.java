@@ -489,7 +489,8 @@ public class FileController {
         if(ssh == null) {
             return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件URL上传失败",null);
         }
-        String command = "cd " + path + " && wget -O " + item + " " + url;
+        String ua = "--user-agent=\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36\"";
+        String command = "cd " + path + " && wget " + ua + " -b -q -O " + item + " \"" + url + "\"";
         try(Session session = ssh.startSession();
             Session.Command cmd = session.exec(command))
         {
