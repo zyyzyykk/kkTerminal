@@ -6,6 +6,7 @@
     title="偏好设置"
     :modal="false"
     modal-class="kk-dialog-class"
+    :before-close="closeDialog"
     draggable
   >
     <div style="margin-top: -27px;"></div>
@@ -139,7 +140,30 @@ export default {
     });
     const confirm = () => {
       context.emit('callback',setInfo.value);
+      closeDialog();
+    };
+
+    // 重置
+    const reset = () => {
+      setInfo.value = {
+        bg: props.env.bg,
+        fg: props.env.fg,
+        fontFamily: props.env.fontFamily,
+        fontSize: props.env.fontSize,
+        cursorStyle: props.env.cursorStyle,
+        cursorBlink: props.env.cursorBlink,
+        tCode: props.env.tCode,
+      };
       DialogVisilble.value = false;
+    };
+
+    // 关闭
+    const closeDialog = (done) => {
+      setTimeout(() => {
+        reset();
+      },400);
+      DialogVisilble.value = false;
+      if(done) done();
     };
 
     return {
@@ -149,7 +173,7 @@ export default {
       setInfo,
       DialogVisilble,
       confirm,
-
+      closeDialog,
     }
   }
 

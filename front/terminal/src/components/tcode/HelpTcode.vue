@@ -158,7 +158,7 @@ export default {
     const initTcodeEditor = (mode) => {
       userTcodeEditorRef.value.setLanguage('kk.js');
       userTcodeEditorRef.value.setValue(JSON.parse(decrypt(localStorage.getItem('tcodes')))[nowTCode.value].workflow || '');
-      userTcodeEditorRef.value.reset();
+      userTcodeEditorRef.value.resetHistory();
       userTcodeEditorRef.value.setReadOnly(mode);
       modifyTag.value = '';
     };
@@ -191,12 +191,22 @@ export default {
       modifyTag.value = '*';
     };
 
+    // 重置
+    const reset = () => {
+      if(userTcodeEditorRef.value) userTcodeEditorRef.value.reset();
+      mode.value = false;
+      nowTCode.value = '';
+      modifyTag.value = '';
+      DialogVisilble.value = false;
+    };
+
     // 关闭
     const closeDialog = (done) => {
       setTimeout(() => {
-        toOverview();
-      },300);
-      done();
+        reset();
+      },400);
+      DialogVisilble.value = false;
+      if(done) done();
     };
 
     return {
@@ -216,6 +226,7 @@ export default {
       doSaveTCode,
       handleChange,
       modifyTag,
+      reset,
       closeDialog,
     }
   }

@@ -514,17 +514,6 @@ export default {
     // 控制Dialog显示
     const DialogVisilble = ref(false);
 
-    // 关闭
-    const closeDialog = (done) => {
-      selectedFiles.value = [];
-      renameFile.value = {};
-      txtPreviewRef.value.DialogVisilble = false;
-      mkFileRef.value.DialogVisilble = false;
-      mkFileRef.value.reset();
-      fileAttrRef.value.DialogVisilble = false;
-      done();
-    };
-
     // 文本文件编辑
     const txtPreviewRef = ref();
     const preViewFile = (name) => {
@@ -680,8 +669,8 @@ export default {
           break;
         // 新建
         case 5:
-          mkFileRef.value.DialogVisilble = true;
           mkFileRef.value.nowDir = dir.value;
+          mkFileRef.value.DialogVisilble = true;
           break;
         // 重命名
         case 6:
@@ -704,9 +693,9 @@ export default {
             fileAttrRef.value.fileInfo = {...selectedFiles.value[0]};
             fileAttrRef.value.fileDir = dir.value;
             fileAttrRef.value.rename = selectedFiles.value[0].name;
-            fileAttrRef.value.DialogVisilble = true;
             if(selectedFiles.value[0].isDirectory) fileAttrRef.value.getFolderInclude();
             else fileAttrRef.value.getFileSize();
+            fileAttrRef.value.DialogVisilble = true;
           }
           break;
         default:
@@ -1008,6 +997,55 @@ export default {
       });
     };
 
+    // 重置
+    const reset = (deep=false) => {
+      if(deep) {
+        loading.value = true;
+        files.value = [];
+        dir.value = '';
+        isShowDirInput.value = false;
+        noDataMsg.value = '暂无文件';
+        dirStatus.value = 0;
+        fileClipboard.value = {
+          path:'/',
+          files:[],
+        };
+        isCtrlx.value = false;
+      }
+      selectedFiles.value = [];
+      lastSelectedIndex = -1;
+      isShowMenu.value = false;
+      isShowPop.value = false;
+      isShowRenameInput.value = false;
+      renameFile.value = {};
+      DialogVisilble.value = false;
+    };
+
+    // 关闭
+    const closeDialog = (done) => {
+      if(txtPreviewRef.value && txtPreviewRef.value.DialogVisilble) txtPreviewRef.value.closeDialog();
+      if(mkFileRef.value && mkFileRef.value.DialogVisilble) mkFileRef.value.closeDialog();
+      if(fileAttrRef.value && fileAttrRef.value.DialogVisilble) fileAttrRef.value.closeDialog();
+      if(fileUrlRef.value && fileUrlRef.value.DialogVisilble) fileUrlRef.value.closeDialog();
+      setTimeout(() => {
+        reset();
+      },400);
+      DialogVisilble.value = false;
+      if(done) done();
+    };
+
+    // 深度关闭
+    const deepCloseDialog = () => {
+      if(txtPreviewRef.value) txtPreviewRef.value.closeDialog();
+      if(mkFileRef.value) mkFileRef.value.closeDialog();
+      if(fileAttrRef.value) fileAttrRef.value.closeDialog();
+      if(fileUrlRef.value) fileUrlRef.value.closeDialog();
+      setTimeout(() => {
+        reset(true);
+      },400);
+      DialogVisilble.value = false;
+    };
+
     onMounted(() => {
       document.addEventListener('mousedown', (event) => {
         if(fileAreaRef.value && fileAreaRef.value.contains(event.target)) {
@@ -1033,7 +1071,6 @@ export default {
 
     return {
       DialogVisilble,
-      closeDialog,
       isShowDirInput,
       dir,
       files,
@@ -1084,6 +1121,9 @@ export default {
       folderInputUploadPrehandle,
       fileUrlRef,
       fileUrlUpload,
+      reset,
+      closeDialog,
+      deepCloseDialog,
     }
   }
 }

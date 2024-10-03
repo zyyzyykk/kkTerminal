@@ -134,7 +134,7 @@ alert('TCode Workflow Over!');`;
     };
     const setValue = (text) => {
       userTcodeEditorRef.value.setValue(text);
-      userTcodeEditorRef.value.reset();
+      userTcodeEditorRef.value.resetHistory();
     };
     const initText = () => {
       // Workflow仅支持JS语法
@@ -142,7 +142,7 @@ alert('TCode Workflow Over!');`;
       // 加载Draft
       if(localStorage.getItem('tcode-draft')) {
         userTcodeEditorRef.value.setValue(localStorage.getItem('tcode-draft'));
-        userTcodeEditorRef.value.reset();
+        userTcodeEditorRef.value.resetHistory();
       }
     };
     // 仅有数字字母组成
@@ -188,7 +188,7 @@ alert('TCode Workflow Over!');`;
               type: 'success',
               grouping: true,
             });
-            reset();
+            closeDialog();
           }
           // 全部失败
           else if(scnt == 0) {
@@ -290,24 +290,25 @@ alert('TCode Workflow Over!');`;
         grouping: true,
       });
       localStorage.removeItem('tcode-draft');
-      reset();
+      closeDialog();
+    };
+
+    // 重置
+    const reset = () => {
+      if(userTcodeEditorRef.value) userTcodeEditorRef.value.reset();
+      loading.value = false;
+      userTcodeInfo.value.name = '';
+      userTcodeInfo.value.desc = '';
+      DialogVisilble.value = false;
     };
 
     // 关闭
     const closeDialog = (done) => {
-      reset();
-      done();
-    };
-
-    const reset = () => {
       setTimeout(() => {
-        loading.value = false;
-        userTcodeInfo.value.name = '';
-        userTcodeInfo.value.desc = '';
-        userTcodeEditorRef.value.setValue('');
-        userTcodeEditorRef.value.reset();
-      },200);
+        reset();
+      },400);
       DialogVisilble.value = false;
+      if(done) done();
     };
 
     return {
@@ -324,7 +325,6 @@ alert('TCode Workflow Over!');`;
       exportTcodes,
       setValue,
       workflowTab,
-
     }
   }
 }

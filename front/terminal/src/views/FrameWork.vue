@@ -357,8 +357,8 @@ export default {
       // 文件管理
       else if(type == 4) {
         isShowSetting.value = false;
-        fileBlockRef.value.DialogVisilble = true;
         fileBlockRef.value.getInitDir();
+        fileBlockRef.value.DialogVisilble = true;
       }
     };
 
@@ -388,19 +388,7 @@ export default {
 
     // 关闭文件模块
     const closeFileBlock = () => {
-      fileBlockRef.value.txtPreviewRef.DialogVisilble = false;
-      fileBlockRef.value.txtPreviewRef.resetEditor();
-      fileBlockRef.value.mkFileRef.DialogVisilble = false;
-      fileBlockRef.value.fileAttrRef.DialogVisilble = false;
-      fileBlockRef.value.DialogVisilble = false;
-      fileBlockRef.value.dir = '';
-      fileBlockRef.value.selectedFiles = [];
-      fileBlockRef.value.renameFile = null;
-      fileBlockRef.value.fileClipboard = {
-        path:'/',
-        files:[],
-      };
-      fileBlockRef.value.isCtrlx = false;
+      if(fileBlockRef.value) fileBlockRef.value.deepCloseDialog();
     };
 
     const setTcodeStatus = (transTcode, state) => {

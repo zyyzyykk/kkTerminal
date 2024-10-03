@@ -76,22 +76,24 @@ export default {
         return;
       }
       context.emit('callback',url.value, name.value);
-      reset();
+      closeDialog();
+    };
+
+    // 重置
+    const reset = () => {
+      err_msg.value = '';
+      name.value = '';
+      url.value = '';
+      DialogVisilble.value = false;
     };
 
     // 关闭
     const closeDialog = (done) => {
       setTimeout(() => {
         reset();
-      },200);
-      done();
-    };
-
-    const reset = () => {
-      err_msg.value = '';
-      name.value = '';
-      url.value = '';
+      },400);
       DialogVisilble.value = false;
+      if(done) done();
     };
 
     return {
