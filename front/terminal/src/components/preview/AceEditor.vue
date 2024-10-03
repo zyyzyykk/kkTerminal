@@ -74,7 +74,7 @@ export default {
     };
 
     // 清空撤销历史
-    const reset = () => {
+    const resetHistory = () => {
       if(aceEditor.value) aceEditor.value.getSession().getUndoManager().reset();
     };
     // 设置语言
@@ -101,6 +101,12 @@ export default {
             break;
         }
       }
+    };
+
+    // 重置编辑器
+    const reset = () => {
+      setValue('');
+      resetHistory();
     };
 
     // 实例化编辑器
@@ -151,6 +157,7 @@ export default {
       aceEditorRef,
       aceEditor,
       setValue,
+      resetHistory,
       reset,
       setLanguage,
       getValue,

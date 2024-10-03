@@ -67,23 +67,25 @@ export default {
         return;
       }
       context.emit('callback', isDirectory.value, name.value, nowDir.value);
-      reset();
+      closeDialog();
     };
 
-    // 关闭
-    const closeDialog = (done) => {
-      setTimeout(() => {
-        reset();
-      },200);
-      done();
-    };
-
+    // 重置
     const reset = () => {
       err_msg.value = '';
       isDirectory.value = false;
       name.value = '';
       nowDir.value = '';
       DialogVisilble.value = false;
+    };
+
+    // 关闭
+    const closeDialog = (done) => {
+      setTimeout(() => {
+        reset();
+      },400);
+      DialogVisilble.value = false;
+      if(done) done();
     };
 
     return {

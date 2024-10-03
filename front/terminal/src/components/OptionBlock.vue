@@ -57,7 +57,6 @@ export default {
   {
     // 控制Dialog显示
     const DialogVisilble = ref(false);
-    const err_msg = ref('');
     const noDataMsg = ref('暂无配置');
     
     // 目标配置
@@ -67,23 +66,32 @@ export default {
     const confirm = () => {
       if(aimOption.value == '' || aimOption.value.trim() == '') return;
       context.emit('callback',aimOption.value.trim());
+      closeDialog();
+    };
+
+    // 重置
+    const reset = () => {
+      noDataMsg.value = '暂无配置';
+      aimOption.value = '';
       DialogVisilble.value = false;
     };
 
     // 关闭
     const closeDialog = (done) => {
-      aimOption.value = '';
-      done();
+      setTimeout(() => {
+        reset();
+      },400);
+      DialogVisilble.value = false;
+      if(done) done();
     };
 
     return {
       DialogVisilble,
-      err_msg,
       noDataMsg,
       aimOption,
       confirm,
+      reset,
       closeDialog,
-
     }
   }
 }

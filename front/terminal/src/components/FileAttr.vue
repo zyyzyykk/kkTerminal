@@ -182,7 +182,7 @@ export default {
     const confirm = () => {
       // 校验
       if(fileInfo.value.name == rename.value) {
-        DialogVisilble.value = false;
+        closeDialog();
         return;
       }
       if(!(rename.value && rename.value.trim().length > 0)) {
@@ -205,22 +205,7 @@ export default {
       let oldPath = fileDir.value + fileInfo.value.name;
       let newPath = fileDir.value + rename.value;
       context.emit('callback',oldPath,newPath);
-      DialogVisilble.value = false;
-    };
-
-    // 关闭
-    const closeDialog = (done) => {
-      done();
-    };
-
-    const reset = () => {
-      fileInfo.value = {};
-      rename.value = '';
-      fileDir.value = '';
-      loading.value = false;
-      unreliable.value = false;
-      includeInfo.value = '0 个文件，0 个文件夹';
-      DialogVisilble.value = false;
+      closeDialog();
     };
 
     // 复制
@@ -242,6 +227,26 @@ export default {
         grouping: true,
         repeatNum: Number.MIN_SAFE_INTEGER,
       });
+    };
+
+    // 重置
+    const reset = () => {
+      fileInfo.value = {};
+      rename.value = '';
+      fileDir.value = '';
+      loading.value = false;
+      unreliable.value = false;
+      includeInfo.value = '0 个文件，0 个文件夹';
+      DialogVisilble.value = false;
+    };
+
+    // 关闭
+    const closeDialog = (done) => {
+      setTimeout(() => {
+        reset();
+      },400);
+      DialogVisilble.value = false;
+      if(done) done();
     };
 
     return {

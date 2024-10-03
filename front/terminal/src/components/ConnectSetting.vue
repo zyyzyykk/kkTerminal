@@ -156,8 +156,8 @@ export default {
         if(verifyParams() == false) return;
       }
       optionBlockType.value = type;
-      optionBlockRef.value.DialogVisilble = true;
       optionBlockRef.value.aimOption = '';
+      optionBlockRef.value.DialogVisilble = true;
     };
 
     const isForbidInput = ref(false);
@@ -186,7 +186,7 @@ export default {
     const confirm = () => {
       if(verifyParams() == false) return;
       context.emit('callback',setInfo.value);
-      DialogVisilble.value = false;
+      closeDialog();
     };
 
     // 拷贝
@@ -215,23 +215,30 @@ export default {
 
     const isShowPassword = ref(false);
 
+    // 重置
+    const reset = () => {
+      err_msg.value = '';
+      isShowPassword.value = false;
+      setInfo.value = {
+        server_ip: props.env.server_ip,
+        server_port: props.env.server_port,
+        server_user: props.env.server_user,
+        server_password:props.env.server_password,
+        option: props.env.option,
+      };
+      if(setInfo.value.option != '') isForbidInput.value = true;
+      else isForbidInput.value = false;
+      DialogVisilble.value = false;
+    };
+
     // 关闭
     const closeDialog = (done) => {
-      optionBlockRef.value.DialogVisilble = false;
+      if(optionBlockRef.value && optionBlockRef.value.DialogVisilble) optionBlockRef.value.closeDialog();
       setTimeout(() => {
-        err_msg.value = '';
-        isShowPassword.value = false;
-        setInfo.value = {
-          server_ip: props.env.server_ip,
-          server_port: props.env.server_port,
-          server_user: props.env.server_user,
-          server_password:props.env.server_password,
-          option: props.env.option,
-        };
-        if(setInfo.value.option != '') isForbidInput.value = true;
-        else isForbidInput.value = false;
-      },200);
-      done();
+        reset();
+      },400);
+      DialogVisilble.value = false;
+      if(done) done();
     };
 
     return {
@@ -245,10 +252,10 @@ export default {
       doOption,
       isForbidInput,
       newOp,
+      reset,
       closeDialog,
       doCopy,
       isShowPassword,
-
     }
   }
 

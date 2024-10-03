@@ -49,7 +49,7 @@ export default {
     const codeEditorRef = ref();
 
     const initText = async () => {
-      resetEditor();
+      reset();
       loading.value = true;
       let url = fileUrl.value;
       await $.ajax({
@@ -63,7 +63,7 @@ export default {
           if(url == fileUrl.value)
           {
             codeEditorRef.value.setValue(resp);
-            codeEditorRef.value.reset();
+            codeEditorRef.value.resetHistory();
             codeEditorRef.value.setLanguage(fileName.value);
             modifyTag.value = '';
             loading.value = false;
@@ -77,8 +77,8 @@ export default {
               type: 'error',
               grouping: true,
             });
-            resetEditor();
-            DialogVisilble.value = false;
+            reset();
+            closeDialog();
           }
         }
       });
@@ -94,20 +94,20 @@ export default {
       modifyTag.value = '';
     };
 
-    // 重置编辑器
-    const resetEditor = () => {
-      if(codeEditorRef.value) {
-        codeEditorRef.value.setValue('');
-        codeEditorRef.value.reset();
-      }
+    // 重置
+    const reset = () => {
+      if(codeEditorRef.value) codeEditorRef.value.reset();
       modifyTag.value = '';
+      DialogVisilble.value = false;
     };
 
+    // 关闭
     const closeDialog = (done) => {
       setTimeout(() => {
-        resetEditor();
-      },200);
-      done();
+        reset();
+      },400);
+      DialogVisilble.value = false;
+      if(done) done();
     };
     
 
@@ -122,7 +122,7 @@ export default {
       handleChange,
       handleSave,
       closeDialog,
-      resetEditor,
+      reset,
     }
   }
 }
