@@ -8,26 +8,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 public class StringUtil {
 
     /**
-     * 生成随机字符与数字
-     */
-    public static String getRandomStr(Integer count)
-    {
-        return RandomStringUtils.random(count,true,true);
-    }
-
-    /**
-     * 生成随机数
-     */
-    public static String getRandomNumber(Integer count)
-    {
-        return RandomStringUtils.random(count,false,true);
-    }
-
-    /**
      * 判断是否为空
      */
     public static boolean isEmpty(String str) {
-
         if (null == str || "".equals(str) || "null".equals(str) || "\u0000".equals(str)) {
             return true;
         } else if ("".equals(str.trim())) {
@@ -54,18 +37,6 @@ public class StringUtil {
     }
 
     /**
-     * 获取最后一个'/'后面的字串
-     */
-    public static String getEndStr(String str) {
-        int lastIndex = str.lastIndexOf("/");
-        if (lastIndex != -1) {
-            return str.substring(lastIndex + 1);
-        } else {
-            return str;
-        }
-    }
-
-    /**
      *  将字符串的'@'转为'/'
      */
     public static String changeStr(String str) {
@@ -85,9 +56,13 @@ public class StringUtil {
         int index = chunkFileName.lastIndexOf("-");
         if(index != -1) {
             String fileName = chunkFileName.substring(0,index);
-            int chunk = Integer.parseInt(chunkFileName.substring(index + 1));
             if(!originFileName.equals(fileName)) return false;
-            if(chunk < 1 || chunk > chunks) return false;
+            try {
+                int chunk = Integer.parseInt(chunkFileName.substring(index + 1));
+                if(chunk < 1 || chunk > chunks) return false;
+            } catch (Exception e) {
+                return false;
+            }
             return true;
         }
 
