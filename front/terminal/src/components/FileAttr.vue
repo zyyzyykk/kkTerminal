@@ -231,7 +231,14 @@ export default {
 
     // 重置
     const reset = () => {
-      fileInfo.value = {};
+      fileInfo.value = {
+        attributes:{
+          mode:{
+            type:'',
+          },
+          permissions:'',
+        },
+      };
       rename.value = '';
       fileDir.value = '';
       loading.value = false;
