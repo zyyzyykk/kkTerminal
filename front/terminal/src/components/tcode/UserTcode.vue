@@ -112,10 +112,10 @@ await kkTerminal.write('lsof -ti :' + port, 1200);
 const resultArr = kkTerminal.read();
 if(resultArr.length >= 2) {
     const pid = resultArr[1];
-	if(pid && /^\\d+$/.test(pid)) await kkTerminal.write('kill -9 ' + pid);
+	if(pid && /^\\d+$/.test(pid)) await kkTerminal.write('kill -9 ' + pid, 1200);
 }
 const jar = 'kkTerminal.jar';
-await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &');`;
+await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
 
     const userTcodeEditorRef = ref();
     const userTcodeInfo = ref({

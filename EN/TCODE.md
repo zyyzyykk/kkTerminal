@@ -49,16 +49,17 @@ TCode is not case sensitive; The length is 2-6 bits, where the first bit represe
 ###### Workflow example: Using Customized TCode to start and deploy Jar packages
 
 ```js
-await kkTerminal.write('cd /root/terminal');
-await kkTerminal.write('lsof -i :3000', 500);
-let resultArr = kkTerminal.read();
-if(resultArr.length >= 3) {
-    let pid = resultArr[2].replace(/\s+/g, ' ').split(' ')[1];
-    if(pid) await kkTerminal.write('kill -9 ' + pid);
+const path = '/root/terminal';
+await kkTerminal.write('cd ' + path, 1200);
+const port = 3000;
+await kkTerminal.write('lsof -ti :' + port, 1200);
+const resultArr = kkTerminal.read();
+if(resultArr.length >= 2) {
+    const pid = resultArr[1];
+	if(pid && /^\d+$/.test(pid)) await kkTerminal.write('kill -9 ' + pid, 1200);
 }
-let jar = 'kkTerminal.jar';
-await kkTerminal.write('java -jar ./' + jar + ' > ./out.log &');
-alert('TCode Workflow Over!');
+const jar = 'kkTerminal.jar';
+await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);
 ```
 
 ###### Import/Export
@@ -74,7 +75,7 @@ Example:
 {
     "UJAR": {
         "desc": "start jar",
-        "workflow": "await kkTerminal.write('cd /root/terminal');\nawait kkTerminal.write('lsof -i :3000', 500);\nlet resultArr = kkTerminal.read();\nif(resultArr.length >= 3) {\n    let pid = resultArr[2].replace(/\\s+/g, ' ').split(' ')[1];\n\tif(pid) await kkTerminal.write('kill -9 ' + pid);\n}\nlet jar = 'kkTerminal.jar';\nawait kkTerminal.write('java -jar ./' + jar + ' > ./out.log &');\nalert('TCode Workflow Over!');",
+        "workflow": "const path = '/root/terminal';\nawait kkTerminal.write('cd ' + path, 1200);\nconst port = 3000;\nawait kkTerminal.write('lsof -ti :' + port, 1200);\nconst resultArr = kkTerminal.read();\nif(resultArr.length >= 2) {\n    const pid = resultArr[1];\n\tif(pid && /^\\d+$/.test(pid)) await kkTerminal.write('kill -9 ' + pid, 1200);\n}\nconst jar = 'kkTerminal.jar';\nawait kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);",
         "status": "Not Active"
     }
 }
