@@ -31,5 +31,9 @@ img {
   pointer-events: auto;
 }
 
+.el-popconfirm__main {
+  user-select: none;
+  margin-top: 2px;
+}
 
 </style>
