@@ -120,20 +120,18 @@
     <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >下载</div>
     <div :class="['kk-menu-item', dirStatus == 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >新建</div>
     <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >重命名</div>
-    <a-popconfirm :open="isShowMenu && isShowPop" :overlayStyle="{zIndex: 3466,marginLeft: '10px'}" placement="rightBottom" ok-text="确定" cancel-text="取消" >
-      <template #title>
-        <div class="no-select" style="font-size: 13px; margin-top: 4px;" >确定删除此文件/文件夹吗?</div>
+    <el-popconfirm title="确定删除此文件/文件夹吗?" 
+      confirm-button-text="确定" cancel-button-text="取消" 
+      @confirm="confirmPopConfirm" @cancel="cancelPopConfirm"
+      :visible="isShowMenu && isShowPop" trigger="click"
+      :popper-style="{zIndex: 3466,fontSize:'13px',color:'black'}" popper-class="confirmPop"
+      placement="right" confirm-button-type="danger" >
+      <template #reference>
+        <div :class="['kk-menu-item', selectedFiles.length == 0 ? 'disabled':'']" key="7" >
+          <div @click="handleMenuSelect(7)" >删除</div>
+        </div>
       </template>
-      <template #okButton>
-        <el-button id="sureDelFileBtn" size="small" type="primary" @click="handlePopConfirm" >确定</el-button>
-      </template>
-      <template #cancelButton>
-        <el-button size="small" text >取消</el-button>
-      </template>
-      <div :class="['kk-menu-item', selectedFiles.length == 0 ? 'disabled':'']" key="7" >
-        <div @click="handleMenuSelect(7)" >删除</div>
-      </div>
-    </a-popconfirm>
+    </el-popconfirm>
     <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(8)" key="8" >属性</div>
   </div>
 
@@ -773,7 +771,7 @@ export default {
       });
     };
     // 批量删除文件/文件夹
-    const handlePopConfirm = () => {
+    const confirmPopConfirm = () => {
       isShowMenu.value = false;
       isShowPop.value = false;
       if(selectedFiles.value.length == 0) return;
@@ -794,6 +792,9 @@ export default {
           getDirList();
         }
       });
+    };
+    const cancelPopConfirm = () => {
+      isShowPop.value = false;
     };
     // 新建文件/文件夹
     const mkFileRef = ref();
@@ -1053,8 +1054,8 @@ export default {
           fileAreaRef.value.focus();
         }
         if (menuBlockRef.value && menuBlockRef.value.contains(event.target)) return;
-        const sureDelFileBtn = document.querySelector('#sureDelFileBtn');
-        if (sureDelFileBtn && sureDelFileBtn.contains(event.target)) return;
+        const confirmPop = document.querySelector('.confirmPop');
+        if (confirmPop && confirmPop.contains(event.target)) return;
         isShowMenu.value = false;
         isShowPop.value = false;
       });
@@ -1103,7 +1104,8 @@ export default {
       menuBlockRef,
       doShowDirInput,
       isShowPop,
-      handlePopConfirm,
+      confirmPopConfirm,
+      cancelPopConfirm,
       mkFileRef,
       handleMkFile,
       doRename,
@@ -1219,6 +1221,11 @@ export default {
 .disabled-function {
   color: #a8abb2;
   pointer-events: none;
+}
+
+.confirmPop {
+  /* 定位删除确认框 */
+  user-select: none;
 }
 
 </style>
