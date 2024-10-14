@@ -2,7 +2,7 @@
 
 > kkTerminal，一个web终端实现ssh远程连接服务器
 >
-> kkTerminal, a web-based terminal for SSH remote server connection.
+> kkTerminal, a web terminal for SSH remote server connection.
 >
 > 作者：[zyyzyykk](https://github.com/zyyzyykk/)
 >
@@ -12,10 +12,10 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-09-16
+> 更新时间：2024-10-14
 >
 
-<p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://img.kkbapps.com/logo/terminal.png" alt="kkterminal logo"></a></p>
+<p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="./img/kkTerminal.png" alt="kkterminal"></a></p>
 
 <p align="center">
   <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/docker/pulls/zyyzyykk/kkterminal?logo=docker" alt="Docker Image"></a>
@@ -25,7 +25,7 @@
   <a href="https://www.apache.org/licenses/"><img src="https://img.shields.io/badge/licence-Apache-red?logo=apache&logoColor=%23D22128" alt="Apache Licence"></a>
   <a href="https://github.com/zyyzyykk/kkTerminal"><img src="https://img.shields.io/github/stars/zyyzyykk/kkterminal" alt="GitHub"></a>
 </p>
-<p align="center">简体中文 ｜ <a href="./EN/README.md" >English</a></p>
+<p align="center">简体中文 ｜ <a href="./README-EN.md" >English</a></p>
 
 ### **⚡** 快速集成
 
@@ -70,15 +70,15 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 🌐 国内服务器访问：https://ssh.kkbpro.com/
 - 🌍 国外服务器访问：https://ssh.kkbapps.com/
 
-![connect](https://img.kkbapps.com/terminal/3.2.6-1.png)
+![Connect](./img/Connect.png)
 
-![prefer](https://img.kkbapps.com/terminal/3.2.6-2.png)
+![Preference](./img/Preference.png)
 
-![file](https://img.kkbapps.com/terminal/3.2.6-3.png)
+![File](./img/File.png)
 
-![editor](https://img.kkbapps.com/terminal/3.2.6-4.png)
+![Editor](./img/Editor.png)
 
-[**更多模块预览**](./MODULE.md)
+[**更多模块预览**](./ZH/MODULE.md)
 
 ### 💡 功能说明
 
@@ -105,11 +105,17 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 10.支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
 
-11.支持 [TCode (终端代码)](./TCODE.md)，能够通过自定义TCode实现类似Shell脚本的自动化Workflow
+11.支持 [TCode (终端代码)](./ZH/TCODE.md)，能够通过自定义TCode实现类似Shell脚本的自动化Workflow
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.2.6：latest
+##### zyyzyykk/kkterminal:3.2.9：latest
+
+- 新增文件URL上传功能
+- 修复了取消文件夹下载导致连接断开的bug
+- 优化页面显示与代码逻辑，优化打包体积
+
+##### zyyzyykk/kkterminal:3.2.6：
 
 - 修复文件特殊字符操作问题的bug
 - 优化文件上传与下载
@@ -122,13 +128,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 文本编辑器新增TCode原生对象 `kkTerminal` 的智能提示
 - 文件管理模块快捷键适配MacOS
 
-##### zyyzyykk/kkterminal:3.2.0：
-
-- 文件管理模块支持快捷键操作：多选/全选、复制粘贴、剪切等
-- 支持文件夹下载
-- 重构部分逻辑，优化显示
-
-[**历史更新记录**](./UPDATE.md)
+[**历史更新记录**](./ZH/UPDATE.md)
 
 ### 🧬 架构
 

@@ -1,5 +1,11 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.2.0 :
+
+- The File Management Module supports shortcut key operations such as multiple/all selection, copy and paste, cut, etc
+- Support folder download
+- Refactoring some logic and optimizing display
+
 ##### zyyzyykk/kkterminal:3.1.7 :
 
 - Adapt to default fonts and optimize TCode status display
