@@ -2,8 +2,9 @@
 
 ##### TCode Help Module
 
-![help](https://img.kkbapps.com/terminal/3.2.6-5.png)
+![Help](../img/Help.png)
 
 ##### Customized TCode Module
 
-![tcode](https://img.kkbapps.com/terminal/3.2.6-6.png)
+![TCode](../img/TCode.png)
+
