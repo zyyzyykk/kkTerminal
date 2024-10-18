@@ -1,6 +1,7 @@
 package com.kkbpro.terminal.controller;
 
 import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
+import com.kkbpro.terminal.constants.enums.FileUntarEnum;
 import com.kkbpro.terminal.consumer.WebSocketServer;
 import com.kkbpro.terminal.exception.MyException;
 import com.kkbpro.terminal.pojo.dto.FileUploadInfo;
@@ -504,6 +505,35 @@ public class FileController {
         }
         return Result.setSuccess(200, "文件URL上传成功", null);
     }
+
+    /**
+     *  tar 文件压缩包解压
+     */
+    @PostMapping("/untar")
+    public Result untar(String sshKey, String path, String item) {
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.setError(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件解压失败",null);
+        }
+        FileUntarEnum fileUntarEnum = FileUntarEnum.getByFileName(item);
+        if(fileUntarEnum == null) return Result.setError(500, "文件解压失败", null);
+
+        String command = "cd " + path + " && " + fileUntarEnum.getCmdParam() + " " + item;
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.setError(500, "文件解压失败", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.setError(500, "文件解压失败", null);
+        }
+        return Result.setSuccess(200, "文件解压成功", null);
+    }
+
 
     /**
      * 分片上传文件

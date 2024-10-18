@@ -42,7 +42,4 @@ public enum FileBlockStateEnum {
         return desc;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
 }
