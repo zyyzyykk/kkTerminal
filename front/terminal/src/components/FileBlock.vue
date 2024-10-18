@@ -120,7 +120,8 @@
     <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >下载</div>
     <div :class="['kk-menu-item', dirStatus == 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >新建</div>
     <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >重命名</div>
-    <el-popconfirm title="确定删除此文件/文件夹吗?" 
+    <div :class="['kk-menu-item', !(selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)) ? 'disabled':'']" @click="handleMenuSelect(9)" key="9" >解压</div>
+    <el-popconfirm title="确定删除此文件吗?" 
       confirm-button-text="确定" cancel-button-text="取消" 
       @confirm="confirmPopConfirm" @cancel="cancelPopConfirm"
       :visible="isShowMenu && isShowPop" trigger="click"
@@ -145,6 +146,7 @@ import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/utils/BaseUrl';
 import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
+import { isZipFile } from '@/utils/Untar';
 
 import NoData from '@/components/NoData';
 import TxtPreview from './preview/TxtPreview';
@@ -696,6 +698,12 @@ export default {
             fileAttrRef.value.DialogVisilble = true;
           }
           break;
+        // 解压
+        case 9:
+          if(selectedFiles.value.length == 1 && isZipFile(selectedFiles.value[0].name)) {
+            untar();
+          }
+          break;
         default:
           break;
       }
@@ -998,6 +1006,27 @@ export default {
       });
     };
 
+    // 解压文件
+    const untar = () => {
+      $.ajax({
+        url: http_base_url + '/untar',
+        type:'post',
+        data:{
+          sshKey:props.sshKey,
+          path:escapePath(dir.value),
+          item:escapeItem(selectedFiles.value[0].name),
+        },
+        success(resp){
+          ElMessage({
+            message: resp.info,
+            type: resp.status,
+            grouping: true,
+          });
+          getDirList();
+        }
+      });
+    };
+
     // 重置
     const reset = (deep=false) => {
       if(deep) {
@@ -1126,6 +1155,8 @@ export default {
       reset,
       closeDialog,
       deepCloseDialog,
+      isZipFile,
+      untar,
     }
   }
 }

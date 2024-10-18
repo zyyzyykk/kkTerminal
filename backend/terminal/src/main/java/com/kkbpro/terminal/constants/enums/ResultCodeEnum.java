@@ -31,7 +31,4 @@ public enum ResultCodeEnum {
         return desc;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
 }
