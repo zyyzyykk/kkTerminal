@@ -38,7 +38,7 @@ public class SystemController {
             windowActiveMap.put(windowId, new Date().getTime());
             startMonitor();
         }
-        return Result.setSuccess("初始化成功", osInfo);
+        return Result.success("初始化成功", osInfo);
     }
 
     private String getOSFromUA(String userAgent) {
@@ -92,7 +92,7 @@ public class SystemController {
     public Result beat(String windowId) {
         if(!"Linux".equals(serverOS) && appConfig.getPcWindowTag() && windowId != null)
             windowActiveMap.replace(windowId, new Date().getTime());
-        return Result.setSuccess("窗口心跳续约成功", null);
+        return Result.success("窗口心跳续约成功", null);
     }
 
     /**

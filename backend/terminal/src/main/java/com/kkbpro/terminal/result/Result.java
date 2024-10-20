@@ -30,7 +30,7 @@ public class Result {
     private String data;
 
     // 失败返回
-    public static Result setFail(Integer code, String info)
+    public static Result fail(Integer code, String info)
     {
         Result result = new Result();
         result.setStatus("warning");
@@ -42,7 +42,7 @@ public class Result {
     }
 
     // 成功返回
-    public static Result setSuccess(Integer code, String info, Object data) {
+    public static Result success(Integer code, String info, Object data) {
         Result result = new Result();
         result.setStatus("success");
         result.setCode(code);
@@ -58,13 +58,12 @@ public class Result {
         return result;
     }
 
-
-    public static Result setSuccess(String info, Object data) {
-        return Result.setSuccess(200, info, data);
+    public static Result success(String info, Object data) {
+        return Result.success(200, info, data);
     }
 
     // 错误返回
-    public static Result setError(Integer code,String info)
+    public static Result error(Integer code, String info)
     {
         Result result = new Result();
         result.setStatus("error");
@@ -76,7 +75,7 @@ public class Result {
     }
 
 
-    public static Result setError(Integer code, String info, Object data) {
+    public static Result error(Integer code, String info, Object data) {
         Result result = new Result();
         result.setStatus("error");
         result.setCode(code);

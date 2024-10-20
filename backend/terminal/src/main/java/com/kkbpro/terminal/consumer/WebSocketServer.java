@@ -221,9 +221,9 @@ public class WebSocketServer {
         synchronized (sessionSocket) {
             try {
                 Result result = null;
-                if("success".equals(type)) result = Result.setSuccess(code,message,null);
-                else if("fail".equals(type)) result = Result.setFail(code,message);
-                else result = Result.setError(code,message);
+                if("success".equals(type)) result = Result.success(code,message,null);
+                else if("fail".equals(type)) result = Result.fail(code,message);
+                else result = Result.error(code,message);
                 sessionSocket.getBasicRemote().sendText(JSON.toJSONString(result));
             } catch(IOException e) {
                 e.printStackTrace();
