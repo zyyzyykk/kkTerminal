@@ -120,7 +120,6 @@
     <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >下载</div>
     <div :class="['kk-menu-item', dirStatus == 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >新建</div>
     <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >重命名</div>
-    <div :class="['kk-menu-item', !(selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)) ? 'disabled':'']" @click="handleMenuSelect(9)" key="9" >解压</div>
     <el-popconfirm title="确定删除此文件吗?" 
       confirm-button-text="确定" cancel-button-text="取消" 
       @confirm="confirmPopConfirm" @cancel="cancelPopConfirm"
@@ -133,6 +132,7 @@
         </div>
       </template>
     </el-popconfirm>
+    <div :class="['kk-menu-item', !(selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)) ? 'disabled':'']" @click="handleMenuSelect(9)" key="9" >解压</div>
     <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(8)" key="8" >属性</div>
   </div>
 
@@ -270,6 +270,7 @@ export default {
           else {
             noDataMsg.value = resp.info;
             dirStatus.value = 1;
+            loading.value = false;
           }
         }
       });
