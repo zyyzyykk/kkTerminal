@@ -13,7 +13,7 @@
     <div class="no-select">
         <el-tabs type="border-card">
             <el-tab-pane label="功能TCode">
-              <div style="height: 210px; overflow-y: auto; padding: 10px 0" >
+              <div style="height: 210px; overflow-y: auto;" >
                   <div>以 <span style="background-color: #f3f4f4;" >/</span> 开头，用于快速执行通用功能</div>
                   <div class="kk-border" ></div>
                   <div v-for="(item, key) in FuncTcode" :key="key" >
@@ -25,7 +25,7 @@
               </div>
             </el-tab-pane>
             <el-tab-pane label="系统TCode">
-              <div style="height: 210px; overflow-y: auto; padding: 10px 0" >
+              <div style="height: 210px; overflow-y: auto;" >
                   <div>以 <span style="background-color: #f3f4f4;" >S</span> 开头，用于快速访问系统模块</div>
                   <div class="kk-border" ></div>
                   <div v-for="(item, key) in SysTcode" :key="key" >
@@ -37,10 +37,10 @@
               </div>
             </el-tab-pane>
             <el-tab-pane label="用户TCode">
-              <div style="height: 210px; overflow-y: auto; padding: 10px 0" >
+              <div style="height: 210px; overflow-y: auto;" >
                 <template v-if="userTCodes && Object.keys(userTCodes).length > 0" >
                   <template v-if="nowTCode && nowTCode.length >= 2 && nowTCode.length <= 6" >
-                    <div class="kk-flex" style="margin-bottom: 12px; margin-top: -10px;" >
+                    <div class="kk-flex" style="margin-bottom: 12px; margin-top: -6px;" >
                       <div @click="toOverview" style="margin-right: 10px; cursor: pointer; font-size: 16px;" ><el-icon><ArrowLeft /></el-icon></div>
                       <div style="margin-top: 3px;" > {{ modifyTag + nowTCode }} </div>
                       <div style="cursor: pointer; margin-left: 10px;" >
@@ -66,7 +66,7 @@
                       </div>
                       <div style="margin-left: 10px;" ></div>
                     </div>
-                    <div style="width: 100%; height: 166px;">
+                    <div style="width: 100%; height: 178px;">
                       <AceEditor ref="userTcodeEditorRef" @handleChange="handleChange" @handleSave="doSaveTCode" ></AceEditor>
                     </div>
                   </template>
