@@ -16,7 +16,14 @@
     </template>
     <div style="margin-top: -28px;"></div>
     <div element-loading-text="Loading..." v-loading="loading" style="padding: 0px 5px; width: 100%; height: 60vh;">
-      <AceEditor ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
+      <AceEditor class="preview" v-show="!loading && previewInfo.preview == 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
+      <iframe class="preview" v-if="!loading && previewInfo.preview == 'iframe' && previewUrl != ''" :src="previewUrl" ></iframe>
+      <audio controls class="preview" v-if="!loading && previewInfo.preview == 'audio' && previewUrl != ''" >
+        <source :src="previewUrl" :type="previewInfo.type" >
+      </audio>
+      <video controls class="preview" v-if="!loading && previewInfo.preview == 'video' && previewUrl != ''" >
+        <source :src="previewUrl" :type="previewInfo.type" >
+      </video>
     </div>
     <div style="margin-top: -13px;"></div>
   </el-dialog>
@@ -27,6 +34,7 @@ import { ref } from 'vue';
 import AceEditor from './AceEditor';
 import $ from 'jquery';
 import { ElMessage } from 'element-plus';
+import { previewFileInfo } from '@/utils/FileSuffix';
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
@@ -46,25 +54,44 @@ export default {
     const fileName = ref('');
     const fileUrl = ref('');
 
+    const previewInfo = ref({
+      preview:'editor',
+      type:'text',
+    });
+    const previewUrl = ref('');
+
     const codeEditorRef = ref();
 
     const initText = async () => {
-      reset();
       loading.value = true;
+      reset();
       let url = fileUrl.value;
       await $.ajax({
         url: url,
         method: 'GET',
-        dataType: 'text',
+        xhrFields: {
+          responseType: 'arraybuffer'
+        },
         dataFilter(resp) {
           return resp;
         },
         success(resp) {
           if(url == fileUrl.value)
           {
-            codeEditorRef.value.setValue(resp);
-            codeEditorRef.value.resetHistory();
-            codeEditorRef.value.setLanguage(fileName.value);
+            previewInfo.value = previewFileInfo(fileName.value);
+            // 文件可预览
+            if(previewInfo.value.preview != 'editor') {
+              const blob = new Blob([resp], {type:previewInfo.value.type});
+              if(previewUrl.value != '') URL.revokeObjectURL(previewUrl.value);
+              previewUrl.value = URL.createObjectURL(blob);
+            }
+            else {
+              const decoder = new TextDecoder('utf-8');
+              const text = decoder.decode(new Uint8Array(resp));
+              codeEditorRef.value.setValue(text);
+              codeEditorRef.value.resetHistory();
+              codeEditorRef.value.setLanguage(fileName.value);
+            }
             modifyTag.value = '';
             loading.value = false;
           }
@@ -98,6 +125,14 @@ export default {
     const reset = () => {
       if(codeEditorRef.value) codeEditorRef.value.reset();
       modifyTag.value = '';
+      previewInfo.value = {
+        preview:'editor',
+        type:'text',
+      };
+      if(previewUrl.value != '') {
+        URL.revokeObjectURL(previewUrl.value);
+        previewUrl.value = '';
+      }
       DialogVisilble.value = false;
     };
 
@@ -117,6 +152,8 @@ export default {
       loading,
       fileName,
       fileUrl,
+      previewInfo,
+      previewUrl,
       codeEditorRef,
       modifyTag,
       handleChange,
@@ -141,4 +178,10 @@ export default {
   text-overflow: ellipsis;
   line-height: 22px;
 }
+
+.preview {
+  width: 100%;
+  height: 100%;
+}
+
 </style>

@@ -117,6 +117,7 @@
     <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(1)" key="1" >刷新</div>
     <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >打开</div>
     <div style="border-bottom: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length > 1 ? 'disabled':'']" @click="handleMenuSelect(3)" key="3" >复制路径</div>
+    <div style="border-bottom: 1px solid #ddd;" v-show="selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)" :class="['kk-menu-item', !(selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)) ? 'disabled':'']" @click="handleMenuSelect(9)" key="9" >解压</div>
     <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >下载</div>
     <div :class="['kk-menu-item', dirStatus == 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >新建</div>
     <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >重命名</div>
@@ -132,7 +133,6 @@
         </div>
       </template>
     </el-popconfirm>
-    <div :class="['kk-menu-item', !(selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)) ? 'disabled':'']" @click="handleMenuSelect(9)" key="9" >解压</div>
     <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(8)" key="8" >属性</div>
   </div>
 
@@ -146,7 +146,7 @@ import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/utils/BaseUrl';
 import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
-import { isZipFile } from '@/utils/Untar';
+import { isZipFile } from '@/utils/FileSuffix';
 
 import NoData from '@/components/NoData';
 import TxtPreview from './preview/TxtPreview';
