@@ -563,8 +563,8 @@ export default {
             type:'post',
             data:{
               sshKey:props.sshKey,
-              path:escapePath(dir.value),
-              item:escapeItem(item.name),
+              path:dir.value,
+              item:item.name,
             },
             success(resp){
               if(resp.status == 'success') {
@@ -604,8 +604,8 @@ export default {
               type:'post',
               data:{
                 sshKey:props.sshKey,
-                path:escapePath(basePath),
-                item:escapeItem(item.name),
+                path:basePath,
+                item:item.name,
               },
               success(resp){
                 if(resp.status == 'success') {
@@ -813,8 +813,8 @@ export default {
         type:'post',
         data:{
           sshKey:props.sshKey,
-          path:escapePath(nowDir),
-          item:escapeItem(name),
+          path:isFolder ? nowDir : escapePath(nowDir),
+          item:isFolder ? name : escapeItem(name),
         },
         success(resp){
           ElMessage({
@@ -958,8 +958,8 @@ export default {
         type:'post',
         data:{
           sshKey:props.sshKey,
-          path:escapePath(dir.value),
-          item:escapeItem(fileObj.path),
+          path:dir.value,
+          item:fileObj.path,
         },
         success(resp){
           if(resp.status == 'success') {

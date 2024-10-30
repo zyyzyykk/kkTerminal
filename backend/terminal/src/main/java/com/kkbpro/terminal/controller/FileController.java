@@ -8,6 +8,7 @@ import com.kkbpro.terminal.pojo.dto.FileUploadInfo;
 import com.kkbpro.terminal.pojo.vo.FileInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.FileUtil;
+import com.sun.prism.null3d.NULL3DPipeline;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.sftp.*;
@@ -458,14 +459,12 @@ public class FileController {
         if(ssh == null) {
             return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg,null);
         }
-        String command = "cd " + path + " && test ! -e " + item + " && mkdir -p " + item;
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
-            if (exitStatus != 0) return Result.error(500, errorMsg, null);
+        try {
+            SFTPClient sftp = getSftpClient(sshKey);
+            String fullPath = path + item;
+            if(sftp.statExistence(fullPath) != null)
+                return Result.error(500, errorMsg, null);
+            sftp.mkdirs(fullPath);
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error(500, errorMsg, null);
@@ -490,7 +489,7 @@ public class FileController {
             sftp.rename(oldPath,newPath);
         } catch (Exception e) {
             e.printStackTrace();
-            return Result.error(500,errorMsg);
+            return Result.error(500, errorMsg, null);
         }
         return Result.success(200, successMsg, null);
     }
