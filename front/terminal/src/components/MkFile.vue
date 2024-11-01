@@ -17,8 +17,8 @@
       <div class="errInfo no-select"> {{ err_msg }} </div>
       <div class="kk-flex">
         <div>
-          <FileIcons width="24" height="24" v-if="isDirectory == true" name="kk.txt" :isFolder="true" />
-          <FileIcons width="24" height="24" v-else name="kk.txt" :isFolder="false" />
+          <FileIcons :style="{display: 'flex', alignItems: 'center'}" :width="24" :height="24" v-if="isDirectory == true" name="kk.txt" :isFolder="true" />
+          <FileIcons :style="{display: 'flex', alignItems: 'center'}" :width="24" :height="24" v-else name="kk.txt" :isFolder="false" />
         </div>
         <div style="width: 10px;"></div>
         <div style="flex: 1;">

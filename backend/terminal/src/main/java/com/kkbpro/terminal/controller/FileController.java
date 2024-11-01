@@ -8,7 +8,6 @@ import com.kkbpro.terminal.pojo.dto.FileUploadInfo;
 import com.kkbpro.terminal.pojo.vo.FileInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.FileUtil;
-import com.sun.prism.null3d.NULL3DPipeline;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.sftp.*;
@@ -147,7 +146,10 @@ public class FileController {
                 fileInfo.setIndex(index++);
                 fileInfo.setId(UUID.randomUUID().toString());
                 fileInfo.setName(file.getName());
-
+                // 是否为引用文件
+                if(file.getAttributes().getType() == FileMode.Type.SYMLINK)
+                    fileInfo.setIsSymlink(true);
+                else fileInfo.setIsSymlink(false);
                 // 是否为文件夹
                 if(file.isDirectory()) fileInfo.setIsDirectory(true);
                 else if(file.isRegularFile()) fileInfo.setIsDirectory(false);
