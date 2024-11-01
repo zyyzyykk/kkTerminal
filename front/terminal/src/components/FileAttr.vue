@@ -11,7 +11,7 @@
     <template #title>
       <div style="margin-top: -15px;"></div>
       <div class="kk-flex nowrap">
-        <FileIcons :name="fileInfo.name" width="16" height="16" :isFolder="fileInfo.isDirectory" />
+        <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="16" :height="16" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" />
         <div class="ellipsis" style="margin: 0 5px; font-size: small;">{{ fileInfo.name }}</div>
         <div style="font-size: small;">属性</div>
       </div>
@@ -19,7 +19,7 @@
     <div style="margin-top: -32px;"></div>
     <div class="no-select" element-loading-text="Loading..." v-loading="loading" >
       <div class="kk-flex">
-        <div style="margin-right: 10px;" ><FileIcons :name="fileInfo.name" width="32" height="32" :isFolder="fileInfo.isDirectory" /></div>
+        <div style="margin-right: 10px;" ><FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="32" :height="32" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" /></div>
         <div>
           <el-input @keydown.enter="confirm" v-model="rename" placeholder="" />
         </div>
@@ -39,7 +39,7 @@
         <div class="ellipsis" >
           {{ includeInfo }}
         </div>
-        <div v-if="unreliable" style="margin-left: 10px;" >
+        <div v-if="fileInfo.isSymlink || unreliable" style="margin-left: 10px;" >
           <el-tag size="small" type="danger">unsure</el-tag>
         </div>
         <div style="cursor: pointer; margin-left: 7px;" @click="getFolderInclude" >
@@ -51,7 +51,7 @@
         <div class="ellipsis" >
           {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size + ' 字节' }})
         </div>
-        <div v-if="unreliable" style="margin-left: 10px;" >
+        <div v-if="fileInfo.isSymlink || unreliable" style="margin-left: 10px;" >
           <el-tag size="small" type="danger">unsure</el-tag>
         </div>
         <div style="cursor: pointer; margin-left: 7px;" @click="getFileSize" >

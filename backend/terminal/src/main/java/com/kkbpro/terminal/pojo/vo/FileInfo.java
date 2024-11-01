@@ -25,6 +25,9 @@ public class FileInfo {
     // 是否为文件夹
     private Boolean isDirectory;
 
+    // 是否为引用文件
+    private Boolean isSymlink;
+
     // 文件详细信息
     private FileAttributes attributes;
 

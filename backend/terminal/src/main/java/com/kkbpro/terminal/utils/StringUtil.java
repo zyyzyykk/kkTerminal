@@ -1,6 +1,5 @@
 package com.kkbpro.terminal.utils;
 
-import org.apache.commons.lang3.RandomStringUtils;
 
 /**
  * 字符串相关工具类
