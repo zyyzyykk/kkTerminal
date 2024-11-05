@@ -62,7 +62,7 @@
           <div v-for="item in files" :key="item.id" >
             <template v-if="item.isDirectory == true">
               <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
-                <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
+                <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] == '.' || (isClipboard(item.id) != -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
                 <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                   <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                 </div>
@@ -71,7 +71,7 @@
             </template>
             <template v-else>
               <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
-                <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: isClipboard(item.id) != -1 && isCtrlx ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
+                <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] == '.' || (isClipboard(item.id) != -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
                 <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                   <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                 </div>
