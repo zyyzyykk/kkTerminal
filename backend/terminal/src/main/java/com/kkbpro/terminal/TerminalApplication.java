@@ -13,7 +13,9 @@ import java.util.Properties;
 
 @SpringBootApplication
 public class TerminalApplication {
+
     private static final Properties properties;
+
     static {
         properties = new Properties();
         InputStream inputStream = TerminalApplication.class.getClassLoader().getResourceAsStream("application.properties");
@@ -30,6 +32,7 @@ public class TerminalApplication {
         File data = new File(FileUtil.folderBasePath);
         if(data.exists()) FileUtil.tmpFloderDelete(data);
     }
+
     public static void main(String[] args) {
         // 清除文件数据残留
         File data = new File(FileUtil.folderBasePath);
@@ -64,6 +67,7 @@ public class TerminalApplication {
             SystemController.serverOS = "Linux";
         }
     }
+
     private static void openWebPage(boolean enableOnceMonitor) {
         Runtime runtime = Runtime.getRuntime();
         try {
@@ -84,11 +88,9 @@ public class TerminalApplication {
         }
     }
 
-
     private static String getUrl() {
         return "http://localhost:" + properties.getProperty("server.port");
     }
-
 
     private static void startOnceMonitor() {
         new Thread(() -> {

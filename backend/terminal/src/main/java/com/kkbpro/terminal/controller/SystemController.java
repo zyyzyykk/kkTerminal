@@ -17,8 +17,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @RestController
 @RequestMapping("/api")
 public class SystemController {
+
     public static String serverOS = "Linux";
+
     private static volatile Thread monitor;
+
     private static ConcurrentHashMap<String, Long> windowActiveMap = new ConcurrentHashMap<>();
 
     @Autowired
@@ -101,4 +104,5 @@ public class SystemController {
     public static Boolean isEnableMonitor() {
         return monitor != null;
     }
+
 }

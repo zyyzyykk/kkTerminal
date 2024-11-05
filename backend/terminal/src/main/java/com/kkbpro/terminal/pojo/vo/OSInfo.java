@@ -11,8 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OSInfo {
+
     private String serverOS;
+
     private String clientOS;
+
     private String windowId;
 
 }

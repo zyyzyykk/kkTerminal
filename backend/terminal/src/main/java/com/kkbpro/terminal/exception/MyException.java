@@ -10,8 +10,10 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class MyException extends RuntimeException{
+public class MyException extends RuntimeException {
+
     private Result result;
+
     public MyException(Result result){
         super(result.getInfo());
         this.result = result;

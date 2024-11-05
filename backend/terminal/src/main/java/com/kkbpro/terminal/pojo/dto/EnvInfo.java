@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EnvInfo {
+
     private String server_ip;
 
     private Integer server_port;

@@ -74,7 +74,6 @@ public class Result {
         return result;
     }
 
-
     public static Result error(Integer code, String info, Object data) {
         Result result = new Result();
         result.setStatus("error");
@@ -90,6 +89,5 @@ public class Result {
 
         return result;
     }
-
 
 }

@@ -24,7 +24,6 @@ public class AppConfig {
     @Value("${kk.source:}")
     private String source;
 
-
     /**
      * 艺术字标题
      */
@@ -42,7 +41,6 @@ public class AppConfig {
      */
     @Value("${kk.max-idle-timeout:}")
     private Integer MaxIdleTimeout;
-
 
     /**
      * PC端启用窗口

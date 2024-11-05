@@ -213,7 +213,6 @@ public class WebSocketServer {
         error.printStackTrace();
     }
 
-
     // 向Client发送信息
     public void sendMessage(Session sessionSocket, String message, String type, Integer code) {
         if(message == null || "".equals(message)) return;

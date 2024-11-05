@@ -301,6 +301,7 @@ export default {
               files.value = resp.data.files;
               noDataMsg.value = '暂无文件';
               dirStatus.value = 0;
+              lastSelectedIndex = -1;
             }
             else {
               files.value = [];
@@ -841,6 +842,25 @@ export default {
       const renameDom = document.querySelector('#rename');
       if(renameDom && renameDom.contains(event.target)) return;
       event.preventDefault();
+      // 上下箭头
+      if(event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        // 上箭头
+        if(event.key === 'ArrowUp') {
+          if(lastSelectedIndex == -1 || lastSelectedIndex > files.value.length) lastSelectedIndex = files.value.length;
+          lastSelectedIndex--;
+          lastSelectedIndex = Math.max(0,lastSelectedIndex);
+        }
+        // 下箭头
+        else if(event.key === 'ArrowDown') {
+          lastSelectedIndex++;
+          lastSelectedIndex = Math.min(files.value.length - 1,lastSelectedIndex);
+        }
+        isShowMenu.value = false;
+        isShowPop.value = false;
+        selectedFiles.value = [];
+        selectedFiles.value.push(files.value[lastSelectedIndex]);
+      }
+      // ctrl
       if ((props.os == "Windows" && event.ctrlKey) || ((props.os == "Mac" || props.os == "iOS") && event.metaKey)) {
         switch (String.fromCharCode(event.which).toLowerCase()) {
           // 全选
