@@ -81,7 +81,7 @@
           </div>
         </div>
         <div v-else>
-          <NoData height="30vh" minHeight="200px" @contextmenu="selectedFiles = []" v-if="loading == false" :msg="noDataMsg"></NoData>
+          <NoData height="248px" @contextmenu="selectedFiles = []" v-if="loading == false" :msg="noDataMsg"></NoData>
         </div>
       </div>
     </div>
@@ -302,11 +302,16 @@ export default {
               noDataMsg.value = '暂无文件';
               dirStatus.value = 0;
               lastSelectedIndex = -1;
+              fileAreaRef.value.tabindex = '0';
+              fileAreaRef.value.focus();
             }
             else {
               files.value = [];
               noDataMsg.value = resp.info;
               dirStatus.value = 1;
+              lastSelectedIndex = -1;
+              fileAreaRef.value.tabindex = '0';
+              fileAreaRef.value.focus();
             }
           }
         },
@@ -394,7 +399,7 @@ export default {
       if(selectedFiles.value.length == 1 && selectedFiles.value[0].name && !selectedFiles.value[0].isDirectory) downloadRemoteFile(selectedFiles.value[0].name);
     };
     // 上传文件
-    const chunkSize = 1024 * 517;   // 每一片大小517kB
+    const chunkSize = 1024 * 2713;   // 每一片大小2713kB
     const doUpload = async (fileData, data={}) => {
       try {
         if(isShowDirInput.value == true) return;
@@ -827,10 +832,25 @@ export default {
         }
       });
     };
+
     watch(dir,() => {
       if(mkFileRef.value) mkFileRef.value.reset();
       if(fileUrlRef.value) fileUrlRef.value.reset();
     });
+
+    // 滚动到可视区
+    const scrollToView = (direction,index) => {
+      // 获取当前滚动位置
+      const currentScrollTop = fileAreaRef.value.scrollTop;
+      if(direction == 'up') {
+        const distance = index * 31;
+        if(distance < currentScrollTop) fileAreaRef.value.scrollTop = distance;
+      }
+      else if(direction == 'down') {
+        const distance = (index + 1) * 31;
+        if(distance > currentScrollTop + 248) fileAreaRef.value.scrollTop = distance - 248;
+      }
+    };
 
     // 文件快捷键操作
     const fileClipboard = ref({
@@ -844,21 +864,38 @@ export default {
       event.preventDefault();
       // 上下箭头
       if(event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        let direction = '';
         // 上箭头
         if(event.key === 'ArrowUp') {
           if(lastSelectedIndex == -1 || lastSelectedIndex > files.value.length) lastSelectedIndex = files.value.length;
           lastSelectedIndex--;
           lastSelectedIndex = Math.max(0,lastSelectedIndex);
+          direction = 'up';
         }
         // 下箭头
         else if(event.key === 'ArrowDown') {
           lastSelectedIndex++;
           lastSelectedIndex = Math.min(files.value.length - 1,lastSelectedIndex);
+          direction = 'down';
         }
         isShowMenu.value = false;
         isShowPop.value = false;
         selectedFiles.value = [];
         selectedFiles.value.push(files.value[lastSelectedIndex]);
+        scrollToView(direction,lastSelectedIndex);
+      }
+      // 回车键
+      if(event.key === 'Enter') {
+        if(isShowMenu.value || isShowPop.value) {
+          isShowMenu.value = false;
+          isShowPop.value = false;
+          return;
+        }
+        if(selectedFiles.value.length == 1) {
+          const item = selectedFiles.value[0];
+          if(item.isDirectory) changeDir(dir.value + item.name + '/');
+          else preViewFile(item.name);
+        }
       }
       // ctrl
       if ((props.os == "Windows" && event.ctrlKey) || ((props.os == "Mac" || props.os == "iOS") && event.metaKey)) {
@@ -1195,8 +1232,7 @@ export default {
 }
 
 .list-class {
-  height: 30vh;
-  min-height: 200px;
+  height: 248px;
   overflow-y: scroll;
   width: 100%;
 }
