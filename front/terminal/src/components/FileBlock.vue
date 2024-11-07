@@ -399,7 +399,7 @@ export default {
       if(selectedFiles.value.length == 1 && selectedFiles.value[0].name && !selectedFiles.value[0].isDirectory) downloadRemoteFile(selectedFiles.value[0].name);
     };
     // 上传文件
-    const chunkSize = 1024 * 2713;   // 每一片大小2713kB
+    const chunkSize = 1024 * 2173;   // 每一片大小2173kB
     const doUpload = async (fileData, data={}) => {
       try {
         if(isShowDirInput.value == true) return;
@@ -839,17 +839,17 @@ export default {
     });
 
     // 滚动到可视区
-    const scrollToView = (direction,index) => {
+    const scrollToView = (index) => {
+      const itemWidth = 31;
+      const upDistance = index * itemWidth;
+      const downDistance = upDistance + itemWidth;
+      // 获取可视区域的高度
+      const viewWidth = fileAreaRef.value.clientHeight;
       // 获取当前滚动位置
       const currentScrollTop = fileAreaRef.value.scrollTop;
-      if(direction == 'up') {
-        const distance = index * 31;
-        if(distance < currentScrollTop) fileAreaRef.value.scrollTop = distance;
-      }
-      else if(direction == 'down') {
-        const distance = (index + 1) * 31;
-        if(distance > currentScrollTop + 248) fileAreaRef.value.scrollTop = distance - 248;
-      }
+      // 当前项不完全在可视区内
+      if(upDistance < currentScrollTop) fileAreaRef.value.scrollTop = upDistance;
+      else if(downDistance > currentScrollTop + viewWidth) fileAreaRef.value.scrollTop = downDistance - viewWidth;
     };
 
     // 文件快捷键操作
@@ -864,25 +864,22 @@ export default {
       event.preventDefault();
       // 上下箭头
       if(event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-        let direction = '';
         // 上箭头
         if(event.key === 'ArrowUp') {
           if(lastSelectedIndex == -1 || lastSelectedIndex > files.value.length) lastSelectedIndex = files.value.length;
           lastSelectedIndex--;
           lastSelectedIndex = Math.max(0,lastSelectedIndex);
-          direction = 'up';
         }
         // 下箭头
         else if(event.key === 'ArrowDown') {
           lastSelectedIndex++;
           lastSelectedIndex = Math.min(files.value.length - 1,lastSelectedIndex);
-          direction = 'down';
         }
         isShowMenu.value = false;
         isShowPop.value = false;
         selectedFiles.value = [];
         selectedFiles.value.push(files.value[lastSelectedIndex]);
-        scrollToView(direction,lastSelectedIndex);
+        scrollToView(lastSelectedIndex);
       }
       // 回车键
       if(event.key === 'Enter') {
