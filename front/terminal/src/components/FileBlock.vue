@@ -6,6 +6,7 @@
     width="50%"
     :modal="false"
     modal-class="kk-dialog-class"
+    align-center
     draggable
     style="position: relative;"
   >
