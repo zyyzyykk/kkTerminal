@@ -1,6 +1,6 @@
 # kkTerminal
 
-> kkTerminal, a web terminal for SSH remote server connection
+> kkTerminal, a terminal for Web SSH connection
 >
 > Author: [zyyzyykk](https://github.com/zyyzyykk/)
 >
@@ -33,7 +33,7 @@ Using the `iframe` tag in HTML web pages to quick integration:
 <iframe src="https://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
 ```
 
-### 💪 Deploy with Docker
+### 🐳 Deploy with Docker
 
 1.Pull image:
 
@@ -80,7 +80,7 @@ Visit the following website:
 
 ### 💡 Function Description
 
-1.kkTerminal is a web-based SSH remote connection tool for servers. Click on the terminal icon in the upper left corner and select the connection settings to establish an SSH connection
+1.kkTerminal is a terminal for Web SSH connection. Click on the terminal icon in the upper left corner and select the connection settings to establish an SSH connection
 
 2.Support the use of `iframe` tags in web pages for quick integration into third-party websites
 
@@ -143,3 +143,7 @@ Vue + Xterm              SpringBoot + SSHJ                Linux OS
 Author: [zyyzyykk](https://github.com/zyyzyykk/)
 
 Welcome to provide valuable opinions or suggestions on this project, and you can also join us in maintaining and developing this project together
+
+### 🌟 Stars
+
+[![Stars](https://starchart.cc/zyyzyykk/kkTerminal.svg?variant=adaptive)](https://starchart.cc/zyyzyykk/kkTerminal)

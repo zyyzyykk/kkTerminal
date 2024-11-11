@@ -1,6 +1,6 @@
 # kkTerminal
 
-> kkTerminal，一个web终端实现ssh远程连接服务器
+> kkTerminal，一个Web SSH连接终端
 >
 > 作者：[zyyzyykk](https://github.com/zyyzyykk/)
 >
@@ -33,7 +33,7 @@
 <iframe src="https://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
 ```
 
-### 💪 使用docker部署
+### 🐳 使用docker部署
 
 1.拉取镜像：
 
@@ -80,7 +80,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 💡 功能说明
 
-1.kkTerminal是一个web端ssh远程连接服务器的工具，点击左上角的终端图标，选择连接设置进行ssh连接
+1.kkTerminal是一个Web SSH连接终端工具，点击左上角的终端图标，选择连接设置进行ssh连接
 
 2.支持在网页中使用 `iframe` 标签引入，可快速集成到第三方网站中
 
@@ -143,3 +143,8 @@ Vue + Xterm              SpringBoot + SSHJ                Linux OS
 作者：[zyyzyykk](https://github.com/zyyzyykk/)
 
 欢迎对此项目提出宝贵的意见或建议，也可以加入我们一起进行此项目的维护与开发
+
+### 🌟 点赞
+
+[![Stars](https://starchart.cc/zyyzyykk/kkTerminal.svg?variant=adaptive)](https://starchart.cc/zyyzyykk/kkTerminal)
+
