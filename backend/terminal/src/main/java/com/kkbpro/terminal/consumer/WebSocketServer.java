@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.lalyos.jfiglet.FigletFont;
 import com.kkbpro.terminal.config.AppConfig;
+import com.kkbpro.terminal.constants.enums.CharsetEnum;
 import com.kkbpro.terminal.constants.enums.MessageInfoTypeRnum;
 import com.kkbpro.terminal.constants.enums.ResultCodeEnum;
 import com.kkbpro.terminal.pojo.dto.EnvInfo;
@@ -13,6 +14,7 @@ import com.kkbpro.terminal.utils.AesUtil;
 import com.kkbpro.terminal.utils.FileUtil;
 import com.kkbpro.terminal.utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.common.IOUtils;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,6 +49,8 @@ public class WebSocketServer {
     private String sshKey = null;
 
     private SSHClient sshClient;
+
+    private Charset serverCharset = null;
 
     private net.schmizz.sshj.connection.channel.direct.Session.Shell shell = null;
 
@@ -90,6 +95,15 @@ public class WebSocketServer {
             return;
         }
 
+        // 获取服务器编码格式
+        try(net.schmizz.sshj.connection.channel.direct.Session sshSession = sshClient.startSession();
+            net.schmizz.sshj.connection.channel.direct.Session.Command command = sshSession.exec("echo $LANG")) {
+            String locale = IOUtils.readFully(command.getInputStream()).toString();
+            command.join();
+            serverCharset = Charset.forName(CharsetEnum.getByLinuxCharset(locale).getJavaCharset());
+        }
+
+        // 开启交互终端
         net.schmizz.sshj.connection.channel.direct.Session sshSession = sshClient.startSession();
         sshSession.allocateDefaultPTY();
 
@@ -121,7 +135,7 @@ public class WebSocketServer {
             int len;
             try {
                 while ((len = shellInputStream.read(buffer)) != -1) {
-                    String shellOut = new String(buffer, 0, len, StandardCharsets.UTF_8);
+                    String shellOut = new String(buffer, 0, len, serverCharset);
                     sendMessage(sessionSocket, shellOut,
                             "success", ResultCodeEnum.OUT_TEXT.getState());
                 }
@@ -197,7 +211,7 @@ public class WebSocketServer {
 
         // 文本命令
         if(MessageInfoTypeRnum.USER_TEXT.getState().equals(messageInfo.getType())) {
-            shellOutputStream.write(messageInfo.getContent().getBytes(StandardCharsets.UTF_8));
+            shellOutputStream.write(messageInfo.getContent().getBytes(serverCharset));
             shellOutputStream.flush();
         }
         // 心跳续约
