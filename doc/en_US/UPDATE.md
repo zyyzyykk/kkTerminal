@@ -1,5 +1,12 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.2.6:
+
+- Fix bugs related to special character operations in files
+- Optimize file upload and download
+- File Attribute Module: Folder addition includes attributes, file size attributes, and real-time refresh
+- Optimize display logic and standardize coding
+
 ##### zyyzyykk/kkterminal:3.2.2:
 
 - TCode supports Get/Set to Session/Local Level variables

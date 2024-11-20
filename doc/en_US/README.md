@@ -10,7 +10,7 @@
 >
 > Preview: https://ssh.kkbpro.com/	(For domestic servers)	or	https://ssh.kkbapps.com/	(For foreign servers)
 >
-> Update Time: 2024-11-04
+> Update Time: 2024-11-20
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="http://img.kkbapps.com/logo/terminal.png" alt="kkTerminal"></a></p>
@@ -72,7 +72,7 @@ Visit the following website:
 
 ![Preference](http://img.kkbapps.com/terminal/Preference-3.3.3.png)
 
-![File](http://img.kkbapps.com/terminal/File-3.3.3.png)
+![File](http://img.kkbapps.com/terminal/File-3.3.7.png)
 
 ![Editor](http://img.kkbapps.com/terminal/Editor-3.3.3.png)
 
@@ -99,7 +99,7 @@ Visit the following website:
 
 8.Support file management, open the File Management Module to view, decompress, upload and download files/folders
 
-9.Support shortcut key operations such as multiple/all file selection, copy and paste and cut
+9.Support shortcut key operations such as multiple/all file selection, copy and paste, cut, selection switch, open
 
 10.Support file browsing and editing, modify the file and save it to a remote server using `ctrl+s`
 
@@ -107,7 +107,14 @@ Visit the following website:
 
 ### 👨‍💻 Update Records
 
-##### zyyzyykk/kkterminal:3.3.3: latest
+##### zyyzyykk/kkterminal:3.3.7: latest
+
+- Adaptive remote server encoding format
+- Expand highlighting file types
+- Add file item keyboard selection switch and open
+- Optimization of hidden file icon style
+
+##### zyyzyykk/kkterminal:3.3.3: 
 
 - Add compressed file decompression function
 - Fixed the bug of file loss caused by folder drag upload
@@ -119,13 +126,6 @@ Visit the following website:
 - Add file URL upload
 - Fixed bug where canceling folder downloads caused disconnection
 - Optimize page display and code logic, optimize packaging volume
-
-##### zyyzyykk/kkterminal:3.2.6:
-
-- Fix bugs related to special character operations in files
-- Optimize file upload and download
-- File Attribute Module: Folder addition includes attributes, file size attributes, and real-time refresh
-- Optimize display logic and standardize coding
 
 [**History Update Records**](./UPDATE.md)
 

@@ -10,7 +10,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-11-04
+> 更新时间：2024-11-20
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="http://img.kkbapps.com/logo/terminal.png" alt="kkterminal"></a></p>
@@ -72,7 +72,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ![Preference](http://img.kkbapps.com/terminal/Preference-3.3.3.png)
 
-![File](http://img.kkbapps.com/terminal/File-3.3.3.png)
+![File](http://img.kkbapps.com/terminal/File-3.3.7.png)
 
 ![Editor](http://img.kkbapps.com/terminal/Editor-3.3.3.png)
 
@@ -99,7 +99,7 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 8.支持文件管理，打开文件管理模块进行文件/文件夹的查看、解压、上传与下载
 
-9.支持文件多选/全选、复制粘贴、剪切等快捷键操作
+9.支持文件多选/全选、复制粘贴、剪切、选择切换、打开等快捷键操作
 
 10.支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
 
@@ -107,7 +107,14 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.3.3：latest
+##### zyyzyykk/kkterminal:3.3.7：latest
+
+- 自适应远程服务器编码格式
+- 扩展高亮文件类型
+- 新增文件项键盘选择切换与打开
+- 隐藏文件图标样式优化
+
+##### zyyzyykk/kkterminal:3.3.3：
 
 - 新增压缩包文件解压功能
 - 修复文件夹拖拽上传导致文件丢失的bug
@@ -119,13 +126,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 新增文件URL上传功能
 - 修复了取消文件夹下载导致连接断开的bug
 - 优化页面显示与代码逻辑，优化打包体积
-
-##### zyyzyykk/kkterminal:3.2.6：
-
-- 修复文件特殊字符操作问题的bug
-- 优化文件上传与下载
-- 文件属性模块：文件夹新增包含属性、文件大小属性实时刷新
-- 优化显示逻辑，规范编码
 
 [**历史更新记录**](./UPDATE.md)
 
@@ -147,4 +147,3 @@ Vue + Xterm              SpringBoot + SSHJ                Linux OS
 ### 🌟 点赞
 
 [![Stars](https://starchart.cc/zyyzyykk/kkTerminal.svg?variant=adaptive)](https://starchart.cc/zyyzyykk/kkTerminal)
-

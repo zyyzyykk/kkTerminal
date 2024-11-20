@@ -101,6 +101,7 @@ public class WebSocketServer {
             String locale = IOUtils.readFully(command.getInputStream()).toString();
             command.join();
             serverCharset = Charset.forName(CharsetEnum.getByLinuxCharset(locale).getJavaCharset());
+            sshClient.setRemoteCharset(serverCharset);
         }
 
         // 开启交互终端
