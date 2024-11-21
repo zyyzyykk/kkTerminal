@@ -282,6 +282,10 @@ export default {
     // 目录状态：0 正常 / 1 目录不存在、无权限等
     const dirStatus = ref(0);
     const getDirList = () => {
+      if(dir.value == '') {
+        getInitDir();
+        return;
+      }
       let now_dir = dir.value;
       $.ajax({
         url: http_base_url + '/ls',
