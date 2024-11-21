@@ -36,12 +36,12 @@
               <div style="user-select: none; font-size: 14px; font-weight: bold;" >什么是 TCode (终端代码) ？</div>
               <div style="user-select: none; margin-top: 5px;">TCode（终端代码）是用于访问和执行特定操作流程的快捷方式</div>
               <div style="user-select: none; margin-top: 5px;">
-                输入 
+                输入
                 <span style="background-color: #f3f4f4; user-select: text;" >/H</span>
                 并按下回车，查看帮助信息
               </div>
               <div style="user-select: none; margin-top: 5px;">
-                输入 
+                输入
                 <span style="background-color: #f3f4f4; user-select: text;" >/A</span>
                 并按下回车，自定义TCode
               </div>
@@ -92,7 +92,7 @@ import HelpTcode from "@/components/tcode/HelpTcode.vue";
 
 import { QuestionFilled } from '@element-plus/icons-vue';
 
-import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/utils/Tcode";
+import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode";
 
 export default {
   name: "FrameWork",
@@ -330,7 +330,7 @@ export default {
 
       term.write(now_connect_status.value);
     };
-    
+
     // 终端设置
     const doSettings = (type) => {
       // 连接设置

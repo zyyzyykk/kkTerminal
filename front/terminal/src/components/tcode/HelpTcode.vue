@@ -110,7 +110,7 @@
 <script>
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
-import { FuncTcode, SysTcode, TCodeStatusEnum } from "@/utils/Tcode";
+import { FuncTcode, SysTcode, TCodeStatusEnum } from "@/components/tcode/Tcode";
 import NoData from '../NoData.vue';
 import { ArrowRight, ArrowLeft, Edit, View, Finished } from '@element-plus/icons-vue';
 import AceEditor from '../preview/AceEditor.vue';

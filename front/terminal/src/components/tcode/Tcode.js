@@ -1,4 +1,4 @@
-import { encrypt, decrypt } from './Encrypt';
+import { encrypt, decrypt } from '@/utils/Encrypt';
 const storageLocalKey = 'tcode-local-vars';
 const storageSessionPrefix = 'tcode-session-vars-';
 
