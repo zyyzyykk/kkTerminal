@@ -8,7 +8,7 @@ ENV TITLE="kkbapps"
 COPY terminal.jar /terminal.jar
 
 # entrance, jar startup command
-ENTRYPOINT java -jar /terminal.jar --kk.title=$TITLE
+ENTRYPOINT java -Dfile.encoding=UTF-8 -jar /terminal.jar --kk.title=$TITLE
 
 # image meta
 LABEL org.opencontainers.image.authors="zyyzyykk@126.com"
