@@ -62,11 +62,13 @@ export default {
 
     const codeEditorRef = ref();
 
+    const jqXHR = ref(null);
+
     const initText = async () => {
       loading.value = true;
       reset();
       let url = fileUrl.value;
-      await $.ajax({
+      jqXHR.value = $.ajax({
         url: url,
         method: 'GET',
         xhrFields: {
@@ -109,6 +111,7 @@ export default {
           }
         }
       });
+      await jqXHR.value;
     };
 
     const handleChange = () => {
@@ -122,7 +125,12 @@ export default {
     };
 
     // 重置
-    const reset = () => {
+    const reset = (deep=false) => {
+      if(deep) {
+        fileName.value = '';
+        fileUrl.value = '';
+        loading.value = false;
+      }
       if(codeEditorRef.value) codeEditorRef.value.reset();
       modifyTag.value = '';
       previewInfo.value = {
@@ -133,13 +141,17 @@ export default {
         URL.revokeObjectURL(previewUrl.value);
         previewUrl.value = '';
       }
+      if(jqXHR.value) {
+        jqXHR.value.abort();
+        jqXHR.value = null;
+      }
       DialogVisilble.value = false;
     };
 
     // 关闭
     const closeDialog = (done) => {
       setTimeout(() => {
-        reset();
+        reset(true);
       },400);
       DialogVisilble.value = false;
       if(done) done();
