@@ -78,7 +78,7 @@
   </el-dialog>
 
   <!-- 配置管理 -->
-  <OptionBlock ref="optionBlockRef" @callback="doOption" :opType="optionBlockType" :sshOptions="sshOptions" ></OptionBlock>
+  <OptionBlock ref="optionBlockRef" @callback="doOption" :opType="optionBlockType" :sshOptions="sshOptions" @handleDeleteOption="handleDeleteOption" ></OptionBlock>
 </template>
 
 <script>
@@ -183,6 +183,15 @@ export default {
       setInfo.value.option = '';
     };
 
+    // 删除配置
+    const handleDeleteOption = (name) => {
+      context.emit('deleteOp', name);
+      if(setInfo.value.option && setInfo.value.option == name) {
+        setInfo.value.option = '';
+        isForbidInput.value = false;
+      }
+    };
+
     const confirm = () => {
       if(verifyParams() == false) return;
       context.emit('callback',setInfo.value);
@@ -252,6 +261,7 @@ export default {
       doOption,
       isForbidInput,
       newOp,
+      handleDeleteOption,
       reset,
       closeDialog,
       doCopy,

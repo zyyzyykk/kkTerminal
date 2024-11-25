@@ -56,7 +56,7 @@
   </div>
 
   <!-- 连接设置 -->
-  <ConnectSetting ref="connectSettingRef" :env="env" :sshOptions="options" @saveOp="saveOp" @callback="saveEnv"></ConnectSetting>
+  <ConnectSetting ref="connectSettingRef" :env="env" :sshOptions="options" @saveOp="saveOp" @deleteOp="deleteOp" @callback="saveEnv"></ConnectSetting>
   <!-- 样式设置 -->
   <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" :os="osInfo.clientOS" ></StyleSetting>
   <!-- 文件管理 -->
@@ -64,7 +64,7 @@
   <!-- 用户TCode -->
   <UserTcode ref="userTcodeRef" @importTCodes="importTCodes" @exportTcodes="exportTcodes" ></UserTcode>
   <!-- 帮助TCode -->
-  <HelpTcode ref="helpTcodeRef" :userTCodes="tcodes" @handleSaveTCode="handleSaveTCode" ></HelpTcode>
+  <HelpTcode ref="helpTcodeRef" :userTCodes="tcodes" @handleSaveTCode="handleSaveTCode" @handleDeleteTCode="handleDeleteTCode" ></HelpTcode>
 
 </template>
 
@@ -148,9 +148,15 @@ export default {
 
     // 保存更改的配置
     const saveOp = (name,item) => {
-      options.value = {...options.value,[name]:item};
+      if(name) options.value = {...options.value,[name]:item};
       localStorage.setItem('options',encrypt(JSON.stringify(options.value)));
       loadOps();
+    };
+    // 删除配置
+    const deleteOp = (name) => {
+      delete options.value[name];
+      saveOp(null,null);
+      if(env.value.option && env.value.option == name) saveEnv({option:''},false);
     };
 
     // 连接状态
@@ -254,10 +260,10 @@ export default {
     const styleSettingRef = ref();
     const fileBlockRef = ref();
     // 保存更改的环境变量
-    const saveEnv = (new_env) => {
+    const saveEnv = (new_env,restart=true) => {
       env.value = {...env.value,...new_env};
       localStorage.setItem('env',encrypt(JSON.stringify(env.value)));
-      doSettings(3);
+      if(restart) doSettings(3);
     };
 
     // 文本消息发送
@@ -511,6 +517,10 @@ export default {
       };
       importTCodes(data);
     };
+    const handleDeleteTCode = (name) => {
+      delete tcodes.value[name];
+      importTCodes({});
+    };
 
     onMounted(() => {
 
@@ -568,6 +578,7 @@ export default {
       sshKey,
       doHeartBeat,
       saveOp,
+      deleteOp,
       tcode,
       handleTcode,
       closeFileBlock,
@@ -579,6 +590,7 @@ export default {
       exportTcodes,
       helpTcodeRef,
       handleSaveTCode,
+      handleDeleteTCode,
       osInfo,
     }
 

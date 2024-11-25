@@ -16,6 +16,8 @@
           <div :class="['item-class', (aimOption == key) ? 'item-selected' : '']" @click="aimOption = key">
             <FileIcons :style="{display: 'flex', alignItems: 'center'}" name="kk.txt" :width="20" :height="20" :isFolder="false" />
             <div class="ellipsis" style="margin: 0 10px;">{{ key }}</div>
+            <div style="flex: 1;" ></div>
+            <div @click="confirmDeleteOption(key)" ><el-icon><CircleClose /></el-icon></div>
           </div>
         </div>
       </div>
@@ -41,16 +43,20 @@
 
 <script>
 import { ref } from 'vue';
+import { CircleClose } from '@element-plus/icons-vue';
+import { ElMessage } from 'element-plus';
+import { deleteDialog } from '@/utils/DeleteDialog';
 
 import NoData from '@/components/NoData';
 // 引入文件图标组件
-import FileIcons from 'file-icons-vue'
+import FileIcons from 'file-icons-vue';
 
 export default {
   name: 'OptionBlock',
   components: {
     FileIcons,
     NoData,
+    CircleClose,
   },
   props:['opType','sshOptions'],
   setup(props,context)
@@ -69,10 +75,26 @@ export default {
       closeDialog();
     };
 
+    // 删除配置
+    const deleteOption = ref('');
+    const confirmDeleteOption = (name) => {
+      deleteOption.value = name;
+      deleteDialog(null, '确定删除此配置吗?', doDeleteOption);
+    };
+    const doDeleteOption = () => {
+      context.emit('handleDeleteOption', deleteOption.value);
+      ElMessage({
+        message: '删除成功',
+        type: 'success',
+        grouping: true,
+      });
+    };
+
     // 重置
     const reset = () => {
       noDataMsg.value = '暂无配置';
       aimOption.value = '';
+      deleteOption.value = '';
       DialogVisilble.value = false;
     };
 
@@ -90,6 +112,8 @@ export default {
       noDataMsg,
       aimOption,
       confirm,
+      confirmDeleteOption,
+      doDeleteOption,
       reset,
       closeDialog,
     }

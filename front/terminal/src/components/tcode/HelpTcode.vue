@@ -54,6 +54,11 @@
                           <el-icon><Edit /></el-icon>
                         </el-tooltip>
                       </div>
+                      <div @click="confirmDeleteTCode" v-if="mode == false" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
+                        <el-tooltip content="删除" placement="top">
+                          <el-icon><Delete /></el-icon>
+                        </el-tooltip>
+                      </div>
                       <div @click="doOnlyRead" v-if="mode == true" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
                         <el-tooltip content="只读" placement="top">
                           <el-icon><View /></el-icon>
@@ -112,10 +117,11 @@ import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { FuncTcode, SysTcode, TCodeStatusEnum } from "@/components/tcode/Tcode";
 import NoData from '../NoData.vue';
-import { ArrowRight, ArrowLeft, Edit, View, Finished } from '@element-plus/icons-vue';
+import { ArrowRight, ArrowLeft, Edit, View, Finished, Delete } from '@element-plus/icons-vue';
 import AceEditor from '../preview/AceEditor.vue';
 import { decrypt } from '@/utils/Encrypt';
 import TcodeStatus from './TcodeStatus.vue';
+import { deleteDialog } from '@/utils/DeleteDialog';
 
 export default {
   name:'HelpTcode',
@@ -128,6 +134,7 @@ export default {
     Edit,
     View,
     Finished,
+    Delete,
   },
   setup(props, context) {
 
@@ -187,6 +194,20 @@ export default {
       modifyTag.value = '';
     };
 
+    // 删除TCode
+    const confirmDeleteTCode = () => {
+      deleteDialog(null, '确定删除此TCode吗?', doDeleteTCode);
+    };
+    const doDeleteTCode = () => {
+      context.emit('handleDeleteTCode', nowTCode.value);
+      ElMessage({
+        message: '删除成功',
+        type: 'success',
+        grouping: true,
+      });
+      toOverview();
+    };
+
     const handleChange = () => {
       modifyTag.value = '*';
     };
@@ -224,6 +245,8 @@ export default {
       doModifyTCode,
       doOnlyRead,
       doSaveTCode,
+      confirmDeleteTCode,
+      doDeleteTCode,
       handleChange,
       modifyTag,
       reset,
