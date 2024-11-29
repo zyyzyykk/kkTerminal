@@ -407,7 +407,7 @@ public class FileController {
         if(ssh == null) {
             return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg,null);
         }
-        String command = "cd " + src + " && mv -rn " + items + " " + dst;
+        String command = "cd " + src + " && mv -n " + items + " " + dst;
         try(Session session = ssh.startSession();
             Session.Command cmd = session.exec(command))
         {

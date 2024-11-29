@@ -1,5 +1,11 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.2.9: 
+
+- Add file URL upload
+- Fixed bug where canceling folder downloads caused disconnection
+- Optimize page display and code logic, optimize packaging volume
+
 ##### zyyzyykk/kkterminal:3.2.6:
 
 - Fix bugs related to special character operations in files

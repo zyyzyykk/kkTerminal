@@ -10,7 +10,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-11-20
+> 更新时间：2024-11-29
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="http://img.kkbapps.com/logo/terminal.png" alt="kkterminal"></a></p>
@@ -107,7 +107,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.3.7：latest
+##### zyyzyykk/kkterminal:3.4.0：latest
+
+- 新增SSH连接配置与自定义TCode的删除功能
+- 修复了文件模块文件夹粘贴失败的bug
+- 优化了网络资源与页面显示
+
+##### zyyzyykk/kkterminal:3.3.7：
 
 - 自适应远程服务器编码格式
 - 扩展高亮文件类型
@@ -120,12 +126,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 修复文件夹拖拽上传导致文件丢失的bug
 - 新增对于浏览器原生支持格式文件的预览
 - 优化文件模块界面显示
-
-##### zyyzyykk/kkterminal:3.2.9：
-
-- 新增文件URL上传功能
-- 修复了取消文件夹下载导致连接断开的bug
-- 优化页面显示与代码逻辑，优化打包体积
 
 [**历史更新记录**](./UPDATE.md)
 

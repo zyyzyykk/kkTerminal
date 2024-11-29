@@ -10,7 +10,7 @@
 >
 > Preview: https://ssh.kkbpro.com/	(For domestic servers)	or	https://ssh.kkbapps.com/	(For foreign servers)
 >
-> Update Time: 2024-11-20
+> Update Time: 2024-11-29
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="http://img.kkbapps.com/logo/terminal.png" alt="kkTerminal"></a></p>
@@ -107,7 +107,13 @@ Visit the following website:
 
 ### 👨‍💻 Update Records
 
-##### zyyzyykk/kkterminal:3.3.7: latest
+##### zyyzyykk/kkterminal:3.4.0: latest
+
+- Add SSH Option and custom TCode deletion function
+- Fixed folder pasting failure bug in File Module
+- Optimized network resources and page display
+
+##### zyyzyykk/kkterminal:3.3.7: 
 
 - Adaptive remote server encoding format
 - Expand highlighting file types
@@ -120,12 +126,6 @@ Visit the following website:
 - Fixed the bug of file loss caused by folder drag upload
 - Added preview for browser native supported format files
 - Optimize the interface display of File Management Module
-
-##### zyyzyykk/kkterminal:3.2.9: 
-
-- Add file URL upload
-- Fixed bug where canceling folder downloads caused disconnection
-- Optimize page display and code logic, optimize packaging volume
 
 [**History Update Records**](./UPDATE.md)
 
