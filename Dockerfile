@@ -1,4 +1,4 @@
-# basic Java image
+# basic java image
 FROM openjdk:8-alpine
 
 # customize environment variables
@@ -7,7 +7,7 @@ ENV TITLE="kkbapps"
 # copy jar to directory
 COPY terminal.jar /terminal.jar
 
-# entrance, jar startup command
+# entrance: jar startup command
 ENTRYPOINT java -Dfile.encoding=UTF-8 -jar /terminal.jar --kk.title=$TITLE
 
 # image meta
