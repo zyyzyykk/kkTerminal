@@ -2,14 +2,14 @@
   <div class="golbal">
     <!-- 设置栏 -->
     <div class="setting" v-show="isShowSetting" >
-      <div class="setting-menu no-select" @click="doSettings(1)" ><div>连接设置</div></div>
-      <div class="setting-menu no-select" @click="doSettings(2)" ><div>偏好设置</div></div>
-      <div class="setting-menu no-select" @click="doSettings(4)" ><div>文件管理</div></div>
-      <div class="setting-menu no-select" @click="doSettings(3)" ><div>重启</div></div>
+      <div class="setting-menu no-select" @click="doSettings(1)" ><div>{{ $t('连接设置') }}</div></div>
+      <div class="setting-menu no-select" @click="doSettings(2)" ><div>{{ $t('偏好设置') }}</div></div>
+      <div class="setting-menu no-select" @click="doSettings(4)" ><div>{{ $t('文件管理') }}</div></div>
+      <div class="setting-menu no-select" @click="doSettings(3)" ><div>{{ $t('重启') }}</div></div>
     </div>
     <div class="bar">
       <div style="user-select: none;" @click="showSettings" >
-        <img src="../assets/logo.png" alt="终端" style="height: 16px; margin: 0 7px; cursor: pointer;" >
+        <img src="../assets/logo.png" :alt="$t('终端')" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
       <div style="user-select: none; font-size: 14px;" ><span>kk Terminal</span></div>
       <div style="flex: 1;"></div>
@@ -28,22 +28,22 @@
           </el-input>
         </div>
         <div style="cursor: pointer; margin-left: 5px;" >
-          <el-popover v-if="env.tCode" placement="bottom-end" :width="220" trigger="click" >
+          <el-popover v-if="env.tCode" placement="bottom-end" :width="$t('220')" trigger="click" >
             <template #reference>
               <el-icon :style="{ color: '#606266' }" ><QuestionFilled /></el-icon>
             </template>
             <div v-if="env.tCode" style="font-size: 12px; color: #313131;" >
-              <div style="user-select: none; font-size: 14px; font-weight: bold;" >什么是 TCode (终端代码) ？</div>
-              <div style="user-select: none; margin-top: 5px;">TCode（终端代码）是用于访问和执行特定操作流程的快捷方式</div>
+              <div style="user-select: none; font-size: 14px; font-weight: bold;" >{{ $t('什么是 TCode (终端代码) ？') }}</div>
+              <div style="user-select: none; margin-top: 5px;">{{ $t('TCode（终端代码）是用于访问和执行特定操作流程的快捷方式') }}</div>
               <div style="user-select: none; margin-top: 5px;">
-                输入
+                {{ $t('输入') }}
                 <span style="background-color: #f3f4f4; user-select: text;" >/H</span>
-                并按下回车，查看帮助信息
+                {{ $t('并按下回车，查看帮助信息') }}
               </div>
               <div style="user-select: none; margin-top: 5px;">
-                输入
+                {{ $t('输入') }}
                 <span style="background-color: #f3f4f4; user-select: text;" >/A</span>
-                并按下回车，自定义TCode
+                {{ $t('并按下回车，自定义TCode') }}
               </div>
             </div>
           </el-popover>
@@ -89,10 +89,10 @@ import StyleSetting from '@/components/StyleSetting.vue';
 import FileBlock from "@/components/FileBlock.vue";
 import UserTcode from '@/components/tcode/UserTcode.vue';
 import HelpTcode from "@/components/tcode/HelpTcode.vue";
-
 import { QuestionFilled } from '@element-plus/icons-vue';
-
 import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode";
+
+import i18n from "@/locales/i18n";
 
 export default {
   name: "FrameWork",
@@ -143,6 +143,8 @@ export default {
         else env.value.option = '';
       }
       else env.value = default_env;
+      // 切换语言
+      i18n.global.locale = env.value.lang || 'en';
     };
     loadEnv();
 
@@ -468,7 +470,7 @@ export default {
       }
       else {
         ElMessage({
-          message: 'TCode-' + transTcode + ' 不存在',
+          message: 'TCode-' + transTcode + ' does not exist',
           type: 'warning',
           grouping: true,
         });

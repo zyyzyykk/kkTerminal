@@ -5,7 +5,7 @@
     destroy-on-close
     :width="420"
     :modal="false"
-    title="全部配置"
+    :title="$t('全部配置')"
     modal-class="kk-dialog-class"
     draggable
   >
@@ -25,14 +25,14 @@
         <NoData :msg="noDataMsg"></NoData>
       </div>
       <div class="kk-flex">
-        <div>配置名：</div>
+        <div>{{ $t('配置名') }}：</div>
         <div style="flex: 1;">
           <el-input size="small" v-model="aimOption" :disabled="opType == 0" @keydown.enter="confirm" class="w-50 m-2" placeholder="">
           </el-input>
         </div>
         <div style="margin-left: 10px;">
           <el-button size="small" type="primary" @click="confirm" >
-            {{ opType ? '保存' : '选择'}}
+            {{ opType ? $t('保存') : $t('选择') }}
           </el-button>
         </div>
       </div>
@@ -50,6 +50,7 @@ import { deleteDialog } from '@/utils/DeleteDialog';
 import NoData from '@/components/NoData';
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
+import i18n from "@/locales/i18n";
 
 export default {
   name: 'OptionBlock',
@@ -63,7 +64,7 @@ export default {
   {
     // 控制Dialog显示
     const DialogVisilble = ref(false);
-    const noDataMsg = ref('暂无配置');
+    const noDataMsg = ref(i18n.global.t('暂无配置'));
     
     // 目标配置
     const aimOption = ref('');
@@ -79,12 +80,12 @@ export default {
     const deleteOption = ref('');
     const confirmDeleteOption = (name) => {
       deleteOption.value = name;
-      deleteDialog(null, '确定删除此配置吗?', doDeleteOption);
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此配置吗?'), doDeleteOption);
     };
     const doDeleteOption = () => {
       context.emit('handleDeleteOption', deleteOption.value);
       ElMessage({
-        message: '删除成功',
+        message: i18n.global.t('删除成功'),
         type: 'success',
         grouping: true,
       });
@@ -92,7 +93,7 @@ export default {
 
     // 重置
     const reset = () => {
-      noDataMsg.value = '暂无配置';
+      noDataMsg.value = i18n.global.t('暂无配置');
       aimOption.value = '';
       deleteOption.value = '';
       DialogVisilble.value = false;

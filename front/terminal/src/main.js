@@ -27,6 +27,10 @@ import { ElButton, ElDialog, ElIcon, ElInput, ElUpload, ElColorPicker,ElDropdown
 app.use(ElButton).use(ElDialog).use(ElIcon).use(ElInput).use(ElUpload).use(ElColorPicker).use(ElTabs).use(ElTabPane).use(ElResult).use(ElTooltip);
 app.use(ElDropdown).use(ElDropdownMenu).use(ElDropdownItem).use(ElSwitch).use(ElLoading).use(ElRadioGroup).use(ElRadio).use(ElPopover).use(ElTag).use(ElPopconfirm);
 
+// i18n 国际化
+import i18n from '@/locales/i18n';
+app.use(i18n);
+
 app.mount('#app');
 
 // 引入全局样式

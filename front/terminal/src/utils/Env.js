@@ -6,6 +6,7 @@ export const default_env = {
   server_password:'',
   option:'',
   // 样式相关
+  lang: "en",
   bg:'#0c0c0c',
   fg:'#cccccc',
   fontFamily: 'Courier New',

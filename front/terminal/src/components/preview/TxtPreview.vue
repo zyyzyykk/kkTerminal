@@ -35,6 +35,7 @@ import AceEditor from './AceEditor';
 import $ from 'jquery';
 import { ElMessage } from 'element-plus';
 import { previewFileInfo } from '@/utils/FileSuffix';
+import i18n from "@/locales/i18n";
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
@@ -102,7 +103,7 @@ export default {
           if(url == fileUrl.value)
           {
             ElMessage({
-              message: '文件加载失败',
+              message: i18n.global.t('文件加载失败'),
               type: 'error',
               grouping: true,
             });

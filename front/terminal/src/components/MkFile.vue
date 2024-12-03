@@ -4,15 +4,15 @@
     :before-close="closeDialog"
     :width="300"
     :modal="false"
-    title="新建"
+    :title="$t('新建')"
     modal-class="kk-dialog-class"
     draggable
   >
     <div style="margin-top: -32px;"></div>
     <div class="no-select">
       <el-radio-group v-model="isDirectory" class="ml-4">
-        <el-radio :label="false" size="large">文件</el-radio>
-        <el-radio :label="true" size="large">文件夹</el-radio>
+        <el-radio :label="false" size="large">{{ $t('文件') }}</el-radio>
+        <el-radio :label="true" size="large">{{ $t('文件夹') }}</el-radio>
       </el-radio-group>
       <div class="errInfo no-select"> {{ err_msg }} </div>
       <div class="kk-flex">
@@ -26,7 +26,7 @@
           </el-input>
         </div>
         <div style="margin-left: 10px;">
-          <el-button size="small" type="primary" @click="confirm" >确定</el-button>
+          <el-button size="small" type="primary" @click="confirm" >{{ $t('确定') }}</el-button>
         </div>
       </div>
     </div>
@@ -36,6 +36,7 @@
 
 <script>
 import { ref } from 'vue';
+import i18n from "@/locales/i18n";
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
 
@@ -58,12 +59,12 @@ export default {
       // 校验
       err_msg.value = '';
       if(!(name.value && name.value.trim().length > 0)) {
-        err_msg.value = '文件名不能为空';
+        err_msg.value = i18n.global.t('文件名不能为空');
         return;
       }
       const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(name.value)) {
-        err_msg.value = "文件名不能含有 |,/";
+        err_msg.value = i18n.global.t("文件名不能含有") + " |,/";
         return;
       }
       context.emit('callback', isDirectory.value, name.value, nowDir.value);

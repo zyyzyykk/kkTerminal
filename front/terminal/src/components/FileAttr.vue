@@ -13,7 +13,7 @@
       <div class="kk-flex nowrap">
         <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="16" :height="16" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" />
         <div class="ellipsis" style="margin: 0 5px; font-size: small;">{{ fileInfo.name }}</div>
-        <div style="font-size: small;">属性</div>
+        <div style="font-size: small;">{{ $t('属性') }}</div>
       </div>
     </template>
     <div style="margin-top: -32px;"></div>
@@ -26,7 +26,7 @@
       </div>
       <div class="kk-border" ></div>
       <div class="kk-flex nowrap">
-        <div style="text-align: left; width: 100px;">位置：</div>
+        <div class="form-width" >{{ $t('位置') }}：</div>
         <div class="ellipsis">
           {{ fileDir + fileInfo.name }}
         </div>
@@ -35,7 +35,7 @@
         </div>
       </div>
       <div v-if="fileInfo.isDirectory" class="kk-flex">
-        <div style="text-align: left; width: 100px;">包含：</div>
+        <div class="form-width" >{{ $t('包含') }}：</div>
         <div class="ellipsis" >
           {{ includeInfo }}
         </div>
@@ -47,9 +47,9 @@
         </div>
       </div>
       <div v-else class="kk-flex">
-        <div style="text-align: left; width: 100px;">大小：</div>
+        <div class="form-width" >{{ $t('大小') }}：</div>
         <div class="ellipsis" >
-          {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size + ' 字节' }})
+          {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size + ' ' + $t('字节') }})
         </div>
         <div v-if="fileInfo.isSymlink || unreliable" style="margin-left: 10px;" >
           <el-tag size="small" type="danger">unsure</el-tag>
@@ -60,26 +60,26 @@
       </div>
       <div class="kk-border" ></div>
       <div class="kk-flex">
-        <div style="text-align: left; width: 100px;">修改时间：</div>
+        <div class="form-width" >{{ $t('修改时间') }}：</div>
         <div>
           {{ formatDate(fileInfo.attributes.mtime) }}
         </div>
       </div>
       <div class="kk-flex">
-        <div style="text-align: left; width: 100px;">访问时间：</div>
+        <div class="form-width" >{{ $t('访问时间') }}：</div>
         <div>
           {{ formatDate(fileInfo.attributes.atime) }}
         </div>
       </div>
       <div class="kk-border" ></div>
       <div class="kk-flex">
-        <div style="text-align: left; width: 100px;">权限：</div>
+        <div class="form-width" >{{ $t('权限') }}：</div>
         <div>
           {{ calcPriority(fileInfo.attributes.mode.type,fileInfo.attributes.permissions) }}
         </div>
         <div style="flex: 1;"></div>
         <div>
-          <el-button size="small" type="primary" @click="confirm" >确定</el-button>
+          <el-button size="small" type="primary" @click="confirm" >{{ $t('确定') }}</el-button>
         </div>
       </div>
     </div>
@@ -98,6 +98,7 @@ import useClipboard from "vue-clipboard3";
 import { DocumentCopy, Refresh } from '@element-plus/icons-vue';
 import { calcSize } from '@/utils/CalcSize';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
+import i18n from "@/locales/i18n";
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
@@ -126,7 +127,7 @@ export default {
     // 不可靠标识
     const unreliable = ref(false);
     // 包含信息
-    const includeInfo = ref('0 个文件，0 个文件夹');
+    const includeInfo = ref(i18n.global.t('0 个文件，0 个文件夹'));
 
     // 获取文件大小
     const getFileSize = () => {
@@ -168,7 +169,7 @@ export default {
         },
         success(resp){
           if(resp.status == 'success') {
-            includeInfo.value = resp.data[0] + ' 个文件，' + (Math.max(0,parseInt(resp.data[1], 10) - 1)) + ' 个文件夹';
+            includeInfo.value = resp.data[0] + i18n.global.t(' 个文件，') + (Math.max(0,parseInt(resp.data[1], 10) - 1)) + i18n.global.t(' 个文件夹');
           }
           else unreliable.value = true;
         },
@@ -187,7 +188,7 @@ export default {
       }
       if(!(rename.value && rename.value.trim().length > 0)) {
         ElMessage({
-          message: "文件名不能为空",
+          message: i18n.global.t("文件名不能为空"),
           type: "warning",
           grouping: true,
         })
@@ -196,7 +197,7 @@ export default {
       const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(rename.value)) {
         ElMessage({
-          message: "文件名不能含有 |,/",
+          message: i18n.global.t("文件名不能含有") + " |,/",
           type: "warning",
           grouping: true,
         })
@@ -213,7 +214,7 @@ export default {
       content += '';
       if(!(content && content.length > 0)) {
         ElMessage({
-          message: '内容为空',
+          message: i18n.global.t('内容为空'),
           type: 'warning',
           grouping: true,
           repeatNum: Number.MIN_SAFE_INTEGER,
@@ -222,7 +223,7 @@ export default {
       }
       await toClipboard(content);
       ElMessage({
-        message: '复制成功',
+        message: i18n.global.t('复制成功'),
         type: 'success',
         grouping: true,
         repeatNum: Number.MIN_SAFE_INTEGER,
@@ -243,7 +244,7 @@ export default {
       fileDir.value = '';
       loading.value = false;
       unreliable.value = false;
-      includeInfo.value = '0 个文件，0 个文件夹';
+      includeInfo.value = i18n.global.t('0 个文件，0 个文件夹');
       DialogVisilble.value = false;
     };
 
@@ -305,5 +306,10 @@ export default {
 
 .nowrap {
   white-space: nowrap;
+}
+
+.form-width {
+  text-align: left;
+  width: 100px;
 }
 </style>

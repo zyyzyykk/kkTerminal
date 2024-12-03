@@ -2,10 +2,12 @@ import { encrypt, decrypt } from '@/utils/Encrypt';
 const storageLocalKey = 'tcode-local-vars';
 const storageSessionPrefix = 'tcode-session-vars-';
 
+import i18n from "@/locales/i18n";
+
 // 功能TCode, 以 / 开头
 export const FuncTcode = {
     '/A': {
-        desc: '自定义TCode',
+        desc: i18n.global.t('自定义TCode'),
         execFlow(context) {
             setTimeout(() => {
                 context.proxy.userTcodeRef.initText();
@@ -14,32 +16,32 @@ export const FuncTcode = {
         }
     },
     '/O': {
-        desc: '新建窗口',
+        desc: i18n.global.t('新建窗口'),
         execFlow() {
             let _url = window.location.href;
             window.open(_url, '_blank');
         }
     },
     '/C': {
-        desc: '关闭窗口',
+        desc: i18n.global.t('关闭窗口'),
         execFlow() {
             window.close();
         }
     },
     '/E': {
-        desc: '退出登录',
+        desc: i18n.global.t('退出登录'),
         execFlow(context) {
             if(context.proxy.socket) context.proxy.socket.close(3131);
         }
     },
     '/R': {
-        desc: '刷新页面',
+        desc: i18n.global.t('刷新页面'),
         execFlow() {
             window.location.reload();
         }
     },
     '/H': {
-        desc: '帮助',
+        desc: i18n.global.t('帮助'),
         execFlow(context) {
             context.proxy.helpTcodeRef.DialogVisilble = true;
         }
@@ -49,21 +51,21 @@ export const FuncTcode = {
 // 系统TCode, 以 S 开头
 export const SysTcode = {
     'SC': {
-        desc: '连接设置',
+        desc: i18n.global.t('连接设置'),
         execFlow(context) {
             context.proxy.isShowSetting = false;
             context.proxy.connectSettingRef.DialogVisilble = true;
         }
     },
     'SP': {
-        desc: '偏好设置',
+        desc: i18n.global.t('偏好设置'),
         execFlow(context) {
             context.proxy.isShowSetting = false;
             context.proxy.styleSettingRef.DialogVisilble = true;
         }
     },
     'SF': {
-        desc: '文件管理',
+        desc: i18n.global.t('文件管理'),
         execFlow(context) {
             context.proxy.isShowSetting = false;
             context.proxy.fileBlockRef.DialogVisilble = true;
@@ -71,7 +73,7 @@ export const SysTcode = {
         }
     },
     'SS': {
-        desc: '重启',
+        desc: i18n.global.t('重启'),
         execFlow(context) {
             context.proxy.isShowSetting = false;
             context.proxy.now_connect_status = context.proxy.connect_status['Connecting'];

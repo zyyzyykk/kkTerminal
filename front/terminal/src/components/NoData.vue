@@ -4,7 +4,7 @@
     <slot name="myslot" ></slot>
     <div style="display: flex; align-items: center;" >
       <div>
-        <img src="../assets/no_data.png" alt="暂无数据" style="width: 120px;">
+        <img src="../assets/no_data.png" :alt="$t('暂无数据')" style="width: 120px;">
       </div>
     </div>
     <div class="msg">{{ msg }}</div>
@@ -14,6 +14,7 @@
 
 <script>
 import { computed } from 'vue';
+import i18n from "@/locales/i18n";
 
 export default {
   name:'NoData',
@@ -23,7 +24,7 @@ export default {
     msg: {
       type:String,
       required:false,
-      default: '暂无数据',
+      default: i18n.global.t('暂无数据'),
     },
     width:{
       type:String,

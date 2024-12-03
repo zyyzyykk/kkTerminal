@@ -4,16 +4,16 @@
     :before-close="closeDialog"
     :width="320"
     :modal="false"
-    title="URL上传"
+    :title="$t('URL上传')"
     modal-class="kk-dialog-class"
     draggable
   >
     <div style="margin-top: -32px;"></div>
     <div class="no-select">
       <div class="kk-flex" >
-        <div style="width: 56px;" >URL：</div>
+        <div class="form-width" >URL：</div>
         <div style="flex: 1;">
-          <el-input size="small" v-model="url" class="w-50 m-2" placeholder="请输入文件URL">
+          <el-input size="small" v-model="url" class="w-50 m-2" :placeholder="$t('请输入文件URL')">
             <template #prefix>
               <el-icon><Connection /></el-icon>
             </template>
@@ -23,16 +23,16 @@
       <div v-if="err_msg && err_msg.length > 0" class="errInfo no-select"> {{ err_msg }} </div>
       <div v-else style="height: 7px;" ></div>
       <div class="kk-flex">
-        <div style="width: 56px;" >文件名：</div>
+        <div class="form-width" >{{ $t('文件名') }}：</div>
         <div style="flex: 1;">
-          <el-input size="small" v-model="name" @keydown.enter="confirm" class="w-50 m-2" placeholder="">
+          <el-input size="small" v-model="name" @keydown.enter="confirm" class="w-50 m-2" :placeholder="$t('请输入文件名')">
             <template #prefix>
               <el-icon><Document /></el-icon>
             </template>
           </el-input>
         </div>
         <div style="margin-left: 10px;">
-          <el-button size="small" type="primary" @click="confirm" >确定</el-button>
+          <el-button size="small" type="primary" @click="confirm" >{{ $t('确定') }}</el-button>
         </div>
       </div>
     </div>
@@ -43,6 +43,7 @@
 <script>
 import { ref } from 'vue';
 import { Connection, Document } from '@element-plus/icons-vue';
+import i18n from "@/locales/i18n";
 
 export default {
   name: 'FileUrl',
@@ -63,16 +64,16 @@ export default {
       // 校验
       err_msg.value = '';
       if(!(url.value && url.value.trim().length > 0)) {
-        err_msg.value = 'URL不能为空';
+        err_msg.value = i18n.global.t('URL不能为空');
         return;
       }
       if(!(name.value && name.value.trim().length > 0)) {
-        err_msg.value = '文件名不能为空';
+        err_msg.value = i18n.global.t('文件名不能为空');
         return;
       }
       const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(name.value)) {
-        err_msg.value = "文件名不能含有 |,/";
+        err_msg.value = i18n.global.t("文件名不能含有") + " |,/";
         return;
       }
       context.emit('callback',url.value, name.value);
@@ -125,5 +126,9 @@ export default {
   font-size: 12px;
   color: rgb(234, 80, 80);
   margin-top: 8px;
+}
+
+.form-width {
+  width: 56px;
 }
 </style>

@@ -3,7 +3,7 @@
     v-model="DialogVisilble"
     destroy-on-close
     :width="480"
-    title="帮助"
+    :title="$t('帮助')"
     :modal="false"
     modal-class="kk-dialog-class"
     :before-close="closeDialog"
@@ -12,9 +12,9 @@
     <div style="margin-top: -27px;"></div>
     <div class="no-select">
         <el-tabs type="border-card">
-            <el-tab-pane label="功能TCode">
+            <el-tab-pane :label="$t('功能TCode')">
               <div style="height: 210px; overflow-y: auto;" >
-                  <div>以 <span style="background-color: #f3f4f4;" >/</span> 开头，用于快速执行通用功能</div>
+                  <div>{{ $t('以') }} <span style="background-color: #f3f4f4;" >/</span> {{ $t('开头，用于快速执行通用功能') }}</div>
                   <div class="kk-border" ></div>
                   <div v-for="(item, key) in FuncTcode" :key="key" >
                     <div class="kk-flex tocde-item" style="padding: 12px 10px;" >
@@ -24,9 +24,9 @@
                   </div>
               </div>
             </el-tab-pane>
-            <el-tab-pane label="系统TCode">
+            <el-tab-pane :label="$t('系统TCode')">
               <div style="height: 210px; overflow-y: auto;" >
-                  <div>以 <span style="background-color: #f3f4f4;" >S</span> 开头，用于快速访问系统模块</div>
+                  <div>{{ $t('以') }} <span style="background-color: #f3f4f4;" >S</span> {{ $t('开头，用于快速访问系统模块') }}</div>
                   <div class="kk-border" ></div>
                   <div v-for="(item, key) in SysTcode" :key="key" >
                     <div class="kk-flex tocde-item" style="padding: 12px 10px;" >
@@ -36,7 +36,7 @@
                   </div>
               </div>
             </el-tab-pane>
-            <el-tab-pane label="用户TCode">
+            <el-tab-pane :label="$t('用户TCode')">
               <div style="height: 210px; overflow-y: auto;" >
                 <template v-if="userTCodes && Object.keys(userTCodes).length > 0" >
                   <template v-if="nowTCode && nowTCode.length >= 2 && nowTCode.length <= 6" >
@@ -50,22 +50,22 @@
                       </div>
                       <div style="flex: 1;" ></div>
                       <div @click="doModifyTCode" v-if="mode == false" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                        <el-tooltip content="编辑" placement="top">
+                        <el-tooltip :content="$t('编辑')" placement="top">
                           <el-icon><Edit /></el-icon>
                         </el-tooltip>
                       </div>
                       <div @click="confirmDeleteTCode" v-if="mode == false" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                        <el-tooltip content="删除" placement="top">
+                        <el-tooltip :content="$t('删除')" placement="top">
                           <el-icon><Delete /></el-icon>
                         </el-tooltip>
                       </div>
                       <div @click="doOnlyRead" v-if="mode == true" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                        <el-tooltip content="只读" placement="top">
+                        <el-tooltip :content="$t('只读')" placement="top">
                           <el-icon><View /></el-icon>
                         </el-tooltip>
                       </div>
                       <div @click="doSaveTCode" v-if="mode == true" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                        <el-tooltip content="保存修改" placement="top">
+                        <el-tooltip :content="$t('保存修改')" placement="top">
                           <el-icon><Finished /></el-icon>
                         </el-tooltip>
                       </div>
@@ -76,7 +76,7 @@
                     </div>
                   </template>
                   <template v-else >
-                    <div>以 <span style="background-color: #f3f4f4;" >U</span> 开头，自定义实现类似Shell脚本的自动化Workflow</div>
+                    <div>{{ $t('以') }} <span style="background-color: #f3f4f4;" >U</span> {{ $t('开头，自定义实现类似Shell脚本的自动化Workflow') }}</div>
                     <div class="kk-border" ></div>
                     <div v-for="(item, key) in userTCodes" :key="key" >
                       <div class="kk-flex tocde-item" style="padding: 12px 10px;" >
@@ -97,7 +97,7 @@
                   </template>
                 </template>
                 <template v-else >
-                  <div>以 <span style="background-color: #f3f4f4;" >U</span> 开头，自定义实现类似Shell脚本的自动化Workflow</div>
+                  <div>{{ $t('以') }} <span style="background-color: #f3f4f4;" >U</span> {{ $t('开头，自定义实现类似Shell脚本的自动化Workflow') }}</div>
                   <div class="kk-border" ></div>
                   <NoData height="160px" >
                     <template #myslot>
@@ -122,6 +122,7 @@ import AceEditor from '../preview/AceEditor.vue';
 import { decrypt } from '@/utils/Encrypt';
 import TcodeStatus from './TcodeStatus.vue';
 import { deleteDialog } from '@/utils/DeleteDialog';
+import i18n from "@/locales/i18n";
 
 export default {
   name:'HelpTcode',
@@ -187,7 +188,7 @@ export default {
       context.emit('handleSaveTCode', nowTCode.value, userTcodeEditorRef.value.getValue());
       doOnlyRead();
       ElMessage({
-        message: '修改成功',
+        message: i18n.global.t('修改成功'),
         type: 'success',
         grouping: true,
       });
@@ -196,12 +197,12 @@ export default {
 
     // 删除TCode
     const confirmDeleteTCode = () => {
-      deleteDialog(null, '确定删除此TCode吗?', doDeleteTCode);
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此TCode吗?'), doDeleteTCode);
     };
     const doDeleteTCode = () => {
       context.emit('handleDeleteTCode', nowTCode.value);
       ElMessage({
-        message: '删除成功',
+        message: i18n.global.t('删除成功'),
         type: 'success',
         grouping: true,
       });

@@ -4,7 +4,7 @@
     :destory-on-close="true"
     :before-close="closeDialog"
     :width="360"
-    title="连接设置"
+    :title="$t('连接设置')"
     :modal="false"
     :close-on-click-modal="false"
     modal-class="kk-dialog-class"
@@ -14,17 +14,17 @@
     <div style="margin-top: -25px;"></div>
     <div>
       <div class="item-class" style="margin-bottom: 15px;">
-        <div class="no-select nowrap">配 &nbsp; 置：</div>
-        <div class="ellipsis" style="user-select: none;" :class="!(setInfo.option && setInfo.option.length > 0) ? 'new-option': 'old-option'" >{{ !(setInfo.option && setInfo.option.length > 0) ? '新建配置' : setInfo.option }}</div>
+        <div class="no-select form-width nowrap">{{ $t('配\u00A0\u00A0\u00A0置') }}：</div>
+        <div class="ellipsis" style="user-select: none;" :class="!(setInfo.option && setInfo.option.length > 0) ? 'new-option': 'old-option'" >{{ !(setInfo.option && setInfo.option.length > 0) ? $t('新建配置') : setInfo.option }}</div>
         <div style="flex: 1;"></div>
-        <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Switch /></el-icon>切换</el-button></div>
-        <div><el-button v-if="isForbidInput == false" size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Finished /></el-icon>保存</el-button></div>
-        <div><el-button v-if="isForbidInput == true" size="small" type="primary" @click="newOp" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Edit /></el-icon>新建</el-button></div>
+        <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Switch /></el-icon>{{ $t('切换') }}</el-button></div>
+        <div><el-button v-if="isForbidInput == false" size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Finished /></el-icon>{{ $t('保存') }}</el-button></div>
+        <div><el-button v-if="isForbidInput == true" size="small" type="primary" @click="newOp" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Edit /></el-icon>{{ $t('新建') }}</el-button></div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;">
-        <div class="no-select">主机ip：</div>
+        <div class="no-select form-width">{{ $t('主机IP') }}：</div>
         <div>
-          <el-input :disabled="isForbidInput" v-model="setInfo.server_ip" class="w-50 m-2" placeholder="输入主机ip">
+          <el-input :disabled="isForbidInput" v-model="setInfo.server_ip" class="w-50 m-2" :placeholder="$t('输入主机IP')">
             <template #prefix>
               <el-icon><HomeFilled /></el-icon>
             </template>
@@ -33,9 +33,9 @@
         <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_ip)"><el-icon size="15"><DocumentCopy /></el-icon></div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;">
-        <div class="no-select">端口号：</div>
+        <div class="no-select form-width">{{ $t('端口号') }}：</div>
         <div>
-          <el-input :disabled="isForbidInput" v-model="setInfo.server_port" class="w-50 m-2" placeholder="输入端口号">
+          <el-input :disabled="isForbidInput" v-model="setInfo.server_port" class="w-50 m-2" :placeholder="$t('输入端口号')">
             <template #prefix>
               <el-icon><Paperclip /></el-icon>
             </template>
@@ -44,9 +44,9 @@
         <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_port)"><el-icon size="15"><DocumentCopy /></el-icon></div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;">
-        <div class="no-select">用户名：</div>
+        <div class="no-select form-width">{{ $t('用户名') }}：</div>
         <div>
-          <el-input :disabled="isForbidInput" v-model="setInfo.server_user" class="w-50 m-2" placeholder="输入用户名">
+          <el-input :disabled="isForbidInput" v-model="setInfo.server_user" class="w-50 m-2" :placeholder="$t('输入用户名')">
             <template #prefix>
               <el-icon class="el-input__icon"><User /></el-icon>
             </template>
@@ -55,9 +55,9 @@
         <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_user)"><el-icon size="15"><DocumentCopy /></el-icon></div>
       </div>
       <div class="item-class" style="margin-bottom: 5px;">
-        <div class="no-select">密 &nbsp; 码：</div>
+        <div class="no-select form-width">{{ $t('密\u00A0\u00A0\u00A0码') }}：</div>
         <div>
-          <el-input :disabled="isForbidInput" v-model="setInfo.server_password" :type="isShowPassword ? 'text': 'password'" class="w-50 m-2" placeholder="输入密码">
+          <el-input :disabled="isForbidInput" v-model="setInfo.server_password" :type="isShowPassword ? 'text': 'password'" class="w-50 m-2" :placeholder="$t('输入密码')">
             <template #prefix>
               <el-icon class="el-input__icon"><Lock /></el-icon>
             </template>
@@ -72,7 +72,7 @@
     <div style="display: flex; border-top: 1px solid #f1f2f4;">
       <div style="flex: 1;"></div>
       <el-button size="small" type="primary" @click="confirm" style="margin-bottom: -15px; margin-top: 10px;">
-        确定
+        {{ $t('确定') }}
       </el-button>
     </div>
   </el-dialog>
@@ -87,6 +87,7 @@ import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
 import OptionBlock from './OptionBlock';
 import { HomeFilled, Paperclip, User, Lock, DocumentCopy, View, Hide, Edit, Finished, Switch } from '@element-plus/icons-vue';
+import i18n from "@/locales/i18n";
 
 export default {
   name:'ConnectSetting',
@@ -125,22 +126,22 @@ export default {
       // 验证IP地址
       const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
       if (!ipRegex.test(setInfo.value.server_ip)) {
-        err_msg.value = "主机ip地址无效";
+        err_msg.value = i18n.global.t("主机IP地址无效");
         return false;
       }
       // 校验端口号
       if (isNaN(setInfo.value.server_port) || setInfo.value.server_port < 0 || setInfo.value.server_port > 65535) {
-        err_msg.value = "端口号无效";
+        err_msg.value = i18n.global.t("端口号无效");
         return false;
       }
       // 校验用户名
       if (!(setInfo.value.server_user && setInfo.value.server_user != '')) {
-        err_msg.value = "用户名不能为空";
+        err_msg.value = i18n.global.t("用户名不能为空");
         return false;
       }
       // 校验密码
       if (!(setInfo.value.server_password && setInfo.value.server_password != '')) {
-        err_msg.value = "密码不能为空";
+        err_msg.value = i18n.global.t("密码不能为空");
         return false;
       }
 
@@ -206,7 +207,7 @@ export default {
       content += '';
       if(!(content && content.length > 0)) {
         ElMessage({
-          message: '内容为空',
+          message: i18n.global.t('内容为空'),
           type: 'warning',
           grouping: true,
           repeatNum: Number.MIN_SAFE_INTEGER,
@@ -215,7 +216,7 @@ export default {
       }
       await toClipboard(content);
       ElMessage({
-        message: '复制成功',
+        message: i18n.global.t('复制成功'),
         type: 'success',
         grouping: true,
         repeatNum: Number.MIN_SAFE_INTEGER,
@@ -309,4 +310,9 @@ export default {
 .new-option {
   color: #f56c6c;
 }
+
+.form-width {
+  width: 56px;
+}
+
 </style>

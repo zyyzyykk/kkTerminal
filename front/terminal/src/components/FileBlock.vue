@@ -2,7 +2,7 @@
   <el-dialog
     v-model="DialogVisilble"
     :before-close="closeDialog"
-    title="文件管理"
+    :title="$t('文件管理')"
     width="50%"
     :modal="false"
     modal-class="kk-dialog-class"
@@ -15,7 +15,7 @@
       <div class="title" style="display: flex; align-items: center;" >
         <div class="ellipsis" style="flex: 1;">
           <div v-if="isShowDirInput == true" >
-            <el-input id="aimDirInput" v-model="dir" placeholder="输入目录路径" size="small" @keydown.enter="isShowDirInput = false;" @blur="isShowDirInput = false;" @mousedown.stop @dblclick.stop @change="dirInputCallback" />
+            <el-input id="aimDirInput" v-model="dir" :placeholder="$t('输入目录路径')" size="small" @keydown.enter="isShowDirInput = false;" @blur="isShowDirInput = false;" @mousedown.stop @dblclick.stop @change="dirInputCallback" />
           </div>
           <div class="no-select ellipsis" v-else @dblclick="doShowDirInput" >{{ dir }}</div>
         </div>
@@ -33,13 +33,13 @@
                   <el-dropdown-item @click="fileUploadTypeChoose(0)" >
                     <div style="display: flex; align-items: center;" >
                       <div><el-icon><DocumentAdd /></el-icon></div>
-                      <div>文件</div>
+                      <div>{{ $t('文件') }}</div>
                     </div>
                   </el-dropdown-item>
                   <el-dropdown-item @click="fileUploadTypeChoose(1)" >
                     <div style="display: flex; align-items: center;" >
                       <div><el-icon><FolderAdd /></el-icon></div>
-                      <div>文件夹</div>
+                      <div>{{ $t('文件夹') }}</div>
                     </div>
                   </el-dropdown-item>
                   <el-dropdown-item @click="fileUploadTypeChoose(2)" >
@@ -115,26 +115,26 @@
 
   <!-- 菜单项 -->
   <div ref="menuBlockRef" @contextmenu="preventDefault" v-show="isShowMenu" class="kk-menu no-select">
-    <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(1)" key="1" >刷新</div>
-    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >打开</div>
-    <div style="border-bottom: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length > 1 ? 'disabled':'']" @click="handleMenuSelect(3)" key="3" >复制路径</div>
-    <div style="border-bottom: 1px solid #ddd;" v-show="selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)" :class="['kk-menu-item', !(selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)) ? 'disabled':'']" @click="handleMenuSelect(9)" key="9" >解压</div>
-    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >下载</div>
-    <div :class="['kk-menu-item', dirStatus == 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >新建</div>
-    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >重命名</div>
-    <el-popconfirm title="确定删除此文件吗?" 
-      confirm-button-text="确定" cancel-button-text="取消" 
+    <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(1)" key="1" >{{ $t('刷新') }}</div>
+    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >{{ $t('打开') }}</div>
+    <div style="border-bottom: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length > 1 ? 'disabled':'']" @click="handleMenuSelect(3)" key="3" >{{ $t('复制路径') }}</div>
+    <div style="border-bottom: 1px solid #ddd;" v-show="selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)" :class="['kk-menu-item', !(selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)) ? 'disabled':'']" @click="handleMenuSelect(9)" key="9" >{{ $t('解压') }}</div>
+    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >{{ $t('下载') }}</div>
+    <div :class="['kk-menu-item', dirStatus == 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >{{ $t('新建') }}</div>
+    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >{{ $t('重命名') }}</div>
+    <el-popconfirm :title="$t('确定删除此文件吗?')"
+      :confirm-button-text="$t('确定')" :cancel-button-text="$t('取消')"
       @confirm="confirmPopConfirm" @cancel="cancelPopConfirm"
       :visible="isShowMenu && isShowPop" trigger="click"
       :popper-style="{zIndex: 3466,fontSize:'13px',color:'black'}" popper-class="confirmPop"
       placement="right" confirm-button-type="danger" >
       <template #reference>
         <div :class="['kk-menu-item', selectedFiles.length == 0 ? 'disabled':'']" key="7" >
-          <div @click="handleMenuSelect(7)" >删除</div>
+          <div @click="handleMenuSelect(7)" >{{ $t('删除') }}</div>
         </div>
       </template>
     </el-popconfirm>
-    <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(8)" key="8" >属性</div>
+    <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(8)" key="8" >{{ $t('属性') }}</div>
   </div>
 
 </template>
@@ -154,6 +154,8 @@ import TxtPreview from './preview/TxtPreview';
 import MkFile from './MkFile';
 import FileAttr from './FileAttr';
 import FileUrl from './FileUrl';
+
+import i18n from "@/locales/i18n";
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';
@@ -260,7 +262,7 @@ export default {
         },
         success(resp){
           if(resp.status == 'success') {
-            noDataMsg.value = '暂无文件';
+            noDataMsg.value = i18n.global.t('暂无文件');
             dirStatus.value = 0;
             dir.value = resp.data.path;
             confirmDirCorrect();
@@ -278,7 +280,7 @@ export default {
     };
     
     // 获取当前路径下的文件列表
-    const noDataMsg = ref('暂无文件');
+    const noDataMsg = ref(i18n.global.t('暂无文件'));
     // 目录状态：0 正常 / 1 目录不存在、无权限等
     const dirStatus = ref(0);
     const getDirList = () => {
@@ -304,7 +306,7 @@ export default {
             selectedFiles.value = [];
             if(resp.status == 'success') {
               files.value = resp.data.files;
-              noDataMsg.value = '暂无文件';
+              noDataMsg.value = i18n.global.t('暂无文件');
               dirStatus.value = 0;
               lastSelectedIndex = -1;
               fileAreaRef.value.tabindex = '0';
@@ -422,7 +424,7 @@ export default {
         // 大文件开始上传提示
         if(fileSize > 20*1024*1024 && !data.noStartUpLoad) {
           ElMessage({
-            message: data.startUpLoad ? data.startUpLoad : '开始上传',
+            message: data.startUpLoad ? data.startUpLoad : i18n.global.t('开始上传'),
             type: 'success',
             grouping: true,
           });
@@ -509,7 +511,7 @@ export default {
         }
       } catch (error) {
         ElMessage({
-          message: "文件上传失败",
+          message: i18n.global.t("文件上传失败"),
           type: "error",
           grouping: true,
         })
@@ -544,7 +546,7 @@ export default {
       // 创建File对象
       const file = new File([blob], name);
       file.uid = Math.random().toString(36).substring(2);
-      doUpload({file:file}, {pathVal: urlParams.path, startUpLoad:"修改保存中",alert:'文件后台保存中'});
+      doUpload({file:file}, {pathVal: urlParams.path, startUpLoad:i18n.global.t("修改保存中"),alert:i18n.global.t('文件后台保存中')});
     };
 
     // 文件/文件夹拖拽
@@ -658,7 +660,7 @@ export default {
         case 3:
           if(!(dir.value && dir.value.length > 0)) {
             ElMessage({
-              message: '内容为空',
+              message: i18n.global.t('内容为空'),
               type: 'warning',
               grouping: true,
               repeatNum: Number.MIN_SAFE_INTEGER,
@@ -668,7 +670,7 @@ export default {
             const path = dir.value + (selectedFiles.value.length == 1 ? selectedFiles.value[0].name : '');
             await toClipboard(path);
             ElMessage({
-              message: '复制成功',
+              message: i18n.global.t('复制成功'),
               type: 'success',
               grouping: true,
               repeatNum: Number.MIN_SAFE_INTEGER,
@@ -749,7 +751,7 @@ export default {
       }
       if(!(renameFile.value.name && renameFile.value.name.trim().length > 0)) {
         ElMessage({
-          message: "文件名不能为空",
+          message: i18n.global.t("文件名不能为空"),
           type: "warning",
           grouping: true,
         })
@@ -759,7 +761,7 @@ export default {
       const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(renameFile.value.name)) {
         ElMessage({
-          message: "文件名不能含有 |,/",
+          message: i18n.global.t("文件名不能含有") + " |,/",
           type: "warning",
           grouping: true,
         });
@@ -1033,7 +1035,7 @@ export default {
           }
           else {
             ElMessage({
-              message: "文件夹上传失败",
+              message: i18n.global.t("文件夹上传失败"),
               type: resp.status,
               grouping: true,
               repeatNum: Number.MIN_SAFE_INTEGER,
@@ -1094,7 +1096,7 @@ export default {
         files.value = [];
         dir.value = '';
         isShowDirInput.value = false;
-        noDataMsg.value = '暂无文件';
+        noDataMsg.value = i18n.global.t('暂无文件');
         dirStatus.value = 0;
         fileClipboard.value = {
           path:'/',
