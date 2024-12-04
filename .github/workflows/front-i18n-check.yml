@@ -1,0 +1,38 @@
+name: Front I18n Check
+
+on:
+  push:
+    branches:
+      - '**' # on all branches
+
+jobs:
+  run-checker:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: check repo code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: set python environment
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9' # set python version
+
+      # Step 3: execute python script
+      - name: Run front_i18n_checker.py
+        id: run_checker
+        run: |
+          python check/front_i18n_checker.py > output.log
+
+      # Step 4: verify output is "No Problem"
+      - name: Verify Output
+        run: |
+          FIRST_LINE=$(head -n 1 output.log)
+          LAST_LINE=$(tail -n 1 output.log)
+          if [[ "$LAST_LINE" != "No Problem" ]]; then
+            echo "❌ $FIRST_LINE"
+            exit 1
+          fi
+        shell: bash
