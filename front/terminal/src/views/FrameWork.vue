@@ -228,14 +228,14 @@ export default {
         if(result.code == 0) {
           term.clear();
           now_connect_status.value = connect_status.value['Success'];
-          sshKey.value = decrypt(result.info);
+          sshKey.value = decrypt(result.data);
           setTimeout(() => {
             termFit();
           },1);
         }
         // 输出
         if(result.code == 1) {
-          let output = decrypt(result.info);
+          let output = decrypt(result.data);
           if(UserTcodeExecutor.active) UserTcodeExecutor.outArray.push(output);
           if(!(UserTcodeExecutor.active && !UserTcodeExecutor.display)) term.write(output);
           // 设置回滚量
