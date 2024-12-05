@@ -24,7 +24,7 @@ jobs:
       - name: Run front_i18n_checker.py
         id: run_checker
         run: |
-          python check/front_i18n_checker.py > output.log
+          cd check && python front_i18n_checker.py > ../output.log
 
       # Step 4: verify output is "No Problem"
       - name: Verify Output
