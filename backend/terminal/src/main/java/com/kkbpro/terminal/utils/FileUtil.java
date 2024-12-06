@@ -29,7 +29,7 @@ public class FileUtil {
                 List<File> list = new ArrayList<>();
                 for (File file : files) {
                     // 判断是否是文件对应的文件片
-                    if (StringUtil.isFileChunk(file.getName(),chunks,fileName)) {
+                    if (isFileChunk(file.getName(),chunks,fileName)) {
                         list.add(file);
                     }
                 }
@@ -39,8 +39,8 @@ public class FileUtil {
                 }
                 // 根据切片文件的下标进行排序
                 List<File> fileListCollect = list.parallelStream().sorted(((file1, file2) -> {
-                    Integer chunk1 = StringUtil.getFileChunkIndex(file1.getName());
-                    Integer chunk2 = StringUtil.getFileChunkIndex(file2.getName());
+                    Integer chunk1 = getFileChunkIndex(file1.getName());
+                    Integer chunk2 = getFileChunkIndex(file2.getName());
                     return chunk1 - chunk2;
                 })).collect(Collectors.toList());
                 // 根据排序的顺序依次将文件合并到新的文件中
@@ -78,6 +78,40 @@ public class FileUtil {
             }
         }
         directory.delete();
+    }
+
+
+    /**
+     * 判断分片文件名
+     */
+    private static Boolean isFileChunk(String chunkFileName, Integer chunks, String originFileName) {
+        int index = chunkFileName.lastIndexOf("-");
+        if(index != -1) {
+            String fileName = chunkFileName.substring(0,index);
+            if(!originFileName.equals(fileName)) return false;
+            try {
+                int chunk = Integer.parseInt(chunkFileName.substring(index + 1));
+                if(chunk < 1 || chunk > chunks) return false;
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * 获取文件片片号
+     */
+    private static Integer getFileChunkIndex(String chunkFileName) {
+        int index = chunkFileName.lastIndexOf("-");
+        if(index != -1) {
+            return Integer.parseInt(chunkFileName.substring(index + 1));
+        }
+
+        return 1;
     }
 
 }
