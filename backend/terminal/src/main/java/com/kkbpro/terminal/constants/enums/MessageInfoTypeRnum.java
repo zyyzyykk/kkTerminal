@@ -1,13 +1,12 @@
 package com.kkbpro.terminal.constants.enums;
 
-
 public enum MessageInfoTypeRnum {
 
-    USER_TEXT(0,"用户输入的文本"),
+    USER_TEXT(0,"User input text"),
 
-    SIZE_CHANGE(1,"改变虚拟终端大小"),
+    SIZE_CHANGE(1,"Change the size of virtual terminal"),
 
-    HEART_BEAT(2,"进行心跳续约");
+    HEART_BEAT(2,"Do heartbeat renewal");
 
     private Integer state;
 

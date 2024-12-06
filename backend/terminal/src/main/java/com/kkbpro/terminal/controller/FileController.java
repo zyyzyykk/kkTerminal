@@ -532,8 +532,8 @@ public class FileController {
      */
     @PostMapping("/untar")
     public Result untar(String sshKey, String path, String item) {
-        String errorMsg = "文件解压失败";
-        String successMsg = "文件解压成功";
+        String errorMsg = "解压失败";
+        String successMsg = "解压成功";
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
@@ -659,7 +659,7 @@ public class FileController {
     }
 
     private void sshClose(String sshKey) {
-        if(WebSocketServer.webSessionMap.get(sshKey) == null && WebSocketServer.fileUploadingMap.get(sshKey).isEmpty()) {
+        if(WebSocketServer.webSessionMap.get(sshKey) == null && (WebSocketServer.fileUploadingMap.get(sshKey) == null || WebSocketServer.fileUploadingMap.get(sshKey).isEmpty())) {
             try {
                 WebSocketServer.fileUploadingMap.remove(sshKey);
                 if(WebSocketServer.sftpClientMap.get(sshKey) != null)

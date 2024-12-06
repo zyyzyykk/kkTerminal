@@ -91,7 +91,7 @@ public class WebSocketServer {
             sshClient.authPassword(user_name, password);                // 使用用户名和密码进行身份验证
         } catch (Exception e) {
             e.printStackTrace();
-            sendMessage(sessionSocket,"远程服务器连接失败","fail", ResultCodeEnum.CONNECT_FAIL.getState());
+            sendMessage(sessionSocket,"Fail to connect remote server !","fail", ResultCodeEnum.CONNECT_FAIL.getState(), null);
             return;
         }
 
@@ -109,15 +109,15 @@ public class WebSocketServer {
         sshSession.allocateDefaultPTY();
 
         // 连接成功，生成key标识
-        sshKey = UUID.randomUUID().toString();
-        sendMessage(sessionSocket, sshKey,"success", ResultCodeEnum.CONNECT_SUCCESS.getState());
+        sshKey = envInfo.getLang() + "-" + serverCharset.name() + "-" + UUID.randomUUID();
+        sendMessage(sessionSocket, "SSHKey","success", ResultCodeEnum.CONNECT_SUCCESS.getState(), sshKey);
         webSessionMap.put(sshKey, sessionSocket);
         sshClientMap.put(sshKey, sshClient);
         fileUploadingMap.put(sshKey, new ConcurrentHashMap<>());
         // 欢迎语
-        sendMessage(sessionSocket, appConfig.getWelcome() + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
+        sendMessage(sessionSocket, "Welcome","success", ResultCodeEnum.OUT_TEXT.getState(), appConfig.getWelcome() + "\r\n");
         // github源地址
-        sendMessage(sessionSocket, "source: " + appConfig.getSource() + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
+        sendMessage(sessionSocket, "GitHub","success", ResultCodeEnum.OUT_TEXT.getState(), "source: " + appConfig.getSource() + "\r\n");
         // 生成艺术字
         String title = appConfig.getTitle();
         String titleArt = FigletFont.convertOneLine(title);
@@ -125,7 +125,7 @@ public class WebSocketServer {
         // 分割成多行
         String[] asciiArts = titleArt.split("\n");
         for (String asciiArt : asciiArts) {
-            sendMessage(sessionSocket,asciiArt + "\r\n","success", ResultCodeEnum.OUT_TEXT.getState());
+            sendMessage(sessionSocket, "ArtWord","success", ResultCodeEnum.OUT_TEXT.getState(), asciiArt + "\r\n");
         }
 
         shell = sshSession.startShell();
@@ -137,8 +137,8 @@ public class WebSocketServer {
             try {
                 while ((len = shellInputStream.read(buffer)) != -1) {
                     String shellOut = new String(buffer, 0, len, serverCharset);
-                    sendMessage(sessionSocket, shellOut,
-                            "success", ResultCodeEnum.OUT_TEXT.getState());
+                    sendMessage(sessionSocket, "ShellOut",
+                            "success", ResultCodeEnum.OUT_TEXT.getState(), shellOut);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -185,7 +185,7 @@ public class WebSocketServer {
             webSessionMap.get(key).close();
         webSessionMap.remove(key);
         sessionSocket = null;
-        if(fileUploadingMap.get(key).isEmpty()) {
+        if(fileUploadingMap.get(key) == null || fileUploadingMap.get(key).isEmpty()) {
             fileUploadingMap.remove(key);
             if(sftpClientMap.get(key) != null)
                 sftpClientMap.get(key).close();
@@ -229,13 +229,12 @@ public class WebSocketServer {
     }
 
     // 向Client发送信息
-    public void sendMessage(Session sessionSocket, String message, String type, Integer code) {
-        if(message == null || "".equals(message)) return;
-        message = AesUtil.aesEncrypt(message);
+    public void sendMessage(Session sessionSocket, String message, String type, Integer code, String data) {
+
         synchronized (sessionSocket) {
             try {
                 Result result = null;
-                if("success".equals(type)) result = Result.success(code,message,null);
+                if("success".equals(type)) result = Result.success(code,message,data);
                 else if("fail".equals(type)) result = Result.fail(code,message);
                 else result = Result.error(code,message);
                 sessionSocket.getBasicRemote().sendText(JSON.toJSONString(result));

@@ -49,13 +49,6 @@
             <version>1.2.66</version>
         </dependency>
 
-        <!--apache common-->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
-        </dependency>
-
         <!--生成终端艺术字-->
         <dependency>
             <groupId>com.github.lalyos</groupId>

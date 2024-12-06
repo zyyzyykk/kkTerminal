@@ -2,11 +2,11 @@ package com.kkbpro.terminal.constants.enums;
 
 public enum ResultCodeEnum {
 
-    CONNECT_FAIL(-1,"连接服务器失败！"),
+    CONNECT_FAIL(-1,"Fail to connect remote server"),
 
-    CONNECT_SUCCESS(0,"连接服务器成功！"),
+    CONNECT_SUCCESS(0,"Connecting success"),
 
-    OUT_TEXT(1,"输出到终端屏幕的文本");
+    OUT_TEXT(1,"Text output to terminal");
 
     private Integer state;
 

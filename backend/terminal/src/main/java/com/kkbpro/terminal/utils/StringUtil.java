@@ -10,12 +10,7 @@ public class StringUtil {
      * 判断是否为空
      */
     public static boolean isEmpty(String str) {
-        if (null == str || "".equals(str) || "null".equals(str) || "\u0000".equals(str)) {
-            return true;
-        } else if ("".equals(str.trim())) {
-            return true;
-        }
-        return false;
+        return str == null || str.length() == 0;
     }
 
     /**

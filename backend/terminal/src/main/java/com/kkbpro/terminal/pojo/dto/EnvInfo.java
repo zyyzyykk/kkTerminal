@@ -21,4 +21,6 @@ public class EnvInfo {
 
     private String server_password;
 
+    private String lang = "en";
+
 }
