@@ -10,7 +10,7 @@
 >
 > Preview: https://ssh.kkbpro.com/	(For domestic servers)	or	https://ssh.kkbapps.com/	(For foreign servers)
 >
-> Update Time: 2024-11-29
+> Update Time: 2024-12-07
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="http://img.kkbapps.com/logo/terminal.png" alt="kkTerminal"></a></p>
@@ -68,13 +68,13 @@ Visit the following website:
 - 🌐 For domestic servers: https://ssh.kkbpro.com/
 - 🌍 For foreign servers: https://ssh.kkbapps.com/
 
-![Connect](http://img.kkbapps.com/terminal/Connect-3.3.3.png)
+![Connect](http://img.kkbapps.com/terminal/Connect-en-3.4.2.png)
 
-![Preference](http://img.kkbapps.com/terminal/Preference-3.3.3.png)
+![Preference](http://img.kkbapps.com/terminal/Preference-en-3.4.2.png)
 
-![File](http://img.kkbapps.com/terminal/File-3.3.7.png)
+![File](http://img.kkbapps.com/terminal/File-en-3.4.2.png)
 
-![Editor](http://img.kkbapps.com/terminal/Editor-3.3.3.png)
+![Editor](http://img.kkbapps.com/terminal/Editor-en-3.4.2.png)
 
 [**More Module Previews**](./doc/en_US/MODULE.md)
 
@@ -84,30 +84,37 @@ Visit the following website:
 
 2.Support the use of `iframe` tags in web pages for quick integration into third-party websites
 
-3.Supports local PC deployment, automatically opens browser window upon startup
+3.Supports internationalization and language switching between Chinese and English
 
-4.Support adaptive window size and Chinese input
+4.Supports local PC deployment, automatically opens browser window upon startup
 
-5.Support custom preference settings, allowing users to choose the background/foreground color, font size, cursor display style and enable TCode for the terminal
+5.Support adaptive window size and Chinese input
 
-6.Support restart: It will automatically restart after modifying SSH connection settings or custom preference settings, or can be manually restarted after SSH connection is disconnected
+6.Support custom preference settings, allowing users to choose the background/foreground color, font size, cursor display style and enable TCode for the terminal
 
-7.Support copy and paste:
+7.Support restart: It will automatically restart after modifying SSH connection settings or custom preference settings, or can be manually restarted after SSH connection is disconnected
+
+8.Support copy and paste:
 
 - Copy: Same as `Git` terminal, selecting text will automatically copy it
 - Paste: Same as `Cmd` terminal, right-click to paste (requires browser access permission)
 
-8.Support file management, open the File Management Module to view, decompress, upload and download files/folders
+9.Support file management, open the File Management Module to view, decompress, upload and download files/folders
 
-9.Support shortcut key operations such as multiple/all file selection, copy and paste, cut, selection switch, open
+10.Support shortcut key operations such as multiple/all file selection, copy and paste, cut, selection switch, open
 
-10.Support file browsing and editing, modify the file and save it to a remote server using `ctrl+s`
+11.Support file browsing and editing, modify the file and save it to a remote server using `ctrl+s`
 
-11.Support [TCode (Terminal Code)](./doc/en_US/TCODE.md)，which can achieve automated Workflow similar to Shell scripts through Customized TCode
+12.Support [TCode (Terminal Code)](./doc/en_US/TCODE.md)，which can achieve automated Workflow similar to Shell scripts through Customized TCode
 
 ### 👨‍💻 Update Records
 
-##### zyyzyykk/kkterminal:3.4.0: latest
+##### zyyzyykk/kkterminal:3.4.2: latest
+
+- Implement internationalization and support language switching between Chinese and English
+- Refactored some logic of code
+
+##### zyyzyykk/kkterminal:3.4.0: 
 
 - Add SSH Option and custom TCode deletion function
 - Fixed folder pasting failure bug in File Module
@@ -119,13 +126,6 @@ Visit the following website:
 - Expand highlighting file types
 - Add file item keyboard selection switch and open
 - Optimization of hidden file icon style
-
-##### zyyzyykk/kkterminal:3.3.3: 
-
-- Add compressed file decompression function
-- Fixed the bug of file loss caused by folder drag upload
-- Added preview for browser native supported format files
-- Optimize the interface display of File Management Module
 
 [**History Update Records**](./doc/en_US/UPDATE.md)
 

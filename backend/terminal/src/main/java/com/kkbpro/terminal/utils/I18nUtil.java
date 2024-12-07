@@ -1,15 +1,13 @@
 package com.kkbpro.terminal.utils;
 
 import com.alibaba.fastjson.JSON;
-import org.springframework.stereotype.Component;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
 public class I18nUtil {
 
     // 语言
@@ -21,10 +19,18 @@ public class I18nUtil {
     // load en_US messages
     static {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        Path filePath = null;
-        try {
-            filePath = Paths.get(classLoader.getResource("locales/en_US.json").toURI());
-            String jsonContent = new String(Files.readAllBytes(filePath));
+        // 使用 getResourceAsStream() 从类路径加载资源
+        try(InputStream inputStream = classLoader.getResourceAsStream("locales/en_US.json")) {
+            // 手动读取输入流内容
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, bytesRead);
+            }
+
+            // 将字节流转换为字符串
+            String jsonContent = byteArrayOutputStream.toString(StandardCharsets.UTF_8.name());
             Map<String, String> messages = JSON.parseObject(jsonContent, Map.class);
             messagesCache.put("en", messages);
         } catch (Exception e) {

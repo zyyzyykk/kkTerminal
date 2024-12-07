@@ -10,7 +10,7 @@
 >
 > 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-11-29
+> 更新时间：2024-12-07
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="http://img.kkbapps.com/logo/terminal.png" alt="kkterminal"></a></p>
@@ -68,13 +68,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 🌐 国内服务器访问：https://ssh.kkbpro.com/
 - 🌍 国外服务器访问：https://ssh.kkbapps.com/
 
-![Connect](http://img.kkbapps.com/terminal/Connect-3.3.3.png)
+![Connect](http://img.kkbapps.com/terminal/Connect-zh-3.4.2.png)
 
-![Preference](http://img.kkbapps.com/terminal/Preference-3.3.3.png)
+![Preference](http://img.kkbapps.com/terminal/Preference-zh-3.4.2.png)
 
-![File](http://img.kkbapps.com/terminal/File-3.3.7.png)
+![File](http://img.kkbapps.com/terminal/File-zh-3.4.2.png)
 
-![Editor](http://img.kkbapps.com/terminal/Editor-3.3.3.png)
+![Editor](http://img.kkbapps.com/terminal/Editor-zh-3.4.2.png)
 
 [**更多模块预览**](./MODULE.md)
 
@@ -84,30 +84,37 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 2.支持在网页中使用 `iframe` 标签引入，可快速集成到第三方网站中
 
-3.支持本地PC端部署，启动时会自动打开浏览器窗口
+3.支持i18n国际化，支持中/英文语言切换
 
-4.支持窗口大小自适应，支持中文输入
+4.支持本地PC端部署，启动时会自动打开浏览器窗口
 
-5.支持自定义偏好设置，可选择终端的背/前景色、字体字号、光标显示样式、启用TCode
+5.支持窗口大小自适应，支持中文输入
 
-6.支持重启：当修改ssh连接设置或自定义偏好设置后会自动重启，也可在ssh连接断开后手动进行重启
+6.支持自定义偏好设置，可选择终端的背/前景色、字体字号、光标显示样式、启用TCode
 
-7.支持复制粘贴：
+7.支持重启：当修改ssh连接设置或自定义偏好设置后会自动重启，也可在ssh连接断开后手动进行重启
+
+8.支持复制粘贴：
 
 - 复制同 `git` 终端，选中文本会自动进行复制
 - 粘贴同 `cmd` 终端，单击鼠标右键进行粘贴（需要浏览器打开权限）
 
-8.支持文件管理，打开文件管理模块进行文件/文件夹的查看、解压、上传与下载
+9.支持文件管理，打开文件管理模块进行文件/文件夹的查看、解压、上传与下载
 
-9.支持文件多选/全选、复制粘贴、剪切、选择切换、打开等快捷键操作
+10.支持文件多选/全选、复制粘贴、剪切、选择切换、打开等快捷键操作
 
-10.支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
+11.支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
 
-11.支持 [TCode (终端代码)](./TCODE.md)，能够通过自定义TCode实现类似Shell脚本的自动化Workflow
+12.支持 [TCode (终端代码)](./TCODE.md)，能够通过自定义TCode实现类似Shell脚本的自动化Workflow
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.4.0：latest
+##### zyyzyykk/kkterminal:3.4.2：latest
+
+- 实现i18n国际化，支持中/英文语言切换
+- 重构了部分代码逻辑
+
+##### zyyzyykk/kkterminal:3.4.0：
 
 - 新增SSH连接配置与自定义TCode的删除功能
 - 修复了文件模块文件夹粘贴失败的bug
@@ -119,13 +126,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 扩展高亮文件类型
 - 新增文件项键盘选择切换与打开
 - 隐藏文件图标样式优化
-
-##### zyyzyykk/kkterminal:3.3.3：
-
-- 新增压缩包文件解压功能
-- 修复文件夹拖拽上传导致文件丢失的bug
-- 新增对于浏览器原生支持格式文件的预览
-- 优化文件模块界面显示
 
 [**历史更新记录**](./UPDATE.md)
 

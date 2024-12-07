@@ -1,4 +1,4 @@
-### ⌨️ TCode Terminal Code
+### ⌨️ TCode (Terminal Code)
 
 ##### TCode Introduction
 

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 /**
  * 返回结果的信息类
  */
-@Component
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

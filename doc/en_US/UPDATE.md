@@ -1,5 +1,12 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.3.3: 
+
+- Add compressed file decompression function
+- Fixed the bug of file loss caused by folder drag upload
+- Added preview for browser native supported format files
+- Optimize the interface display of File Management Module
+
 ##### zyyzyykk/kkterminal:3.2.9: 
 
 - Add file URL upload
