@@ -43,29 +43,28 @@ export default {
       },1);
     };
 
-    // 使用MutationObserver监听DOM变化
-    let mutationObserver = null;
+    // 使用ResizeObserver监听尺寸变化
+    let resizeObserver = null;
 
-    const observeTextChanges = () => {
+    const observeSizeChanges = () => {
       if(tooltipContent.value) {
-        mutationObserver = new MutationObserver(() => {
+        resizeObserver = new ResizeObserver(() => {
           checkOverflow();
         });
-        mutationObserver.observe(tooltipContent.value, {
-          childList: true,          // 监听子节点的变化
-          subtree: true,            // 监听所有后代节点的变化
-          characterData: true,      // 监听文本节点的变化
-        });
+        resizeObserver.observe(tooltipContent.value);
       }
     };
 
     onMounted(() => {
       checkOverflow();
-      observeTextChanges();
+      observeSizeChanges();
     });
 
     onBeforeUnmount(() => {
-      if(mutationObserver) mutationObserver.disconnect();
+      if(resizeObserver && tooltipContent.value) {
+        resizeObserver.unobserve(tooltipContent.value);
+        resizeObserver.disconnect();
+      }
     });
 
     return {
