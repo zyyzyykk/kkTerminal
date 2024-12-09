@@ -15,7 +15,11 @@
     <div>
       <div class="item-class" style="margin-bottom: 15px;">
         <div class="no-select form-width nowrap">{{ $t('配\u00A0\u00A0\u00A0置') }}：</div>
-        <div class="ellipsis" style="user-select: none;" :class="!(setInfo.option && setInfo.option.length > 0) ? 'new-option': 'old-option'" >{{ !(setInfo.option && setInfo.option.length > 0) ? $t('新建配置') : setInfo.option }}</div>
+        <ToolTip :content="!(setInfo.option && setInfo.option.length > 0) ? $t('新建配置') : setInfo.option" >
+          <template #content>
+            <div class="ellipsis" style="user-select: none;" :class="!(setInfo.option && setInfo.option.length > 0) ? 'new-option': 'old-option'" >{{ !(setInfo.option && setInfo.option.length > 0) ? $t('新建配置') : setInfo.option }}</div>
+          </template>
+        </ToolTip>
         <div style="flex: 1;"></div>
         <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Switch /></el-icon>{{ $t('切换') }}</el-button></div>
         <div><el-button v-if="isForbidInput == false" size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Finished /></el-icon>{{ $t('保存') }}</el-button></div>
@@ -86,12 +90,14 @@ import { ref } from 'vue';
 import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
 import OptionBlock from './OptionBlock';
+import ToolTip from './ToolTip.vue';
 import { HomeFilled, Paperclip, User, Lock, DocumentCopy, View, Hide, Edit, Finished, Switch } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 
 export default {
   name:'ConnectSetting',
   components: {
+    ToolTip,
     OptionBlock,
     HomeFilled,
     Paperclip,

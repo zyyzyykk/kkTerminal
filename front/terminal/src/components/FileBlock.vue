@@ -67,7 +67,13 @@
                 <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                   <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                 </div>
-                <div v-else class="ellipsis" style="margin: 0 10px;">{{ item.name }}</div>
+                <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
+                  <template #content>
+                    <div v-if="!(isShowRenameInput == true && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
+                      {{ item.name }}
+                    </div>
+                  </template>
+                </ToolTip>
               </div>
             </template>
             <template v-else>
@@ -76,7 +82,13 @@
                 <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
                   <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                 </div>
-                <div v-else class="ellipsis" style="margin: 0 10px;">{{ item.name }}</div>
+                <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
+                  <template #content>
+                    <div v-if="!(isShowRenameInput == true && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
+                      {{ item.name }}
+                    </div>
+                  </template>
+                </ToolTip>
               </div>
             </template>
           </div>
@@ -148,6 +160,7 @@ import { http_base_url } from '@/utils/BaseUrl';
 import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
 import { isZipFile } from '@/utils/FileSuffix';
+import ToolTip from './ToolTip.vue';
 
 import NoData from '@/components/NoData';
 import TxtPreview from './preview/TxtPreview';
@@ -163,6 +176,7 @@ import FileIcons from 'file-icons-vue';
 export default {
   name:'FileBlock',
   components: {
+    ToolTip,
     NoData,
     FileIcons,
     TxtPreview,

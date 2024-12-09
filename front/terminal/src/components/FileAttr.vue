@@ -27,9 +27,13 @@
       <div class="kk-border" ></div>
       <div class="kk-flex nowrap">
         <div class="form-width" >{{ $t('位置') }}：</div>
-        <div class="ellipsis">
-          {{ fileDir + fileInfo.name }}
-        </div>
+        <ToolTip :content="fileDir + fileInfo.name" >
+          <template #content>
+            <div class="ellipsis">
+              {{ fileDir + fileInfo.name }}
+            </div>
+          </template>
+        </ToolTip>
         <div style="cursor: pointer; margin-left: 5px;" @click="doCopy(fileDir + fileInfo.name)">
           <el-icon size="18"><DocumentCopy /></el-icon>
         </div>
@@ -98,6 +102,7 @@ import useClipboard from "vue-clipboard3";
 import { DocumentCopy, Refresh } from '@element-plus/icons-vue';
 import { calcSize } from '@/utils/CalcSize';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
+import ToolTip from './ToolTip.vue';
 import i18n from "@/locales/i18n";
 
 // 引入文件图标组件
@@ -106,6 +111,7 @@ import FileIcons from 'file-icons-vue';
 export default {
   name: 'FileAttr',
   components: {
+    ToolTip,
     FileIcons,
     DocumentCopy,
     Refresh,
