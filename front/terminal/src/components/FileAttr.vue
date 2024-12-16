@@ -34,7 +34,7 @@
             </div>
           </template>
         </ToolTip>
-        <div style="cursor: pointer; margin-left: 5px;" @click="doCopy(fileDir + fileInfo.name)">
+        <div style="cursor: pointer; margin-left: 7px;" @click="doCopy(fileDir + fileInfo.name)">
           <el-icon size="18"><DocumentCopy /></el-icon>
         </div>
       </div>
@@ -81,6 +81,9 @@
         <div>
           {{ calcPriority(fileInfo.attributes.mode.type,fileInfo.attributes.permissions) }}
         </div>
+        <div style="cursor: pointer; margin-left: 7px;" @click="openEditPermissions">
+          <el-icon size="18"><Edit /></el-icon>
+        </div>
         <div style="flex: 1;"></div>
         <div>
           <el-button size="small" type="primary" @click="confirm" >{{ $t('确定') }}</el-button>
@@ -89,6 +92,10 @@
     </div>
     <div style="margin-top: -15px;"></div>
   </el-dialog>
+
+  <!-- 权限修改 -->
+  <PermissionsEdit ref="permissionsEditRef" @editPermissions="editPermissions" ></PermissionsEdit>
+
 </template>
 
 <script>
@@ -99,10 +106,11 @@ import { formatDate } from '@/utils/FormatDate';
 import { calcPriority } from '@/utils/CalcPriority';
 import { ElMessage } from 'element-plus';
 import useClipboard from "vue-clipboard3";
-import { DocumentCopy, Refresh } from '@element-plus/icons-vue';
+import { DocumentCopy, Refresh, Edit } from '@element-plus/icons-vue';
 import { calcSize } from '@/utils/CalcSize';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
 import ToolTip from './ToolTip.vue';
+import PermissionsEdit from './PermissionsEdit.vue';
 import i18n from "@/locales/i18n";
 
 // 引入文件图标组件
@@ -115,6 +123,8 @@ export default {
     FileIcons,
     DocumentCopy,
     Refresh,
+    Edit,
+    PermissionsEdit,
   },
   props:['sshKey'],
   setup(props,context)
@@ -236,6 +246,10 @@ export default {
       });
     };
 
+    const editPermissions = (path,item, permissionsInfo) => {
+      context.emit('editPermissions', path, item, permissionsInfo);
+    };
+
     // 重置
     const reset = () => {
       fileInfo.value = {
@@ -254,8 +268,18 @@ export default {
       DialogVisilble.value = false;
     };
 
+    // 权限修改
+    const permissionsEditRef = ref();
+    const openEditPermissions = () => {
+      permissionsEditRef.value.fileDir = fileDir.value;
+      permissionsEditRef.value.fileInfo = fileInfo.value;
+      permissionsEditRef.value.DialogVisilble = true;
+      permissionsEditRef.value.init();
+    };
+
     // 关闭
     const closeDialog = (done) => {
+      if(permissionsEditRef.value) permissionsEditRef.value.closeDialog();
       setTimeout(() => {
         reset();
       },400);
@@ -280,7 +304,9 @@ export default {
       includeInfo,
       getFileSize,
       getFolderInclude,
-
+      permissionsEditRef,
+      openEditPermissions,
+      editPermissions,
     }
   }
 }

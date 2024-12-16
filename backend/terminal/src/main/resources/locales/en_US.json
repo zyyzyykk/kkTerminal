@@ -39,5 +39,7 @@
   "文件片缺失": "File Chunk Missing",
   "上传文件大小不一致": "File Upload Size Diff",
   "文件片合并失败": "File Chunks Merge Failed",
-  "ssh连接断开": "SSH Disconnected"
+  "ssh连接断开": "SSH Disconnected",
+  "权限修改失败": "Permissions Edit Failed",
+  "权限修改成功": "Permissions Edit Success"
 }

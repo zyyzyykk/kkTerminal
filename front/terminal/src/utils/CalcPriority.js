@@ -2,6 +2,31 @@ export const calcPriority = (type,attrs) => {
   return getType(type) + getAttrs(attrs);
 };
 
+// 获取所有者、所属组和其他用户的权限数组
+export const getPermissionInfo = (attrs) => {
+  const permissionString = calcPriority('REGULAR', attrs).slice(1);   // 仅提取权限部分
+  const permissions = {
+    owner: [permissionString[0] === 'r', permissionString[1] === 'w', permissionString[2] === 'x' || permissionString[2] === 's' || permissionString[2] === 'S'],
+    group: [permissionString[3] === 'r', permissionString[4] === 'w', permissionString[5] === 'x' || permissionString[5] === 's' || permissionString[5] === 'S'],
+    others: [permissionString[6] === 'r', permissionString[7] === 'w', permissionString[8] === 'x' || permissionString[8] === 't' || permissionString[8] === 'T'],
+    sub: false,
+  };
+
+  return permissions;
+};
+
+// chmod权限整数值
+export const getChmodValue = (permissions) => {
+  const calculateSection = (section) => {
+    return (section[0] ? 4 : 0) + (section[1] ? 2 : 0) + (section[2] ? 1 : 0);
+  };
+  const ownerValue = calculateSection(permissions.owner) + '';
+  const groupValue = calculateSection(permissions.group) + '';
+  const othersValue = calculateSection(permissions.others) + '';
+
+  return ownerValue + groupValue + othersValue;
+};
+
 const fileTypeSymbols = {
   'BLOCK_SPECIAL': 'b',
   'CHAR_SPECIAL': 'c',

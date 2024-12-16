@@ -130,7 +130,7 @@ export default {
     // 控制Dialog显示
     const DialogVisilble = ref(false);
 
-    // 语言列标
+    // 语言列表
     const langList = [{label:"English",value:"en"}, {label:"Chinese",value:"zh"}];
     const mapValueToLabel = (lang) => {
       const item = langList.find(item => item.value === lang);

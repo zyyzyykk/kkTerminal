@@ -557,6 +557,33 @@ public class FileController {
         return Result.success(200, successMsg, null);
     }
 
+    /**
+     * chmod 文件权限修改
+     */
+    @PostMapping("/chmod")
+    public Result chmod(String sshKey, String path, String item, String perms, Boolean sub) {
+        String errorMsg = "权限修改失败";
+        String successMsg = "权限修改成功";
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg,null);
+        }
+        String command = "cd " + path + " && chmod " + (sub ? "-R " : "") + perms + " " + item;
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.error(500, errorMsg, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(500, errorMsg, null);
+        }
+        return Result.success(200, successMsg, null);
+    }
+
 
     /**
      * 分片上传文件

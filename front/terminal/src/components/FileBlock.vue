@@ -123,7 +123,9 @@
   <FileUrl ref="fileUrlRef" @callback="fileUrlUpload" ></FileUrl> 
   <TxtPreview ref="txtPreviewRef" @doSave="doSave" ></TxtPreview>
   <MkFile ref="mkFileRef" @callback="handleMkFile" ></MkFile>
-  <FileAttr :sshKey="sshKey" ref="fileAttrRef" @callback="doRename" ></FileAttr>
+
+  <!-- 文件属性 -->
+  <FileAttr :sshKey="sshKey" ref="fileAttrRef" @callback="doRename" @editPermissions="editPermissions" ></FileAttr>
 
   <!-- 菜单项 -->
   <div ref="menuBlockRef" @contextmenu="preventDefault" v-show="isShowMenu" class="kk-menu no-select">
@@ -160,6 +162,7 @@ import { http_base_url } from '@/utils/BaseUrl';
 import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
 import { isZipFile } from '@/utils/FileSuffix';
+import { getChmodValue } from '@/utils/CalcPriority';
 import ToolTip from './ToolTip.vue';
 
 import NoData from '@/components/NoData';
@@ -254,6 +257,12 @@ export default {
       }
       return -1;
     };
+    const getFileInfoByName = (name) => {
+      for(let i=0;i<files.value.length;i++) {
+        if(files.value[i].name == name) return files.value[i];
+      }
+      return null;
+    };
 
     const dir = ref('');
     // 保证路径正确
@@ -325,6 +334,19 @@ export default {
               lastSelectedIndex = -1;
               fileAreaRef.value.tabindex = '0';
               fileAreaRef.value.focus();
+              if(fileAttrRef.value && fileAttrRef.value.DialogVisilble) {
+                let nowFileInfo = getFileInfoByName(fileAttrRef.value.fileInfo.name);
+                if(nowFileInfo) {
+                  fileAttrRef.value.reset();
+                  fileAttrRef.value.DialogVisilble = true;
+                  fileAttrRef.value.fileInfo = nowFileInfo;
+                  fileAttrRef.value.fileDir = dir.value;
+                  fileAttrRef.value.rename = nowFileInfo.name;
+                  if(nowFileInfo.isDirectory) fileAttrRef.value.getFolderInclude();
+                  else fileAttrRef.value.getFileSize();
+                }
+                else fileAttrRef.value.closeDialog();
+              }
             }
             else {
               files.value = [];
@@ -1103,6 +1125,32 @@ export default {
       });
     };
 
+    // 修改权限
+    const editPermissions = (path,item, permissionsInfo) => {
+      $.ajax({
+        url: http_base_url + '/chmod',
+        type:'post',
+        data:{
+          sshKey:props.sshKey,
+          path:escapePath(path),
+          item:escapeItem(item),
+          perms:getChmodValue(permissionsInfo),
+          sub:permissionsInfo.sub || false,
+        },
+        success(resp){
+          ElMessage({
+            message: resp.info,
+            type: resp.status,
+            grouping: true,
+          });
+          if(resp.status == 'success') {
+            if(fileAttrRef.value && fileAttrRef.value.permissionsEditRef) fileAttrRef.value.permissionsEditRef.closeDialog();
+            getDirList();
+          }
+        }
+      });
+    };
+
     // 重置
     const reset = (deep=false) => {
       if(deep) {
@@ -1233,6 +1281,7 @@ export default {
       deepCloseDialog,
       isZipFile,
       untar,
+      editPermissions,
     }
   }
 }

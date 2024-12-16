@@ -1,5 +1,6 @@
 {
   "220": "260",
+  "360": "380",
   "描\u00A0\u00A0\u00A0述": "Desc",
   "配\u00A0\u00A0\u00A0置": "Option",
   "密\u00A0\u00A0\u00A0码": "Pwd",
@@ -75,6 +76,7 @@
   "修改时间": "mtime",
   "访问时间": "atime",
   "权限": "permissions",
+  "权限修改": "Permissions Edit",
   "0 个文件，0 个文件夹": "0 files, 0 folders",
   " 个文件，": " files, ",
   " 个文件夹": " folders",
@@ -128,5 +130,12 @@
   "文件夹上传失败": "Folder upload failed",
   "暂无文件": "No File",
   "修改保存中": "Saving modification",
-  "文件后台保存中": "Saving file in the backend"
+  "文件后台保存中": "Saving file in the backend",
+  "读取": "Read",
+  "写入": "Write",
+  "执行": "Execute",
+  "所有者": "Owner",
+  "所属组": "Group",
+  "其他用户": "Others",
+  "应用到子目录和文件": "Apply to sub directories and files"
 }
