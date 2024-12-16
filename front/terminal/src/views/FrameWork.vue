@@ -469,11 +469,20 @@ export default {
         }
       }
       else {
-        ElMessage({
-          message: 'TCode-' + transTcode + ' does not exist',
-          type: 'warning',
-          grouping: true,
-        });
+        if(transTcode[0] == '/' || transTcode[0] == 'S' || transTcode[0] == 'U') {
+          ElMessage({
+            message: 'TCode-' + transTcode + ' does not exist',
+            type: 'warning',
+            grouping: true,
+          });
+        }
+        else {
+          ElMessage({
+            message: i18n.global.t('TCode必须以 /,S,U 开头'),
+            type: 'warning',
+            grouping: true,
+          });
+        }
       }
     };
     // 重置用户TCode执行器

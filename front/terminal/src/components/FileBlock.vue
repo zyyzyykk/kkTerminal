@@ -877,8 +877,9 @@ export default {
     };
 
     watch(dir,() => {
-      if(mkFileRef.value) mkFileRef.value.reset();
-      if(fileUrlRef.value) fileUrlRef.value.reset();
+      if(mkFileRef.value) mkFileRef.value.closeDialog();
+      if(fileUrlRef.value) fileUrlRef.value.closeDialog();
+      if(fileAttrRef.value) fileAttrRef.value.closeDialog();
     });
 
     // 滚动到可视区
