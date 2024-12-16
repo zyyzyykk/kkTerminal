@@ -41,11 +41,11 @@ public class I18nUtil {
     /**
      * 获取国际化消息
      */
-    public String getMessage(String key) {
+    public static String getMessage(String key) {
         return getMessage(key, locale.get());
     }
 
-    public String getMessage(String key, String lang) {
+    public static String getMessage(String key, String lang) {
         return messagesCache.get(lang) == null ? key : messagesCache.get(lang).getOrDefault(key, key);
     }
 

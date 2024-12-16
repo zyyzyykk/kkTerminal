@@ -29,12 +29,9 @@ public class Result {
     // 返回数据
     private String data;
 
-    // 国际化工具类
-    public static final I18nUtil i18nUtil = new I18nUtil();
-
     // 国际化info属性
     public void setInfo(String info) {
-        this.info = i18nUtil.getMessage(info);
+        this.info = I18nUtil.getMessage(info);
     }
 
     // 失败返回
