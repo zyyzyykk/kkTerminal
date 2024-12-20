@@ -595,24 +595,25 @@ export default {
       // 文件/文件夹项
       const items = event.dataTransfer.items;
       if(!(items && items.length > 0)) return;
+      let basePath = dir.value;
       for (let i = 0; i < items.length; i++) {
         let item = items[i].webkitGetAsEntry();
         // 文件类型
         if(item.isFile && !item.isDirectory) {
           item.file(file => {
             file.uid = Math.random().toString(36).substring(2);
-            doUpload({file:file}, {pathVal: dir.value});
+            doUpload({file:file}, {pathVal: basePath});
           });
         }
         // 文件夹类型
         else if(!item.isFile && item.isDirectory) {
-          const nowPath = dir.value + item.name;
+          const nowPath = basePath + item.name;
           $.ajax({
             url: http_base_url + '/mkdir',
             type:'post',
             data:{
               sshKey:props.sshKey,
-              path:dir.value,
+              path:basePath,
               item:item.name,
             },
             success(resp){
@@ -1024,6 +1025,7 @@ export default {
     };
     // 文件夹input框上传预处理
     const folderInputUploadPrehandle = (event) => {
+      let basePath = dir.value;
       let filesGroupByPath = {};
       // 根据文件路径进行分类
       for(let i=0;i<event.target.files['length'];i++) {
@@ -1045,10 +1047,10 @@ export default {
         filesArr.push(filesGroupByPath[key]);
       }
       filesArr.sort((a, b) => a.path.length - b.path.length);
-      folderInputUpload(filesArr,0);
+      folderInputUpload(basePath,filesArr,0);
     };
     // 文件夹input框上传
-    const folderInputUpload = (filesArr,now) => {
+    const folderInputUpload = (basePath,filesArr,now) => {
       // 父目录创建
       const fileObj = filesArr[now];
       $.ajax({
@@ -1056,18 +1058,18 @@ export default {
         type:'post',
         data:{
           sshKey:props.sshKey,
-          path:dir.value,
+          path:basePath,
           item:fileObj.path,
         },
         success(resp){
           if(resp.status == 'success') {
             if(now == 0) getDirList();
-            if(now < filesArr.length - 1) folderInputUpload(filesArr, now+1);
+            if(now < filesArr.length - 1) folderInputUpload(basePath,filesArr, now+1);
             // 子文件上传
             for(let i=0;i<fileObj.files.length;i++) {
               const file = fileObj.files[i];
               file.uid = Math.random().toString(36).substring(2);
-              doUpload({file:file}, {pathVal: dir.value + fileObj.path, noStartUpLoad: true});
+              doUpload({file:file}, {pathVal: basePath + fileObj.path, noStartUpLoad: true});
             }
           }
           else {
