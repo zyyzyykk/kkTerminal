@@ -12,14 +12,20 @@
   >
     <div style="margin-top: -27px;"></div>
     <div>
-      <div class="title" style="display: flex; align-items: center;" >
+      <div class="title kk-flex" >
         <div class="ellipsis" style="flex: 1;">
           <div v-if="isShowDirInput == true" >
             <el-input id="aimDirInput" v-model="dir" :placeholder="$t('输入目录路径')" size="small" @keydown.enter="isShowDirInput = false;" @blur="isShowDirInput = false;" @mousedown.stop @dblclick.stop @change="dirInputCallback" />
           </div>
-          <div class="no-select ellipsis" v-else @dblclick="doShowDirInput" >{{ dir }}</div>
+          <div class="kk-flex no-select ellipsis" v-else @dblclick="doShowDirInput" >
+            <div v-for="(item, index) in dirLevels" :key="index" class="kk-flex" >
+              <div>/</div>
+              <div class="dir-level" @click="changeDirByLevel($event,index)" >{{ item }}</div>
+            </div>
+            <div>/</div>
+          </div>
         </div>
-        <div style="display: flex; align-items: center;">
+        <div class="kk-flex" >
           <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
           <div v-if="dir && dir != '/'" class="hover-class" @click="doReturn" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
           <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
@@ -31,19 +37,19 @@
               <template #dropdown>
                 <el-dropdown-menu v-show="DialogVisilble" class="no-select" style="text-align: center;">
                   <el-dropdown-item @click="fileUploadTypeChoose(0)" >
-                    <div style="display: flex; align-items: center;" >
+                    <div class="kk-flex" >
                       <div><el-icon><DocumentAdd /></el-icon></div>
                       <div>{{ $t('文件') }}</div>
                     </div>
                   </el-dropdown-item>
                   <el-dropdown-item @click="fileUploadTypeChoose(1)" >
-                    <div style="display: flex; align-items: center;" >
+                    <div class="kk-flex" >
                       <div><el-icon><FolderAdd /></el-icon></div>
                       <div>{{ $t('文件夹') }}</div>
                     </div>
                   </el-dropdown-item>
                   <el-dropdown-item @click="fileUploadTypeChoose(2)" >
-                    <div style="display: flex; align-items: center;" >
+                    <div class="kk-flex" >
                       <div><el-icon><Link /></el-icon></div>
                       <div>URL</div>
                     </div>
@@ -265,11 +271,29 @@ export default {
     };
 
     const dir = ref('');
+    const dirLevels = ref([]);
     // 保证路径正确
     const confirmDirCorrect = () => {
       if(dir.value == '' || dir.value[0] != '/') dir.value = '/' + dir.value;
       if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
       dir.value = dir.value.replace(/\/{2,}/g, '/');
+      // 更新路径显示
+      calcDirLevel(dir.value);
+    };
+    const calcDirLevel = (fullPath) => {
+      if(fullPath == '/') dirLevels.value = [];
+      else dirLevels.value = fullPath.substring(1,fullPath.length - 1).split('/');
+    };
+    const changeDirByLevel = (event,index) => {
+      // ctrl
+      if(!((props.os == "Windows" && event.ctrlKey) || ((props.os == "Mac" || props.os == "iOS") && event.metaKey))) return;
+      event.preventDefault();
+      let aimDir = '/';
+      for(let i=0;i<=index;i++) {
+        aimDir += dirLevels.value[i];
+        aimDir += '/';
+      }
+      changeDir(aimDir);
     };
 
     // 获取初始家目录
@@ -408,6 +432,7 @@ export default {
     const changeDir = (new_dir) => {
       if(isShowDirInput.value == true) return;
       dir.value = new_dir;
+      confirmDirCorrect();
       selectedFiles.value = [];
       getDirList();
     };
@@ -432,6 +457,7 @@ export default {
       if(dir.value[dir.value.length - 1] == '/') dir.value = dir.value.substring(0,dir.value.length - 1);
       let index = dir.value.lastIndexOf('/');
       if(index != -1) dir.value = dir.value.substring(0,index + 1);
+      confirmDirCorrect();
       selectedFiles.value = [];
       doRefresh();
     };
@@ -1160,6 +1186,7 @@ export default {
         loading.value = true;
         files.value = [];
         dir.value = '';
+        dirLevels.value = [];
         isShowDirInput.value = false;
         noDataMsg.value = i18n.global.t('暂无文件');
         dirStatus.value = 0;
@@ -1285,6 +1312,8 @@ export default {
       isZipFile,
       untar,
       editPermissions,
+      dirLevels,
+      changeDirByLevel,
     }
   }
 }
@@ -1299,6 +1328,11 @@ export default {
   overflow: hidden;
   text-overflow:ellipsis;
   margin-bottom: 15px;
+}
+
+.kk-flex {
+  display: flex;
+  align-items: center;
 }
 
 .list-class {
@@ -1384,6 +1418,12 @@ export default {
 .confirmPop {
   /* 定位删除确认框 */
   user-select: none;
+}
+
+.dir-level:hover {
+  text-decoration: none;
+  color: var(--link);
+  cursor: pointer;
 }
 
 </style>
