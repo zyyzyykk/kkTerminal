@@ -30,9 +30,9 @@ TCode is not case sensitive; The length is 2-6 bits, where the first bit represe
 
 3. `kkTerminal` contains the following methods:
 
-   | Msethod | Description                                                  | Example                                                      |
+   | Methods | Description                                                  | Example                                                      |
    | ------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-   | write   | Write content and wait for output results                    | `await kkTerminal.write('content'[, Delay in obtaining results=200ms])` |
+   | write   | Write content and wait for output results                    | `await kkTerminal.write('content'[, Delay for obtaining results=200ms])` |
    | read    | Obtain all output result arrays since the last write command | `kkTerminal.read()`                                          |
    | readAll | Obtain an array of all output results from the start of Workflow execution | `kkTerminal.readAll()`                                       |
    | session | Get/Set Session Level variables                              | `kkTerminal.variables.session('key'[, value])`               |

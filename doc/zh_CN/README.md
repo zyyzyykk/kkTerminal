@@ -8,9 +8,9 @@
 >
 > docker仓库地址：https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general
 >
-> 预览：https://ssh.kkbpro.com/	(国内服务器访问)	或	https://ssh.kkbapps.com/	(国外服务器访问)
+> 预览：http://ssh.kkbpro.com/	(国内服务器访问)	或	http://ssh.kkbapps.com/	(国外服务器访问)
 >
-> 更新时间：2024-12-07
+> 更新时间：2024-12-24
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="http://img.kkbapps.com/logo/terminal.png" alt="kkterminal"></a></p>
@@ -30,7 +30,7 @@
 在html网页中使用 `iframe` 标签实现快速集成：
 
 ```html
-<iframe src="https://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
+<iframe src="http://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
 ```
 
 ### 🐳 使用docker部署
@@ -65,8 +65,8 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 访问以下网址：
 
-- 🌐 国内服务器访问：https://ssh.kkbpro.com/
-- 🌍 国外服务器访问：https://ssh.kkbapps.com/
+- 🌐 国内服务器访问：http://ssh.kkbpro.com/
+- 🌍 国外服务器访问：http://ssh.kkbapps.com/
 
 ![Connect](http://img.kkbapps.com/terminal/Connect-zh-3.4.2.png)
 
@@ -80,36 +80,44 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 💡 功能说明
 
-1.kkTerminal是一个Web SSH连接终端工具，点击左上角的终端图标，选择连接设置进行ssh连接
+1. kkTerminal是一个Web SSH连接终端工具，点击左上角的终端图标，选择连接设置进行ssh连接
 
-2.支持在网页中使用 `iframe` 标签引入，可快速集成到第三方网站中
+2. 支持在网页中使用 `iframe` 标签引入，可快速集成到第三方网站中
 
-3.支持i18n国际化，支持中/英文语言切换
+3. 支持i18n国际化，支持中/英文语言切换
 
-4.支持本地PC端部署，启动时会自动打开浏览器窗口
+4. 支持本地PC端部署，启动时会自动打开浏览器窗口
 
-5.支持窗口大小自适应，支持中文输入
+5. 支持窗口大小自适应，支持中文输入
 
-6.支持自定义偏好设置，可选择终端的背/前景色、字体字号、光标显示样式、启用TCode
+6. 支持自定义偏好设置，可选择终端的背/前景色、字体字号、光标显示样式、启用TCode
 
-7.支持重启：当修改ssh连接设置或自定义偏好设置后会自动重启，也可在ssh连接断开后手动进行重启
+7. 支持重启：当修改ssh连接设置或自定义偏好设置后会自动重启，也可在ssh连接断开后手动进行重启
 
-8.支持复制粘贴：
+8. 支持复制粘贴：
 
-- 复制同 `git` 终端，选中文本会自动进行复制
-- 粘贴同 `cmd` 终端，单击鼠标右键进行粘贴（需要浏览器打开权限）
+   - 复制同 `git` 终端，选中文本会自动进行复制
 
-9.支持文件管理，打开文件管理模块进行文件/文件夹的查看、解压、上传与下载
+   - 粘贴同 `cmd` 终端，单击鼠标右键进行粘贴（需要浏览器打开权限）
 
-10.支持文件多选/全选、复制粘贴、剪切、选择切换、打开等快捷键操作
 
-11.支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
+9. 支持文件管理，打开文件管理模块进行文件/文件夹的查看、解压、上传与下载
 
-12.支持 [TCode (终端代码)](./TCODE.md)，能够通过自定义TCode实现类似Shell脚本的自动化Workflow
+10. 支持文件多选/全选、复制粘贴、剪切、选择切换、打开等快捷键操作
+
+11. 支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
+
+12. 支持 [TCode (终端代码)](./TCODE.md)，能够通过自定义TCode实现类似Shell脚本的自动化Workflow
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.4.2：latest
+##### zyyzyykk/kkterminal:3.4.5：latest
+
+- 新增文件权限编辑功能
+- 修复了输入框上传时更改目录导致文件夹上传错误的bug
+- 优化界面显示
+
+##### zyyzyykk/kkterminal:3.4.2：
 
 - 实现i18n国际化，支持中/英文语言切换
 - 重构了部分代码逻辑
@@ -119,13 +127,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 新增SSH连接配置与自定义TCode的删除功能
 - 修复了文件模块文件夹粘贴失败的bug
 - 优化了网络资源与页面显示
-
-##### zyyzyykk/kkterminal:3.3.7：
-
-- 自适应远程服务器编码格式
-- 扩展高亮文件类型
-- 新增文件项键盘选择切换与打开
-- 隐藏文件图标样式优化
 
 [**历史更新记录**](./UPDATE.md)
 

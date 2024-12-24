@@ -1,5 +1,12 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.3.7: 
+
+- Adaptive remote server encoding format
+- Expand highlighting file types
+- Add file item keyboard selection switch and open
+- Optimization of hidden file icon style
+
 ##### zyyzyykk/kkterminal:3.3.3: 
 
 - Add compressed file decompression function
