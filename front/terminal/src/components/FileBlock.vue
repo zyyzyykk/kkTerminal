@@ -285,7 +285,7 @@ export default {
       else dirLevels.value = fullPath.substring(1,fullPath.length - 1).split('/');
     };
     const changeDirByLevel = (event,index) => {
-      // ctrl
+      // not ctrl
       if(!((props.os == "Windows" && event.ctrlKey) || ((props.os == "Mac" || props.os == "iOS") && event.metaKey))) return;
       event.preventDefault();
       let aimDir = '/';
@@ -580,7 +580,9 @@ export default {
       }  
     };
 
-    const doShowDirInput = () => {
+    const doShowDirInput = (event) => {
+      // ctrl
+      if((props.os == "Windows" && event.ctrlKey) || ((props.os == "Mac" || props.os == "iOS") && event.metaKey)) return;
       isShowDirInput.value = true;
       setTimeout(() => {
         document.querySelector('#aimDirInput').focus();
