@@ -31,7 +31,7 @@
         <div class="form-width" >{{ $t('文本') }}：</div>
         <div class="item-class">
           <div>{{ $t('字体') }}</div>
-          <el-dropdown style="margin: 0 20px;" >
+          <el-dropdown style="margin: 0 20px;" hide-timeout="400" >
             <span class="a-link" >{{ setInfo.fontFamily }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -44,7 +44,7 @@
         </div>
         <div class="item-class">
           <div>{{ $t('字号') }}</div>
-          <el-dropdown style="margin: 0 20px;" >
+          <el-dropdown style="margin: 0 20px;" hide-timeout="400" >
             <span class="a-link" >{{ setInfo.fontSize }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -60,7 +60,7 @@
         <div class="form-width" >{{ $t('光标') }}：</div>
         <div class="item-class">
           <div>{{ $t('样式') }}</div>
-          <el-dropdown style="margin: 0 20px;" >
+          <el-dropdown style="margin: 0 20px;" hide-timeout="400" >
             <span class="a-link" >{{ setInfo.cursorStyle }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -92,7 +92,7 @@
         <div class="form-width" >{{ $t('其它') }}：</div>
         <div class="item-class">
           <div>{{ $t('语言') }}</div>
-          <el-dropdown style="margin: 0 20px;" >
+          <el-dropdown style="margin: 0 20px;" hide-timeout="400" >
             <span class="a-link" >{{ mapValueToLabel(setInfo.lang) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>

@@ -602,11 +602,11 @@ export default {
       txtPreviewRef.value.DialogVisilble = true;
     };
     // 保存文本，写回服务器
-    const doSave = (name, url, text) => {
+    const doSave = (name, url, arrayBuffer) => {
       let urlParams = parseUrl(url);
       if(urlParams.key != props.sshKey) return;
       // 创建Blob对象
-      const blob = new Blob([text], { type: 'text/plain' });
+      const blob = new Blob([arrayBuffer], { type: 'application/octet-stream' });
       // 创建File对象
       const file = new File([blob], name);
       file.uid = Math.random().toString(36).substring(2);

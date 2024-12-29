@@ -109,7 +109,7 @@ public class WebSocketServer {
         sshSession.allocateDefaultPTY();
 
         // 连接成功，生成key标识
-        sshKey = envInfo.getLang() + "-" + serverCharset.name() + "-" + UUID.randomUUID();
+        sshKey = envInfo.getLang() + "-" + serverCharset.name().replace("-","@") + "-" + UUID.randomUUID();
         sendMessage(sessionSocket, "SSHKey","success", ResultCodeEnum.CONNECT_SUCCESS.getState(), sshKey);
         webSessionMap.put(sshKey, sessionSocket);
         sshClientMap.put(sshKey, sshClient);

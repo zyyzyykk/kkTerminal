@@ -22,9 +22,9 @@ public enum CharsetEnum {
 
     KOI8_R("ru_RU.KOI8-R", "KOI8-R"),
 
-    WINDOWS_1251("ru_RU.CP1251", "windows-1251"),
+    WINDOWS_1251("ru_RU.CP1251", "Windows-1251"),
 
-    WINDOWS_1252("en_US.CP1252", "windows-1252"),
+    WINDOWS_1252("en_US.CP1252", "Windows-1252"),
 
     ISO_8859_6("ar_SA.ISO-8859-6", "ISO-8859-6"),
 

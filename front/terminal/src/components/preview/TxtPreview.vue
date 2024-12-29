@@ -15,6 +15,21 @@
       </div>
     </template>
     <div style="margin-top: -28px;"></div>
+    <div v-show="previewInfo.preview == 'editor'" class="kk-flex" style="margin-bottom: 5px;" >
+      <div class="kk-flex" >
+        <div>{{ $t('保存编码') }}：</div>
+        <el-dropdown size="small" hide-timeout="400" >
+          <span class="a-link" >{{ encode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <template v-for="(name,index) in encodeSet" :key="index" >
+                <el-dropdown-item @click="encode = name; modifyTag = '*';" >{{ name }}</el-dropdown-item>
+              </template>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+    </div>
     <div element-loading-text="Loading..." v-loading="loading" style="padding: 0px 5px; width: 100%; height: 60vh;">
       <AceEditor class="preview" v-show="!loading && previewInfo.preview == 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
       <iframe class="preview" v-if="!loading && previewInfo.preview == 'iframe' && previewUrl != ''" :src="previewUrl" ></iframe>
@@ -35,6 +50,9 @@ import AceEditor from './AceEditor';
 import $ from 'jquery';
 import { ElMessage } from 'element-plus';
 import { previewFileInfo } from '@/utils/FileSuffix';
+import { changeStr2 } from '@/utils/StringUtil';
+import { detectEncoding, encodeStrToArray, decodeArrayToStr } from "@/components/preview/EncodeUtil";
+import { ArrowDown } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 
 // 引入文件图标组件
@@ -45,6 +63,7 @@ export default {
   components: {
     AceEditor,
     FileIcons,
+    ArrowDown,
   },
   setup(props,context) {
 
@@ -69,6 +88,8 @@ export default {
       loading.value = true;
       reset();
       let url = fileUrl.value;
+      previewInfo.value = previewFileInfo(fileName.value);
+      initEncode(url);
       jqXHR.value = $.ajax({
         url: url,
         method: 'GET',
@@ -81,7 +102,6 @@ export default {
         success(resp) {
           if(url == fileUrl.value)
           {
-            previewInfo.value = previewFileInfo(fileName.value);
             // 文件可预览
             if(previewInfo.value.preview != 'editor') {
               const blob = new Blob([resp], {type:previewInfo.value.type});
@@ -89,8 +109,9 @@ export default {
               previewUrl.value = URL.createObjectURL(blob);
             }
             else {
-              const decoder = new TextDecoder('utf-8');
-              const text = decoder.decode(new Uint8Array(resp));
+              encode.value = detectEncoding(String.fromCharCode(...new Uint8Array(resp.slice(0,100*1024))));
+              initEncode(url);
+              const text = decodeArrayToStr(new Uint8Array(resp),encode.value);
               codeEditorRef.value.setValue(text);
               codeEditorRef.value.resetHistory();
               codeEditorRef.value.setLanguage(fileName.value);
@@ -121,8 +142,22 @@ export default {
 
     const handleSave = (text) => {
       if(modifyTag.value != '*') return;
-      context.emit('doSave',fileName.value, fileUrl.value, text);
+      context.emit('doSave',fileName.value, fileUrl.value, encodeStrToArray(text, (encode.value || "UTF-8")));
       modifyTag.value = '';
+    };
+
+    // 编码
+    const encode = ref('');
+    const encodeSet = ref(['UTF-8','GBK','ISO-8859-1','Windows-1252']);
+    const initEncode = (url) => {
+      let serverEncode = 'UTF-8';
+      let indexKey = url.indexOf('&sshKey=');
+      let indexPath = url.indexOf('&path=');
+      if(indexKey != -1 && indexPath != -1) serverEncode = changeStr2(url.substring(indexKey + 8, indexPath).split('-')[1]);
+      encodeSet.value = ['UTF-8','GBK','ISO-8859-1','Windows-1252'];
+      if(!encodeSet.value.map(item => item.toLowerCase()).includes(serverEncode.toLowerCase())) encodeSet.value.unshift(serverEncode);
+      if(!encode.value) encode.value = serverEncode;
+      else if(!encodeSet.value.map(item => item.toLowerCase()).includes(encode.value.toLowerCase())) encodeSet.value.unshift(encode.value);
     };
 
     // 重置
@@ -146,6 +181,8 @@ export default {
         jqXHR.value.abort();
         jqXHR.value = null;
       }
+      encode.value = '';
+      encodeSet.value = ['UTF-8','GBK','ISO-8859-1','Windows-1252'];
       DialogVisilble.value = false;
     };
 
@@ -157,7 +194,6 @@ export default {
       DialogVisilble.value = false;
       if(done) done();
     };
-    
 
     return {
       DialogVisilble,
@@ -171,6 +207,9 @@ export default {
       modifyTag,
       handleChange,
       handleSave,
+      encode,
+      encodeSet,
+      initEncode,
       closeDialog,
       reset,
     }
