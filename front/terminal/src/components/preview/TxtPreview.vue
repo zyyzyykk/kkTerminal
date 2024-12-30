@@ -15,9 +15,9 @@
       </div>
     </template>
     <div style="margin-top: -28px;"></div>
-    <div v-show="previewInfo.preview == 'editor'" class="kk-flex" style="margin-bottom: 5px;" >
+    <div v-show="previewInfo.preview == 'editor'" class="kk-flex ellipsis" style="margin-bottom: 5px; overflow-x: auto;" >
       <div class="kk-flex" >
-        <div>{{ $t('保存编码') }}：</div>
+        <div class="no-select" >{{ $t('保存编码') }}：</div>
         <el-dropdown size="small" hide-timeout="300" >
           <span class="a-link" >{{ encode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
           <template #dropdown>
@@ -31,7 +31,7 @@
       </div>
       <div style="margin-right: 20px;" ></div>
       <div class="kk-flex" >
-        <div>{{ $t('模式') }}：</div>
+        <div class="no-select" >{{ $t('模式') }}：</div>
         <el-dropdown size="small" hide-timeout="300" >
           <span class="a-link" >{{ mode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
           <template #dropdown>
@@ -42,6 +42,17 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
+      </div>
+      <div style="margin-right: 20px;" ></div>
+      <div class="kk-flex" >
+        <div class="no-select" >{{ $t('缩进') }}：</div>
+        <div><el-input-number :style="{width: '80px'}" size="small" v-model="indent" :min="2" :max="4" step="2" :step-strictly="true" @change="setIndent" /></div>
+      </div>
+      <div style="margin-right: 20px;" ></div>
+      <div class="kk-flex" >
+        <el-button size="small" type="primary" @click="doCopy" >
+          <el-icon class="el-icon--left"><DocumentCopy /></el-icon>{{ $t('复制') }}
+        </el-button>
       </div>
     </div>
     <div element-loading-text="Loading..." v-loading="loading" style="padding: 0px 5px; width: 100%; height: 60vh;">
@@ -62,11 +73,12 @@
 import { ref } from 'vue';
 import AceEditor from './AceEditor';
 import $ from 'jquery';
+import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
 import { previewFileInfo } from '@/utils/FileSuffix';
 import { changeStr2 } from '@/utils/StringUtil';
 import { detectEncoding, encodeStrToArray, decodeArrayToStr } from "@/components/preview/EncodeUtil";
-import { ArrowDown } from '@element-plus/icons-vue';
+import { ArrowDown, DocumentCopy } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 
 // 引入文件图标组件
@@ -78,6 +90,7 @@ export default {
     AceEditor,
     FileIcons,
     ArrowDown,
+    DocumentCopy,
   },
   setup(props,context) {
 
@@ -130,6 +143,7 @@ export default {
               codeEditorRef.value.resetHistory();
               mode.value = 'auto';
               codeEditorRef.value.setLanguage(fileName.value);
+              setIndent();
             }
             modifyTag.value = '';
             loading.value = false;
@@ -184,6 +198,36 @@ export default {
       codeEditorRef.value.setLanguage((name == 'auto') ? fileName.value : ("kk." + name));
     };
 
+    // 缩进
+    const indent = ref(4);
+    const setIndent = () => {
+      codeEditorRef.value.setTabSize(indent.value);
+    };
+
+    // 拷贝
+    const { toClipboard } = useClipboard();
+
+    // 复制
+    const doCopy = async () => {
+      const content = codeEditorRef.value.getValue();
+      if(!(content && content.length > 0)) {
+        ElMessage({
+          message: i18n.global.t('内容为空'),
+          type: 'warning',
+          grouping: true,
+          repeatNum: Number.MIN_SAFE_INTEGER,
+        });
+        return;
+      }
+      await toClipboard(content);
+      ElMessage({
+        message: i18n.global.t('复制成功'),
+        type: 'success',
+        grouping: true,
+        repeatNum: Number.MIN_SAFE_INTEGER,
+      });
+    };
+
     // 重置
     const reset = (deep=false) => {
       if(deep) {
@@ -208,6 +252,7 @@ export default {
       encode.value = '';
       encodeSet.value = ['UTF-8','GBK','ISO-8859-1','Windows-1252'];
       mode.value = '';
+      indent.value = 4;
       DialogVisilble.value = false;
     };
 
@@ -238,6 +283,9 @@ export default {
       mode,
       modeSet,
       setMode,
+      indent,
+      setIndent,
+      doCopy,
       closeDialog,
       reset,
     }
@@ -257,6 +305,11 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 22px;
+}
+
+/* 文本不可选中 */
+.no-select {
+  user-select: none;
 }
 
 .preview {

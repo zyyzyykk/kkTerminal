@@ -92,6 +92,13 @@ export default {
         aceEditorRef.value.style.backgroundColor = backgroundColor;
       }
     };
+    // 设置缩进
+    const setTabSize = (tabSize) => {
+      if(aceEditor.value) aceEditor.value.setOptions({
+        tabSize: tabSize,     // 缩进空格数
+        useSoftTabs: false    // 使用Tab
+      });
+    };
 
     // 保存代码
     const CtrlS = (event) => {
@@ -164,6 +171,7 @@ export default {
       setLanguage,
       getValue,
       setReadOnly,
+      setTabSize,
     }
   }
 }
