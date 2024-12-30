@@ -18,12 +18,26 @@
     <div v-show="previewInfo.preview == 'editor'" class="kk-flex" style="margin-bottom: 5px;" >
       <div class="kk-flex" >
         <div>{{ $t('保存编码') }}：</div>
-        <el-dropdown size="small" hide-timeout="400" >
+        <el-dropdown size="small" hide-timeout="300" >
           <span class="a-link" >{{ encode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
           <template #dropdown>
             <el-dropdown-menu>
               <template v-for="(name,index) in encodeSet" :key="index" >
                 <el-dropdown-item @click="encode = name; modifyTag = '*';" >{{ name }}</el-dropdown-item>
+              </template>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+      <div style="margin-right: 20px;" ></div>
+      <div class="kk-flex" >
+        <div>{{ $t('模式') }}：</div>
+        <el-dropdown size="small" hide-timeout="300" >
+          <span class="a-link" >{{ mode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <template v-for="(name,index) in modeSet" :key="index" >
+                <el-dropdown-item @click="setMode(name)" >{{ name }}</el-dropdown-item>
               </template>
             </el-dropdown-menu>
           </template>
@@ -114,6 +128,7 @@ export default {
               const text = decodeArrayToStr(new Uint8Array(resp),encode.value);
               codeEditorRef.value.setValue(text);
               codeEditorRef.value.resetHistory();
+              mode.value = 'auto';
               codeEditorRef.value.setLanguage(fileName.value);
             }
             modifyTag.value = '';
@@ -156,8 +171,17 @@ export default {
       if(indexKey != -1 && indexPath != -1) serverEncode = changeStr2(url.substring(indexKey + 8, indexPath).split('-')[1]);
       encodeSet.value = ['UTF-8','GBK','ISO-8859-1','Windows-1252'];
       if(!encodeSet.value.map(item => item.toLowerCase()).includes(serverEncode.toLowerCase())) encodeSet.value.unshift(serverEncode);
-      if(!encode.value) encode.value = serverEncode;
+      if(!encode.value || encode.value.toLowerCase() == 'ascii') encode.value = serverEncode;
       else if(!encodeSet.value.map(item => item.toLowerCase()).includes(encode.value.toLowerCase())) encodeSet.value.unshift(encode.value);
+    };
+
+    // 语言模式
+    const mode = ref('');
+    const modeSet = ref(['auto','xml','bash','json']);
+    const setMode = (name) => {
+      if(mode.value == name) return;
+      mode.value = name;
+      codeEditorRef.value.setLanguage((name == 'auto') ? fileName.value : ("kk." + name));
     };
 
     // 重置
@@ -183,6 +207,7 @@ export default {
       }
       encode.value = '';
       encodeSet.value = ['UTF-8','GBK','ISO-8859-1','Windows-1252'];
+      mode.value = '';
       DialogVisilble.value = false;
     };
 
@@ -210,6 +235,9 @@ export default {
       encode,
       encodeSet,
       initEncode,
+      mode,
+      modeSet,
+      setMode,
       closeDialog,
       reset,
     }
