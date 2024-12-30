@@ -89,6 +89,7 @@ export default {
         type: 'success',
         grouping: true,
       });
+      if(aimOption.value == deleteOption.value) aimOption.value = '';
     };
 
     // 重置
