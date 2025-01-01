@@ -59,16 +59,31 @@
         <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_user)"><el-icon size="15"><DocumentCopy /></el-icon></div>
       </div>
       <div class="item-class" style="margin-bottom: 5px;">
-        <div class="no-select form-width">{{ $t('密\u00A0\u00A0\u00A0码') }}：</div>
-        <div>
-          <el-input :disabled="isForbidInput" v-model="setInfo.server_password" :type="isShowPassword ? 'text': 'password'" class="w-50 m-2" :placeholder="$t('输入密码')">
-            <template #prefix>
-              <el-icon class="el-input__icon"><Lock /></el-icon>
-            </template>
-          </el-input>
+        <el-dropdown class="no-select form-width" hide-timeout="300" >
+          <span>{{ setInfo.authType == 0 ? $t('密码') : $t('私钥') }}<el-icon class="el-icon--right"><arrow-down style="cursor: pointer;" /></el-icon></span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item class="no-select" @click="setInfo.authType = 0" >{{ $t('密码') }}</el-dropdown-item>
+              <el-dropdown-item class="no-select" @click="setInfo.authType = 1" >{{ $t('私钥') }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <div v-if="setInfo.authType == 0" class="item-class">
+          <div>
+            <el-input :disabled="isForbidInput" v-model="setInfo.server_password" :type="isShowPassword ? 'text': 'password'" class="w-50 m-2" :placeholder="$t('输入密码')">
+              <template #prefix>
+                <el-icon class="el-input__icon"><Lock /></el-icon>
+              </template>
+            </el-input>
+          </div>
+          <div v-if="isShowPassword == true" style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = false"><el-icon size="15"><View /></el-icon></div>
+          <div v-else style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = true"><el-icon size="15"><Hide /></el-icon></div>
         </div>
-        <div v-if="isShowPassword == true" style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = false"><el-icon size="15"><View /></el-icon></div>
-        <div v-else style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = true"><el-icon size="15"><Hide /></el-icon></div>
+        <div v-else >
+          <el-button :disabled="isForbidInput" type="primary" @click="openprivateKeyBlock" >
+            <el-icon class="el-icon--left"><Key /></el-icon>{{ $t('导入') }}
+          </el-button>
+        </div>
       </div>
     </div>
     <div class="errInfo no-select"> {{ err_msg }} </div>
@@ -83,6 +98,8 @@
 
   <!-- 配置管理 -->
   <OptionBlock ref="optionBlockRef" @callback="doOption" :opType="optionBlockType" :sshOptions="sshOptions" @handleDeleteOption="handleDeleteOption" ></OptionBlock>
+  <!-- 私钥管理 -->
+  <PrivateKey ref="privateKeyRef" @callback="savePrivateKey" ></PrivateKey>
 </template>
 
 <script>
@@ -90,8 +107,9 @@ import { ref } from 'vue';
 import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
 import OptionBlock from './OptionBlock';
+import PrivateKey from './PrivateKey';
 import ToolTip from './ToolTip.vue';
-import { HomeFilled, Paperclip, User, Lock, DocumentCopy, View, Hide, Edit, Finished, Switch } from '@element-plus/icons-vue';
+import { HomeFilled, Paperclip, User, Lock, DocumentCopy, View, Hide, Edit, Finished, Switch, ArrowDown, Key } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 
 export default {
@@ -99,6 +117,7 @@ export default {
   components: {
     ToolTip,
     OptionBlock,
+    PrivateKey,
     HomeFilled,
     Paperclip,
     User,
@@ -109,6 +128,8 @@ export default {
     Edit,
     Finished,
     Switch,
+    ArrowDown,
+    Key,
   },
   props:['env','sshOptions'],
   setup(props,context) {
@@ -123,6 +144,8 @@ export default {
       server_port: props.env.server_port,
       server_user: props.env.server_user,
       server_password:props.env.server_password,
+      server_key: props.env.server_key || null,
+      authType: props.env.authType || 0,
       option: props.env.option,
     });
 
@@ -146,8 +169,13 @@ export default {
         return false;
       }
       // 校验密码
-      if (!(setInfo.value.server_password && setInfo.value.server_password != '')) {
+      if (setInfo.value.authType == 0 && !(setInfo.value.server_password && setInfo.value.server_password != '')) {
         err_msg.value = i18n.global.t("密码不能为空");
+        return false;
+      }
+      // 校验私钥
+      if(setInfo.value.authType == 1 && !(setInfo.value.server_key && setInfo.value.server_key.content != '')) {
+        err_msg.value = i18n.global.t("私钥不能为空");
         return false;
       }
 
@@ -173,6 +201,7 @@ export default {
       // 切换
       if(optionBlockType.value == 0)
       {
+        if(!props.sshOptions[option].authType) setInfo.value.authType = 0;
         setInfo.value = {...setInfo.value, ...props.sshOptions[option]};
         isForbidInput.value = true;
       }
@@ -197,6 +226,19 @@ export default {
         setInfo.value.option = '';
         isForbidInput.value = false;
       }
+    };
+
+    // 私钥相关
+    const privateKeyRef = ref();
+    const openprivateKeyBlock = () => {
+      privateKeyRef.value.passphrase = setInfo.value.server_key ? setInfo.value.server_key.passphrase : '';
+      privateKeyRef.value.DialogVisilble = true;
+    };
+    const savePrivateKey = (content,passphrase) => {
+      setInfo.value.server_key = {
+        content:content,
+        passphrase:passphrase,
+      };
     };
 
     const confirm = () => {
@@ -240,6 +282,8 @@ export default {
         server_port: props.env.server_port,
         server_user: props.env.server_user,
         server_password:props.env.server_password,
+        server_key: props.env.server_key || null,
+        authType: props.env.authType || 0,
         option: props.env.option,
       };
       if(setInfo.value.option != '') isForbidInput.value = true;
@@ -250,6 +294,7 @@ export default {
     // 关闭
     const closeDialog = (done) => {
       if(optionBlockRef.value && optionBlockRef.value.DialogVisilble) optionBlockRef.value.closeDialog();
+      if(privateKeyRef.value && privateKeyRef.value.DialogVisilble) privateKeyRef.value.closeDialog();
       setTimeout(() => {
         reset();
       },400);
@@ -273,6 +318,9 @@ export default {
       closeDialog,
       doCopy,
       isShowPassword,
+      privateKeyRef,
+      openprivateKeyBlock,
+      savePrivateKey,
     }
   }
 

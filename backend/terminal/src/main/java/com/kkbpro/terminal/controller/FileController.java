@@ -653,7 +653,7 @@ public class FileController {
                     e.printStackTrace();
                 } finally {
                     // 删除临时文件
-                    FileUtil.tmpFloderDelete(temporaryFolder);
+                    FileUtil.fileDelete(temporaryFolder);
                     WebSocketServer.fileUploadingMap.get(sshKey).remove(id);
                     // 释放资源
                     sshClose(sshKey);

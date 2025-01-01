@@ -9,6 +9,7 @@ import com.kkbpro.terminal.constants.enums.MessageInfoTypeRnum;
 import com.kkbpro.terminal.constants.enums.ResultCodeEnum;
 import com.kkbpro.terminal.pojo.dto.EnvInfo;
 import com.kkbpro.terminal.pojo.dto.MessageInfo;
+import com.kkbpro.terminal.pojo.dto.PrivateKey;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.AesUtil;
 import com.kkbpro.terminal.utils.FileUtil;
@@ -17,6 +18,7 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.IOUtils;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,8 @@ import javax.websocket.server.ServerEndpoint;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -81,6 +85,9 @@ public class WebSocketServer {
         int port = envInfo.getServer_port();
         String user_name = envInfo.getServer_user();
         String password = envInfo.getServer_password();
+        PrivateKey privateKey = envInfo.getServer_key();
+        Integer authType = envInfo.getAuthType();
+        File keyFile = null;
 
         sshClient = new SSHClient();
 
@@ -88,11 +95,29 @@ public class WebSocketServer {
             sshClient.setConnectTimeout(appConfig.getSshMaxTimeout());
             sshClient.addHostKeyVerifier(new PromiscuousVerifier());    // 不验证主机密钥
             sshClient.connect(host,port);
-            sshClient.authPassword(user_name, password);                // 使用用户名和密码进行身份验证
+            if(authType != 1) sshClient.authPassword(user_name, password);     // 使用用户名和密码进行身份验证
+            else {
+                // 创建本地私钥文件
+                String keyPath = FileUtil.folderBasePath + "/keyProviders/" + UUID.randomUUID();
+                keyFile = new File(keyPath);
+                // 确保父目录存在
+                if (!keyFile.getParentFile().exists()) {
+                    keyFile.getParentFile().mkdirs();
+                }
+                // 写入私钥内容
+                Files.write(Paths.get(keyFile.getAbsolutePath()), privateKey.getContent().getBytes());
+                // 加载私钥
+                KeyProvider keyProvider = sshClient.loadKeys(keyPath, privateKey.getPassphrase());
+                // 使用私钥进行身份验证
+                sshClient.authPublickey(user_name, keyProvider);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             sendMessage(sessionSocket,"Fail to connect remote server !","fail", ResultCodeEnum.CONNECT_FAIL.getState(), null);
             return;
+        } finally {
+            // 删除本地私钥文件
+            if(keyFile != null) FileUtil.fileDelete(keyFile);
         }
 
         // 获取服务器编码格式
@@ -167,7 +192,7 @@ public class WebSocketServer {
                 if (file.isDirectory() && StringUtil.isPrefix(key, file.getName())) {
                     // 忽略正在进行文件上传的文件夹
                     if(fileUploadingMap.get(key).get(file.getName().substring(key.length() + 1)) == null)
-                        FileUtil.tmpFloderDelete(file);
+                        FileUtil.fileDelete(file);
                 }
             }
         });

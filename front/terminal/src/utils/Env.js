@@ -4,6 +4,8 @@ export const default_env = {
   server_port: 22,
   server_user: 'root',
   server_password:'',
+  server_key: null,
+  authType: 0,
   option:'',
   // 样式相关
   lang: "en",

@@ -68,16 +68,16 @@ public class FileUtil {
     /**
      * 删除文件/文件夹
      */
-    public static void tmpFloderDelete(File directory) {
-        if (directory.isDirectory()) {
-            File[] files = directory.listFiles();
+    public static void fileDelete(File item) {
+        if (item.isDirectory()) {
+            File[] files = item.listFiles();
             if (files != null) {
                 for (File file : files) {
-                    tmpFloderDelete(file);
+                    fileDelete(file);
                 }
             }
         }
-        directory.delete();
+        item.delete();
     }
 
 

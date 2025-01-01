@@ -30,13 +30,13 @@ public class TerminalApplication {
     public void cleanData() {
         // 清除文件数据残留
         File data = new File(FileUtil.folderBasePath);
-        if(data.exists()) FileUtil.tmpFloderDelete(data);
+        if(data.exists()) FileUtil.fileDelete(data);
     }
 
     public static void main(String[] args) {
         // 清除文件数据残留
         File data = new File(FileUtil.folderBasePath);
-        if(data.exists()) FileUtil.tmpFloderDelete(data);
+        if(data.exists()) FileUtil.fileDelete(data);
         data.mkdirs();
         // 设置服务器OS
         setServerOS();

@@ -21,6 +21,10 @@ public class EnvInfo {
 
     private String server_password;
 
+    private PrivateKey server_key;
+
+    private Integer authType = 0;
+
     private String lang = "en";
 
 }

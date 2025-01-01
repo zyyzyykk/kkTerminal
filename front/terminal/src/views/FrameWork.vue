@@ -222,7 +222,9 @@ export default {
           term.clear();
           now_connect_status.value = connect_status.value['Fail'];
           term.write(now_connect_status.value);
-          doSettings(1);
+          setTimeout(() => {
+            doSettings(1);
+          },400);
         }
         // 连接成功
         if(result.code == 0) {
