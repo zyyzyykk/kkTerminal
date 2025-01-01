@@ -231,6 +231,7 @@ export default {
     // 私钥相关
     const privateKeyRef = ref();
     const openprivateKeyBlock = () => {
+      privateKeyRef.value.content = setInfo.value.server_key ? setInfo.value.server_key.content : '';
       privateKeyRef.value.passphrase = setInfo.value.server_key ? setInfo.value.server_key.passphrase : '';
       privateKeyRef.value.DialogVisilble = true;
     };
