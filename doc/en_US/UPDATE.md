@@ -1,5 +1,11 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.4.0: 
+
+- Add SSH Option and custom TCode deletion function
+- Fixed folder pasting failure bug in File Module
+- Optimized network resources and page display
+
 ##### zyyzyykk/kkterminal:3.3.7: 
 
 - Adaptive remote server encoding format

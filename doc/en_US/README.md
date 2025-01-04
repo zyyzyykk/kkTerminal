@@ -8,12 +8,12 @@
 >
 > Docker Hub Address: https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general
 >
-> Preview: http://ssh.kkbpro.com/	(For domestic servers)	or	http://ssh.kkbapps.com/	(For foreign servers)
+> Preview: https://ssh.kkbpro.com/
 >
-> Update Time: 2024-12-24
+> Update Time: 2025-01-04
 >
 
-<p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="http://img.kkbapps.com/logo/terminal.png" alt="kkTerminal"></a></p>
+<p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.png" alt="kkTerminal"></a></p>
 
 <p align="center">
   <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/docker/pulls/zyyzyykk/kkterminal?logo=docker" alt="Docker Image"></a>
@@ -30,7 +30,7 @@
 Using the `iframe` tag in HTML web pages to quick integration:
 
 ```html
-<iframe src="http://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
+<iframe src="https://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
 ```
 
 ### 🐳 Deploy with Docker
@@ -63,18 +63,15 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 🛸 Preview
 
-Visit the following website:
+Visit the following website: https://ssh.kkbpro.com/
 
-- 🌐 For domestic servers: http://ssh.kkbpro.com/
-- 🌍 For foreign servers: http://ssh.kkbapps.com/
+![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/en/Connect.png)
 
-![Connect](http://img.kkbapps.com/terminal/Connect-en-3.4.2.png)
+![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/en/Preference.png)
 
-![Preference](http://img.kkbapps.com/terminal/Preference-en-3.4.2.png)
+![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/en/File.png)
 
-![File](http://img.kkbapps.com/terminal/File-en-3.4.2.png)
-
-![Editor](http://img.kkbapps.com/terminal/Editor-en-3.4.2.png)
+![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/en/Editor.png)
 
 [**More Module Previews**](./MODULE.md)
 
@@ -111,7 +108,14 @@ Visit the following website:
 
 ### 👨‍💻 Update Records
 
-##### zyyzyykk/kkterminal:3.4.5: latest
+##### zyyzyykk/kkterminal:3.4.9: latest
+
+- Add private key login method
+- Add automatic judging and save switch for file encoding
+- Add file mode switch
+- Add file indentation selection and content copying
+
+##### zyyzyykk/kkterminal:3.4.5: 
 
 - Add file permission editing function
 - Fix folder input upload bug caused by changing dir during upload
@@ -121,12 +125,6 @@ Visit the following website:
 
 - Implement internationalization and support language switching between Chinese and English
 - Refactored some logic of code
-
-##### zyyzyykk/kkterminal:3.4.0: 
-
-- Add SSH Option and custom TCode deletion function
-- Fixed folder pasting failure bug in File Module
-- Optimized network resources and page display
 
 [**History Update Records**](./UPDATE.md)
 

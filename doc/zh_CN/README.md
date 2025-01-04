@@ -8,12 +8,12 @@
 >
 > docker仓库地址：https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general
 >
-> 预览：http://ssh.kkbpro.com/	(国内服务器访问)	或	http://ssh.kkbapps.com/	(国外服务器访问)
+> 预览：https://ssh.kkbpro.com/
 >
-> 更新时间：2024-12-24
+> 更新时间：2025-01-04
 >
 
-<p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="http://img.kkbapps.com/logo/terminal.png" alt="kkterminal"></a></p>
+<p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.png" alt="kkterminal"></a></p>
 
 <p align="center">
   <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/docker/pulls/zyyzyykk/kkterminal?logo=docker" alt="Docker Image"></a>
@@ -30,7 +30,7 @@
 在html网页中使用 `iframe` 标签实现快速集成：
 
 ```html
-<iframe src="http://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
+<iframe src="https://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
 ```
 
 ### 🐳 使用docker部署
@@ -63,18 +63,15 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 🛸 预览
 
-访问以下网址：
+访问以下网址：https://ssh.kkbpro.com/
 
-- 🌐 国内服务器访问：http://ssh.kkbpro.com/
-- 🌍 国外服务器访问：http://ssh.kkbapps.com/
+![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/zh/Connect.png)
 
-![Connect](http://img.kkbapps.com/terminal/Connect-zh-3.4.2.png)
+![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/zh/Preference.png)
 
-![Preference](http://img.kkbapps.com/terminal/Preference-zh-3.4.2.png)
+![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/zh/File.png)
 
-![File](http://img.kkbapps.com/terminal/File-zh-3.4.2.png)
-
-![Editor](http://img.kkbapps.com/terminal/Editor-zh-3.4.2.png)
+![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/zh/Editor.png)
 
 [**更多模块预览**](./MODULE.md)
 
@@ -111,7 +108,14 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.4.5：latest
+##### zyyzyykk/kkterminal:3.4.9：latest
+
+- 新增私钥方式登录
+- 新增文件编码自动识别与保存切换
+- 新增文件语言模式选择
+- 新增文件缩进选择和内容复制
+
+##### zyyzyykk/kkterminal:3.4.5：
 
 - 新增文件权限编辑功能
 - 修复了输入框上传时更改目录导致文件夹上传错误的bug
@@ -121,12 +125,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 - 实现i18n国际化，支持中/英文语言切换
 - 重构了部分代码逻辑
-
-##### zyyzyykk/kkterminal:3.4.0：
-
-- 新增SSH连接配置与自定义TCode的删除功能
-- 修复了文件模块文件夹粘贴失败的bug
-- 优化了网络资源与页面显示
 
 [**历史更新记录**](./UPDATE.md)
 
