@@ -59,7 +59,7 @@
         <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_user)"><el-icon size="15"><DocumentCopy /></el-icon></div>
       </div>
       <div class="item-class" style="margin-bottom: 5px;">
-        <el-dropdown class="no-select form-width" hide-timeout="300" >
+        <el-dropdown :disabled="isForbidInput" class="no-select form-width" hide-timeout="300" >
           <span>{{ setInfo.authType == 0 ? $t('密码') : $t('私钥') }}<el-icon class="el-icon--right"><arrow-down style="cursor: pointer;" /></el-icon></span>
           <template #dropdown>
             <el-dropdown-menu>

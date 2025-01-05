@@ -115,6 +115,16 @@ export default {
     // 终端自适应
     const fitAddon = new FitAddon();
 
+    // 获取url参数
+    const getUrlParams = (url) => {
+      const params = {};
+      const urlParams = new URLSearchParams(url || window.location.search).entries();
+      for (const [key, value] of urlParams) {
+        params[key] = value;
+      }
+      return params;
+    };
+
     // 加载环境变量
     const osInfo = ref({});
     const options = ref({});
@@ -136,14 +146,22 @@ export default {
     loadTCodes();
     const env = ref(null);
     const loadEnv = () => {
-      if(localStorage.getItem('env')) {
-        env.value = JSON.parse(decrypt(localStorage.getItem('env')));
-        let nowOpInfo = options.value[env.value['option']];
-        if(nowOpInfo) env.value = {...env.value,...nowOpInfo};
-        else env.value.option = '';
-      }
+      if(localStorage.getItem('env')) env.value = JSON.parse(decrypt(localStorage.getItem('env')));
       else env.value = default_env;
-      // 切换语言
+      // url参数
+      const urlParams = getUrlParams();
+      env.value = {...env.value,...urlParams};
+      // session参数
+      let sessionEnv = {};
+      if(sessionStorage.getItem('env')) sessionEnv = JSON.parse(decrypt(sessionStorage.getItem('env')));
+      env.value = {...env.value,...sessionEnv};
+
+      // option
+      let nowOpInfo = options.value[env.value['option']];
+      if(nowOpInfo) env.value = {...env.value,...nowOpInfo};
+      else env.value.option = '';
+
+      // lang
       i18n.global.locale = env.value.lang || 'en';
     };
     loadEnv();
