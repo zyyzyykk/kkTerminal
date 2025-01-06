@@ -89,6 +89,7 @@
     <div class="errInfo no-select"> {{ err_msg }} </div>
     <div style="margin-bottom: 5px;"></div>
     <div style="display: flex; border-top: 1px solid #f1f2f4;">
+      <el-checkbox v-if="setInfo.option && setInfo.option.length > 0" v-model="isNewWindow" :label="$t('新窗口打开')" size="small" style="margin-bottom: -15px; margin-top: 10px;" />
       <div style="flex: 1;"></div>
       <el-button size="small" type="primary" @click="confirm" style="margin-bottom: -15px; margin-top: 10px;">
         {{ $t('确定') }}
@@ -137,6 +138,7 @@ export default {
     // 控制Dialog显示
     const DialogVisilble = ref(false);
     const err_msg = ref('');
+    const isNewWindow = ref(false);
 
     // 设置信息
     const setInfo = ref({
@@ -244,6 +246,12 @@ export default {
 
     const confirm = () => {
       if(verifyParams() == false) return;
+      if(isNewWindow.value && (setInfo.value.option && setInfo.value.option.length > 0)) {
+        let _url = window.location.href;
+        if(_url.indexOf('?') != -1) _url = _url.substring(0, _url.indexOf('?'));
+        window.open(_url + '?option=' + setInfo.value.option, '_blank');
+        return;
+      }
       context.emit('callback',setInfo.value);
       closeDialog();
     };
@@ -277,6 +285,7 @@ export default {
     // 重置
     const reset = () => {
       err_msg.value = '';
+      isNewWindow.value = false;
       isShowPassword.value = false;
       setInfo.value = {
         server_ip: props.env.server_ip,
@@ -307,6 +316,7 @@ export default {
       setInfo,
       DialogVisilble,
       err_msg,
+      isNewWindow,
       confirm,
       optionBlockRef,
       showOption,
