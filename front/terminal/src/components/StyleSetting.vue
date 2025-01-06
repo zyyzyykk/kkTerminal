@@ -32,11 +32,11 @@
         <div class="item-class">
           <div>{{ $t('字体') }}</div>
           <el-dropdown style="margin: 0 20px;" hide-timeout="300" >
-            <span class="a-link" >{{ setInfo.fontFamily }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+            <span class="a-link no-select" >{{ setInfo.fontFamily }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>
                 <template v-for="(font,index) in fontFamilyList" :key="index" >
-                  <el-dropdown-item @click="setInfo.fontFamily = font" >{{ font }}</el-dropdown-item>
+                  <el-dropdown-item class="no-select" @click="setInfo.fontFamily = font" >{{ font }}</el-dropdown-item>
                 </template>
               </el-dropdown-menu>
             </template>
@@ -45,11 +45,11 @@
         <div class="item-class">
           <div>{{ $t('字号') }}</div>
           <el-dropdown style="margin: 0 20px;" hide-timeout="300" >
-            <span class="a-link" >{{ setInfo.fontSize }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+            <span class="a-link no-select" >{{ setInfo.fontSize }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>
                 <template v-for="(size,index) in fontSizeList" :key="index" >
-                  <el-dropdown-item @click="setInfo.fontSize = size" >{{ size }}</el-dropdown-item>
+                  <el-dropdown-item class="no-select" @click="setInfo.fontSize = size" >{{ size }}</el-dropdown-item>
                 </template>
               </el-dropdown-menu>
             </template>
@@ -61,11 +61,11 @@
         <div class="item-class">
           <div>{{ $t('样式') }}</div>
           <el-dropdown style="margin: 0 20px;" hide-timeout="300" >
-            <span class="a-link" >{{ setInfo.cursorStyle }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+            <span class="a-link no-select" >{{ setInfo.cursorStyle }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>
                 <template v-for="(style,index) in cursorStyleList" :key="index" >
-                  <el-dropdown-item @click="setInfo.cursorStyle = style" >{{ style }}</el-dropdown-item>
+                  <el-dropdown-item class="no-select" @click="setInfo.cursorStyle = style" >{{ style }}</el-dropdown-item>
                 </template>
               </el-dropdown-menu>
             </template>
@@ -93,11 +93,11 @@
         <div class="item-class">
           <div>{{ $t('语言') }}</div>
           <el-dropdown style="margin: 0 20px;" hide-timeout="300" >
-            <span class="a-link" >{{ mapValueToLabel(setInfo.lang) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+            <span class="a-link no-select" >{{ mapValueToLabel(setInfo.lang) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>
                 <template v-for="(lang,index) in langList" :key="index" >
-                  <el-dropdown-item @click="setInfo.lang = lang.value" >{{ lang.label }}</el-dropdown-item>
+                  <el-dropdown-item class="no-select" @click="setInfo.lang = lang.value" >{{ lang.label }}</el-dropdown-item>
                 </template>
               </el-dropdown-menu>
             </template>

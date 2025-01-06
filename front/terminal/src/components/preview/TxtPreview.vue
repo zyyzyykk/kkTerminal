@@ -19,11 +19,11 @@
       <div class="kk-flex" >
         <div class="no-select" >{{ $t('保存编码') }}：</div>
         <el-dropdown size="small" hide-timeout="300" >
-          <span class="a-link" >{{ encode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+          <span class="a-link no-select" >{{ encode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
           <template #dropdown>
             <el-dropdown-menu>
               <template v-for="(name,index) in encodeSet" :key="index" >
-                <el-dropdown-item @click="encode = name; modifyTag = '*';" >{{ name }}</el-dropdown-item>
+                <el-dropdown-item class="no-select" @click="encode = name; modifyTag = '*';" >{{ name }}</el-dropdown-item>
               </template>
             </el-dropdown-menu>
           </template>
@@ -33,11 +33,11 @@
       <div class="kk-flex" >
         <div class="no-select" >{{ $t('模式') }}：</div>
         <el-dropdown size="small" hide-timeout="300" >
-          <span class="a-link" >{{ mode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+          <span class="a-link no-select" >{{ mode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
           <template #dropdown>
             <el-dropdown-menu>
               <template v-for="(name,index) in modeSet" :key="index" >
-                <el-dropdown-item @click="setMode(name)" >{{ name }}</el-dropdown-item>
+                <el-dropdown-item class="no-select" @click="setMode(name)" >{{ name }}</el-dropdown-item>
               </template>
             </el-dropdown-menu>
           </template>
