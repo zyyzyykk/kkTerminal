@@ -145,22 +145,19 @@ export default {
     };
     loadTCodes();
     const env = ref(null);
+    const urlParams = ref(getUrlParams());
     const loadEnv = () => {
       if(localStorage.getItem('env')) env.value = JSON.parse(decrypt(localStorage.getItem('env')));
       else env.value = default_env;
       // url参数
-      const urlParams = getUrlParams();
-      env.value = {...env.value,...urlParams};
-      // session参数
-      let sessionEnv = {};
-      if(sessionStorage.getItem('env')) sessionEnv = JSON.parse(decrypt(sessionStorage.getItem('env')));
-      env.value = {...env.value,...sessionEnv};
-
+      for (const key in urlParams.value) {
+        if(key in env.value && key.lastIndexOf('_') == -1) env.value[key] = urlParams.value[key];
+      }
       // option
       let nowOpInfo = options.value[env.value['option']];
       if(nowOpInfo) env.value = {...env.value,...nowOpInfo};
       else env.value.option = '';
-
+      urlParams.value.option = env.value.option;
       // lang
       i18n.global.locale = env.value.lang || 'en';
     };
@@ -283,8 +280,14 @@ export default {
     const fileBlockRef = ref();
     // 保存更改的环境变量
     const saveEnv = (new_env,restart=true) => {
-      env.value = {...env.value,...new_env};
-      localStorage.setItem('env',encrypt(JSON.stringify(env.value)));
+      let save_env = {};
+      if(localStorage.getItem('env')) save_env = JSON.parse(decrypt(localStorage.getItem('env')));
+      else save_env = default_env;
+      save_env = {...save_env,...new_env};
+      localStorage.setItem('env',encrypt(JSON.stringify(save_env)));
+      for (const key in new_env) {
+        if(key in urlParams.value) urlParams.value[key] = new_env[key];
+      }
       if(restart) doSettings(3);
     };
 
@@ -379,8 +382,8 @@ export default {
         if(socket.value) socket.value.close(3333);  // 主动释放资源，必需
         // 进行重启
         closeFileBlock();
-        doSSHConnect();
         resetTerminal();
+        doSSHConnect();
       }
       // 文件管理
       else if(type == 4) {
@@ -558,6 +561,7 @@ export default {
       // 启动终端
       resetTerminal();
 
+      // 初始化
       $.ajax({
         url: http_base_url + '/init',
         type:'get',

@@ -81,8 +81,8 @@ export const SysTcode = {
             if(context.proxy.socket) context.proxy.socket.close(3333);  // 主动释放资源，必需
             // 进行重启
             context.proxy.closeFileBlock();
-            context.proxy.doSSHConnect();
             context.proxy.resetTerminal();
+            context.proxy.doSSHConnect();
         }
     }
 };
