@@ -1,54 +1,56 @@
 <template>
   <div class="golbal">
     <!-- 设置栏 -->
-    <div class="setting" v-show="isShowSetting" >
+    <div class="setting" v-show="isShowSetting && (urlParams.mode != 'headless' && urlParams.mode != 'pure')" >
       <div class="setting-menu no-select" @click="doSettings(1)" ><div>{{ $t('连接设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(2)" ><div>{{ $t('偏好设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(4)" ><div>{{ $t('文件管理') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(3)" ><div>{{ $t('重启') }}</div></div>
     </div>
-    <div class="bar">
+    <div v-if="urlParams.mode != 'headless'" class="kk-flex bar">
       <div style="user-select: none;" @click="showSettings" >
         <img src="../assets/logo.png" :alt="$t('终端')" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
       <div style="user-select: none; font-size: 14px;" ><span>kk Terminal</span></div>
       <div style="flex: 1;"></div>
-      <div v-if="env.tCode" style="display: flex; align-items: center;" >
-        <div style="font-size: 12px; color: #313131; user-select: none;" > TCode </div>
-        <div style="margin-left: 7px;" ></div>
-        <div>
-          <el-input
-            v-model="tcode"
-            id="kkterminalTcode"
-            ref="tCodeInputRef"
-            :style="{ width: '100px', height: '20px', fontSize: '12px'}"
-            @keydown.enter="handleTcode"
-            maxlength="6"
-          >
-          </el-input>
-        </div>
-        <div style="cursor: pointer; margin-left: 5px;" >
-          <el-popover v-if="env.tCode" placement="bottom-end" :width="$t('220')" trigger="click" >
-            <template #reference>
-              <el-icon :style="{ color: '#606266' }" ><QuestionFilled /></el-icon>
-            </template>
-            <div v-if="env.tCode" style="font-size: 12px; color: #313131;" >
-              <div style="user-select: none; font-size: 14px; font-weight: bold;" >{{ $t('什么是 TCode (终端代码) ？') }}</div>
-              <div style="user-select: none; margin-top: 5px;">{{ $t('TCode（终端代码）是用于访问和执行特定操作流程的快捷方式') }}</div>
-              <div style="user-select: none; margin-top: 5px;">
-                {{ $t('输入') }}
-                <span style="background-color: #f3f4f4; user-select: text;" >/H</span>
-                {{ $t('并按下回车，查看帮助信息') }}
+      <div v-show="urlParams.mode != 'headless' && urlParams.mode != 'pure'" class="kk-flex" >
+        <div v-if="env.tCode" class="kk-flex" >
+          <div style="font-size: 12px; color: #313131; user-select: none;" > TCode </div>
+          <div style="margin-left: 7px;" ></div>
+          <div>
+            <el-input
+              v-model="tcode"
+              id="kkterminalTcode"
+              ref="tCodeInputRef"
+              :style="{ width: '100px', height: '20px', fontSize: '12px'}"
+              @keydown.enter="handleTcode"
+              maxlength="6"
+            >
+            </el-input>
+          </div>
+          <div style="cursor: pointer; margin-left: 5px;" >
+            <el-popover v-if="env.tCode" placement="bottom-end" :width="$t('220')" trigger="click" >
+              <template #reference>
+                <el-icon :style="{ color: '#606266' }" ><QuestionFilled /></el-icon>
+              </template>
+              <div v-if="env.tCode" style="font-size: 12px; color: #313131;" >
+                <div style="user-select: none; font-size: 14px; font-weight: bold;" >{{ $t('什么是 TCode (终端代码) ？') }}</div>
+                <div style="user-select: none; margin-top: 5px;">{{ $t('TCode（终端代码）是用于访问和执行特定操作流程的快捷方式') }}</div>
+                <div style="user-select: none; margin-top: 5px;">
+                  {{ $t('输入') }}
+                  <span style="background-color: #f3f4f4; user-select: text;" >/H</span>
+                  {{ $t('并按下回车，查看帮助信息') }}
+                </div>
+                <div style="user-select: none; margin-top: 5px;">
+                  {{ $t('输入') }}
+                  <span style="background-color: #f3f4f4; user-select: text;" >/A</span>
+                  {{ $t('并按下回车，自定义TCode') }}
+                </div>
               </div>
-              <div style="user-select: none; margin-top: 5px;">
-                {{ $t('输入') }}
-                <span style="background-color: #f3f4f4; user-select: text;" >/A</span>
-                {{ $t('并按下回车，自定义TCode') }}
-              </div>
-            </div>
-          </el-popover>
+            </el-popover>
+          </div>
+          <div style="margin-left: 20px;" ></div>
         </div>
-        <div style="margin-left: 20px;" ></div>
       </div>
     </div>
     <!-- terminal主体 -->
@@ -211,7 +213,7 @@ export default {
 
     // 终端视高自适应
     const termFit = () => {
-      terminal.value.style.height = (window.innerHeight - 25) + 'px';
+      terminal.value.style.height = (window.innerHeight - (urlParams.value.mode != 'headless' ? 25 : 0)) + 'px';
       fitAddon.fit();
       // 修改虚拟终端行列大小
       if(socket.value && socket.value.readyState == WebSocket.OPEN && term) {
@@ -597,6 +599,7 @@ export default {
 
     return {
       env,
+      urlParams,
       options,
       now_connect_status,
       connect_status,
@@ -644,9 +647,12 @@ export default {
   overflow: hidden;
 }
 
-.bar {
+.kk-flex {
   display: flex;
   align-items: center;
+}
+
+.bar {
   background-color: #f5f5f5;
   color: black;
   width: 100%;
