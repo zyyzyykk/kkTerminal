@@ -164,7 +164,7 @@ import { ref, onUnmounted, onMounted, watch } from 'vue';
 import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
 import { ElMessage } from 'element-plus';
-import { http_base_url } from '@/utils/BaseUrl';
+import { http_base_url } from '@/env/BaseUrl';
 import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
 import { isZipFile } from '@/utils/FileSuffix';

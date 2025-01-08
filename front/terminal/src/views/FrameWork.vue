@@ -88,10 +88,10 @@ import { FitAddon } from 'xterm-addon-fit';
 import "xterm/css/xterm.css";
 
 import $ from 'jquery';
-import { default_env } from '@/utils/Env';
-import { ws_base_url } from '@/utils/BaseUrl';
+import { default_env } from '@/env/Env';
+import { ws_base_url } from '@/env/BaseUrl';
 import { changeStr } from '@/utils/StringUtil';
-import { http_base_url } from '@/utils/BaseUrl';
+import { http_base_url } from '@/env/BaseUrl';
 
 import ConnectSetting from '@/components/ConnectSetting.vue';
 import StyleSetting from '@/components/StyleSetting.vue';

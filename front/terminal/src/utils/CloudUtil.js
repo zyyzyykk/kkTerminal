@@ -2,7 +2,7 @@ import { decrypt, encrypt} from '@/utils/Encrypt';
 import { generateRandomString } from '@/utils/StringUtil';
 
 import $ from 'jquery';
-import { http_base_url } from '@/utils/BaseUrl';
+import { http_base_url } from '@/env/BaseUrl';
 import { ElMessage } from 'element-plus';
 import i18n from "@/locales/i18n";
 

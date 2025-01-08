@@ -101,7 +101,7 @@
 <script>
 import { ref } from 'vue';
 import $ from 'jquery';
-import { http_base_url } from '@/utils/BaseUrl';
+import { http_base_url } from '@/env/BaseUrl';
 import { formatDate } from '@/utils/FormatDate';
 import { calcPriority } from '@/utils/CalcPriority';
 import { ElMessage } from 'element-plus';
