@@ -150,5 +150,13 @@
   "模式": "Mode",
   "缩进": "Indent",
   "复制": "Copy",
-  "新窗口打开": "Open in new window"
+  "新窗口打开": "Open in new window",
+  "开始录制": "Start Record",
+  "录制中": "Recording",
+  "录像链接已复制": "Record Link Copied",
+  "云端": "cloud",
+  "云端同步": "Cloud Sync",
+  "云端文件过多": "Too many Cloud Files",
+  "云端文件加载失败": "Cloud File loading failed",
+  "确定从云端覆盖本地数据吗?": "Sure to overwrite local data from Cloud?"
 }

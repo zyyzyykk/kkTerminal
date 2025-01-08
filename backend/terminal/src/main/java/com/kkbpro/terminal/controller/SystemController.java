@@ -95,7 +95,7 @@ public class SystemController {
     public Result beat(String windowId) {
         if(!"Linux".equals(serverOS) && appConfig.getPcWindowTag() && windowId != null)
             windowActiveMap.replace(windowId, new Date().getTime());
-        return Result.success("窗口心跳续约成功", null);
+        return Result.success("窗口心跳续约成功");
     }
 
     /**

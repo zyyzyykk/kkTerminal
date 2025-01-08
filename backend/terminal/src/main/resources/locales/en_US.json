@@ -41,5 +41,9 @@
   "文件片合并失败": "File Chunks Merge Failed",
   "ssh连接断开": "SSH Disconnected",
   "权限修改失败": "Permissions Edit Failed",
-  "权限修改成功": "Permissions Edit Success"
+  "权限修改成功": "Permissions Edit Success",
+  "文件内容": "File Content",
+  "文件不存在": "No Such File",
+  "云端文件过多": "Too many Cloud Files",
+  "云端上传成功": "Cloud File Uploaded"
 }

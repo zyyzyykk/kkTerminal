@@ -87,6 +87,12 @@
             <el-switch v-model="setInfo.tCode" />
           </div>
         </div>
+        <div class="item-class">
+          <div>{{ $t('云端') }}</div>
+          <div style="margin: 0 20px;" >
+            <el-switch v-model="setInfo.cloud" />
+          </div>
+        </div>
       </div>
       <div class="item-class" style="margin-bottom: 5px;">
         <div class="form-width" >{{ $t('其它') }}：</div>
@@ -162,6 +168,7 @@ export default {
       cursorStyle: props.env.cursorStyle,
       cursorBlink: props.env.cursorBlink,
       tCode: props.env.tCode,
+      cloud: props.env.cloud,
     });
     const confirm = () => {
       context.emit('callback',setInfo.value);
@@ -179,6 +186,7 @@ export default {
         cursorStyle: props.env.cursorStyle,
         cursorBlink: props.env.cursorBlink,
         tCode: props.env.tCode,
+        cloud: props.env.cloud,
       };
       DialogVisilble.value = false;
     };

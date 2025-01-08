@@ -5,8 +5,8 @@ const SECRET_KEY = 'P5P1SIqVe6kaOxMX';
 /**
  * AES Encrypt
  */
-export const encrypt = (word) => {
-    var key = CryptoJS.enc.Utf8.parse(SECRET_KEY);
+export const encrypt = (word, secretKey) => {
+    var key = CryptoJS.enc.Utf8.parse(secretKey || SECRET_KEY);
     var srcs = CryptoJS.enc.Utf8.parse(word);
     var encrypted = CryptoJS.AES.encrypt(srcs, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
     return encrypted.toString();
@@ -15,8 +15,8 @@ export const encrypt = (word) => {
 /**
  * AES Decrypt
  */
-export const decrypt = (word) => {
-    var key = CryptoJS.enc.Utf8.parse(SECRET_KEY);
+export const decrypt = (word, secretKey) => {
+    var key = CryptoJS.enc.Utf8.parse(secretKey || SECRET_KEY);
     var decrypt = CryptoJS.AES.decrypt(word, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
     return CryptoJS.enc.Utf8.stringify(decrypt).toString();
 };

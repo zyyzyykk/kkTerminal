@@ -20,6 +20,18 @@ export const changeStr2 = (str) => {
   return result;
 };
 
+// 生成随机字符串
+export const generateRandomString = (length) => {
+  // 字符集合
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * chars.length);
+      result += chars[randomIndex];
+  }
+  return result;
+}
+
 // 转义字符串(路径)
 const pathChars = /[ !"#$&'()*,:;<=>?@[\\\]^`{}~]/g;
 export const escapePath = (str) => {

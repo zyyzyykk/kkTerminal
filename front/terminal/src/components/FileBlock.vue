@@ -311,7 +311,7 @@ export default {
           if(resp.status == 'success') {
             noDataMsg.value = i18n.global.t('暂无文件');
             dirStatus.value = 0;
-            dir.value = resp.data.path;
+            dir.value = resp.data;
             confirmDirCorrect();
             selectedFiles.value = [];
             files.value = [];
@@ -352,7 +352,7 @@ export default {
           if(now_dir == dir.value) {
             selectedFiles.value = [];
             if(resp.status == 'success') {
-              files.value = resp.data.files;
+              files.value = resp.data;
               noDataMsg.value = i18n.global.t('暂无文件');
               dirStatus.value = 0;
               lastSelectedIndex = -1;

@@ -14,7 +14,6 @@ public class MyErrorController implements ErrorController {
 
     @GetMapping("/error")
     public String handleError(HttpServletRequest request) {
-        System.out.println("aaa");
         // 获取原始请求的参数
         String queryString = request.getQueryString();
 

@@ -16,4 +16,6 @@ export const default_env = {
   cursorStyle: 'block',
   cursorBlink: true,
   tCode: true,
+  // 功能相关
+  cloud: true,
 };

@@ -11,10 +11,17 @@
       <div style="user-select: none;" @click="showSettings" >
         <img src="../assets/logo.png" :alt="$t('终端')" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
-      <div style="user-select: none; font-size: 14px;" ><span>kk Terminal</span></div>
+      <div class="ellipsis no-select" style="font-size: 14px;" ><span>kk Terminal</span></div>
       <div style="flex: 1;"></div>
       <div v-show="urlParams.mode != 'headless' && urlParams.mode != 'pure'" class="kk-flex" >
-        <div v-if="env.tCode" class="kk-flex" >
+        <div v-if="env.cloud" style="margin-left: 10px; cursor: pointer;" >
+          <el-tag v-if="recording == false" @click="startRecord" size="small" type="info" effect="plain" class="kk-flex no-select" style="color: #313131;" ><el-icon class="el-icon--left" ><VideoPlay /></el-icon>{{ $t('开始录制') }}</el-tag>
+          <el-tag v-else size="small" @click="stopRecord" type="danger" effect="plain" class="kk-flex no-select" ><el-icon class="el-icon--left" ><VideoPause /></el-icon>{{ $t('录制中') }}</el-tag>
+        </div>
+        <div v-if="env.cloud" style="margin-left: 10px; cursor: pointer;" >
+          <el-tag @click="cloudSync" size="small" type="info" effect="plain" class="kk-flex no-select" style="color: #313131;" ><el-icon class="el-icon--left" ><MostlyCloudy /></el-icon>{{ $t('云端同步') }}</el-tag>
+        </div>
+        <div v-if="env.tCode" class="kk-flex" style="margin-left: 10px;" >
           <div style="font-size: 12px; color: #313131; user-select: none;" > TCode </div>
           <div style="margin-left: 7px;" ></div>
           <div>
@@ -91,10 +98,13 @@ import StyleSetting from '@/components/StyleSetting.vue';
 import FileBlock from "@/components/FileBlock.vue";
 import UserTcode from '@/components/tcode/UserTcode.vue';
 import HelpTcode from "@/components/tcode/HelpTcode.vue";
-import { QuestionFilled } from '@element-plus/icons-vue';
+import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
+import { QuestionFilled, VideoPlay, VideoPause, MostlyCloudy } from '@element-plus/icons-vue';
 import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode";
 
 import i18n from "@/locales/i18n";
+import {cloud, load, syncUpload, syncDownload } from "@/utils/CloudUtil";
+import { deleteDialog } from "@/utils/DeleteDialog";
 
 export default {
   name: "FrameWork",
@@ -105,8 +115,20 @@ export default {
     UserTcode,
     HelpTcode,
     QuestionFilled,
+    VideoPlay,
+    VideoPause,
+    MostlyCloudy,
   },
   setup() {
+
+    // 连接状态
+    const connect_status = ref({
+      'Fail':'Fail to connect remote server !\r\n',
+      'Success':'Connecting success !\r\n',
+      'Connecting':'Connecting to remote server ...\r\n',
+      'Disconnected':'Disconnect to remote server.\r\n',
+    });
+    const now_connect_status = ref(connect_status.value['Connecting']);
 
     // 获取当前组件实例
     const instance = getCurrentInstance();
@@ -117,14 +139,47 @@ export default {
     // 终端自适应
     const fitAddon = new FitAddon();
 
-    // 获取url参数
-    const getUrlParams = (url) => {
-      const params = {};
-      const urlParams = new URLSearchParams(url || window.location.search).entries();
-      for (const [key, value] of urlParams) {
-        params[key] = value;
+    // 操作录像
+    const recording = ref(false);
+    const recordId = ref('');
+    const recordInfo = ref([]);
+    const startRecord = () => {
+      recordId.value = crypto.randomUUID();
+      recordInfo.value = [];
+      recordInfo.value.push({
+        time: new Date().getTime(),
+        content: 'Record ' + recordId.value + ' Start.\r\n',
+      });
+      recording.value = true;
+    };
+    const stopRecord = async () => {
+      recording.value = false;
+      recordInfo.value.push({
+        time: new Date().getTime(),
+        content: '\r\nRecord ' + recordId.value + ' Over.',
+      })
+      await cloud('record-', recordId.value, JSON.stringify(recordInfo.value));
+      await toClipboard(getPureUrl() + '?record=' + recordId.value);
+      ElMessage({
+        message: i18n.global.t('录像链接已复制'),
+        type: 'success',
+        grouping: true,
+      });
+    };
+    const playRecord = (index) => {
+      const record = recordInfo.value[index];
+      if(record) termWrite(record.content);
+      const nextRecord = recordInfo.value[index + 1];
+      if(nextRecord) {
+        setTimeout(() => {
+          playRecord(index + 1);
+        }, nextRecord.time - record.time);
       }
-      return params;
+    };
+
+    // 云端同步
+    const cloudSync = () => {
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定从云端覆盖本地数据吗?'), syncDownload);
     };
 
     // 加载环境变量
@@ -146,11 +201,10 @@ export default {
       },1);
     };
     loadTCodes();
-    const env = ref(null);
+    const env = ref(default_env);
     const urlParams = ref(getUrlParams());
     const loadEnv = () => {
-      if(localStorage.getItem('env')) env.value = JSON.parse(decrypt(localStorage.getItem('env')));
-      else env.value = default_env;
+      if(localStorage.getItem('env')) env.value = {...env.value, ...JSON.parse(decrypt(localStorage.getItem('env')))};
       // url参数
       for (const key in urlParams.value) {
         if(key in env.value && key.lastIndexOf('_') == -1) env.value[key] = urlParams.value[key];
@@ -160,6 +214,12 @@ export default {
       if(nowOpInfo) env.value = {...env.value,...nowOpInfo};
       else env.value.option = '';
       urlParams.value.option = env.value.option;
+      // record
+      if(urlParams.value.record) {
+        if(urlParams.value.mode != 'headless' && urlParams.value.mode != 'pure') urlParams.value.mode = 'pure';
+        now_connect_status.value = '';
+      }
+      else urlParams.value.record = '';
       // lang
       i18n.global.locale = env.value.lang || 'en';
     };
@@ -177,15 +237,6 @@ export default {
       saveOp(null,null);
       if(env.value.option && env.value.option == name) saveEnv({option:''},false);
     };
-
-    // 连接状态
-    const connect_status = ref({
-      'Fail':'Fail to connect remote server !\r\n',
-      'Success':'Connecting success !\r\n',
-      'Connecting':'Connecting to remote server ...\r\n',
-      'Disconnected':'Disconnect to remote server.\r\n',
-    });
-    const now_connect_status = ref(connect_status.value['Connecting']);
 
     // 初始化终端
     const terminal = ref();
@@ -223,6 +274,12 @@ export default {
         term.resize(new_cols,new_rows);
       }
     };
+    // 终端写入
+    const termWrite = (content) => {
+      term.write(content);
+      // 设置回滚量
+      term.options.scrollback += term._core.buffer.lines.length;
+    };
 
     // websocket连接
     const sshKey = ref('');
@@ -238,7 +295,7 @@ export default {
         if(result.code == -1) {
           term.clear();
           now_connect_status.value = connect_status.value['Fail'];
-          term.write(now_connect_status.value);
+          termWrite(now_connect_status.value);
           setTimeout(() => {
             doSettings(1);
           },400);
@@ -256,9 +313,13 @@ export default {
         if(result.code == 1) {
           let output = decrypt(result.data);
           if(UserTcodeExecutor.active) UserTcodeExecutor.outArray.push(output);
-          if(!(UserTcodeExecutor.active && !UserTcodeExecutor.display)) term.write(output);
-          // 设置回滚量
-          term.options.scrollback += term._core.buffer.lines.length;
+          if(recording.value) {
+            recordInfo.value.push({
+              time: new Date().getTime(),
+              content: output,
+            });
+          }
+          if(!(UserTcodeExecutor.active && !UserTcodeExecutor.display)) termWrite(output);
         }
       }
       socket.value.onclose = (e) => {
@@ -266,7 +327,7 @@ export default {
           sshKey.value = '';
           closeFileBlock();
           now_connect_status.value = connect_status.value['Disconnected'];
-          term.write("\r\n" + now_connect_status.value);
+          termWrite("\r\n" + now_connect_status.value);
         }
         userTcodeExecutorReset();
       }
@@ -361,7 +422,7 @@ export default {
       // 左键单击
       terminal.value.addEventListener('click', doClick);
 
-      term.write(now_connect_status.value);
+      termWrite(now_connect_status.value);
     };
 
     // 终端设置
@@ -558,10 +619,19 @@ export default {
       importTCodes({});
     };
 
-    onMounted(() => {
-
+    onMounted(async () => {
       // 启动终端
       resetTerminal();
+
+      // 录像
+      if(urlParams.value.record) {
+        recordInfo.value = await load('record-' + urlParams.value.record);
+        if(recordInfo.value) playRecord(0);
+        return;
+      }
+
+      // 云端同步
+      if(env.value.cloud) syncUpload();
 
       // 初始化
       $.ajax({
@@ -598,6 +668,10 @@ export default {
     });
 
     return {
+      recording,
+      startRecord,
+      stopRecord,
+      cloudSync,
       env,
       urlParams,
       options,
@@ -696,5 +770,13 @@ export default {
 /* 文本不可选中 */
 .no-select {
   user-select: none;
+}
+
+/* 文本溢出省略 */
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 18px;
 }
 </style>

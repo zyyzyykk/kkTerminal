@@ -110,6 +110,7 @@ import { ElMessage } from 'element-plus';
 import OptionBlock from './OptionBlock';
 import PrivateKey from './PrivateKey';
 import ToolTip from './ToolTip.vue';
+import { getPureUrl } from '@/utils/UrlUtil';
 import { HomeFilled, Paperclip, User, Lock, DocumentCopy, View, Hide, Edit, Finished, Switch, ArrowDown, Key } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 
@@ -247,9 +248,7 @@ export default {
     const confirm = () => {
       if(verifyParams() == false) return;
       if(isNewWindow.value && (setInfo.value.option && setInfo.value.option.length > 0)) {
-        let _url = window.location.href;
-        if(_url.indexOf('?') != -1) _url = _url.substring(0, _url.indexOf('?'));
-        window.open(_url + '?option=' + setInfo.value.option, '_blank');
+        window.open(getPureUrl() + '?option=' + setInfo.value.option, '_blank');
         return;
       }
       context.emit('callback',setInfo.value);

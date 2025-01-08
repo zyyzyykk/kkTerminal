@@ -6,7 +6,6 @@ import com.kkbpro.terminal.utils.I18nUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Component;
 
 
 /**
@@ -47,7 +46,7 @@ public class Result {
     }
 
     // 成功返回
-    public static Result success(Integer code, String info, String data) {
+    public static Result successStr(Integer code, String info, String data) {
         Result result = new Result();
         result.setStatus("success");
         result.setCode(code);
@@ -63,25 +62,18 @@ public class Result {
         return result;
     }
     public static Result success(Integer code, String info, Object data) {
-       return Result.success(code, info, JSON.toJSONString(data));
+       return Result.successStr(code, info, JSON.toJSONString(data));
     }
 
     public static Result success(String info, Object data) {
         return Result.success(200, info, data);
     }
 
-    // 错误返回
-    public static Result error(Integer code, String info)
-    {
-        Result result = new Result();
-        result.setStatus("error");
-        result.setCode(code);
-        result.setInfo(info);
-        result.setData(null);
-
-        return result;
+    public static Result success(String info) {
+        return Result.success(200, info, null);
     }
 
+    // 错误返回
     public static Result error(Integer code, String info, Object data) {
         Result result = new Result();
         result.setStatus("error");
@@ -96,6 +88,14 @@ public class Result {
         }
 
         return result;
+    }
+
+    public static Result error(Integer code, String info) {
+        return Result.error(code, info, null);
+    }
+
+    public static Result error(String info) {
+        return Result.error(500, info);
     }
 
 }
