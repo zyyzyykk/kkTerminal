@@ -1,7 +1,7 @@
 // 获取url参数
 export const getUrlParams = (url) => {
   const params = {};
-  const urlParams = new URLSearchParams(url || window.location.search).entries();
+  const urlParams = new URLSearchParams(new URL((url || window.location.href)).search).entries();
   for (const [key, value] of urlParams) {
     params[key] = value;
   }

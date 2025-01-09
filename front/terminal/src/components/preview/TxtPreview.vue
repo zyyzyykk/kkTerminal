@@ -77,6 +77,7 @@ import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
 import { previewFileInfo } from '@/utils/FileSuffix';
 import { changeStr2 } from '@/utils/StringUtil';
+import { getUrlParams } from "@/utils/UrlUtil";
 import { detectEncoding, encodeStrToArray, decodeArrayToStr } from "@/components/preview/EncodeUtil";
 import { ArrowDown, DocumentCopy } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
@@ -180,9 +181,8 @@ export default {
     const encodeSet = ref(['UTF-8','GBK','ISO-8859-1','Windows-1252']);
     const initEncode = (url) => {
       let serverEncode = 'UTF-8';
-      let indexKey = url.indexOf('&sshKey=');
-      let indexPath = url.indexOf('&path=');
-      if(indexKey != -1 && indexPath != -1) serverEncode = changeStr2(url.substring(indexKey + 8, indexPath).split('-')[1]);
+      const urlParams = getUrlParams(url);
+      if(urlParams.sshKey) serverEncode = changeStr2(urlParams.sshKey.split('-')[1]);
       encodeSet.value = ['UTF-8','GBK','ISO-8859-1','Windows-1252'];
       if(!encodeSet.value.map(item => item.toLowerCase()).includes(serverEncode.toLowerCase())) encodeSet.value.unshift(serverEncode);
       if(!encode.value || encode.value.toLowerCase() == 'ascii') encode.value = serverEncode;

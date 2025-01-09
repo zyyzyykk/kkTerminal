@@ -169,8 +169,9 @@ import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@
 import { escapeItem, escapePath } from '@/utils/StringUtil';
 import { isZipFile } from '@/utils/FileSuffix';
 import { getChmodValue } from '@/utils/CalcPriority';
-import ToolTip from './ToolTip.vue';
+import { getUrlParams } from "@/utils/UrlUtil";
 
+import ToolTip from './ToolTip.vue';
 import NoData from '@/components/NoData';
 import TxtPreview from './preview/TxtPreview';
 import MkFile from './MkFile';
@@ -388,7 +389,6 @@ export default {
       });
     };
 
-    // 远程url参数规范: sshKey不能是第一个参数，path必须是最后一个参数，sshKey和path必须连在一起
     // 获取远程文件url
     const getRemoteFileUrl = (name, path) => {
       return http_base_url + '/download/remote/file' + '?time=' + new Date().getTime() + '&fileName=' + encodeURIComponent(name) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(path ? path : dir.value);
@@ -396,16 +396,6 @@ export default {
     // 获取远程文件夹url
     const getRemoteFolderUrl = (name, path) => {
       return http_base_url + '/download/remote/folder' + '?time=' + new Date().getTime() + '&folderName=' + encodeURIComponent(escapeItem(name)) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(escapePath(path ? path : dir.value));
-    };
-
-    // 解析文件url的path
-    const parseUrl = (url) => {
-      let urlParams = {key:'', path:null};
-      let indexKey = url.indexOf('&sshKey=');
-      let indexPath = url.indexOf('&path=');
-      if(indexKey != -1 && indexPath != -1) urlParams.key = url.substring(indexKey + 8, indexPath);
-      if(indexPath != -1) urlParams.path = decodeURIComponent(url.substring(indexPath + 6));
-      return urlParams;
     };
 
     // 下载远程文件
@@ -603,8 +593,8 @@ export default {
     };
     // 保存文本，写回服务器
     const doSave = (name, url, arrayBuffer) => {
-      let urlParams = parseUrl(url);
-      if(urlParams.key != props.sshKey) return;
+      const urlParams = getUrlParams(url);
+      if(urlParams.sshKey != props.sshKey) return;
       // 创建Blob对象
       const blob = new Blob([arrayBuffer], { type: 'application/octet-stream' });
       // 创建File对象
