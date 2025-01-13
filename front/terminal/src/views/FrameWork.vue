@@ -343,9 +343,8 @@ export default {
     const fileBlockRef = ref();
     // 保存更改的环境变量
     const saveEnv = (new_env,restart=true) => {
-      let save_env = {};
-      if(localStorage.getItem('env')) save_env = JSON.parse(decrypt(localStorage.getItem('env')));
-      else save_env = default_env;
+      let save_env = default_env;
+      if(localStorage.getItem('env')) save_env = {...save_env,...JSON.parse(decrypt(localStorage.getItem('env')))};
       save_env = {...save_env,...new_env};
       localStorage.setItem('env',encrypt(JSON.stringify(save_env)));
       for (const key in new_env) {
