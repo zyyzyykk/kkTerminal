@@ -1,5 +1,10 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.4.2:
+
+- Implement internationalization and support language switching between Chinese and English
+- Refactored some logic of code
+
 ##### zyyzyykk/kkterminal:3.4.0: 
 
 - Add SSH Option and custom TCode deletion function

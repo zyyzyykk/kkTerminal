@@ -1,5 +1,10 @@
 ### 👨‍💻 历史更新记录
 
+##### zyyzyykk/kkterminal:3.4.2：
+
+- 实现i18n国际化，支持中/英文语言切换
+- 重构了部分代码逻辑
+
 ##### zyyzyykk/kkterminal:3.4.0：
 
 - 新增SSH连接配置与自定义TCode的删除功能

@@ -14,6 +14,8 @@ public enum FileBlockStateEnum {
 
     CHUNK_MERGE_ERROR(505,"文件片合并失败"),
 
+    CLOUD_COUNT_ERROR(506,"云端文件过多"),
+
     SSH_NOT_EXIST(602,"ssh连接断开");
 
     private Integer state;

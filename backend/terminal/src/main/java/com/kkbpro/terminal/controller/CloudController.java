@@ -1,5 +1,6 @@
 package com.kkbpro.terminal.controller;
 
+import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.StringUtil;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -42,7 +43,8 @@ public class CloudController {
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        if(folder.listFiles().length > maxCount && countType.equals(type)) return Result.error("云端文件过多");
+        if(folder.listFiles().length > maxCount && countType.equals(type))
+            return Result.error(FileBlockStateEnum.CLOUD_COUNT_ERROR.getState(),"云端文件过多");
         File aimFile = new File(folderPath + "/" + type + name);
         // 如果文件存在则删除
         if (aimFile.exists()) {

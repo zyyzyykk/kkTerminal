@@ -39,11 +39,20 @@ export const cloud = async (type, name, content) => {
     processData : false,
     success(resp){
       if(resp.status != 'success') {
-        ElMessage({
-          message: i18n.global.t('云端文件过多'),
-          type: resp.status,
-          grouping: true,
-        });
+        if(resp.code == 506) {
+          ElMessage({
+            message: i18n.global.t('云端文件过多'),
+            type: resp.status,
+            grouping: true,
+          });
+        }
+        else {
+          ElMessage({
+            message: i18n.global.t('云端同步失败'),
+            type: resp.status,
+            grouping: true,
+          });
+        }
       }
     }
   });

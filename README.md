@@ -10,7 +10,7 @@
 >
 > Preview: https://ssh.kkbpro.com/
 >
-> Update Time: 2025-01-04
+> Update Time: 2025-01-10
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.png" alt="kkTerminal"></a></p>
@@ -35,43 +35,37 @@ Using the `iframe` tag in HTML web pages to quick integration:
 
 ### 🐳 Deploy with Docker
 
-1.Pull image:
+1. Pull image:
 
 ```bash
 docker pull zyyzyykk/kkterminal
 ```
 
-2.Create and run a container for port mapping: `-p port:3000`
+2. Create and run a container for port mapping: `-p port:3000`
 
 ```bash
 docker run -d --name kkterminal -p 3000:3000 zyyzyykk/kkterminal
 ```
 
-3.Mount data volume: `-v path:/data`
-
-```bash
-docker run -d --name kkterminal -p 3000:3000 -v /data:/data zyyzyykk/kkterminal
-```
-
-4.Custom art word: `-e TITLE="ArtWord"`
+3. Custom art word: `-e TITLE="ArtWord"`
 
 ```bash
 docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kkterminal
 ```
 
-5.Accessing in browser: `http://server-ip:3000/`
+4. Accessing in browser: `http://server-ip:3000/`
 
 ### 🛸 Preview
 
 Visit the following website: https://ssh.kkbpro.com/
 
-![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/en/Connect.png)
+![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/en/Connect.png)
 
-![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/en/Preference.png)
+![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/en/Preference.png)
 
-![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/en/File.png)
+![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/en/File.png)
 
-![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.4.9/en/Editor.png)
+![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/en/Editor.png)
 
 [**More Module Previews**](./doc/en_US/MODULE.md)
 
@@ -81,17 +75,19 @@ Visit the following website: https://ssh.kkbpro.com/
 
 2. Support the use of `iframe` tags in web pages for quick integration into third-party websites
 
-3. Support internationalization and language switching between Chinese and English
+3. Support customizing terminal configuration through [URL Parameters](./doc/en_US/PARAMS.md)
 
-4. Support local PC deployment, automatically opens browser window upon startup
+4. Support internationalization and language switching between Chinese and English
 
-5. Support adaptive window size and Chinese input
+5. Support local PC deployment, automatically opens browser window upon startup
 
-6. Support custom preference settings, allowing users to choose the background/foreground color, font size, cursor display style and enable TCode for the terminal
+6. Support adaptive window size and Chinese input
 
-7. Support restart: It will automatically restart after modifying SSH connection settings or custom preference settings, or can be manually restarted after SSH connection is disconnected
+7. Support custom preference settings, allowing users to choose the background/foreground color, font size, cursor display style, enable TCode for the terminal, etc
 
-8. Support copy and paste:
+8. Support restart: It will automatically restart after modifying SSH connection settings or custom preference settings, or can be manually restarted after SSH connection is disconnected
+
+9. Support copy and paste:
 
    - Copy: Same as `Git` terminal, selecting text will automatically copy it
 
@@ -100,15 +96,24 @@ Visit the following website: https://ssh.kkbpro.com/
 
 9. Support file management, open the File Management Module to view, decompress, upload and download files/folders
 
-10. Support shortcut key operations such as multiple/all file selection, copy and paste, cut, selection switch, open
+10. Support shortcut key operations such as multiple/all file selection, copy and paste, cut, selection switch, open, etc
 
 11. Support file browsing and editing, modify the file and save it to a remote server using `ctrl+s`
 
 12. Support [TCode (Terminal Code)](./doc/en_US/TCODE.md)，which can achieve automated Workflow similar to Shell scripts through Customized TCode
 
+13. Support operation recording and cloud synchronization functions
+
 ### 👨‍💻 Update Records
 
-##### zyyzyykk/kkterminal:3.4.9: latest
+##### zyyzyykk/kkterminal:3.5.3: latest
+
+- Add URL parameter to customize terminal configuration
+- Fix bug of multi window restart
+- Added operation recording and cloud synchronization functions
+- Refactoring some code logic
+
+##### zyyzyykk/kkterminal:3.4.9: 
 
 - Add private key login method
 - Add automatic judging and save switch for file encoding
@@ -120,11 +125,6 @@ Visit the following website: https://ssh.kkbpro.com/
 - Add file permission editing function
 - Fix folder input upload bug caused by changing dir during upload
 - Optimize page display
-
-##### zyyzyykk/kkterminal:3.4.2:
-
-- Implement internationalization and support language switching between Chinese and English
-- Refactored some logic of code
 
 [**History Update Records**](./doc/en_US/UPDATE.md)
 
