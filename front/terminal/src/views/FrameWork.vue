@@ -58,6 +58,7 @@
           </div>
           <div style="margin-left: 20px;" ></div>
         </div>
+        <div v-else style="margin-left: 10px;" ></div>
       </div>
     </div>
     <!-- terminal主体 -->
@@ -205,6 +206,16 @@ export default {
     const urlParams = ref(getUrlParams());
     const loadEnv = () => {
       if(localStorage.getItem('env')) env.value = {...env.value, ...JSON.parse(decrypt(localStorage.getItem('env')))};
+      // bg fg
+      if(urlParams.value.bg && urlParams.value.bg[0] != '#') urlParams.value.bg = '#' + urlParams.value.bg;
+      if(urlParams.value.fg && urlParams.value.fg[0] != '#') urlParams.value.fg = '#' + urlParams.value.fg;
+      // cursorBlink tCode cloud
+      if(urlParams.value.cursorBlink === 'true') urlParams.value.cursorBlink = true;
+      else if(urlParams.value.cursorBlink === 'false') urlParams.value.cursorBlink = false;
+      if(urlParams.value.tCode === 'true') urlParams.value.tCode = true;
+      else if(urlParams.value.tCode === 'false') urlParams.value.tCode = false;
+      if(urlParams.value.cloud === 'true') urlParams.value.cloud = true;
+      else if(urlParams.value.cloud === 'false') urlParams.value.cloud = false;
       // url参数
       for (const key in urlParams.value) {
         if(key in env.value && key.lastIndexOf('_') == -1) env.value[key] = urlParams.value[key];
