@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class FileUtil {
 
-    public static final String folderBasePath = System.getProperty("user.dir") + "/" + "data";
+    public static final String folderBasePath = System.getProperty("user.dir") + "/" + "file";
 
     /**
      * 文件片合并
