@@ -137,6 +137,8 @@ Vue + Xterm              SpringBoot + SSHJ                Linux OS
 
 作者：[zyyzyykk](https://github.com/zyyzyykk/)
 
+赞助商：[<img src="https://api.gitsponsors.com/api/badge/img?id=704828551" height="20">](https://api.gitsponsors.com/api/badge/link?p=ZeY5IHF8NCpCNujm6upYNHtOtIhaIz5VvgUnIlPWJR9Ta0EgrNeq3P+SXzdv9I03XbxmzJe/sogYZPuCzSoEB2C+x9YgzNCl+5N/hx6Bn7wY7k/ajlj7EJJwQAJoiR3uK9o26so7BlUobWU0htzAlg==)
+
 欢迎对此项目提出宝贵的意见或建议，也可以加入我们一起进行此项目的维护与开发
 
 ### 🌟 点赞

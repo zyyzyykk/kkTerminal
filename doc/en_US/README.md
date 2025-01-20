@@ -110,7 +110,7 @@ Visit the following website: https://ssh.kkbpro.com/
 
 - Add URL parameter to customize terminal configuration
 - Fix bug of multi window restart
-- Added operation recording and cloud synchronization functions
+- Add operation recording and cloud synchronization functions
 - Refactoring some code logic
 
 ##### zyyzyykk/kkterminal:3.4.9: 
@@ -140,6 +140,8 @@ Vue + Xterm              SpringBoot + SSHJ                Linux OS
 ### 🏘️ About this project
 
 Author: [zyyzyykk](https://github.com/zyyzyykk/)
+
+Sponsor: [<img src="https://api.gitsponsors.com/api/badge/img?id=704828551" height="20">](https://api.gitsponsors.com/api/badge/link?p=ZeY5IHF8NCpCNujm6upYNHtOtIhaIz5VvgUnIlPWJR9Ta0EgrNeq3P+SXzdv9I03XbxmzJe/sogYZPuCzSoEB2C+x9YgzNCl+5N/hx6Bn7wY7k/ajlj7EJJwQAJoiR3uK9o26so7BlUobWU0htzAlg==)
 
 Welcome to provide valuable opinions or suggestions on this project, and you can also join us in maintaining and developing this project together
 
