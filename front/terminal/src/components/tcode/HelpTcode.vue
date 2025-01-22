@@ -6,10 +6,11 @@
     :title="$t('帮助')"
     :modal="false"
     modal-class="kk-dialog-class"
+    header-class="kk-header-class"
+    body-class="kk-body-class-6"
     :before-close="closeDialog"
     draggable
   >
-    <div style="margin-top: -27px;"></div>
     <div class="no-select">
         <el-tabs type="border-card">
             <el-tab-pane :label="$t('功能TCode')">

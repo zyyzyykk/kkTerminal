@@ -6,10 +6,11 @@
     :title="$t('偏好设置')"
     :modal="false"
     modal-class="kk-dialog-class"
+    header-class="kk-header-class"
+    body-class="kk-body-class-6"
     :before-close="closeDialog"
     draggable
   >
-    <div style="margin-top: -27px;"></div>
     <div class="no-select">
       <div class="item-class" style="margin-bottom: 13px;">
         <div class="form-width" >{{ $t('颜色') }}：</div>
@@ -114,7 +115,7 @@
     <div style="margin-bottom: 5px;"></div>
     <div style="display: flex; border-top: 1px solid #f1f2f4;">
       <div style="flex: 1;"></div>
-      <el-button size="small" type="primary" @click="confirm" style="margin-bottom: -15px; margin-top: 10px;">
+      <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;">
         {{ $t('确定') }}
       </el-button>
     </div>
@@ -219,8 +220,8 @@ export default {
 
 <style scoped>
 .item-class {
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
 }
 
 /* 文本不可选中 */

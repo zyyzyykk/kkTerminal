@@ -5,12 +5,12 @@
     :width=" $t('360')"
     :modal="false"
     modal-class="kk-dialog-class"
+    body-class="kk-body-class-12"
     align-center
     draggable
   >
     <template #title>
-      <div style="margin-top: -15px;"></div>
-      <div class="kk-flex nowrap">
+      <div class="kk-flex-0 nowrap kk-header-class">
         <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="16" :height="16" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" />
         <div class="ellipsis" style="margin: 0 5px; font-size: small;">{{ fileInfo.name }}</div>
         <div style="font-size: small;">{{ $t('权限修改') }}</div>
@@ -37,9 +37,9 @@
     </div>
     <div style="margin-bottom: 5px;"></div>
     <div style="display: flex; align-items: center; border-top: 1px solid #f1f2f4;">
-      <el-checkbox v-if="fileInfo.isDirectory" v-model="permissionsInfo.sub" :label="$t('应用到子目录和文件')" size="small" style="margin-bottom: -15px; margin-top: 10px;" />
+      <el-checkbox v-if="fileInfo.isDirectory" v-model="permissionsInfo.sub" :label="$t('应用到子目录和文件')" size="small" style="margin-top: 10px;" />
       <div style="flex: 1;"></div>
-      <el-button size="small" type="primary" @click="confirm" style="margin-bottom: -15px; margin-top: 10px;" >
+      <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;" >
         {{ $t('确定') }}
       </el-button>
     </div>
@@ -73,7 +73,7 @@ export default {
         permissions:'',
       },
     });
-    
+
     const permissionsInfo = ref({
       owner: [false,false,false],
       group: [false,false,false],
@@ -135,8 +135,13 @@ export default {
 </script>
 
 <style scoped>
+.kk-flex-0 {
+  display: flex;
+  align-items: center;
+}
+
 .kk-flex {
-  display: flex; 
+  display: flex;
   align-items: center;
   margin-top: 15px;
 }

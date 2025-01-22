@@ -6,9 +6,10 @@
     :modal="false"
     :title="$t('URL上传')"
     modal-class="kk-dialog-class"
+    header-class="kk-header-class"
+    body-class="kk-body-class-0"
     draggable
   >
-    <div style="margin-top: -32px;"></div>
     <div class="no-select">
       <div class="kk-flex" >
         <div class="form-width" >URL：</div>
@@ -36,7 +37,6 @@
         </div>
       </div>
     </div>
-    <div style="margin-top: -10px;"></div>
   </el-dialog>
 </template>
 
@@ -56,9 +56,9 @@ export default {
     // 控制Dialog显示
     const DialogVisilble = ref(false);
     const err_msg = ref('');
-    const name = ref(''); 
+    const name = ref('');
     const url = ref('');
-    
+
     // 确定
     const confirm = () => {
       // 校验
@@ -112,7 +112,7 @@ export default {
 
 <style scoped>
 .kk-flex {
-  display: flex; 
+  display: flex;
   align-items: center;
   margin-top: 10px;
 }

@@ -99,6 +99,12 @@ export default {
         useSoftTabs: false    // 使用Tab
       });
     };
+    // 设置字号
+    const setFontSize = (fontSize) => {
+      if(aceEditor.value) aceEditor.value.setOptions({
+        fontSize: fontSize,
+      })
+    };
 
     // 保存代码
     const CtrlS = (event) => {
@@ -172,6 +178,7 @@ export default {
       getValue,
       setReadOnly,
       setTabSize,
+      setFontSize,
     }
   }
 }

@@ -7,9 +7,10 @@
     :modal="false"
     :title="$t('全部配置')"
     modal-class="kk-dialog-class"
+    header-class="kk-header-class"
+    body-class="kk-body-class-6"
     draggable
   >
-    <div style="margin-top: -27px;"></div>
     <div class="no-select">
       <div v-if="Object.keys(sshOptions).length > 0" class="kk-border">
         <div v-for="(value, key) in sshOptions" :key="key" >
@@ -37,7 +38,6 @@
         </div>
       </div>
     </div>
-    <div style="margin-top: -15px;"></div>
   </el-dialog>
 </template>
 
@@ -65,10 +65,10 @@ export default {
     // 控制Dialog显示
     const DialogVisilble = ref(false);
     const noDataMsg = ref(i18n.global.t('暂无配置'));
-    
+
     // 目标配置
     const aimOption = ref('');
-    
+
     // 确定
     const confirm = () => {
       if(aimOption.value == '' || aimOption.value.trim() == '') return;
@@ -142,7 +142,7 @@ export default {
 }
 
 .kk-flex {
-  display: flex; 
+  display: flex;
   align-items: center;
   margin-top: 10px;
 }

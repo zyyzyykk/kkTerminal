@@ -8,10 +8,11 @@
     :modal="false"
     :close-on-click-modal="false"
     modal-class="kk-dialog-class"
+    header-class="kk-header-class"
+    body-class="kk-body-class-6"
     align-center
     draggable
   >
-    <div style="margin-top: -25px;"></div>
     <div>
       <div class="item-class" style="margin-bottom: 15px;">
         <div class="no-select form-width nowrap">{{ $t('配\u00A0\u00A0\u00A0置') }}：</div>
@@ -89,9 +90,9 @@
     <div class="errInfo no-select"> {{ err_msg }} </div>
     <div style="margin-bottom: 5px;"></div>
     <div style="display: flex; border-top: 1px solid #f1f2f4;">
-      <el-checkbox v-if="setInfo.option && setInfo.option.length > 0" v-model="isNewWindow" :label="$t('新窗口打开')" size="small" style="margin-bottom: -15px; margin-top: 10px;" />
+      <el-checkbox v-if="setInfo.option && setInfo.option.length > 0" v-model="isNewWindow" :label="$t('新窗口打开')" size="small" style="margin-top: 10px;" />
       <div style="flex: 1;"></div>
-      <el-button size="small" type="primary" @click="confirm" style="margin-bottom: -15px; margin-top: 10px;">
+      <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;">
         {{ $t('确定') }}
       </el-button>
     </div>
@@ -341,8 +342,8 @@ export default {
 <style scoped>
 
 .item-class {
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
 }
 
 .errInfo{

@@ -6,11 +6,12 @@
     width="50%"
     :modal="false"
     modal-class="kk-dialog-class"
+    header-class="kk-header-class"
+    body-class="kk-body-class-0"
     align-center
     draggable
     style="position: relative;"
   >
-    <div style="margin-top: -27px;"></div>
     <div>
       <div class="title kk-flex" >
         <div class="ellipsis" style="flex: 1;">
@@ -61,9 +62,9 @@
           <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
         </div>
       </div>
-      <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select" 
-        @contextmenu="handleContextMenu" @scroll="handleScroll" 
-        @dragover="preventDefault" @drop="handleFileDrag" 
+      <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select"
+        @contextmenu="handleContextMenu" @scroll="handleScroll"
+        @dragover="preventDefault" @drop="handleFileDrag"
         tabindex="0" @keydown="handleShortcutKeys" >
         <div v-if="files.length != 0" >
           <div v-for="item in files" :key="item.id" >
@@ -126,7 +127,7 @@
     id="folderUploadInput"
   />
   <!-- 文件URL上传 -->
-  <FileUrl ref="fileUrlRef" @callback="fileUrlUpload" ></FileUrl> 
+  <FileUrl ref="fileUrlRef" @callback="fileUrlUpload" ></FileUrl>
   <TxtPreview ref="txtPreviewRef" @doSave="doSave" ></TxtPreview>
   <MkFile ref="mkFileRef" @callback="handleMkFile" ></MkFile>
 
@@ -224,7 +225,7 @@ export default {
           selectedFiles.value.push(item);
         }
         return;
-      }      
+      }
       // 单击
       // shift
       if(event.shiftKey) {
@@ -326,7 +327,7 @@ export default {
         }
       });
     };
-    
+
     // 获取当前路径下的文件列表
     const noDataMsg = ref(i18n.global.t('暂无文件'));
     // 目录状态：0 正常 / 1 目录不存在、无权限等
@@ -567,7 +568,7 @@ export default {
           type: "error",
           grouping: true,
         })
-      }  
+      }
     };
 
     const doShowDirInput = (event) => {
@@ -875,7 +876,7 @@ export default {
     };
     // 新建文件/文件夹
     const mkFileRef = ref();
-    const handleMkFile = (isFolder, name, nowDir) => {      
+    const handleMkFile = (isFolder, name, nowDir) => {
       $.ajax({
         url: http_base_url + (isFolder ? '/mkdir' : '/touch'),
         type:'post',
@@ -1316,7 +1317,7 @@ export default {
   background-color: #efefef;
   padding: 4px 10px;
   font-size: 13px;
-  white-space: nowrap; 
+  white-space: nowrap;
   overflow: hidden;
   text-overflow:ellipsis;
   margin-bottom: 15px;
@@ -1328,6 +1329,7 @@ export default {
 }
 
 .list-class {
+  margin-bottom: 10px;
   height: 248px;
   overflow-y: scroll;
   width: 100%;

@@ -7,10 +7,11 @@
     :title="$t('自定义TCode')"
     :modal="false"
     modal-class="kk-dialog-class"
+    header-class="kk-header-class"
+    body-class="kk-body-class-0"
     align-center
     draggable
   >
-    <div style="margin-top: -32px;"></div>
     <div>
       <div class="kk-flex">
         <div class="no-select nowrap form-width" >TCode：</div>
@@ -74,7 +75,7 @@
     </div>
     <div style="display: flex;">
       <div style="flex: 1;"></div>
-      <el-button size="small" type="primary" @click="confirm" style="margin-bottom: -15px; margin-top: 10px;">
+      <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;">
         {{ $t('确定') }}
       </el-button>
     </div>
@@ -105,7 +106,7 @@ export default {
     // 控制Dialog显示
     const DialogVisilble = ref(false);
     const loading = ref(false);
-    
+
     const workflowTemplate = `const path = '/root/terminal';
 await kkTerminal.write('cd ' + path, 1200);
 const port = 3000;
@@ -258,7 +259,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
           break;
       }
     };
-    
+
     // 确定(添加TCode)
     const confirm = () => {
       if(!(userTcodeInfo.value.name && userTcodeInfo.value.name.length >= 1 && userTcodeInfo.value.name.length <= 5)) {
@@ -334,7 +335,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
 
 <style scoped>
 .kk-flex {
-  display: flex; 
+  display: flex;
   align-items: center;
   margin-top: 15px;
 }

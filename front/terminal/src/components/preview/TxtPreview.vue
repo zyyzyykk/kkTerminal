@@ -4,12 +4,13 @@
     width="80%"
     :modal="false"
     modal-class="kk-dialog-class"
+    body-class="kk-body-class-12"
     :before-close="closeDialog"
     align-center
     draggable
   >
     <template #title>
-      <div class="kk-flex">
+      <div class="kk-flex no-select kk-header-class">
         <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileName" :width="25" :height="25" :isFolder="false" />
         <div class="ellipsis" style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
       </div>
@@ -50,20 +51,38 @@
       </div>
       <div style="margin-right: 20px;" ></div>
       <div class="kk-flex" >
+        <div class="no-select" >{{ $t('字号') }}：</div>
+        <div>
+          <el-input-number :style="{width: '100px'}" size="small" v-model="fontSize" :min="12" :max="16" step="2" :step-strictly="true" @change="setFontSize" >
+            <template #suffix>
+              <span>px</span>
+            </template>
+          </el-input-number>
+        </div>
+      </div>
+      <div style="margin-right: 20px;" ></div>
+      <div class="kk-flex" >
         <el-button size="small" type="primary" @click="doCopy" >
           <el-icon class="el-icon--left"><DocumentCopy /></el-icon>{{ $t('复制') }}
         </el-button>
       </div>
     </div>
-    <div element-loading-text="Loading..." v-loading="loading" style="padding: 0px 5px; width: 100%; height: 60vh;">
+    <div element-loading-text="Loading..." v-loading="loading" style="padding: 0px 5px; width: 100%; height: 60vh; position: relative; margin-bottom: 10px">
       <AceEditor class="preview" v-show="!loading && previewInfo.preview == 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
-      <iframe class="preview" v-if="!loading && previewInfo.preview == 'iframe' && previewUrl != ''" :src="previewUrl" ></iframe>
+      <iframe id="imgPreview" class="preview" v-if="!loading && previewInfo.preview == 'iframe' && previewUrl != ''" :src="previewUrl" ></iframe>
       <audio controls class="preview" v-if="!loading && previewInfo.preview == 'audio' && previewUrl != ''" >
         <source :src="previewUrl" :type="previewInfo.type" >
       </audio>
       <video controls class="preview" v-if="!loading && previewInfo.preview == 'video' && previewUrl != ''" >
         <source :src="previewUrl" :type="previewInfo.type" >
       </video>
+      <div style="position: absolute; top: 0; right: 30px" v-if="!loading && previewInfo.preview == 'iframe' && previewUrl != ''" >
+        <el-input-number :style="{width: '105px'}" size="small" v-model="percentage" :min="20" :max="200" step="10" :step-strictly="true" @change="setPercentage" >
+          <template #suffix>
+            <span>%</span>
+          </template>
+        </el-input-number>
+      </div>
     </div>
     <div style="margin-top: -13px;"></div>
   </el-dialog>
@@ -135,6 +154,7 @@ export default {
               const blob = new Blob([resp], {type:previewInfo.value.type});
               if(previewUrl.value != '') URL.revokeObjectURL(previewUrl.value);
               previewUrl.value = URL.createObjectURL(blob);
+              percentage.value = 100;
             }
             else {
               encode.value = detectEncoding(String.fromCharCode(...new Uint8Array(resp.slice(0,100*1024))));
@@ -145,6 +165,7 @@ export default {
               mode.value = 'auto';
               codeEditorRef.value.setLanguage(fileName.value);
               setIndent();
+              setFontSize();
             }
             modifyTag.value = '';
             loading.value = false;
@@ -204,6 +225,26 @@ export default {
       codeEditorRef.value.setTabSize(indent.value);
     };
 
+    // 编辑器字号
+    const fontSize = ref(14);
+    const setFontSize = () => {
+      codeEditorRef.value.setFontSize(fontSize.value);
+    };
+
+    // 图片百分比
+    const percentage = ref(100);
+    const imgHeight = ref(-1);
+    const getIframeImg = () => {
+      const iframe = document.getElementById('imgPreview');
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      return iframeDoc.querySelector('img');
+    };
+    const setPercentage = () => {
+      const iframeImg = getIframeImg();
+      if(imgHeight.value == -1) imgHeight.value = iframeImg.height;
+      iframeImg.height = (imgHeight.value * percentage.value) / 100;
+    };
+
     // 拷贝
     const { toClipboard } = useClipboard();
 
@@ -252,7 +293,10 @@ export default {
       encode.value = '';
       encodeSet.value = ['UTF-8','GBK','ISO-8859-1','Windows-1252'];
       mode.value = '';
-      indent.value = 4;
+      // indent.value = 4;
+      // fontSize.value = 14;
+      percentage.value = 100;
+      imgHeight.value = -1;
       DialogVisilble.value = false;
     };
 
@@ -285,6 +329,10 @@ export default {
       setMode,
       indent,
       setIndent,
+      fontSize,
+      setFontSize,
+      percentage,
+      setPercentage,
       doCopy,
       closeDialog,
       reset,

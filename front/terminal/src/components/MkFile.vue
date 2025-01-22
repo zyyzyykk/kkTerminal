@@ -6,9 +6,10 @@
     :modal="false"
     :title="$t('新建')"
     modal-class="kk-dialog-class"
+    header-class="kk-header-class"
+    body-class="kk-body-class-0"
     draggable
   >
-    <div style="margin-top: -32px;"></div>
     <div class="no-select">
       <el-radio-group v-model="isDirectory" class="ml-4">
         <el-radio :label="false" size="large">{{ $t('文件') }}</el-radio>
@@ -30,7 +31,6 @@
         </div>
       </div>
     </div>
-    <div style="margin-top: -10px;"></div>
   </el-dialog>
 </template>
 
@@ -51,9 +51,9 @@ export default {
     const DialogVisilble = ref(false);
     const err_msg = ref('');
     const isDirectory = ref(false);
-    const name = ref(''); 
+    const name = ref('');
     const nowDir = ref('');
-    
+
     // 确定
     const confirm = () => {
       // 校验
@@ -106,7 +106,7 @@ export default {
 
 <style scoped>
 .kk-flex {
-  display: flex; 
+  display: flex;
   align-items: center;
   margin-top: 10px;
 }

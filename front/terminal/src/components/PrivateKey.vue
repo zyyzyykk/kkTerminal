@@ -6,9 +6,10 @@
     :modal="false"
     :title="$t('导入私钥')"
     modal-class="kk-dialog-class"
+    header-class="kk-header-class"
+    body-class="kk-body-class-0"
     draggable
   >
-    <div style="margin-top: -32px;"></div>
     <div class="no-select">
       <div class="kk-flex" >
         <div class="form-width" >{{ $t('私钥') }}：</div>
@@ -37,7 +38,6 @@
         </div>
       </div>
     </div>
-    <div style="margin-top: -10px;"></div>
   </el-dialog>
 </template>
 
@@ -58,9 +58,9 @@ export default {
     // 控制Dialog显示
     const DialogVisilble = ref(false);
     const err_msg = ref('');
-    const content = ref(''); 
+    const content = ref('');
     const passphrase = ref('');
-    
+
     // 确定
     const confirm = () => {
       context.emit('callback',content.value, passphrase.value);
@@ -129,7 +129,7 @@ export default {
 
 <style scoped>
 .kk-flex {
-  display: flex; 
+  display: flex;
   align-items: center;
   margin-top: 10px;
 }
