@@ -159,5 +159,6 @@
   "云端文件过多": "Too many Cloud Files",
   "云端同步失败": "Cloud Sync Failed",
   "云端文件加载失败": "Cloud File loading failed",
-  "确定从云端覆盖本地数据吗?": "Sure to overwrite local data from Cloud?"
+  "确定从云端覆盖本地数据吗?": "Sure to overwrite local data from Cloud?",
+  "字体大小": "Size"
 }

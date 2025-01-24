@@ -51,9 +51,9 @@
       </div>
       <div style="margin-right: 20px;" ></div>
       <div class="kk-flex" >
-        <div class="no-select" >{{ $t('字号') }}：</div>
+        <div class="no-select" >{{ $t('字体大小') }}：</div>
         <div>
-          <el-input-number :style="{width: '100px'}" size="small" v-model="fontSize" :min="12" :max="16" step="2" :step-strictly="true" @change="setFontSize" >
+          <el-input-number :style="{width: '100px'}" size="small" v-model="fontSize" :min="12" :max="20" step="2" :step-strictly="true" @change="setFontSize" >
             <template #suffix>
               <span>px</span>
             </template>
@@ -155,6 +155,7 @@ export default {
               if(previewUrl.value != '') URL.revokeObjectURL(previewUrl.value);
               previewUrl.value = URL.createObjectURL(blob);
               percentage.value = 100;
+              imgHeight.value = -1;
             }
             else {
               encode.value = detectEncoding(String.fromCharCode(...new Uint8Array(resp.slice(0,100*1024))));
@@ -332,6 +333,7 @@ export default {
       fontSize,
       setFontSize,
       percentage,
+      imgHeight,
       setPercentage,
       doCopy,
       closeDialog,
