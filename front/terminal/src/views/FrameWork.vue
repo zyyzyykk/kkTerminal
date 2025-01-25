@@ -646,9 +646,9 @@ export default {
 
       // 录像
       if(urlParams.value.record) {
+        listenResize();
         recordInfo.value = await load('record-' + urlParams.value.record);
         if(recordInfo.value) playRecord(0);
-        listenResize();
         return;
       }
 
