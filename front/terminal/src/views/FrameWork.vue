@@ -279,8 +279,8 @@ export default {
       fitAddon.fit();
       // 修改虚拟终端行列大小
       if(socket.value && socket.value.readyState == WebSocket.OPEN && term) {
-        let new_rows = fitAddon.proposeDimensions().rows;
-        let new_cols = fitAddon.proposeDimensions().cols;
+        const new_rows = fitAddon.proposeDimensions().rows;
+        const new_cols = fitAddon.proposeDimensions().cols;
         socket.value.send(encrypt(JSON.stringify({type:1,content:"",rows:new_rows,cols:new_cols})));
         term.resize(new_cols,new_rows);
       }
@@ -629,6 +629,17 @@ export default {
       importTCodes({});
     };
 
+    // 监听窗口大小变化，自动调整终端大小
+    const listenResize = () => {
+      window.addEventListener('resize', () => {
+        if(fileBlockRef.value) {
+          fileBlockRef.value.isShowMenu = false;
+          fileBlockRef.value.isShowPop = false;
+        }
+        termFit();
+      });
+    };
+
     onMounted(async () => {
       // 启动终端
       resetTerminal();
@@ -637,6 +648,7 @@ export default {
       if(urlParams.value.record) {
         recordInfo.value = await load('record-' + urlParams.value.record);
         if(recordInfo.value) playRecord(0);
+        listenResize();
         return;
       }
 
@@ -654,14 +666,8 @@ export default {
           osInfo.value = {...resp.data};
           // 连接服务器
           doSSHConnect();
-          // 监听窗口大小变化事件，自动调整终端大小
-          window.addEventListener('resize', () => {
-            if(fileBlockRef.value) {
-              fileBlockRef.value.isShowMenu = false;
-              fileBlockRef.value.isShowPop = false;
-            }
-            termFit();
-          });
+          // 监听窗口大小变化
+          listenResize();
           // 心跳
           doHeartBeat();
         },
