@@ -94,7 +94,7 @@ import AceEditor from './AceEditor';
 import $ from 'jquery';
 import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
-import { previewFileInfo } from '@/utils/FileSuffix';
+import { previewFileInfo } from '@/components/preview/FileSuffix';
 import { changeStr2 } from '@/utils/StringUtil';
 import { getUrlParams } from "@/utils/UrlUtil";
 import { detectEncoding, encodeStrToArray, decodeArrayToStr } from "@/components/preview/EncodeUtil";

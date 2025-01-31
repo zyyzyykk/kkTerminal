@@ -48,7 +48,7 @@
 
 <script>
 import { ref } from 'vue';
-import { getPermissionInfo } from '@/utils/CalcPriority';
+import { getPermissionInfo } from '@/components/calc/CalcPriority';
 
 // 引入文件图标组件
 import FileIcons from 'file-icons-vue';

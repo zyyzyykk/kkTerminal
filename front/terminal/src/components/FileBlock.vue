@@ -168,8 +168,8 @@ import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/env/BaseUrl';
 import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
-import { isZipFile } from '@/utils/FileSuffix';
-import { getChmodValue } from '@/utils/CalcPriority';
+import { isZipFile } from '@/components/preview/FileSuffix';
+import { getChmodValue } from '@/components/calc/CalcPriority';
 import { getUrlParams } from "@/utils/UrlUtil";
 
 import ToolTip from './ToolTip.vue';

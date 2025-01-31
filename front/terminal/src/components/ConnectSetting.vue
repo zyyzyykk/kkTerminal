@@ -114,6 +114,7 @@ import ToolTip from './ToolTip.vue';
 import { getPureUrl } from '@/utils/UrlUtil';
 import { HomeFilled, Paperclip, User, Lock, DocumentCopy, View, Hide, Edit, Finished, Switch, ArrowDown, Key } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
+import { isIP, isFQDN } from '@/utils/IPUtil';
 
 export default {
   name:'ConnectSetting',
@@ -156,9 +157,8 @@ export default {
     // 校验参数
     const verifyParams = () => {
       err_msg.value = '';
-      // 验证IP地址
-      const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-      if (!ipRegex.test(setInfo.value.server_ip)) {
+      // 验证IP地址/域名
+      if (!(isIP(setInfo.value.server_ip) || isFQDN(setInfo.value.server_ip))) {
         err_msg.value = i18n.global.t("主机IP地址无效");
         return false;
       }
@@ -208,6 +208,7 @@ export default {
         if(!props.sshOptions[option].authType) setInfo.value.authType = 0;
         setInfo.value = {...setInfo.value, ...props.sshOptions[option]};
         isForbidInput.value = true;
+        err_msg.value = '';
       }
       // 保存
       else if(optionBlockType.value == 1)

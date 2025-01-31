@@ -66,13 +66,13 @@
       <div class="kk-flex">
         <div class="form-width" >{{ $t('修改时间') }}：</div>
         <div>
-          {{ formatDate(fileInfo.attributes.mtime) }}
+          {{ calcDate(fileInfo.attributes.mtime) }}
         </div>
       </div>
       <div class="kk-flex">
         <div class="form-width" >{{ $t('访问时间') }}：</div>
         <div>
-          {{ formatDate(fileInfo.attributes.atime) }}
+          {{ calcDate(fileInfo.attributes.atime) }}
         </div>
       </div>
       <div class="kk-border" ></div>
@@ -102,12 +102,12 @@
 import { ref } from 'vue';
 import $ from 'jquery';
 import { http_base_url } from '@/env/BaseUrl';
-import { formatDate } from '@/utils/FormatDate';
-import { calcPriority } from '@/utils/CalcPriority';
+import { calcDate } from '@/components/calc/CalcDate';
+import { calcPriority } from '@/components/calc/CalcPriority';
 import { ElMessage } from 'element-plus';
 import useClipboard from "vue-clipboard3";
 import { DocumentCopy, Refresh, Edit } from '@element-plus/icons-vue';
-import { calcSize } from '@/utils/CalcSize';
+import { calcSize } from '@/components/calc/CalcSize';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
 import ToolTip from './ToolTip.vue';
 import PermissionsEdit from './PermissionsEdit.vue';
@@ -295,7 +295,7 @@ export default {
       reset,
       fileDir,
       rename,
-      formatDate,
+      calcDate,
       calcPriority,
       calcSize,
       doCopy,
