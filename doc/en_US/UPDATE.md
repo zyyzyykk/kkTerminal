@@ -1,5 +1,11 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.4.5: 
+
+- Add file permission editing function
+- Fix folder input upload bug caused by changing dir during upload
+- Optimize page display
+
 ##### zyyzyykk/kkterminal:3.4.2:
 
 - Implement internationalization and support language switching between Chinese and English

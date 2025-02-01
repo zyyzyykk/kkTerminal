@@ -10,7 +10,7 @@
 >
 > 预览：https://ssh.kkbpro.com/
 >
-> 更新时间：2025-01-10
+> 更新时间：2025-02-01
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.png" alt="kkterminal"></a></p>
@@ -59,13 +59,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 访问以下网址：https://ssh.kkbpro.com/
 
-![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/zh/Connect.png)
+![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/zh/Connect.png)
 
-![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/zh/Preference.png)
+![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/zh/Preference.png)
 
-![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/zh/File.png)
+![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/zh/File.png)
 
-![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/zh/Editor.png)
+![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/zh/Editor.png)
 
 [**更多模块预览**](./MODULE.md)
 
@@ -102,7 +102,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.5.3：latest
+##### zyyzyykk/kkterminal:3.5.6：latest
+
+- 支持更多URL参数
+- 新增编辑器文字&图片大小百分比
+- 优化界面显示
+
+##### zyyzyykk/kkterminal:3.5.3：
 
 - 新增url参数自定义终端配置
 - 修复多窗口重启的bug
@@ -115,12 +121,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 新增文件编码自动识别与保存切换
 - 新增文件语言模式选择
 - 新增文件缩进选择和内容复制
-
-##### zyyzyykk/kkterminal:3.4.5：
-
-- 新增文件权限编辑功能
-- 修复了输入框上传时更改目录导致文件夹上传错误的bug
-- 优化界面显示
 
 [**历史更新记录**](./UPDATE.md)
 

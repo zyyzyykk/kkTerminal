@@ -10,7 +10,7 @@
 >
 > Preview: https://ssh.kkbpro.com/
 >
-> Update Time: 2025-01-10
+> Update Time: 2025-02-01
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.png" alt="kkTerminal"></a></p>
@@ -59,13 +59,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 Visit the following website: https://ssh.kkbpro.com/
 
-![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/en/Connect.png)
+![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/en/Connect.png)
 
-![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/en/Preference.png)
+![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/en/Preference.png)
 
-![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/en/File.png)
+![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/en/File.png)
 
-![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.3/en/Editor.png)
+![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/en/Editor.png)
 
 [**More Module Previews**](./doc/en_US/MODULE.md)
 
@@ -106,7 +106,13 @@ Visit the following website: https://ssh.kkbpro.com/
 
 ### 👨‍💻 Update Records
 
-##### zyyzyykk/kkterminal:3.5.3: latest
+##### zyyzyykk/kkterminal:3.5.6: latest
+
+- Support more URL parameters
+- Add editor text & image size percentage
+- Optimize webpage display
+
+##### zyyzyykk/kkterminal:3.5.3: 
 
 - Add URL parameter to customize terminal configuration
 - Fix bug of multi window restart
@@ -119,12 +125,6 @@ Visit the following website: https://ssh.kkbpro.com/
 - Add automatic judging and save switch for file encoding
 - Add file mode switch
 - Add file indentation selection and content copying
-
-##### zyyzyykk/kkterminal:3.4.5: 
-
-- Add file permission editing function
-- Fix folder input upload bug caused by changing dir during upload
-- Optimize page display
 
 [**History Update Records**](./doc/en_US/UPDATE.md)
 
