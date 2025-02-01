@@ -318,6 +318,7 @@ export default {
           sshKey.value = decrypt(result.data);
           setTimeout(() => {
             termFit();
+            if(urlParams.value.cmd) sendMessage(urlParams.value.cmd + "\n");
           },1);
         }
         // 输出
