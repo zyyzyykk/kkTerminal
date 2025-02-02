@@ -2,11 +2,15 @@ package com.kkbpro.terminal.constants.enums;
 
 public enum ResultCodeEnum {
 
+    COOPERATE_KEY_INVALID(-2, "Cooperate Key is invalid"),
+
     CONNECT_FAIL(-1,"Fail to connect remote server"),
 
     CONNECT_SUCCESS(0,"Connecting success"),
 
-    OUT_TEXT(1,"Text output to terminal");
+    OUT_TEXT(1,"Text output to terminal"),
+
+    COOPERATE_NUMBER_UPDATE(2,"Update cooperate number");
 
     private Integer state;
 

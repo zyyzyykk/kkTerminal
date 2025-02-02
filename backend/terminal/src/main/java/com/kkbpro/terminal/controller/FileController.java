@@ -682,7 +682,8 @@ public class FileController {
     }
 
     private void sshClose(String sshKey) {
-        if(WebSocketServer.webSessionMap.get(sshKey) == null && (WebSocketServer.fileUploadingMap.get(sshKey) == null || WebSocketServer.fileUploadingMap.get(sshKey).isEmpty())) {
+        if((WebSocketServer.webSocketServerMap.get(sshKey) == null || WebSocketServer.webSocketServerMap.get(sshKey).getSessionSocket() == null)
+                && (WebSocketServer.fileUploadingMap.get(sshKey) == null || WebSocketServer.fileUploadingMap.get(sshKey).isEmpty())) {
             try {
                 WebSocketServer.fileUploadingMap.remove(sshKey);
                 if(WebSocketServer.sftpClientMap.get(sshKey) != null)

@@ -27,4 +27,6 @@ public class EnvInfo {
 
     private String lang = "en";
 
+    private String cooperateKey = null;
+
 }

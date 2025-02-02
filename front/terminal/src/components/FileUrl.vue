@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="DialogVisilble"
+    v-model="DialogVisible"
     :before-close="closeDialog"
     :width="320"
     :modal="false"
@@ -51,10 +51,9 @@ export default {
     Connection,
     Document,
   },
-  setup(props,context)
-  {
+  setup(props,context) {
     // 控制Dialog显示
-    const DialogVisilble = ref(false);
+    const DialogVisible = ref(false);
     const err_msg = ref('');
     const name = ref('');
     const url = ref('');
@@ -85,7 +84,7 @@ export default {
       err_msg.value = '';
       name.value = '';
       url.value = '';
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     // 关闭
@@ -93,12 +92,12 @@ export default {
       setTimeout(() => {
         reset();
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
       if(done) done();
     };
 
     return {
-      DialogVisilble,
+      DialogVisible,
       err_msg,
       name,
       url,

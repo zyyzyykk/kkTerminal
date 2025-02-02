@@ -12,7 +12,7 @@ export const FuncTcode = {
             setTimeout(() => {
                 context.proxy.userTcodeRef.initText();
             },1);
-            context.proxy.userTcodeRef.DialogVisilble = true;
+            context.proxy.userTcodeRef.DialogVisible = true;
         }
     },
     '/O': {
@@ -43,7 +43,7 @@ export const FuncTcode = {
     '/H': {
         desc: i18n.global.t('帮助'),
         execFlow(context) {
-            context.proxy.helpTcodeRef.DialogVisilble = true;
+            context.proxy.helpTcodeRef.DialogVisible = true;
         }
     },
 };
@@ -54,21 +54,21 @@ export const SysTcode = {
         desc: i18n.global.t('连接设置'),
         execFlow(context) {
             context.proxy.isShowSetting = false;
-            context.proxy.connectSettingRef.DialogVisilble = true;
+            context.proxy.connectSettingRef.DialogVisible = true;
         }
     },
     'SP': {
         desc: i18n.global.t('偏好设置'),
         execFlow(context) {
             context.proxy.isShowSetting = false;
-            context.proxy.styleSettingRef.DialogVisilble = true;
+            context.proxy.styleSettingRef.DialogVisible = true;
         }
     },
     'SF': {
         desc: i18n.global.t('文件管理'),
         execFlow(context) {
             context.proxy.isShowSetting = false;
-            context.proxy.fileBlockRef.DialogVisilble = true;
+            context.proxy.fileBlockRef.DialogVisible = true;
             context.proxy.fileBlockRef.getInitDir();
         }
     },

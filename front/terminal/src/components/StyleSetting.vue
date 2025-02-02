@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="DialogVisilble"
+    v-model="DialogVisible"
     destroy-on-close
     :width="426"
     :title="$t('偏好设置')"
@@ -135,7 +135,7 @@ export default {
   setup(props,context) {
 
     // 控制Dialog显示
-    const DialogVisilble = ref(false);
+    const DialogVisible = ref(false);
 
     // 语言列表
     const langList = [{label:"English",value:"en"}, {label:"Chinese",value:"zh"}];
@@ -189,7 +189,7 @@ export default {
         tCode: props.env.tCode,
         cloud: props.env.cloud,
       };
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     // 关闭
@@ -197,7 +197,7 @@ export default {
       setTimeout(() => {
         reset();
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
       if(done) done();
     };
 
@@ -208,7 +208,7 @@ export default {
       fontSizeList,
       cursorStyleList,
       setInfo,
-      DialogVisilble,
+      DialogVisible,
       confirm,
       closeDialog,
     }

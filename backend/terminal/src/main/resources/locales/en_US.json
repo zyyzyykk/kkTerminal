@@ -45,5 +45,7 @@
   "文件内容": "File Content",
   "文件不存在": "No Such File",
   "云端文件过多": "Too many Cloud Files",
-  "云端上传成功": "Cloud File Uploaded"
+  "云端上传成功": "Cloud File Uploaded",
+  "协作Key生成成功": "Cooperate Key Generate Success",
+  "协作Key生成失败": "Cooperate Key Generate Failed"
 }

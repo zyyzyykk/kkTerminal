@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="DialogVisilble"
+    v-model="DialogVisible"
     :before-close="closeDialog"
     :width="400"
     :modal="false"
@@ -127,13 +127,12 @@ export default {
     PermissionsEdit,
   },
   props:['sshKey'],
-  setup(props,context)
-  {
+  setup(props,context) {
     // 拷贝
     const { toClipboard } = useClipboard();
 
     // 控制Dialog显示
-    const DialogVisilble = ref(false);
+    const DialogVisible = ref(false);
     const fileInfo = ref({});
     const fileDir = ref('');
     const rename = ref('');
@@ -265,7 +264,7 @@ export default {
       loading.value = false;
       unreliable.value = false;
       includeInfo.value = i18n.global.t('0 个文件，0 个文件夹');
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     // 权限修改
@@ -273,7 +272,7 @@ export default {
     const openEditPermissions = () => {
       permissionsEditRef.value.fileDir = fileDir.value;
       permissionsEditRef.value.fileInfo = fileInfo.value;
-      permissionsEditRef.value.DialogVisilble = true;
+      permissionsEditRef.value.DialogVisible = true;
       permissionsEditRef.value.init();
     };
 
@@ -283,12 +282,12 @@ export default {
       setTimeout(() => {
         reset();
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
       if(done) done();
     };
 
     return {
-      DialogVisilble,
+      DialogVisible,
       fileInfo,
       confirm,
       closeDialog,

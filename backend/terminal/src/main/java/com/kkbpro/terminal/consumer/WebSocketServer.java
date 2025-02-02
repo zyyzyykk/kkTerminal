@@ -7,6 +7,8 @@ import com.kkbpro.terminal.config.AppConfig;
 import com.kkbpro.terminal.constants.enums.CharsetEnum;
 import com.kkbpro.terminal.constants.enums.MessageInfoTypeRnum;
 import com.kkbpro.terminal.constants.enums.ResultCodeEnum;
+import com.kkbpro.terminal.controller.AdvanceController;
+import com.kkbpro.terminal.pojo.dto.CooperateInfo;
 import com.kkbpro.terminal.pojo.dto.EnvInfo;
 import com.kkbpro.terminal.pojo.dto.MessageInfo;
 import com.kkbpro.terminal.pojo.dto.PrivateKey;
@@ -14,6 +16,8 @@ import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.AesUtil;
 import com.kkbpro.terminal.utils.FileUtil;
 import com.kkbpro.terminal.utils.StringUtil;
+import lombok.Getter;
+import lombok.Setter;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.IOUtils;
 import net.schmizz.sshj.sftp.SFTPClient;
@@ -31,6 +35,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint("/socket/ssh/{env}")  // 注意不要以'/'结尾
 public class WebSocketServer {
 
-    public static ConcurrentHashMap<String, Session> webSessionMap = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, WebSocketServer> webSocketServerMap = new ConcurrentHashMap<>();
 
     public static ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
 
@@ -46,9 +52,17 @@ public class WebSocketServer {
 
     public static ConcurrentHashMap<String, SFTPClient> sftpClientMap = new ConcurrentHashMap<>();
 
+    public static ConcurrentHashMap<String, List<Session>> cooperateMap = new ConcurrentHashMap<>();
+
     private static AppConfig appConfig;
 
+    @Getter
     private Session sessionSocket = null;
+
+    @Getter @Setter
+    private CooperateInfo cooperateInfo;
+
+    private Boolean cooperator = false;
 
     private String sshKey = null;
 
@@ -80,6 +94,45 @@ public class WebSocketServer {
         // 设置最大空闲超时（上线后失效？？？）
         sessionSocket.setMaxIdleTimeout(appConfig.getMaxIdleTimeout());
 
+        // 协作
+        String cooperateKey = envInfo.getCooperateKey();
+        if(cooperateKey != null && !cooperateKey.isEmpty()) {
+            Integer state = ResultCodeEnum.COOPERATE_KEY_INVALID.getState();
+            String msg = ResultCodeEnum.COOPERATE_KEY_INVALID.getDesc();
+            try {
+                String sshKey = AesUtil.aesDecrypt(StringUtil.changeStrBase64(cooperateKey), AdvanceController.COOPERATE_SECRET_KEY);
+                WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
+                if(webSocketServer == null || webSocketServer.cooperateInfo == null)
+                    throw new RuntimeException();
+
+                List<Session> sessions = WebSocketServer.cooperateMap.computeIfAbsent(sshKey, k -> new ArrayList<>());
+                synchronized (sessions) {
+                    Integer maxHeadCount = webSocketServer.cooperateInfo.getMaxHeadCount();
+                    Boolean readOnly = webSocketServer.cooperateInfo.getReadOnly();
+                    // 成功加入协作
+                    if(maxHeadCount > sessions.size()) {
+                        state = ResultCodeEnum.CONNECT_SUCCESS.getState();
+                        msg = (readOnly ? "ReadOnly" : "Edit") + " cooperate connect success";
+                        sessions.add(sessionSocket);
+                        this.sshKey = sshKey;
+                        this.cooperator = true;
+                        this.serverCharset = webSocketServer.serverCharset;
+                        if(!readOnly) {
+                            this.shell = webSocketServer.shell;
+                            this.shellOutputStream = webSocketServer.shellOutputStream;
+                        }
+                        sendMessage(webSocketServer.sessionSocket, ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
+                                "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(sessions.size()));
+                    }
+                    else msg = "Cooperators limit exceeded";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            sendMessage(sessionSocket, msg, "fail", state, null);
+            return;
+        }
+
         // 与服务器建立连接
         String host = envInfo.getServer_ip();
         int port = envInfo.getServer_port();
@@ -93,9 +146,9 @@ public class WebSocketServer {
 
         try {
             sshClient.setConnectTimeout(appConfig.getSshMaxTimeout());
-            sshClient.addHostKeyVerifier(new PromiscuousVerifier());    // 不验证主机密钥
+            sshClient.addHostKeyVerifier(new PromiscuousVerifier());            // 不验证主机密钥
             sshClient.connect(host,port);
-            if(authType != 1) sshClient.authPassword(user_name, password);     // 使用用户名和密码进行身份验证
+            if(authType != 1) sshClient.authPassword(user_name, password);      // 使用用户名和密码进行身份验证
             else {
                 // 创建本地私钥文件
                 String keyPath = FileUtil.folderBasePath + "/keyProviders/" + UUID.randomUUID();
@@ -136,7 +189,7 @@ public class WebSocketServer {
         // 连接成功，生成key标识
         sshKey = envInfo.getLang() + "-" + serverCharset.name().replace("-","@") + "-" + UUID.randomUUID();
         sendMessage(sessionSocket, "SSHKey","success", ResultCodeEnum.CONNECT_SUCCESS.getState(), sshKey);
-        webSessionMap.put(sshKey, sessionSocket);
+        webSocketServerMap.put(sshKey, this);
         sshClientMap.put(sshKey, sshClient);
         fileUploadingMap.put(sshKey, new ConcurrentHashMap<>());
         // 欢迎语
@@ -164,6 +217,13 @@ public class WebSocketServer {
                     String shellOut = new String(buffer, 0, len, serverCharset);
                     sendMessage(sessionSocket, "ShellOut",
                             "success", ResultCodeEnum.OUT_TEXT.getState(), shellOut);
+                    List<Session> sessions = cooperateMap.get(sshKey);
+                    if(sessions != null) {
+                        for (Session session : sessions) {
+                            sendMessage(session, "ShellOut",
+                                    "success", ResultCodeEnum.OUT_TEXT.getState(), shellOut);
+                        }
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -174,6 +234,18 @@ public class WebSocketServer {
 
     @OnClose
     public void onClose() throws IOException {
+        if(cooperator) {
+            List<Session> sessions = cooperateMap.get(sshKey);
+            if(sessions != null) {
+                sessions.remove(this.sessionSocket);
+                WebSocketServer webSocketServer = webSocketServerMap.get(sshKey);
+                if(webSocketServer != null) {
+                    sendMessage(webSocketServer.sessionSocket, ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
+                            "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(sessions.size()));
+                }
+            }
+            return;
+        }
         // 删除临时文件
         String key = sshKey;
         Thread deleteTmpFileThread = new Thread(() -> {
@@ -206,9 +278,10 @@ public class WebSocketServer {
             shellInputStream.close();
         if(shell != null)
             shell.close();
-        if(webSessionMap.get(key) != null)
-            webSessionMap.get(key).close();
-        webSessionMap.remove(key);
+        if(webSocketServerMap.get(key) != null && webSocketServerMap.get(key).sessionSocket != null)
+            webSocketServerMap.get(key).sessionSocket.close();
+        webSocketServerMap.remove(key);
+        cooperateMap.remove(key);
         sessionSocket = null;
         if(fileUploadingMap.get(key) == null || fileUploadingMap.get(key).isEmpty()) {
             fileUploadingMap.remove(key);
@@ -226,6 +299,7 @@ public class WebSocketServer {
     // 从Client接收消息
     @OnMessage
     public void onMessage(String message) throws IOException {
+        if(shell == null || shellOutputStream == null) return;
 
         message = AesUtil.aesDecrypt(message);
         MessageInfo messageInfo = JSONObject.parseObject(message, MessageInfo.class);
@@ -244,6 +318,12 @@ public class WebSocketServer {
         if(MessageInfoTypeRnum.HEART_BEAT.getState().equals(messageInfo.getType())) {
             shellOutputStream.write("".getBytes(StandardCharsets.UTF_8));
             shellOutputStream.flush();
+            // 更新协作者数量
+            List<Session> sessions = cooperateMap.get(sshKey);
+            if(sessions != null) {
+                sendMessage(sessionSocket, ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
+                        "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(sessions.size()));
+            }
         }
 
     }

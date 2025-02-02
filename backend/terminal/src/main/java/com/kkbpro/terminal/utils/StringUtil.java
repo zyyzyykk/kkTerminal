@@ -43,4 +43,13 @@ public class StringUtil {
         return result.toString();
     }
 
+    // 将Base64编码转换为合法的URL参数
+    public static String changeBase64Str(String str) {
+        return str.replace("+", "-").replace("=", "@");
+    }
+
+    public static String changeStrBase64(String str) {
+        return str.replace("-", "+").replace("@", "=");
+    }
+
 }

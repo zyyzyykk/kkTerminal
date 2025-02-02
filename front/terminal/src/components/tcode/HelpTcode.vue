@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="DialogVisilble"
+    v-model="DialogVisible"
     destroy-on-close
     :width="480"
     :title="$t('帮助')"
@@ -141,7 +141,7 @@ export default {
   setup(props, context) {
 
     // 控制Dialog显示
-    const DialogVisilble = ref(false);
+    const DialogVisible = ref(false);
     const modifyTag = ref('');
 
     const userTCodes = ref({});
@@ -220,7 +220,7 @@ export default {
       mode.value = false;
       nowTCode.value = '';
       modifyTag.value = '';
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     // 关闭
@@ -228,12 +228,12 @@ export default {
       setTimeout(() => {
         reset();
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
       if(done) done();
     };
 
     return {
-      DialogVisilble,
+      DialogVisible,
       FuncTcode,
       SysTcode,
       nowTCode,

@@ -1,6 +1,7 @@
 {
   "220": "260",
   "360": "380",
+  "240": "300",
   "描\u00A0\u00A0\u00A0述": "Desc",
   "配\u00A0\u00A0\u00A0置": "Option",
   "密码": "Pwd",
@@ -34,8 +35,11 @@
   "刷新页面": "Refresh Webpage",
   "连接设置": "Connect",
   "偏好设置": "Style",
+  "高级": "Advance",
   "文件管理": "File",
   "重启": "Restart",
+  "协作": "Cooperate",
+  "监控": "Monitor",
   "输入TCode": "Input TCode",
   "输入TCode描述": "Input Description",
   "导入": "Import",
@@ -154,11 +158,17 @@
   "开始录制": "Start Record",
   "录制中": "Recording",
   "录像链接已复制": "Record Link Copied",
+  "协作链接已复制": "Cooperate Link Copied",
   "云端": "cloud",
   "云端同步": "Cloud Sync",
   "云端文件过多": "Too many Cloud Files",
   "云端同步失败": "Cloud Sync Failed",
   "云端文件加载失败": "Cloud File loading failed",
   "确定从云端覆盖本地数据吗?": "Sure to overwrite local data from Cloud?",
-  "字体大小": "Size"
+  "字体大小": "Size",
+  "编辑权限": "Edit Permissions",
+  "人数上限": "Max Head Count",
+  "是": "Yes",
+  "否": "No",
+  "协作Key生成失败": "Cooperate Key Generate Failed"
 }

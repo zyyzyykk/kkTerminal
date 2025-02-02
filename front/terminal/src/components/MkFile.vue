@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="DialogVisilble"
+    v-model="DialogVisible"
     :before-close="closeDialog"
     :width="300"
     :modal="false"
@@ -45,10 +45,9 @@ export default {
   components: {
     FileIcons,
   },
-  setup(props,context)
-  {
+  setup(props,context) {
     // 控制Dialog显示
-    const DialogVisilble = ref(false);
+    const DialogVisible = ref(false);
     const err_msg = ref('');
     const isDirectory = ref(false);
     const name = ref('');
@@ -77,7 +76,7 @@ export default {
       isDirectory.value = false;
       name.value = '';
       nowDir.value = '';
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     // 关闭
@@ -85,12 +84,12 @@ export default {
       setTimeout(() => {
         reset();
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
       if(done) done();
     };
 
     return {
-      DialogVisilble,
+      DialogVisible,
       err_msg,
       isDirectory,
       name,

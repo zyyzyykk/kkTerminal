@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="DialogVisilble"
+    v-model="DialogVisible"
     :destory-on-close="true"
     :before-close="closeDialog"
     :width="360"
@@ -139,7 +139,7 @@ export default {
   setup(props,context) {
 
     // 控制Dialog显示
-    const DialogVisilble = ref(false);
+    const DialogVisible = ref(false);
     const err_msg = ref('');
     const isNewWindow = ref(false);
 
@@ -196,7 +196,7 @@ export default {
       }
       optionBlockType.value = type;
       optionBlockRef.value.aimOption = '';
-      optionBlockRef.value.DialogVisilble = true;
+      optionBlockRef.value.DialogVisible = true;
     };
 
     const isForbidInput = ref(false);
@@ -238,7 +238,7 @@ export default {
     const openprivateKeyBlock = () => {
       privateKeyRef.value.content = setInfo.value.server_key ? setInfo.value.server_key.content : '';
       privateKeyRef.value.passphrase = setInfo.value.server_key ? setInfo.value.server_key.passphrase : '';
-      privateKeyRef.value.DialogVisilble = true;
+      privateKeyRef.value.DialogVisible = true;
     };
     const savePrivateKey = (content,passphrase) => {
       setInfo.value.server_key = {
@@ -299,23 +299,23 @@ export default {
       };
       if(setInfo.value.option != '') isForbidInput.value = true;
       else isForbidInput.value = false;
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     // 关闭
     const closeDialog = (done) => {
-      if(optionBlockRef.value && optionBlockRef.value.DialogVisilble) optionBlockRef.value.closeDialog();
-      if(privateKeyRef.value && privateKeyRef.value.DialogVisilble) privateKeyRef.value.closeDialog();
+      if(optionBlockRef.value && optionBlockRef.value.DialogVisible) optionBlockRef.value.closeDialog();
+      if(privateKeyRef.value && privateKeyRef.value.DialogVisible) privateKeyRef.value.closeDialog();
       setTimeout(() => {
         reset();
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
       if(done) done();
     };
 
     return {
       setInfo,
-      DialogVisilble,
+      DialogVisible,
       err_msg,
       isNewWindow,
       confirm,

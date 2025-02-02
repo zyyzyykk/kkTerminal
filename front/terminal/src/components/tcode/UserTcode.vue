@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="DialogVisilble"
+    v-model="DialogVisible"
     :before-close="closeDialog"
     destroy-on-close
     :width="550"
@@ -104,7 +104,7 @@ export default {
   setup(props,context)
   {
     // 控制Dialog显示
-    const DialogVisilble = ref(false);
+    const DialogVisible = ref(false);
     const loading = ref(false);
 
     const workflowTemplate = `const path = '/root/terminal';
@@ -302,7 +302,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       loading.value = false;
       userTcodeInfo.value.name = '';
       userTcodeInfo.value.desc = '';
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     // 关闭
@@ -310,12 +310,12 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       setTimeout(() => {
         reset();
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
       if(done) done();
     };
 
     return {
-      DialogVisilble,
+      DialogVisible,
       confirm,
       closeDialog,
       reset,

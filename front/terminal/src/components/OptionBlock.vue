@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="DialogVisilble"
+    v-model="DialogVisible"
     :before-close="closeDialog"
     destroy-on-close
     :width="420"
@@ -60,10 +60,9 @@ export default {
     CircleClose,
   },
   props:['opType','sshOptions'],
-  setup(props,context)
-  {
+  setup(props,context) {
     // 控制Dialog显示
-    const DialogVisilble = ref(false);
+    const DialogVisible = ref(false);
     const noDataMsg = ref(i18n.global.t('暂无配置'));
 
     // 目标配置
@@ -97,7 +96,7 @@ export default {
       noDataMsg.value = i18n.global.t('暂无配置');
       aimOption.value = '';
       deleteOption.value = '';
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     // 关闭
@@ -105,12 +104,12 @@ export default {
       setTimeout(() => {
         reset();
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
       if(done) done();
     };
 
     return {
-      DialogVisilble,
+      DialogVisible,
       noDataMsg,
       aimOption,
       confirm,

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="DialogVisilble"
+    v-model="DialogVisible"
     :before-close="closeDialog"
     :width=" $t('360')"
     :modal="false"
@@ -61,7 +61,7 @@ export default {
   setup(props, context) {
 
     // 控制Dialog显示
-    const DialogVisilble = ref(false);
+    const DialogVisible = ref(false);
 
     // 文件信息
     const fileDir = ref('');
@@ -108,7 +108,7 @@ export default {
         others: [false,false,false],
         sub: false,
       };
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     // 关闭
@@ -116,14 +116,14 @@ export default {
       setTimeout(() => {
         reset();
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
       if(done) done();
     };
 
     return {
       fileDir,
       fileInfo,
-      DialogVisilble,
+      DialogVisible,
       closeDialog,
       init,
       permissionsInfo,

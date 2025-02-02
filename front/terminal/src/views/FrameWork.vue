@@ -5,15 +5,29 @@
       <div class="setting-menu no-select" @click="doSettings(1)" ><div>{{ $t('连接设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(2)" ><div>{{ $t('偏好设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(4)" ><div>{{ $t('文件管理') }}</div></div>
+      <div class="setting-menu no-select" @click="doSettings(5)" >
+        <div style="flex: 2" ></div>
+        <div>{{ $t('高级') }}</div>
+        <div style="flex: 1" ></div>
+        <el-icon style="margin-right: 2px" ><ArrowRight /></el-icon>
+      </div>
       <div class="setting-menu no-select" @click="doSettings(3)" ><div>{{ $t('重启') }}</div></div>
     </div>
+    <div class="advance" v-show="isShowSetting && isShowAdvance && (urlParams.mode != 'headless' && urlParams.mode != 'pure')" >
+      <div class="setting-menu no-select" @click="doSettings(6)" ><div>{{ $t('协作') }}</div></div>
+      <div class="setting-menu no-select" @click="doSettings(7)" ><div>{{ $t('监控') }}</div></div>
+      <div class="setting-menu no-select" @click="doSettings(8)" ><div>Docker</div></div>
+    </div>
     <div v-if="urlParams.mode != 'headless'" class="kk-flex bar">
-      <div style="user-select: none;" @click="showSettings" >
+      <div style="user-select: none;" @click="isShowSetting = !isShowSetting; isShowAdvance = false;" >
         <img src="../assets/logo.png" :alt="$t('终端')" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
       <div class="ellipsis no-select" style="font-size: 14px;" ><span>kk Terminal</span></div>
       <div style="flex: 1;"></div>
       <div v-show="urlParams.mode != 'headless' && urlParams.mode != 'pure'" class="kk-flex" >
+        <div v-if="cooperating" style="margin-left: 10px; cursor: pointer;" >
+          <el-tag size="small" @click="copyCooperateLink" :type="calcType(onlineNumber, maxNumber)" effect="plain" class="kk-flex no-select" ><el-icon class="el-icon--left" ><UserFilled /></el-icon>{{ onlineNumber }}</el-tag>
+        </div>
         <div v-if="env.cloud" style="margin-left: 10px; cursor: pointer;" >
           <el-tag v-if="recording == false" @click="startRecord" size="small" type="info" effect="plain" class="kk-flex no-select" style="color: #313131;" ><el-icon class="el-icon--left" ><VideoPlay /></el-icon>{{ $t('开始录制') }}</el-tag>
           <el-tag v-else size="small" @click="stopRecord" type="danger" effect="plain" class="kk-flex no-select" ><el-icon class="el-icon--left" ><VideoPause /></el-icon>{{ $t('录制中') }}</el-tag>
@@ -75,6 +89,8 @@
   <UserTcode ref="userTcodeRef" @importTCodes="importTCodes" @exportTcodes="exportTcodes" ></UserTcode>
   <!-- 帮助TCode -->
   <HelpTcode ref="helpTcodeRef" :userTCodes="tcodes" @handleSaveTCode="handleSaveTCode" @handleDeleteTCode="handleDeleteTCode" ></HelpTcode>
+  <!--协作-->
+  <CooperateGen ref="cooperateGenRef" :sshKey="sshKey" @handleCooperate="handleCooperate" ></CooperateGen>
 
 </template>
 
@@ -94,31 +110,42 @@ import { ws_base_url } from '@/env/BaseUrl';
 import { changeStr } from '@/utils/StringUtil';
 import { http_base_url } from '@/env/BaseUrl';
 
-import ConnectSetting from '@/components/ConnectSetting.vue';
-import StyleSetting from '@/components/StyleSetting.vue';
-import FileBlock from "@/components/FileBlock.vue";
-import UserTcode from '@/components/tcode/UserTcode.vue';
-import HelpTcode from "@/components/tcode/HelpTcode.vue";
+import ConnectSetting from '@/components/ConnectSetting';
+import StyleSetting from '@/components/StyleSetting';
+import FileBlock from "@/components/FileBlock";
+import UserTcode from '@/components/tcode/UserTcode';
+import HelpTcode from "@/components/tcode/HelpTcode";
+import CooperateGen from '@/components/CooperateGen';
 import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
-import { QuestionFilled, VideoPlay, VideoPause, MostlyCloudy } from '@element-plus/icons-vue';
+import { QuestionFilled, VideoPlay, VideoPause, MostlyCloudy, ArrowRight, UserFilled } from '@element-plus/icons-vue';
 import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode";
 
 import i18n from "@/locales/i18n";
 import {cloud, load, syncUpload, syncDownload } from "@/utils/CloudUtil";
 import { deleteDialog } from "@/utils/DeleteDialog";
+import cooperateGen from "@/components/CooperateGen.vue";
+import { calcType } from "@/components/calc/CalcType"
 
 export default {
   name: "FrameWork",
+  computed: {
+    cooperateGen() {
+      return cooperateGen
+    }
+  },
   components: {
     ConnectSetting,
     StyleSetting,
     FileBlock,
     UserTcode,
     HelpTcode,
+    CooperateGen,
     QuestionFilled,
     VideoPlay,
     VideoPause,
     MostlyCloudy,
+    ArrowRight,
+    UserFilled,
   },
   setup() {
 
@@ -228,9 +255,16 @@ export default {
       // record
       if(urlParams.value.record) {
         if(urlParams.value.mode != 'headless' && urlParams.value.mode != 'pure') urlParams.value.mode = 'pure';
+        urlParams.value.cooperate = '';
         now_connect_status.value = '';
       }
       else urlParams.value.record = '';
+      // cooperate
+      if(urlParams.value.cooperate) {
+        if(urlParams.value.mode != 'headless' && urlParams.value.mode != 'pure') urlParams.value.mode = 'pure';
+        urlParams.value.cmd = '';
+      }
+      else urlParams.value.cooperate = '';
       // lang
       i18n.global.locale = env.value.lang || 'en';
     };
@@ -292,18 +326,44 @@ export default {
       term.options.scrollback += term._core.buffer.lines.length;
     };
 
+    // 协作
+    const cooperating = ref(false);
+    const onlineNumber = ref(0);
+    const maxNumber = ref(0);
+    const cooperateLink = ref(null);
+    const handleCooperate = (num, link) => {
+      maxNumber.value = num;
+      cooperateLink.value = link;
+      cooperating.value = true;
+    };
+    const copyCooperateLink = async () => {
+      await toClipboard(cooperateLink.value);
+      ElMessage({
+        message: i18n.global.t('协作链接已复制'),
+        type: 'success',
+        grouping: true,
+        repeatNum: Number.MIN_SAFE_INTEGER,
+      });
+    };
+
     // websocket连接
     const sshKey = ref('');
     const socket = ref(null);
     const doSSHConnect = () => {
-      socket.value = new WebSocket(ws_base_url + changeStr(encrypt(JSON.stringify(env.value))));
+      socket.value = new WebSocket(ws_base_url + changeStr(encrypt(JSON.stringify({...env.value, cooperateKey: urlParams.value.cooperate}))));
       socket.value.onopen = () => {
         termFit();
       }
       socket.value.onmessage = resp => {
         let result = JSON.parse(resp.data);
+        // 协作失败
+        if(result.code == -2) {
+          term.clear();
+          now_connect_status.value = connect_status.value['Fail'];
+          termWrite(result.info + ".\n");
+        }
         // 连接失败
-        if(result.code == -1) {
+        else if(result.code == -1) {
           term.clear();
           now_connect_status.value = connect_status.value['Fail'];
           termWrite(now_connect_status.value);
@@ -312,17 +372,21 @@ export default {
           },400);
         }
         // 连接成功
-        if(result.code == 0) {
+        else if(result.code == 0) {
           term.clear();
           now_connect_status.value = connect_status.value['Success'];
-          sshKey.value = decrypt(result.data);
           setTimeout(() => {
             termFit();
-            if(urlParams.value.cmd) sendMessage(urlParams.value.cmd + "\n");
           },1);
+          if(urlParams.value.cooperate) {
+            termWrite(result.info + ".\n");
+            return;
+          }
+          sshKey.value = decrypt(result.data);
+          if(urlParams.value.cmd) sendMessage(urlParams.value.cmd + "\n");
         }
         // 输出
-        if(result.code == 1) {
+        else if(result.code == 1) {
           let output = decrypt(result.data);
           if(UserTcodeExecutor.active) UserTcodeExecutor.outArray.push(output);
           if(recording.value) {
@@ -333,11 +397,15 @@ export default {
           }
           if(!(UserTcodeExecutor.active && !UserTcodeExecutor.display)) termWrite(output);
         }
+        // 更新协作者数量
+        else if(result.code == 2) {
+          onlineNumber.value = Number(decrypt(result.data));
+        }
       }
       socket.value.onclose = (e) => {
         if(now_connect_status.value == connect_status.value['Success'] && e.code != 3333) {
           sshKey.value = '';
-          closeFileBlock();
+          closeBlock();
           now_connect_status.value = connect_status.value['Disconnected'];
           termWrite("\r\n" + now_connect_status.value);
         }
@@ -347,12 +415,15 @@ export default {
 
     // 终端信息设置
     const isShowSetting = ref(false);
-    const showSettings = () => {
-      isShowSetting.value = !isShowSetting.value;
+    const isShowAdvance = ref(false);
+    const showSettings = (newVal) => {
+      isShowSetting.value = newVal;
+      isShowAdvance.value = false;
     };
     const connectSettingRef = ref();
     const styleSettingRef = ref();
     const fileBlockRef = ref();
+    const cooperateGenRef = ref();
     // 保存更改的环境变量
     const saveEnv = (new_env,restart=true) => {
       let save_env = default_env;
@@ -393,7 +464,7 @@ export default {
 
     // 单击事件
     const doClick = () => {
-      isShowSetting.value = false;
+      showSettings(false);
     };
 
     // 重启终端
@@ -440,30 +511,40 @@ export default {
     const doSettings = (type) => {
       // 连接设置
       if(type == 1) {
-        isShowSetting.value = false;
-        connectSettingRef.value.DialogVisilble = true;
+        showSettings(false);
+        connectSettingRef.value.DialogVisible = true;
       }
       // 偏好设置
       else if (type == 2) {
-        isShowSetting.value = false;
-        styleSettingRef.value.DialogVisilble = true;
+        showSettings(false);
+        styleSettingRef.value.DialogVisible = true;
       }
       // 重启
       else if (type == 3) {
-        isShowSetting.value = false;
+        showSettings(false);
         now_connect_status.value = connect_status.value['Connecting'];
         sshKey.value = '';
         if(socket.value) socket.value.close(3333);  // 主动释放资源，必需
         // 进行重启
-        closeFileBlock();
+        closeBlock();
         resetTerminal();
         doSSHConnect();
       }
       // 文件管理
       else if(type == 4) {
-        isShowSetting.value = false;
+        showSettings(false);
         fileBlockRef.value.getInitDir();
-        fileBlockRef.value.DialogVisilble = true;
+        fileBlockRef.value.DialogVisible = true;
+      }
+      // 高级
+      else if(type == 5) {
+        isShowSetting.value = true;
+        isShowAdvance.value = true;
+      }
+      // 协作
+      else if(type == 6) {
+        showSettings(false);
+        cooperateGenRef.value.DialogVisible = true;
       }
     };
 
@@ -491,9 +572,16 @@ export default {
       }
     };
 
-    // 关闭文件模块
-    const closeFileBlock = () => {
+    // 关闭相关模块
+    const closeBlock = () => {
+      // 文件模块
       if(fileBlockRef.value) fileBlockRef.value.deepCloseDialog();
+      // 高级-协作模块
+      if(cooperateGenRef.value) cooperateGenRef.value.closeDialog();
+      cooperating.value = false;
+      onlineNumber.value = 0;
+      maxNumber.value = 0;
+      cooperateLink.value = null;
     };
 
     const setTcodeStatus = (transTcode, state) => {
@@ -699,10 +787,12 @@ export default {
       socket,
       showSettings,
       isShowSetting,
+      isShowAdvance,
       doSettings,
       connectSettingRef,
       styleSettingRef,
       fileBlockRef,
+      cooperateGenRef,
       saveEnv,
       sshKey,
       doHeartBeat,
@@ -710,7 +800,7 @@ export default {
       deleteOp,
       tcode,
       handleTcode,
-      closeFileBlock,
+      closeBlock,
       resetTerminal,
       tcodes,
       userTcodeRef,
@@ -721,6 +811,13 @@ export default {
       handleSaveTCode,
       handleDeleteTCode,
       osInfo,
+      cooperating,
+      onlineNumber,
+      maxNumber,
+      cooperateLink,
+      handleCooperate,
+      copyCooperateLink,
+      calcType,
     }
 
   }
@@ -782,6 +879,16 @@ export default {
 
 .setting-menu:hover {
   background-color: #91c9f7;
+}
+
+.advance {
+  position: absolute;
+  left: 84px;
+  top: 100px;
+  z-index: 100;
+  cursor: pointer;
+  border: 2px solid #f2f2f2;
+  border-left: 2px solid #efefef;
 }
 
 /* 文本不可选中 */

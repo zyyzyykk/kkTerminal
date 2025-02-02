@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="DialogVisilble"
+    v-model="DialogVisible"
     width="80%"
     :modal="false"
     modal-class="kk-dialog-class"
@@ -114,7 +114,7 @@ export default {
   },
   setup(props,context) {
 
-    const DialogVisilble = ref(false);
+    const DialogVisible = ref(false);
     const loading = ref(false);
 
     const modifyTag = ref('');
@@ -298,7 +298,7 @@ export default {
       // fontSize.value = 14;
       percentage.value = 100;
       imgHeight.value = -1;
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     // 关闭
@@ -306,12 +306,12 @@ export default {
       setTimeout(() => {
         reset(true);
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
       if(done) done();
     };
 
     return {
-      DialogVisilble,
+      DialogVisible,
       initText,
       loading,
       fileName,

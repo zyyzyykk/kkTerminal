@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="DialogVisilble"
+    v-model="DialogVisible"
     :before-close="closeDialog"
     :title="$t('文件管理')"
     width="50%"
@@ -33,10 +33,10 @@
           <div v-if="selectedFiles.length == 1" class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
           <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
           <div v-if="dirStatus == 0" class="hover-class" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
-            <el-dropdown v-show="DialogVisilble" style="line-height: unset;" placement="bottom-end" size="small" trigger="click" >
+            <el-dropdown v-show="DialogVisible" style="line-height: unset;" placement="bottom-end" size="small" trigger="click" >
               <div class="hover-class" style="font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
               <template #dropdown>
-                <el-dropdown-menu v-show="DialogVisilble" class="no-select" style="text-align: center;">
+                <el-dropdown-menu v-show="DialogVisible" class="no-select" style="text-align: center;">
                   <el-dropdown-item @click="fileUploadTypeChoose(0)" >
                     <div class="kk-flex" >
                       <div><el-icon><DocumentAdd /></el-icon></div>
@@ -360,11 +360,11 @@ export default {
               lastSelectedIndex = -1;
               fileAreaRef.value.tabindex = '0';
               fileAreaRef.value.focus();
-              if(fileAttrRef.value && fileAttrRef.value.DialogVisilble) {
+              if(fileAttrRef.value && fileAttrRef.value.DialogVisible) {
                 let nowFileInfo = getFileInfoByName(fileAttrRef.value.fileInfo.name);
                 if(nowFileInfo) {
                   fileAttrRef.value.reset();
-                  fileAttrRef.value.DialogVisilble = true;
+                  fileAttrRef.value.DialogVisible = true;
                   fileAttrRef.value.fileInfo = nowFileInfo;
                   fileAttrRef.value.fileDir = dir.value;
                   fileAttrRef.value.rename = nowFileInfo.name;
@@ -581,7 +581,7 @@ export default {
     };
 
     // 控制Dialog显示
-    const DialogVisilble = ref(false);
+    const DialogVisible = ref(false);
 
     // 文本文件编辑
     const txtPreviewRef = ref();
@@ -590,7 +590,7 @@ export default {
       txtPreviewRef.value.fileUrl = getRemoteFileUrl(name);
       txtPreviewRef.value.loading = true;
       txtPreviewRef.value.initText();
-      txtPreviewRef.value.DialogVisilble = true;
+      txtPreviewRef.value.DialogVisible = true;
     };
     // 保存文本，写回服务器
     const doSave = (name, url, arrayBuffer) => {
@@ -740,7 +740,7 @@ export default {
         // 新建
         case 5:
           mkFileRef.value.nowDir = dir.value;
-          mkFileRef.value.DialogVisilble = true;
+          mkFileRef.value.DialogVisible = true;
           break;
         // 重命名
         case 6:
@@ -765,7 +765,7 @@ export default {
             fileAttrRef.value.rename = selectedFiles.value[0].name;
             if(selectedFiles.value[0].isDirectory) fileAttrRef.value.getFolderInclude();
             else fileAttrRef.value.getFileSize();
-            fileAttrRef.value.DialogVisilble = true;
+            fileAttrRef.value.DialogVisible = true;
           }
           break;
         // 解压
@@ -1039,7 +1039,7 @@ export default {
       }
       // URL上传
       else if(type == 2) {
-        fileUrlRef.value.DialogVisilble = true;
+        fileUrlRef.value.DialogVisible = true;
       }
     };
     // 文件夹input框上传预处理
@@ -1195,19 +1195,19 @@ export default {
       isShowPop.value = false;
       isShowRenameInput.value = false;
       renameFile.value = {};
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     // 关闭
     const closeDialog = (done) => {
-      if(txtPreviewRef.value && txtPreviewRef.value.DialogVisilble) txtPreviewRef.value.closeDialog();
-      if(mkFileRef.value && mkFileRef.value.DialogVisilble) mkFileRef.value.closeDialog();
-      if(fileAttrRef.value && fileAttrRef.value.DialogVisilble) fileAttrRef.value.closeDialog();
-      if(fileUrlRef.value && fileUrlRef.value.DialogVisilble) fileUrlRef.value.closeDialog();
+      if(txtPreviewRef.value && txtPreviewRef.value.DialogVisible) txtPreviewRef.value.closeDialog();
+      if(mkFileRef.value && mkFileRef.value.DialogVisible) mkFileRef.value.closeDialog();
+      if(fileAttrRef.value && fileAttrRef.value.DialogVisible) fileAttrRef.value.closeDialog();
+      if(fileUrlRef.value && fileUrlRef.value.DialogVisible) fileUrlRef.value.closeDialog();
       setTimeout(() => {
         reset();
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
       if(done) done();
     };
 
@@ -1220,7 +1220,7 @@ export default {
       setTimeout(() => {
         reset(true);
       },400);
-      DialogVisilble.value = false;
+      DialogVisible.value = false;
     };
 
     onMounted(() => {
@@ -1247,7 +1247,7 @@ export default {
     });
 
     return {
-      DialogVisilble,
+      DialogVisible,
       isShowDirInput,
       dir,
       files,
