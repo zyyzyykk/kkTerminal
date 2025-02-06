@@ -47,5 +47,7 @@
   "云端文件过多": "Too many Cloud Files",
   "云端上传成功": "Cloud File Uploaded",
   "协作Key生成成功": "Cooperate Key Generate Success",
-  "协作Key生成失败": "Cooperate Key Generate Failed"
+  "协作Key生成失败": "Cooperate Key Generate Failed",
+  "获取监控状态成功": "Obtain Monitor Status Success",
+  "获取监控状态失败": "Obtain Monitor Status Failed"
 }

@@ -2,7 +2,7 @@
   <el-dialog
     v-model="DialogVisible"
     destroy-on-close
-    :width="426"
+    :width="$t('450')"
     :title="$t('偏好设置')"
     :modal="false"
     modal-class="kk-dialog-class"
@@ -94,6 +94,12 @@
             <el-switch v-model="setInfo.cloud" />
           </div>
         </div>
+        <div class="item-class">
+          <div>{{ $t('高级') }}</div>
+          <div style="margin: 0 20px;" >
+            <el-switch v-model="setInfo.advance" />
+          </div>
+        </div>
       </div>
       <div class="item-class" style="margin-bottom: 5px;">
         <div class="form-width" >{{ $t('其它') }}：</div>
@@ -170,6 +176,7 @@ export default {
       cursorBlink: props.env.cursorBlink,
       tCode: props.env.tCode,
       cloud: props.env.cloud,
+      advance: props.env.advance,
     });
     const confirm = () => {
       context.emit('callback',setInfo.value);
@@ -188,6 +195,7 @@ export default {
         cursorBlink: props.env.cursorBlink,
         tCode: props.env.tCode,
         cloud: props.env.cloud,
+        advance: props.env.advance,
       };
       DialogVisible.value = false;
     };

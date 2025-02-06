@@ -18,4 +18,5 @@ export const default_env = {
   // 功能相关
   tCode: true,
   cloud: true,
+  advance: true,
 };

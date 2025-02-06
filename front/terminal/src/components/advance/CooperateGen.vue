@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-      v-model="DialogVisible"
+      v-model="computedDialogVisible"
       :before-close="closeDialog"
       :width="$t('240')"
       :modal="false"
@@ -42,21 +42,25 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref,computed } from 'vue';
 import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
 import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/env/BaseUrl';
 import i18n from "@/locales/i18n";
-import {getPureUrl} from "@/utils/UrlUtil";
+import { getPureUrl } from "@/utils/UrlUtil";
 
 export default {
   name: 'CooperateGen',
-  props:['sshKey'],
+  props:['sshKey', 'advance'],
   setup(props, context) {
 
     // 控制Dialog显示
     const DialogVisible = ref(false);
+    const computedDialogVisible = computed(() => {
+      return DialogVisible.value && props.advance;
+    });
+
     const isReadonly = ref(true);
     const maxHeadCount = ref(6);
 
@@ -117,6 +121,7 @@ export default {
     };
 
     return {
+      computedDialogVisible,
       DialogVisible,
       confirm,
       closeDialog,

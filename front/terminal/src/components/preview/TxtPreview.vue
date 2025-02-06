@@ -51,7 +51,7 @@
       </div>
       <div style="margin-right: 20px;" ></div>
       <div class="kk-flex" >
-        <div class="no-select" >{{ $t('字体大小') }}：</div>
+        <div class="no-select" >{{ $t('字号') }}：</div>
         <div>
           <el-input-number :style="{width: '100px'}" size="small" v-model="fontSize" :min="12" :max="20" step="2" :step-strictly="true" @change="setFontSize" >
             <template #suffix>

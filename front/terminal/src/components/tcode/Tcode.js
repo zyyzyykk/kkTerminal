@@ -53,29 +53,39 @@ export const SysTcode = {
     'SC': {
         desc: i18n.global.t('连接设置'),
         execFlow(context) {
-            context.proxy.isShowSetting = false;
             context.proxy.connectSettingRef.DialogVisible = true;
         }
     },
     'SP': {
         desc: i18n.global.t('偏好设置'),
         execFlow(context) {
-            context.proxy.isShowSetting = false;
             context.proxy.styleSettingRef.DialogVisible = true;
         }
     },
     'SF': {
         desc: i18n.global.t('文件管理'),
         execFlow(context) {
-            context.proxy.isShowSetting = false;
             context.proxy.fileBlockRef.DialogVisible = true;
             context.proxy.fileBlockRef.getInitDir();
+        }
+    },
+    'SAC': {
+        desc: i18n.global.t('协作'),
+        execFlow(context) {
+            if(!(context.proxy.sshKey && context.proxy.env.advance && context.proxy.env.server_user === 'root')) return;
+            context.proxy.cooperateGenRef.DialogVisible = true;
+        }
+    },
+    'SAM': {
+        desc: i18n.global.t('监控'),
+        execFlow(context) {
+            if(!(context.proxy.sshKey && context.proxy.env.advance && context.proxy.env.server_user === 'root')) return;
+            context.proxy.statusMonitorRef.DialogVisible = true;
         }
     },
     'SS': {
         desc: i18n.global.t('重启'),
         execFlow(context) {
-            context.proxy.isShowSetting = false;
             context.proxy.now_connect_status = context.proxy.connect_status['Connecting'];
             context.proxy.sshKey = '';
             if(context.proxy.socket) context.proxy.socket.close(3333);  // 主动释放资源，必需

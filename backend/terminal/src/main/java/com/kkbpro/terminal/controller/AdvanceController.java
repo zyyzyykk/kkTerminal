@@ -7,9 +7,14 @@ import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.AesUtil;
 import com.kkbpro.terminal.utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.channel.direct.Session;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 /**
  * 高级功能接口类
@@ -21,10 +26,10 @@ public class AdvanceController {
     public static final String COOPERATE_SECRET_KEY = "o4D1fYuVp2js9xKX";
 
     /**
-     * 获取协作id
+     * 获取协作Key
      */
     @GetMapping("/cooperate")
-    public Result getCooperateId(String sshKey, Boolean readOnly, Integer maxHeadCount) throws Exception {
+    public Result cooperate(String sshKey, Boolean readOnly, Integer maxHeadCount) throws Exception {
         String errorMsg = "协作Key生成失败";
         String successMsg = "协作Key生成成功";
 
@@ -46,7 +51,71 @@ public class AdvanceController {
         return Result.success(successMsg, key);
     }
 
+    //    完整命令
+    //    echo -n "$(uptime | awk -F'load average: ' '{print $2}' | awk '{print $1}' | sed 's/,//')@" && \
+    //    echo -n "$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')@" && \
+    //    echo -n "$(nproc)@" && \
+    //    echo -n "$(free -m | grep Mem | awk '{print $3"@"$2}')@" && \
+    //    echo -n "$(df -BMB / | grep / | awk '{print $3"@"$2}' | sed 's/[A-Za-z]//g')" && \
+    //    echo -n "^" && \
+    //    echo -n "$(ps -eo pid,user,%cpu,%mem,comm --sort=-%cpu | head -n 5 | awk 'NR>1 {print $1"@"$2"@"$3"@"$4"@"$5}' | tr '\n' '$' | sed 's/\(.*\)\$$/\1/')" && \
+    //    echo -n "^" && \
+    //    echo -n "$(cat /proc/net/dev | awk 'NR>2 {up+=$10; down+=$2;} END {print "all:@"up"@"down}')" && \
+    //    echo -n "$" && \
+    //    echo -n "$(cat /proc/net/dev | awk 'NR>2 {print $1"@"$10"@"$2}' | tr -s ' ' '@' | tr '\n' '$' | sed 's/\(.*\)\$/\1/')" && \
+    //    echo -n "^" && \
+    //    echo -n "$(cat /proc/diskstats | awk '{if($3 ~ /[^0-9]$/) {read+=$6; write+=$10}} END {print "all@" read"@"write}')" && \
+    //    echo -n "$" && \
+    //    echo -n "$(cat /proc/diskstats | awk '{print $3"@"$6"@"$10}' | tr -s ' ' '@' | tr '\n' '$' | sed 's/\(.*\)\$/\1/')" && \
+    //    echo -n "^" && \
+    //    echo -n $(date +%s%3N)
+    /**
+     * 获取监控状态
+     */
+    @PostMapping("/monitor")
+    public Result monitor(String sshKey) {
+        String errorMsg = "获取监控状态失败";
+        String successMsg = "获取监控状态成功";
 
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        }
+        String status = "";
+        String command = "echo -n \"$(uptime | awk -F'load average: ' '{print $2}' | awk '{print $1}' | sed 's/,//')@\" && \\\n" +
+                "echo -n \"$(top -bn1 | grep \"Cpu(s)\" | sed \"s/.*, *\\([0-9.]*\\)%* id.*/\\1/\" | awk '{print 100 - $1}')@\" && \\\n" +
+                "echo -n \"$(nproc)@\" && \\\n" +
+                "echo -n \"$(free -m | grep Mem | awk '{print $3\"@\"$2}')@\" && \\\n" +
+                "echo -n \"$(df -BMB / | grep / | awk '{print $3\"@\"$2}' | sed 's/[A-Za-z]//g')\" && \\\n" +
+                "echo -n \"^\" && \\\n" +
+                "echo -n \"$(ps -eo pid,user,%cpu,%mem,comm --sort=-%cpu | head -n 5 | awk 'NR>1 {print $1\"@\"$2\"@\"$3\"@\"$4\"@\"$5}' | tr '\\n' '$' | sed 's/\\(.*\\)\\$$/\\1/')\" && \\\n" +
+                "echo -n \"^\" && \\\n" +
+                "echo -n \"$(cat /proc/net/dev | awk 'NR>2 {up+=$10; down+=$2;} END {print \"all:@\"up\"@\"down}')\" && \\\n" +
+                "echo -n \"$\" && \\\n" +
+                "echo -n \"$(cat /proc/net/dev | awk 'NR>2 {print $1\"@\"$10\"@\"$2}' | tr -s ' ' '@' | tr '\\n' '$' | sed 's/\\(.*\\)\\$/\\1/')\" && \\\n" +
+                "echo -n \"^\" && \\\n" +
+                "echo -n \"$(cat /proc/diskstats | awk '{if($3 ~ /[^0-9]$/) {read+=$6; write+=$10}} END {print \"all@\" read\"@\"write}')\" && \\\n" +
+                "echo -n \"$\" && \\\n" +
+                "echo -n \"$(cat /proc/diskstats | awk '{print $3\"@\"$6\"@\"$10}' | tr -s ' ' '@' | tr '\\n' '$' | sed 's/\\(.*\\)\\$/\\1/')\" && \\\n" +
+                "echo -n \"^\" && \\\n" +
+                "echo -n $(date +%s%3N)";
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
+            // 读取命令执行结果
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
+                status += reader.readLine();
+            }
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.error(errorMsg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(errorMsg);
+        }
+        return Result.success(200, successMsg, status);
+    }
 
 
 }

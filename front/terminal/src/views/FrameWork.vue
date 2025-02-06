@@ -5,7 +5,7 @@
       <div class="setting-menu no-select" @click="doSettings(1)" ><div>{{ $t('连接设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(2)" ><div>{{ $t('偏好设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(4)" ><div>{{ $t('文件管理') }}</div></div>
-      <div class="setting-menu no-select" @click="doSettings(5)" >
+      <div :class="['setting-menu', 'no-select', (sshKey && env.advance && env.server_user === 'root') ? '':'disabled']" @click="doSettings(5)" >
         <div style="flex: 2" ></div>
         <div>{{ $t('高级') }}</div>
         <div style="flex: 1" ></div>
@@ -13,7 +13,7 @@
       </div>
       <div class="setting-menu no-select" @click="doSettings(3)" ><div>{{ $t('重启') }}</div></div>
     </div>
-    <div class="advance" v-show="isShowSetting && isShowAdvance && (urlParams.mode != 'headless' && urlParams.mode != 'pure')" >
+    <div :class="['advance', (sshKey && env.advance && env.server_user === 'root') ? '':'disabled']" v-show="isShowSetting && isShowAdvance && (urlParams.mode != 'headless' && urlParams.mode != 'pure')" >
       <div class="setting-menu no-select" @click="doSettings(6)" ><div>{{ $t('协作') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(7)" ><div>{{ $t('监控') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(8)" ><div>Docker</div></div>
@@ -90,7 +90,9 @@
   <!-- 帮助TCode -->
   <HelpTcode ref="helpTcodeRef" :userTCodes="tcodes" @handleSaveTCode="handleSaveTCode" @handleDeleteTCode="handleDeleteTCode" ></HelpTcode>
   <!--协作-->
-  <CooperateGen ref="cooperateGenRef" :sshKey="sshKey" @handleCooperate="handleCooperate" ></CooperateGen>
+  <CooperateGen ref="cooperateGenRef" :sshKey="sshKey" :advance="env.advance" @handleCooperate="handleCooperate" ></CooperateGen>
+  <!--监控-->
+  <StatusMonitor ref="statusMonitorRef" :sshKey="sshKey" :advance="env.advance" ></StatusMonitor>
 
 </template>
 
@@ -115,7 +117,8 @@ import StyleSetting from '@/components/StyleSetting';
 import FileBlock from "@/components/FileBlock";
 import UserTcode from '@/components/tcode/UserTcode';
 import HelpTcode from "@/components/tcode/HelpTcode";
-import CooperateGen from '@/components/CooperateGen';
+import CooperateGen from '@/components/advance/CooperateGen';
+import StatusMonitor from '@/components/advance/StatusMonitor'
 import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
 import { QuestionFilled, VideoPlay, VideoPause, MostlyCloudy, ArrowRight, UserFilled } from '@element-plus/icons-vue';
 import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode";
@@ -123,16 +126,10 @@ import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode
 import i18n from "@/locales/i18n";
 import {cloud, load, syncUpload, syncDownload } from "@/utils/CloudUtil";
 import { deleteDialog } from "@/utils/DeleteDialog";
-import cooperateGen from "@/components/CooperateGen.vue";
 import { calcType } from "@/components/calc/CalcType"
 
 export default {
   name: "FrameWork",
-  computed: {
-    cooperateGen() {
-      return cooperateGen
-    }
-  },
   components: {
     ConnectSetting,
     StyleSetting,
@@ -140,6 +137,7 @@ export default {
     UserTcode,
     HelpTcode,
     CooperateGen,
+    StatusMonitor,
     QuestionFilled,
     VideoPlay,
     VideoPause,
@@ -255,14 +253,12 @@ export default {
       // record
       if(urlParams.value.record) {
         if(urlParams.value.mode != 'headless' && urlParams.value.mode != 'pure') urlParams.value.mode = 'pure';
-        urlParams.value.cooperate = '';
         now_connect_status.value = '';
       }
       else urlParams.value.record = '';
       // cooperate
       if(urlParams.value.cooperate) {
         if(urlParams.value.mode != 'headless' && urlParams.value.mode != 'pure') urlParams.value.mode = 'pure';
-        urlParams.value.cmd = '';
       }
       else urlParams.value.cooperate = '';
       // lang
@@ -384,6 +380,7 @@ export default {
           }
           sshKey.value = decrypt(result.data);
           if(urlParams.value.cmd) sendMessage(urlParams.value.cmd + "\n");
+          if(env.value.advance && env.value.server_user === 'root' && statusMonitorRef.value) statusMonitorRef.value.doMonitor();
         }
         // 输出
         else if(result.code == 1) {
@@ -424,6 +421,7 @@ export default {
     const styleSettingRef = ref();
     const fileBlockRef = ref();
     const cooperateGenRef = ref();
+    const statusMonitorRef = ref();
     // 保存更改的环境变量
     const saveEnv = (new_env,restart=true) => {
       let save_env = default_env;
@@ -546,6 +544,11 @@ export default {
         showSettings(false);
         cooperateGenRef.value.DialogVisible = true;
       }
+      // 监控
+      else if(type == 7) {
+        showSettings(false);
+        statusMonitorRef.value.DialogVisible = true;
+      }
     };
 
     // websocket心跳续约 (25秒)
@@ -582,6 +585,8 @@ export default {
       onlineNumber.value = 0;
       maxNumber.value = 0;
       cooperateLink.value = null;
+      // 高级-监控模块
+      if(statusMonitorRef.value) statusMonitorRef.value.deepCloseDialog();
     };
 
     const setTcodeStatus = (transTcode, state) => {
@@ -793,6 +798,7 @@ export default {
       styleSettingRef,
       fileBlockRef,
       cooperateGenRef,
+      statusMonitorRef,
       saveEnv,
       sshKey,
       doHeartBeat,
@@ -902,5 +908,11 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 18px;
+}
+
+.disabled {
+  background-color: #f5f7fa;
+  color: #a8abb2;
+  pointer-events: none;
 }
 </style>
