@@ -5,7 +5,7 @@
       <div class="setting-menu no-select" @click="doSettings(1)" ><div>{{ $t('连接设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(2)" ><div>{{ $t('偏好设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(4)" ><div>{{ $t('文件管理') }}</div></div>
-      <div :class="['setting-menu', 'no-select', (sshKey && env.advance && env.server_user === 'root') ? '':'disabled']" @click="doSettings(5)" >
+      <div :class="['setting-menu', 'no-select', (sshKey && env.advance) ? '':'disabled']" @click="doSettings(5)" >
         <div style="flex: 2" ></div>
         <div>{{ $t('高级') }}</div>
         <div style="flex: 1" ></div>
@@ -13,9 +13,9 @@
       </div>
       <div class="setting-menu no-select" @click="doSettings(3)" ><div>{{ $t('重启') }}</div></div>
     </div>
-    <div :class="['advance', (sshKey && env.advance && env.server_user === 'root') ? '':'disabled']" v-show="isShowSetting && isShowAdvance && (urlParams.mode != 'headless' && urlParams.mode != 'pure')" >
+    <div :class="['advance', (sshKey && env.advance) ? '':'disabled']" v-show="isShowSetting && isShowAdvance && (urlParams.mode != 'headless' && urlParams.mode != 'pure')" >
       <div class="setting-menu no-select" @click="doSettings(6)" ><div>{{ $t('协作') }}</div></div>
-      <div class="setting-menu no-select" @click="doSettings(7)" ><div>{{ $t('监控') }}</div></div>
+      <div :class="['setting-menu', 'no-select', (env.server_user === 'root') ? '':'disabled']" @click="doSettings(7)" ><div>{{ $t('监控') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(8)" ><div>Docker</div></div>
     </div>
     <div v-if="urlParams.mode != 'headless'" class="kk-flex bar">
@@ -93,6 +93,8 @@
   <CooperateGen ref="cooperateGenRef" :sshKey="sshKey" :advance="env.advance" @handleCooperate="handleCooperate" ></CooperateGen>
   <!--监控-->
   <StatusMonitor ref="statusMonitorRef" :sshKey="sshKey" :advance="env.advance" ></StatusMonitor>
+  <!--Docker-->
+  <DockerBlock ref="dockerBlockRef" :sshKey="sshKey" :advance="env.advance" ></DockerBlock>
 
 </template>
 
@@ -119,6 +121,7 @@ import UserTcode from '@/components/tcode/UserTcode';
 import HelpTcode from "@/components/tcode/HelpTcode";
 import CooperateGen from '@/components/advance/CooperateGen';
 import StatusMonitor from '@/components/advance/StatusMonitor'
+import DockerBlock from "@/components/advance/DockerBlock";
 import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
 import { QuestionFilled, VideoPlay, VideoPause, MostlyCloudy, ArrowRight, UserFilled } from '@element-plus/icons-vue';
 import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode";
@@ -131,6 +134,7 @@ import { calcType } from "@/components/calc/CalcType"
 export default {
   name: "FrameWork",
   components: {
+    DockerBlock,
     ConnectSetting,
     StyleSetting,
     FileBlock,
@@ -422,6 +426,7 @@ export default {
     const fileBlockRef = ref();
     const cooperateGenRef = ref();
     const statusMonitorRef = ref();
+    const dockerBlockRef = ref();
     // 保存更改的环境变量
     const saveEnv = (new_env,restart=true) => {
       let save_env = default_env;
@@ -549,6 +554,12 @@ export default {
         showSettings(false);
         statusMonitorRef.value.DialogVisible = true;
       }
+      // Docker
+      else if(type == 8) {
+        showSettings(false);
+        dockerBlockRef.value.getDockerInfo();
+        dockerBlockRef.value.DialogVisible = true;
+      }
     };
 
     // websocket心跳续约 (25秒)
@@ -587,6 +598,8 @@ export default {
       cooperateLink.value = null;
       // 高级-监控模块
       if(statusMonitorRef.value) statusMonitorRef.value.deepCloseDialog();
+      // 高级-Docker模块
+      if(dockerBlockRef.value) dockerBlockRef.value.deepCloseDialog();
     };
 
     const setTcodeStatus = (transTcode, state) => {
@@ -799,6 +812,7 @@ export default {
       fileBlockRef,
       cooperateGenRef,
       statusMonitorRef,
+      dockerBlockRef,
       saveEnv,
       sshKey,
       doHeartBeat,

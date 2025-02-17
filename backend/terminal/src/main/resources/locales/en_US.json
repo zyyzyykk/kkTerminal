@@ -49,5 +49,7 @@
   "协作Key生成成功": "Cooperate Key Generate Success",
   "协作Key生成失败": "Cooperate Key Generate Failed",
   "获取监控状态成功": "Obtain Monitor Status Success",
-  "获取监控状态失败": "Obtain Monitor Status Failed"
+  "获取监控状态失败": "Obtain Monitor Status Failed",
+  "获取Docker信息成功": "Obtain Docker Info Success",
+  "获取Docker信息失败": "Obtain Docker Info Failed"
 }

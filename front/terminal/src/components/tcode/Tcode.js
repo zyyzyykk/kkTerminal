@@ -72,7 +72,7 @@ export const SysTcode = {
     'SAC': {
         desc: i18n.global.t('协作'),
         execFlow(context) {
-            if(!(context.proxy.sshKey && context.proxy.env.advance && context.proxy.env.server_user === 'root')) return;
+            if(!(context.proxy.sshKey && context.proxy.env.advance)) return;
             context.proxy.cooperateGenRef.DialogVisible = true;
         }
     },

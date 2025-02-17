@@ -192,7 +192,7 @@ export default {
       },
       processes: [],
       network: {},
-      disk: [],
+      disk: {},
       time: [],
     });
     const selectedNetwork = ref('all');
@@ -252,7 +252,7 @@ export default {
               });
             }
             if(!disk[selectedDisk.value]) selectedDisk.value = "all";
-            // time
+            // Time
             const time = statusInfo.value.time;
             time.push(newTime);
 

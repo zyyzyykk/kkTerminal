@@ -25,6 +25,13 @@ public class AdvanceController {
 
     public static final String COOPERATE_SECRET_KEY = "o4D1fYuVp2js9xKX";
 
+    public static final String[] DOCKER_INFO_CMD = new String[]{
+            "echo -n \"$(docker ps --format \"{{.ID}}@{{.Names}}@{{.Status}}@{{.Image}}@{{.Ports}}\" | paste -sd '$' -)\"",
+            "echo -n \"$(docker images --format \"{{.ID}}@{{.Repository}}@{{.Size}}@{{.CreatedAt}}\" | paste -sd '$' -)\"",
+            "echo -n \"$(docker network ls --format \"{{.Name}}\" | xargs -I {} docker network inspect {} --format \"{{.Name}}@{{range .IPAM.Config}}{{.Subnet}}{{end}}@{{range .IPAM.Config}}{{.Gateway}}{{end}}@{{.Created}}\" | paste -sd'$' -)\"",
+            "echo -n \"$(docker volume ls --format \"{{.Name}}\" | xargs -I {} docker volume inspect {} --format \"{{.Name}}@{{.Mountpoint}}@{{.CreatedAt}}\" | paste -sd'$' -)\"\n"
+    };
+
     /**
      * 获取协作Key
      */
@@ -117,5 +124,44 @@ public class AdvanceController {
         return Result.success(200, successMsg, status);
     }
 
+    // 完整命令
+    //    echo -n "$(docker ps --format "{{.ID}}@{{.Names}}@{{.Status}}@{{.Image}}@{{.Ports}}" | paste -sd '$' -)" && \
+    //    echo -n "^" && \
+    //    echo -n "$(docker images --format "{{.ID}}@{{.Repository}}@{{.Size}}@{{.CreatedAt}}" | paste -sd '$' -)" && \
+    //    echo -n "^" && \
+    //    echo -n "$(docker network ls --format "{{.Name}}" | xargs -I {} docker network inspect {} --format "{{.Name}}@{{range .IPAM.Config}}{{.Subnet}}{{end}}@{{range .IPAM.Config}}{{.Gateway}}{{end}}@{{.Created}}" | paste -sd'$' -)" && \
+    //    echo -n "^" && \
+    //    echo -n "$(docker volume ls --format "{{.Name}}" | xargs -I {} docker volume inspect {} --format "{{.Name}}@{{.Mountpoint}}@{{.CreatedAt}}" | paste -sd'$' -)"
+    /**
+     * 获取Docker信息
+     */
+    @PostMapping("/docker/info")
+    public Result dockerContainerInfo(String sshKey, Integer type) {
+        String errorMsg = "获取Docker信息失败";
+        String successMsg = "获取Docker信息成功";
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        }
+        String docker = "";
+        String command = DOCKER_INFO_CMD[type % DOCKER_INFO_CMD.length];
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
+            // 读取命令执行结果
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
+                docker += reader.readLine();
+            }
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.error(errorMsg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(errorMsg);
+        }
+        return Result.success(200, successMsg, docker);
+    }
 
 }

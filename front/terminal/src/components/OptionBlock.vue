@@ -15,7 +15,7 @@
       <div v-if="Object.keys(sshOptions).length > 0" class="kk-border">
         <div v-for="(value, key) in sshOptions" :key="key" >
           <div :class="['item-class', (aimOption == key) ? 'item-selected' : '']" @click="aimOption = key">
-            <FileIcons :style="{display: 'flex', alignItems: 'center'}" name="kk.txt" :width="20" :height="20" :isFolder="false" />
+            <FileIcons :style="{display: 'flex', alignItems: 'center'}" name="kk.ini" :width="20" :height="20" :isFolder="false" />
             <div class="ellipsis" style="margin: 0 10px;">{{ key }}</div>
             <div style="flex: 1;" ></div>
             <div @click="confirmDeleteOption(key)" ><el-icon><CircleClose /></el-icon></div>
