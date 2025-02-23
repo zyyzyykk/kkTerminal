@@ -19,8 +19,11 @@
                   <div class="kk-border" ></div>
                   <div v-for="(item, key) in FuncTcode" :key="key" >
                     <div class="kk-flex tocde-item" style="padding: 12px 10px;" >
-                      <div style="background-color: #f3f4f4;" >{{ key }}</div>
-                      <div style="margin-left: 25px;" >{{ item.desc }}</div>
+                      <div class="kk-flex" style="width: 60px;">
+                        <div style="background-color: #f3f4f4;" >{{ key }}</div>
+                        <div style="flex: 1;" ></div>
+                      </div>
+                      <div class="ellipsis" style="margin-left: 10px;" >{{ item.desc }}</div>
                     </div>
                   </div>
               </div>
@@ -31,8 +34,11 @@
                   <div class="kk-border" ></div>
                   <div v-for="(item, key) in SysTcode" :key="key" >
                     <div class="kk-flex tocde-item" style="padding: 12px 10px;" >
-                      <div style="background-color: #f3f4f4;" >{{ key }}</div>
-                      <div style="margin-left: 25px;" >{{ item.desc }}</div>
+                      <div class="kk-flex" style="width: 60px;">
+                        <div style="background-color: #f3f4f4;" >{{ key }}</div>
+                        <div style="flex: 1;" ></div>
+                      </div>
+                      <div class="ellipsis" style="margin-left: 10px;" >{{ item.desc }}</div>
                     </div>
                   </div>
               </div>

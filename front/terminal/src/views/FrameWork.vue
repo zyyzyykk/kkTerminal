@@ -94,7 +94,7 @@
   <!--监控-->
   <StatusMonitor ref="statusMonitorRef" :sshKey="sshKey" :advance="env.advance" ></StatusMonitor>
   <!--Docker-->
-  <DockerBlock ref="dockerBlockRef" :sshKey="sshKey" :advance="env.advance" ></DockerBlock>
+  <DockerBlock ref="dockerBlockRef" :sshKey="sshKey" :advance="env.advance" @install="installDocker" ></DockerBlock>
 
 </template>
 
@@ -385,6 +385,7 @@ export default {
           sshKey.value = decrypt(result.data);
           if(urlParams.value.cmd) sendMessage(urlParams.value.cmd + "\n");
           if(env.value.advance && env.value.server_user === 'root' && statusMonitorRef.value) statusMonitorRef.value.doMonitor();
+          if(env.value.advance && dockerBlockRef.value) dockerBlockRef.value.getDockerVersion(sshKey.value);
         }
         // 输出
         else if(result.code == 1) {
@@ -557,7 +558,6 @@ export default {
       // Docker
       else if(type == 8) {
         showSettings(false);
-        dockerBlockRef.value.getDockerInfo();
         dockerBlockRef.value.DialogVisible = true;
       }
     };
@@ -747,6 +747,11 @@ export default {
       });
     };
 
+    // 安装Docker
+    const installDocker = (cmd) => {
+      sendMessage(cmd);
+    };
+
     onMounted(async () => {
       // 启动终端
       resetTerminal();
@@ -838,6 +843,7 @@ export default {
       handleCooperate,
       copyCooperateLink,
       calcType,
+      installDocker,
     }
 
   }

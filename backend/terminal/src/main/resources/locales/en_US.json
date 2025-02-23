@@ -51,5 +51,9 @@
   "获取监控状态成功": "Obtain Monitor Status Success",
   "获取监控状态失败": "Obtain Monitor Status Failed",
   "获取Docker信息成功": "Obtain Docker Info Success",
-  "获取Docker信息失败": "Obtain Docker Info Failed"
+  "获取Docker信息失败": "Obtain Docker Info Failed",
+  "获取Docker版本成功": "Obtain Docker Version Success",
+  "获取Docker版本失败": "Obtain Docker Version Failed",
+  "操作成功": "Operation Success",
+  "操作失败": "Operation Failed"
 }

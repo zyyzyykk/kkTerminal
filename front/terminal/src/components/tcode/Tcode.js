@@ -83,6 +83,13 @@ export const SysTcode = {
             context.proxy.statusMonitorRef.DialogVisible = true;
         }
     },
+    'SAD': {
+        desc: 'Docker',
+        execFlow(context) {
+            if(!(context.proxy.sshKey && context.proxy.env.advance)) return;
+            context.proxy.dockerBlockRef.DialogVisible = true;
+        }
+    },
     'SS': {
         desc: i18n.global.t('重启'),
         execFlow(context) {

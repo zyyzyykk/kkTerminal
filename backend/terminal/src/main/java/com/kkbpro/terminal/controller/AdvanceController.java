@@ -26,10 +26,24 @@ public class AdvanceController {
     public static final String COOPERATE_SECRET_KEY = "o4D1fYuVp2js9xKX";
 
     public static final String[] DOCKER_INFO_CMD = new String[]{
-            "echo -n \"$(docker ps --format \"{{.ID}}@{{.Names}}@{{.Status}}@{{.Image}}@{{.Ports}}\" | paste -sd '$' -)\"",
+            "echo -n \"$(docker ps -a --format \"{{.ID}}@{{.Names}}@{{.Status}}@{{.Image}}@{{.Ports}}\" | paste -sd '$' -)\"",
             "echo -n \"$(docker images --format \"{{.ID}}@{{.Repository}}@{{.Size}}@{{.CreatedAt}}\" | paste -sd '$' -)\"",
             "echo -n \"$(docker network ls --format \"{{.Name}}\" | xargs -I {} docker network inspect {} --format \"{{.Name}}@{{range .IPAM.Config}}{{.Subnet}}{{end}}@{{range .IPAM.Config}}{{.Gateway}}{{end}}@{{.Created}}\" | paste -sd'$' -)\"",
             "echo -n \"$(docker volume ls --format \"{{.Name}}\" | xargs -I {} docker volume inspect {} --format \"{{.Name}}@{{.Mountpoint}}@{{.CreatedAt}}\" | paste -sd'$' -)\"\n"
+    };
+
+    public static final String[] DOCKER_DELETE_CMD = new String[]{
+            "docker rm -f ",
+            "docker rmi -f ",
+            "docker network rm ",
+            "docker volume rm "
+    };
+
+    public static final String[] DOCKER_CONTAINER_CMD = new String[]{
+            "docker start ",
+            "docker pause ",
+            "docker restart ",
+            "docker rm -f "
     };
 
     /**
@@ -124,8 +138,40 @@ public class AdvanceController {
         return Result.success(200, successMsg, status);
     }
 
+    /**
+     * 获取Docker版本
+     */
+    @PostMapping("/docker/version")
+    public Result dockerVersion(String sshKey) {
+        String errorMsg = "获取Docker版本失败";
+        String successMsg = "获取Docker版本成功";
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        }
+        String version = "";
+        String command = "docker --version";
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
+            // 读取命令执行结果
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
+                version += reader.readLine();
+            }
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.error(errorMsg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(errorMsg);
+        }
+        return Result.success(200, successMsg, version);
+    }
+
     // 完整命令
-    //    echo -n "$(docker ps --format "{{.ID}}@{{.Names}}@{{.Status}}@{{.Image}}@{{.Ports}}" | paste -sd '$' -)" && \
+    //    echo -n "$(docker ps -a --format "{{.ID}}@{{.Names}}@{{.Status}}@{{.Image}}@{{.Ports}}" | paste -sd '$' -)" && \
     //    echo -n "^" && \
     //    echo -n "$(docker images --format "{{.ID}}@{{.Repository}}@{{.Size}}@{{.CreatedAt}}" | paste -sd '$' -)" && \
     //    echo -n "^" && \
@@ -136,7 +182,7 @@ public class AdvanceController {
      * 获取Docker信息
      */
     @PostMapping("/docker/info")
-    public Result dockerContainerInfo(String sshKey, Integer type) {
+    public Result dockerInfo(String sshKey, Integer type) {
         String errorMsg = "获取Docker信息失败";
         String successMsg = "获取Docker信息成功";
 
@@ -144,14 +190,14 @@ public class AdvanceController {
         if(ssh == null) {
             return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
-        String docker = "";
+        String info = "";
         String command = DOCKER_INFO_CMD[type % DOCKER_INFO_CMD.length];
         try(Session session = ssh.startSession();
             Session.Command cmd = session.exec(command))
         {
             // 读取命令执行结果
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
-                docker += reader.readLine();
+                info += reader.readLine();
             }
             // 等待命令执行完毕
             cmd.join();
@@ -161,7 +207,67 @@ public class AdvanceController {
             e.printStackTrace();
             return Result.error(errorMsg);
         }
-        return Result.success(200, successMsg, docker);
+        return Result.success(200, successMsg, info);
+    }
+
+    /**
+     * Docker删除
+     */
+    @PostMapping("/docker/delete")
+    public Result dockerDelete(String sshKey, Integer type, String items) {
+        String errorMsg = "删除失败";
+        String successMsg = "删除成功";
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        }
+        String command = DOCKER_DELETE_CMD[type % DOCKER_DELETE_CMD.length] + items;
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.error(errorMsg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(errorMsg);
+        }
+        return Result.success(200, successMsg, null);
+    }
+
+
+    /**
+     * Docker容器操作
+     */
+    @PostMapping("/docker/container")
+    public Result dockerContainer(String sshKey, Integer type, String items) {
+        String errorMsg = "操作失败";
+        String successMsg = "操作成功";
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        if(ssh == null) {
+            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        }
+        String container = "";
+        String command = DOCKER_CONTAINER_CMD[type % DOCKER_CONTAINER_CMD.length] + items;
+        try(Session session = ssh.startSession();
+            Session.Command cmd = session.exec(command))
+        {
+            // 读取命令执行结果
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
+                container += reader.readLine();
+            }
+            // 等待命令执行完毕
+            cmd.join();
+            int exitStatus = cmd.getExitStatus();
+            if (exitStatus != 0) return Result.error(errorMsg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(errorMsg);
+        }
+        return Result.success(200, successMsg, container);
     }
 
 }

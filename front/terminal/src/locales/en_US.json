@@ -190,9 +190,20 @@
   "镜像": "Image",
   "数据卷": "Volume",
   "名称": "Name",
+  "状态": "Status",
   "端口": "Port",
   "仓库": "Repository",
   "创建时间": "Create Time",
   "网关": "Gateway",
-  "挂载点": "Mount Point"
+  "挂载点": "Mount Point",
+  "安装": "Install",
+  "选择批量操作": "Select Batch Operation",
+  "启动容器": "Start Container",
+  "停止容器": "Pause Container",
+  "重启容器": "Restart Container",
+  "删除容器": "Delete Container",
+  "删除镜像": "Delete Image",
+  "删除网络": "Delete NetWork",
+  "删除数据卷": "Delete Volume",
+  "Docker未安装?": "Docker is not installed?"
 }
