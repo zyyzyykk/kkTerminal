@@ -205,5 +205,6 @@
   "删除镜像": "Delete Image",
   "删除网络": "Delete NetWork",
   "删除数据卷": "Delete Volume",
-  "Docker未安装?": "Docker is not installed?"
+  "Docker未安装?": "Docker is not installed?",
+  "确定进行此操作吗?": "Sure to do this operation?"
 }

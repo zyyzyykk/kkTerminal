@@ -37,7 +37,7 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-button :disabled="!(selectedItems.length > 0 && containerType != 0)" size="small" type="primary" @click="containerOperate" style="margin-left: 10px;" >
+            <el-button :disabled="!(selectedItems.length > 0 && containerType != 0)" size="small" type="primary" @click="operateConfirm" style="margin-left: 10px;" >
               {{ $t('确定') }}
             </el-button>
           </div>
@@ -62,7 +62,7 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-button :disabled="!(selectedItems.length > 0 && deleteType != 0)" size="small" type="primary" @click="dockerDelete" style="margin-left: 10px;" >
+            <el-button :disabled="!(selectedItems.length > 0 && deleteType != 0)" size="small" type="primary" @click="deleteConfirm" style="margin-left: 10px;" >
               {{ $t('确定') }}
             </el-button>
           </div>
@@ -87,7 +87,7 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-button :disabled="!(selectedItems.length > 0 && deleteType != 0)" size="small" type="primary" @click="dockerDelete" style="margin-left: 10px;" >
+            <el-button :disabled="!(selectedItems.length > 0 && deleteType != 0)" size="small" type="primary" @click="deleteConfirm" style="margin-left: 10px;" >
               {{ $t('确定') }}
             </el-button>
           </div>
@@ -111,7 +111,7 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-button :disabled="!(selectedItems.length > 0 && deleteType != 0)" size="small" type="primary" @click="dockerDelete" style="margin-left: 10px;" >
+            <el-button :disabled="!(selectedItems.length > 0 && deleteType != 0)" size="small" type="primary" @click="deleteConfirm" style="margin-left: 10px;" >
               {{ $t('确定') }}
             </el-button>
           </div>
@@ -145,6 +145,7 @@ import { http_base_url } from "@/env/BaseUrl";
 import { ArrowDown } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 import {ElMessage} from "element-plus";
+import { deleteDialog } from "@/utils/DeleteDialog";
 
 export default {
   name: 'DockerBlock',
@@ -349,6 +350,12 @@ export default {
         }
       });
     };
+    const operateConfirm = () => {
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定进行此操作吗?'), containerOperate);
+    };
+    const deleteConfirm = () => {
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定进行此操作吗?'), dockerDelete);
+    };
 
     // 安装Docker
     const installDocker = () => {
@@ -407,11 +414,11 @@ export default {
       tableSelect,
       containerType,
       deleteType,
-      containerOperate,
-      dockerDelete,
       selectedItems,
       containerTypeArr,
       deleteTypeArr,
+      operateConfirm,
+      deleteConfirm,
     }
   }
 }

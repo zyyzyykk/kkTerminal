@@ -2,7 +2,7 @@ package com.kkbpro.terminal.constants.enums;
 
 public enum ResultCodeEnum {
 
-    COOPERATE_KEY_INVALID(-2, "Cooperate Key is invalid"),
+    COOPERATE_KEY_INVALID(-2, "Cooperate Key is Invalid"),
 
     CONNECT_FAIL(-1,"Fail to connect remote server"),
 

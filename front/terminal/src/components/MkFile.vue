@@ -19,7 +19,7 @@
       <div class="kk-flex">
         <div>
           <FileIcons :style="{display: 'flex', alignItems: 'center'}" :width="24" :height="24" v-if="isDirectory == true" name="kk.txt" :isFolder="true" />
-          <FileIcons :style="{display: 'flex', alignItems: 'center'}" :width="24" :height="24" v-else name="kk.txt" :isFolder="false" />
+          <FileIcons :style="{display: 'flex', alignItems: 'center'}" :width="24" :height="24" v-else :name="name" :isFolder="false" />
         </div>
         <div style="width: 10px;"></div>
         <div style="flex: 1;">

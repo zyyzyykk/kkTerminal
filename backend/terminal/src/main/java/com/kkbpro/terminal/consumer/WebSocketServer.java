@@ -112,7 +112,7 @@ public class WebSocketServer {
                     // 成功加入协作
                     if(maxHeadCount > sessions.size()) {
                         state = ResultCodeEnum.CONNECT_SUCCESS.getState();
-                        msg = (readOnly ? "ReadOnly" : "Edit") + " cooperate connect success";
+                        msg = (readOnly ? "ReadOnly" : "Edit") + " Cooperation Success";
                         sessions.add(sessionSocket);
                         this.sshKey = sshKey;
                         this.cooperator = true;
@@ -124,7 +124,7 @@ public class WebSocketServer {
                         sendMessage(webSocketServer.sessionSocket, ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
                                 "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(sessions.size()));
                     }
-                    else msg = "Cooperators limit exceeded";
+                    else msg = "Cooperators Limit Exceeded";
                 }
             } catch (Exception e) {
                 e.printStackTrace();
