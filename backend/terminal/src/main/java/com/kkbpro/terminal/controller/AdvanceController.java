@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 /**
  * 高级功能接口类
@@ -47,10 +49,10 @@ public class AdvanceController {
     };
 
     /**
-     * 获取协作Key
+     * 生成协作Key
      */
-    @GetMapping("/cooperate")
-    public Result cooperate(String sshKey, Boolean readOnly, Integer maxHeadCount) throws Exception {
+    @GetMapping("/cooperate/key")
+    public Result cooperateKey(String sshKey, Boolean readOnly, Integer maxHeadCount) throws Exception {
         String errorMsg = "协作Key生成失败";
         String successMsg = "协作Key生成成功";
 
@@ -70,6 +72,32 @@ public class AdvanceController {
         String key = StringUtil.changeBase64Str(AesUtil.aesEncrypt(sshKey, COOPERATE_SECRET_KEY));
 
         return Result.success(successMsg, key);
+    }
+
+    /**
+     * 结束协作
+     */
+    @PostMapping("/cooperate/end")
+    public Result cooperateEnd(String sshKey) throws IOException {
+        String errorMsg = "结束协作失败";
+        String successMsg = "结束协作成功";
+
+        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
+        if(ssh == null || webSocketServer == null) {
+            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        }
+
+        webSocketServer.setCooperateInfo(null);
+        List<javax.websocket.Session> sessions = WebSocketServer.cooperateMap.get(sshKey);
+        WebSocketServer.cooperateMap.remove(sshKey);
+        if(sessions != null) {
+            for(javax.websocket.Session session : sessions) {
+                session.close();
+            }
+        }
+
+        return Result.success(successMsg);
     }
 
     //    完整命令

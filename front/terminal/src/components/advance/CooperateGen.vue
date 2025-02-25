@@ -71,7 +71,7 @@ export default {
     const confirm = async () => {
       const maxHC = maxHeadCount.value;
       $.ajax({
-        url: http_base_url + '/cooperate',
+        url: http_base_url + '/cooperate/key',
         type:'get',
         data:{
           time:new Date().getTime(),
@@ -89,7 +89,7 @@ export default {
               grouping: true,
               repeatNum: Number.MIN_SAFE_INTEGER,
             });
-            context.emit('handleCooperate', maxHC, link);
+            context.emit('handleCooperate', maxHC);
             closeDialog();
           }
           else {

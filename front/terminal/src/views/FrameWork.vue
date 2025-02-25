@@ -5,7 +5,7 @@
       <div class="setting-menu no-select" @click="doSettings(1)" ><div>{{ $t('连接设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(2)" ><div>{{ $t('偏好设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(4)" ><div>{{ $t('文件管理') }}</div></div>
-      <div :class="['setting-menu', 'no-select', (sshKey && env.advance) ? '':'disabled']" @click="doSettings(5)" >
+      <div @mousemove="showAdvance(true)" @mouseleave="showAdvance(false)" :class="['setting-menu', 'no-select', (sshKey && env.advance) ? '':'disabled']" @click="doSettings(5)" >
         <div style="flex: 2" ></div>
         <div>{{ $t('高级') }}</div>
         <div style="flex: 1" ></div>
@@ -13,20 +13,20 @@
       </div>
       <div class="setting-menu no-select" @click="doSettings(3)" ><div>{{ $t('重启') }}</div></div>
     </div>
-    <div :class="['advance', (sshKey && env.advance) ? '':'disabled']" v-show="isShowSetting && isShowAdvance && (urlParams.mode != 'headless' && urlParams.mode != 'pure')" >
+    <div @mousemove="showAdvance(true)" @mouseleave="showAdvance(false)" :class="['advance', (sshKey && env.advance) ? '':'disabled']" v-show="isShowSetting && isShowAdvance && (urlParams.mode != 'headless' && urlParams.mode != 'pure')" >
       <div class="setting-menu no-select" @click="doSettings(6)" ><div>{{ $t('协作') }}</div></div>
       <div :class="['setting-menu', 'no-select', (env.server_user === 'root') ? '':'disabled']" @click="doSettings(7)" ><div>{{ $t('监控') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(8)" ><div>Docker</div></div>
     </div>
     <div v-if="urlParams.mode != 'headless'" class="kk-flex bar">
-      <div style="user-select: none;" @click="isShowSetting = !isShowSetting; isShowAdvance = false;" >
+      <div style="user-select: none;" @click="isShowSetting = !isShowSetting; isShowAdvance = false; showAdvance(false);" >
         <img src="../assets/logo.png" :alt="$t('终端')" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
       <div class="ellipsis no-select" style="font-size: 14px;" ><span>kk Terminal</span></div>
       <div style="flex: 1;"></div>
       <div v-show="urlParams.mode != 'headless' && urlParams.mode != 'pure'" class="kk-flex" >
         <div v-if="cooperating" style="margin-left: 10px; cursor: pointer;" >
-          <el-tag size="small" @click="copyCooperateLink" :type="calcType(onlineNumber, maxNumber)" effect="plain" class="kk-flex no-select" ><el-icon class="el-icon--left" ><UserFilled /></el-icon>{{ onlineNumber }}</el-tag>
+          <el-tag size="small" @click="endCooperateConfirm" :type="calcType(onlineNumber, maxNumber)" effect="plain" class="kk-flex no-select" ><el-icon class="el-icon--left" ><UserFilled /></el-icon>{{ onlineNumber }}</el-tag>
         </div>
         <div v-if="env.cloud" style="margin-left: 10px; cursor: pointer;" >
           <el-tag v-if="recording == false" @click="startRecord" size="small" type="info" effect="plain" class="kk-flex no-select" style="color: #313131;" ><el-icon class="el-icon--left" ><VideoPlay /></el-icon>{{ $t('开始录制') }}</el-tag>
@@ -157,6 +157,7 @@ export default {
       'Success':'Connecting success !\r\n',
       'Connecting':'Connecting to remote server ...\r\n',
       'Disconnected':'Disconnect to remote server.\r\n',
+      'End':'This Cooperation is Ended.\r\n',
     });
     const now_connect_status = ref(connect_status.value['Connecting']);
 
@@ -330,20 +331,31 @@ export default {
     const cooperating = ref(false);
     const onlineNumber = ref(0);
     const maxNumber = ref(0);
-    const cooperateLink = ref(null);
-    const handleCooperate = (num, link) => {
+    const handleCooperate = (num) => {
       maxNumber.value = num;
-      cooperateLink.value = link;
       cooperating.value = true;
     };
-    const copyCooperateLink = async () => {
-      await toClipboard(cooperateLink.value);
-      ElMessage({
-        message: i18n.global.t('协作链接已复制'),
-        type: 'success',
-        grouping: true,
-        repeatNum: Number.MIN_SAFE_INTEGER,
+    const endCooperate = () => {
+      $.ajax({
+        url: http_base_url + '/cooperate/end',
+        type:'post',
+        data:{
+          sshKey:sshKey.value,
+        },
+        async success(resp) {
+          if(resp.status == 'success') {
+            maxNumber.value = 0;
+            cooperating.value = false;
+          }
+          ElMessage({
+            message: resp.info,
+            type: resp.status,
+          });
+        }
       });
+    };
+    const endCooperateConfirm = () => {
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定结束此次协作吗?'), endCooperate);
     };
 
     // websocket连接
@@ -407,6 +419,11 @@ export default {
       socket.value.onclose = (e) => {
         if(now_connect_status.value == connect_status.value['Success'] && e.code != 3333) {
           sshKey.value = '';
+          if(urlParams.value.cooperate) {
+            now_connect_status.value = connect_status.value['End'];
+            termWrite("\r\n" + now_connect_status.value);
+            return;
+          }
           closeBlock();
           now_connect_status.value = connect_status.value['Disconnected'];
           termWrite("\r\n" + now_connect_status.value);
@@ -421,6 +438,16 @@ export default {
     const showSettings = (newVal) => {
       isShowSetting.value = newVal;
       isShowAdvance.value = false;
+      showAdvance(false);
+    };
+    let advanceTimer = null;
+    const showAdvance = (newVal) => {
+      if(advanceTimer) clearTimeout(advanceTimer);
+      if(isShowAdvance.value != newVal) {
+        advanceTimer = setTimeout(() => {
+          isShowAdvance.value = newVal;
+        }, 400);
+      }
     };
     const connectSettingRef = ref();
     const styleSettingRef = ref();
@@ -544,6 +571,7 @@ export default {
       else if(type == 5) {
         isShowSetting.value = true;
         isShowAdvance.value = true;
+        showAdvance(true);
       }
       // 协作
       else if(type == 6) {
@@ -595,7 +623,6 @@ export default {
       cooperating.value = false;
       onlineNumber.value = 0;
       maxNumber.value = 0;
-      cooperateLink.value = null;
       // 高级-监控模块
       if(statusMonitorRef.value) statusMonitorRef.value.deepCloseDialog();
       // 高级-Docker模块
@@ -808,6 +835,7 @@ export default {
       terminal,
       doSSHConnect,
       socket,
+      showAdvance,
       showSettings,
       isShowSetting,
       isShowAdvance,
@@ -839,9 +867,8 @@ export default {
       cooperating,
       onlineNumber,
       maxNumber,
-      cooperateLink,
       handleCooperate,
-      copyCooperateLink,
+      endCooperateConfirm,
       calcType,
       installDocker,
     }

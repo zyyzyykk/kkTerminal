@@ -205,10 +205,14 @@ export default {
       let serverEncode = 'UTF-8';
       const urlParams = getUrlParams(url);
       if(urlParams.sshKey) serverEncode = changeStr2(urlParams.sshKey.split('-')[1]);
+      if(encode.value && encode.value.toLowerCase() === 'gb2312') encode.value = 'GBK';
       encodeSet.value = ['UTF-8','GBK','ISO-8859-1','Windows-1252'];
+      // 服务器编码不在默认编码集中
       if(!encodeSet.value.map(item => item.toLowerCase()).includes(serverEncode.toLowerCase())) encodeSet.value.unshift(serverEncode);
-      if(!encode.value || encode.value.toLowerCase() == 'ascii') encode.value = serverEncode;
+      // 编码格式为ASCII，则默认使用服务器编码
+      if(!encode.value || encode.value.toLowerCase() === 'ascii') encode.value = serverEncode;
       else if(!encodeSet.value.map(item => item.toLowerCase()).includes(encode.value.toLowerCase())) encodeSet.value.unshift(encode.value);
+      else encode.value = encodeSet.value.find(item => item.toLowerCase() === encode.value.toLowerCase());
     };
 
     // 语言模式
