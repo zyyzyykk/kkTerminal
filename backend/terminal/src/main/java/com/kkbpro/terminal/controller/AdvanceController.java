@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 高级功能接口类
@@ -64,12 +65,14 @@ public class AdvanceController {
         if(webSocketServer.getCooperateInfo() != null)
             return Result.error(errorMsg);
 
+        String cooperateId = UUID.randomUUID().toString();
         CooperateInfo cooperateInfo = new CooperateInfo();
+        cooperateInfo.setId(cooperateId);
         cooperateInfo.setReadOnly(readOnly);
         cooperateInfo.setMaxHeadCount(maxHeadCount);
         webSocketServer.setCooperateInfo(cooperateInfo);
 
-        String key = StringUtil.changeBase64Str(AesUtil.aesEncrypt(sshKey, COOPERATE_SECRET_KEY));
+        String key = StringUtil.changeBase64Str(AesUtil.aesEncrypt(cooperateId + "^" + sshKey, COOPERATE_SECRET_KEY));
 
         return Result.success(successMsg, key);
     }

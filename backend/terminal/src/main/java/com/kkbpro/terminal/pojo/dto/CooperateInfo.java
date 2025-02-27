@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CooperateInfo {
 
+    private String id;
+
     private Boolean readOnly;
 
     private Integer maxHeadCount;

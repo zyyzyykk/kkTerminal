@@ -100,9 +100,11 @@ public class WebSocketServer {
             Integer state = ResultCodeEnum.COOPERATE_KEY_INVALID.getState();
             String msg = ResultCodeEnum.COOPERATE_KEY_INVALID.getDesc();
             try {
-                String sshKey = AesUtil.aesDecrypt(StringUtil.changeStrBase64(cooperateKey), AdvanceController.COOPERATE_SECRET_KEY);
+                String[] keyInfo = AesUtil.aesDecrypt(StringUtil.changeStrBase64(cooperateKey), AdvanceController.COOPERATE_SECRET_KEY).split("\\^");
+                String cooperateId = keyInfo[0];
+                String sshKey = keyInfo[1];
                 WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
-                if(webSocketServer == null || webSocketServer.cooperateInfo == null)
+                if(webSocketServer == null || webSocketServer.cooperateInfo == null || !webSocketServer.cooperateInfo.getId().equals(cooperateId))
                     throw new RuntimeException();
 
                 List<Session> sessions = WebSocketServer.cooperateMap.computeIfAbsent(sshKey, k -> new ArrayList<>());
