@@ -64,7 +64,7 @@ def process_file_line_by_line(file_path, translation_keys):
     issues = []
 
     # Match $t(...) and i18n.global.t(...)
-    wrapped_pattern = re.compile(r"(?:\$t|i18n\.global\.t)\(['\"]([^'\"]*?)['\"]\)")
+    wrapped_pattern = re.compile(r"(?:\$t|i18n\.global\.t|i18n\.global\.k)\(['\"]([^'\"]*?)['\"]\)")
     # Match Chinese
     chinese_pattern = re.compile(r"[\u4e00-\u9fff]")
     # Match comments
