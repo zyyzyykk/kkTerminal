@@ -131,6 +131,7 @@
 <script>
 import { ref, computed } from 'vue';
 import { ArrowDown } from '@element-plus/icons-vue';
+import i18n from "@/locales/i18n";
 
 export default {
   name:'StyleSetting',
@@ -144,7 +145,7 @@ export default {
     const DialogVisible = ref(false);
 
     // 语言列表
-    const langList = [{label:"English",value:"en"}, {label:"Chinese",value:"zh"}];
+    const langList = [{label:"English",value:"en"}, {label:i18n.global.k("简体中文"),value:"zh"}];
     const mapValueToLabel = (lang) => {
       const item = langList.find(item => item.value === lang);
       return item ? item.label : "English";

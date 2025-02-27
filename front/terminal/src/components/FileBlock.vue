@@ -101,7 +101,7 @@
           </div>
         </div>
         <div v-else>
-          <NoData height="248px" @contextmenu="selectedFiles = []" v-if="loading == false" :msg="noDataMsg"></NoData>
+          <NoData height="248px" @contextmenu="selectedFiles = []" v-if="loading == false" :msg="$t(noDataMsg)"></NoData>
         </div>
       </div>
     </div>
@@ -311,7 +311,7 @@ export default {
         },
         success(resp){
           if(resp.status == 'success') {
-            noDataMsg.value = i18n.global.t('暂无文件');
+            noDataMsg.value = i18n.global.k('暂无文件');
             dirStatus.value = 0;
             dir.value = resp.data;
             confirmDirCorrect();
@@ -329,7 +329,7 @@ export default {
     };
 
     // 获取当前路径下的文件列表
-    const noDataMsg = ref(i18n.global.t('暂无文件'));
+    const noDataMsg = ref(i18n.global.k('暂无文件'));
     // 目录状态：0 正常 / 1 目录不存在、无权限等
     const dirStatus = ref(0);
     const getDirList = () => {
@@ -355,7 +355,7 @@ export default {
             selectedFiles.value = [];
             if(resp.status == 'success') {
               files.value = resp.data;
-              noDataMsg.value = i18n.global.t('暂无文件');
+              noDataMsg.value = i18n.global.k('暂无文件');
               dirStatus.value = 0;
               lastSelectedIndex = -1;
               fileAreaRef.value.tabindex = '0';
@@ -1181,7 +1181,7 @@ export default {
         dir.value = '';
         dirLevels.value = [];
         isShowDirInput.value = false;
-        noDataMsg.value = i18n.global.t('暂无文件');
+        noDataMsg.value = i18n.global.k('暂无文件');
         dirStatus.value = 0;
         fileClipboard.value = {
           path:'/',

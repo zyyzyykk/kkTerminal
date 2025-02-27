@@ -5,6 +5,7 @@
   "450": "480",
   "描\u00A0\u00A0\u00A0述": "Desc",
   "配\u00A0\u00A0\u00A0置": "Option",
+  "简体中文": "Chinese",
   "密码": "Pwd",
   "私钥": "Key",
   "导入私钥": "Import Key",
@@ -207,5 +208,8 @@
   "删除网络": "Delete NetWork",
   "删除数据卷": "Delete Volume",
   "Docker未安装?": "Docker is not installed?",
-  "确定进行此操作吗?": "Sure to do this operation?"
+  "确定进行此操作吗?": "Sure to do this operation?",
+  "高级-协作": "Advance-Cooperate",
+  "高级-监控": "Advance-Monitor",
+  "高级-Docker": "Advance-Docker"
 }

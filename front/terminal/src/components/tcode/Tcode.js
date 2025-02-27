@@ -7,7 +7,7 @@ import i18n from "@/locales/i18n";
 // 功能TCode, 以 / 开头
 export const FuncTcode = {
     '/A': {
-        desc: i18n.global.t('自定义TCode'),
+        desc: i18n.global.k('自定义TCode'),
         execFlow(context) {
             setTimeout(() => {
                 context.proxy.userTcodeRef.initText();
@@ -16,32 +16,32 @@ export const FuncTcode = {
         }
     },
     '/O': {
-        desc: i18n.global.t('新建窗口'),
+        desc: i18n.global.k('新建窗口'),
         execFlow() {
             let _url = window.location.href;
             window.open(_url, '_blank');
         }
     },
     '/C': {
-        desc: i18n.global.t('关闭窗口'),
+        desc: i18n.global.k('关闭窗口'),
         execFlow() {
             window.close();
         }
     },
     '/E': {
-        desc: i18n.global.t('退出登录'),
+        desc: i18n.global.k('退出登录'),
         execFlow(context) {
             if(context.proxy.socket) context.proxy.socket.close(3131);
         }
     },
     '/R': {
-        desc: i18n.global.t('刷新页面'),
+        desc: i18n.global.k('刷新页面'),
         execFlow() {
             window.location.reload();
         }
     },
     '/H': {
-        desc: i18n.global.t('帮助'),
+        desc: i18n.global.k('帮助'),
         execFlow(context) {
             context.proxy.helpTcodeRef.DialogVisible = true;
         }
@@ -51,47 +51,47 @@ export const FuncTcode = {
 // 系统TCode, 以 S 开头
 export const SysTcode = {
     'SC': {
-        desc: i18n.global.t('连接设置'),
+        desc: i18n.global.k('连接设置'),
         execFlow(context) {
             context.proxy.connectSettingRef.DialogVisible = true;
         }
     },
     'SP': {
-        desc: i18n.global.t('偏好设置'),
+        desc: i18n.global.k('偏好设置'),
         execFlow(context) {
             context.proxy.styleSettingRef.DialogVisible = true;
         }
     },
     'SF': {
-        desc: i18n.global.t('文件管理'),
+        desc: i18n.global.k('文件管理'),
         execFlow(context) {
             context.proxy.fileBlockRef.DialogVisible = true;
             context.proxy.fileBlockRef.getInitDir();
         }
     },
     'SAC': {
-        desc: i18n.global.t('协作'),
+        desc: i18n.global.k('高级-协作'),
         execFlow(context) {
             if(!(context.proxy.sshKey && context.proxy.env.advance)) return;
             context.proxy.cooperateGenRef.DialogVisible = true;
         }
     },
     'SAM': {
-        desc: i18n.global.t('监控'),
+        desc: i18n.global.k('高级-监控'),
         execFlow(context) {
             if(!(context.proxy.sshKey && context.proxy.env.advance && context.proxy.env.server_user === 'root')) return;
             context.proxy.statusMonitorRef.DialogVisible = true;
         }
     },
     'SAD': {
-        desc: 'Docker',
+        desc: i18n.global.k('高级-Docker'),
         execFlow(context) {
             if(!(context.proxy.sshKey && context.proxy.env.advance)) return;
             context.proxy.dockerBlockRef.DialogVisible = true;
         }
     },
     'SS': {
-        desc: i18n.global.t('重启'),
+        desc: i18n.global.k('重启'),
         execFlow(context) {
             context.proxy.now_connect_status = context.proxy.connect_status['Connecting'];
             context.proxy.sshKey = '';

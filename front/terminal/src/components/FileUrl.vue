@@ -21,7 +21,7 @@
           </el-input>
         </div>
       </div>
-      <div v-if="err_msg && err_msg.length > 0" class="errInfo no-select"> {{ err_msg }} </div>
+      <div v-if="err_msg && err_msg.length > 0" class="errInfo no-select"> {{ $t(err_msg) }} </div>
       <div v-else style="height: 7px;" ></div>
       <div class="kk-flex">
         <div class="form-width" >{{ $t('文件名') }}：</div>
@@ -63,16 +63,16 @@ export default {
       // 校验
       err_msg.value = '';
       if(!(url.value && url.value.trim().length > 0)) {
-        err_msg.value = i18n.global.t('URL不能为空');
+        err_msg.value = i18n.global.k('URL不能为空');
         return;
       }
       if(!(name.value && name.value.trim().length > 0)) {
-        err_msg.value = i18n.global.t('文件名不能为空');
+        err_msg.value = i18n.global.k('文件名不能为空');
         return;
       }
       const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(name.value)) {
-        err_msg.value = i18n.global.t("文件名不能含有") + " |,/";
+        err_msg.value = i18n.global.k("文件名不能含有") + " |,/";
         return;
       }
       context.emit('callback',url.value, name.value);

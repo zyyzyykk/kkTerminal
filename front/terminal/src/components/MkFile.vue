@@ -15,7 +15,7 @@
         <el-radio :label="false" size="large">{{ $t('文件') }}</el-radio>
         <el-radio :label="true" size="large">{{ $t('文件夹') }}</el-radio>
       </el-radio-group>
-      <div class="errInfo no-select"> {{ err_msg }} </div>
+      <div class="errInfo no-select"> {{ $t(err_msg) }} </div>
       <div class="kk-flex">
         <div>
           <FileIcons :style="{display: 'flex', alignItems: 'center'}" :width="24" :height="24" v-if="isDirectory == true" name="kk.txt" :isFolder="true" />
@@ -58,12 +58,12 @@ export default {
       // 校验
       err_msg.value = '';
       if(!(name.value && name.value.trim().length > 0)) {
-        err_msg.value = i18n.global.t('文件名不能为空');
+        err_msg.value = i18n.global.k('文件名不能为空');
         return;
       }
       const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(name.value)) {
-        err_msg.value = i18n.global.t("文件名不能含有") + " |,/";
+        err_msg.value = i18n.global.k("文件名不能含有") + " |,/";
         return;
       }
       context.emit('callback', isDirectory.value, name.value, nowDir.value);

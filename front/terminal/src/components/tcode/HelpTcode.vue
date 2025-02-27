@@ -23,7 +23,7 @@
                         <div style="background-color: #f3f4f4;" >{{ key }}</div>
                         <div style="flex: 1;" ></div>
                       </div>
-                      <div class="ellipsis" style="margin-left: 10px;" >{{ item.desc }}</div>
+                      <div class="ellipsis" style="margin-left: 10px;" >{{ $t(item.desc) }}</div>
                     </div>
                   </div>
               </div>
@@ -38,7 +38,7 @@
                         <div style="background-color: #f3f4f4;" >{{ key }}</div>
                         <div style="flex: 1;" ></div>
                       </div>
-                      <div class="ellipsis" style="margin-left: 10px;" >{{ item.desc }}</div>
+                      <div class="ellipsis" style="margin-left: 10px;" >{{ $t(item.desc) }}</div>
                     </div>
                   </div>
               </div>

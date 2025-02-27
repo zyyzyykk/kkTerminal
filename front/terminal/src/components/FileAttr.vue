@@ -41,7 +41,7 @@
       <div v-if="fileInfo.isDirectory" class="kk-flex">
         <div class="form-width" >{{ $t('包含') }}：</div>
         <div class="ellipsis" >
-          {{ includeInfo }}
+          {{ $t(includeInfo) }}
         </div>
         <div v-if="fileInfo.isSymlink || unreliable" style="margin-left: 10px;" >
           <el-tag size="small" type="danger">unsure</el-tag>
@@ -142,7 +142,7 @@ export default {
     // 不可靠标识
     const unreliable = ref(false);
     // 包含信息
-    const includeInfo = ref(i18n.global.t('0 个文件，0 个文件夹'));
+    const includeInfo = ref(i18n.global.k('0 个文件，0 个文件夹'));
 
     // 获取文件大小
     const getFileSize = () => {
@@ -263,7 +263,7 @@ export default {
       fileDir.value = '';
       loading.value = false;
       unreliable.value = false;
-      includeInfo.value = i18n.global.t('0 个文件，0 个文件夹');
+      includeInfo.value = i18n.global.k('0 个文件，0 个文件夹');
       DialogVisible.value = false;
     };
 

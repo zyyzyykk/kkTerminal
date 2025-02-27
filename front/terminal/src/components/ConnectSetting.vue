@@ -87,7 +87,7 @@
         </div>
       </div>
     </div>
-    <div class="errInfo no-select"> {{ err_msg }} </div>
+    <div class="errInfo no-select"> {{ $t(err_msg) }} </div>
     <div style="margin-bottom: 5px;"></div>
     <div style="display: flex; border-top: 1px solid #f1f2f4;">
       <el-checkbox v-if="setInfo.option && setInfo.option.length > 0" v-model="isNewWindow" :label="$t('新窗口打开')" size="small" style="margin-top: 10px;" />
@@ -159,27 +159,27 @@ export default {
       err_msg.value = '';
       // 验证IP地址/域名
       if (!(isIP(setInfo.value.server_ip) || isFQDN(setInfo.value.server_ip))) {
-        err_msg.value = i18n.global.t("主机IP地址无效");
+        err_msg.value = i18n.global.k("主机IP地址无效");
         return false;
       }
       // 校验端口号
       if (isNaN(setInfo.value.server_port) || setInfo.value.server_port < 0 || setInfo.value.server_port > 65535) {
-        err_msg.value = i18n.global.t("端口号无效");
+        err_msg.value = i18n.global.k("端口号无效");
         return false;
       }
       // 校验用户名
       if (!(setInfo.value.server_user && setInfo.value.server_user != '')) {
-        err_msg.value = i18n.global.t("用户名不能为空");
+        err_msg.value = i18n.global.k("用户名不能为空");
         return false;
       }
       // 校验密码
       if (setInfo.value.authType == 0 && !(setInfo.value.server_password && setInfo.value.server_password != '')) {
-        err_msg.value = i18n.global.t("密码不能为空");
+        err_msg.value = i18n.global.k("密码不能为空");
         return false;
       }
       // 校验私钥
       if(setInfo.value.authType == 1 && !(setInfo.value.server_key && setInfo.value.server_key.content != '')) {
-        err_msg.value = i18n.global.t("私钥不能为空");
+        err_msg.value = i18n.global.k("私钥不能为空");
         return false;
       }
 

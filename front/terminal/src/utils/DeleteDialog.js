@@ -5,7 +5,7 @@ import i18n from "@/locales/i18n";
 export const deleteDialog = (title,content,callback) => {
     return ElMessageBox.alert(content || i18n.global.t('确定删除吗?'), title || i18n.global.t('提示'), {
       autofocus: false,
-      customStyle:'font-size: 13px; color: black; width: 260px; user-select: none;',
+      customStyle:'font-size: 13px; color: black; width: 265px; user-select: none;',
       cancelButtonText: i18n.global.t('取消'),
       confirmButtonText: i18n.global.t('确定'),
       showCancelButton: true,

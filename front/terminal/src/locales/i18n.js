@@ -10,4 +10,8 @@ const i18n = createI18n({
     },
 });
 
+i18n.global.k = (val) => {
+    return val;
+};
+
 export default i18n;

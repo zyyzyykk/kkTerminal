@@ -27,13 +27,13 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.container.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ containerTypeArr[containerType % containerTypeArr.length] }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(containerTypeArr[containerType % containerTypeArr.length]) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item class="no-select" @click="containerType = 1" >{{ containerTypeArr[1] }}</el-dropdown-item>
-                  <el-dropdown-item class="no-select" @click="containerType = 2" >{{ containerTypeArr[2] }}</el-dropdown-item>
-                  <el-dropdown-item class="no-select" @click="containerType = 3" >{{ containerTypeArr[3] }}</el-dropdown-item>
-                  <el-dropdown-item class="no-select" @click="containerType = 4" >{{ containerTypeArr[4] }}</el-dropdown-item>
+                  <el-dropdown-item class="no-select" @click="containerType = 1" >{{ $t(containerTypeArr[1]) }}</el-dropdown-item>
+                  <el-dropdown-item class="no-select" @click="containerType = 2" >{{ $t(containerTypeArr[2]) }}</el-dropdown-item>
+                  <el-dropdown-item class="no-select" @click="containerType = 3" >{{ $t(containerTypeArr[3]) }}</el-dropdown-item>
+                  <el-dropdown-item class="no-select" @click="containerType = 4" >{{ $t(containerTypeArr[4]) }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -55,10 +55,10 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.image.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ deleteTypeArr[deleteType % deleteTypeArr.length] }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item class="no-select" @click="deleteType = 1" >{{ deleteTypeArr[1] }}</el-dropdown-item>
+                  <el-dropdown-item class="no-select" @click="deleteType = 1" >{{ $t(deleteTypeArr[1]) }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -80,10 +80,10 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.network.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ deleteTypeArr[deleteType % deleteTypeArr.length] }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item class="no-select" @click="deleteType = 2" >{{ deleteTypeArr[2] }}</el-dropdown-item>
+                  <el-dropdown-item class="no-select" @click="deleteType = 2" >{{ $t(deleteTypeArr[2]) }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -104,10 +104,10 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.volume.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ deleteTypeArr[deleteType % deleteTypeArr.length] }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item class="no-select" @click="deleteType = 3" >{{ deleteTypeArr[3] }}</el-dropdown-item>
+                  <el-dropdown-item class="no-select" @click="deleteType = 3" >{{ $t(deleteTypeArr[3]) }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -292,17 +292,17 @@ export default {
     const containerType = ref(0);
     const deleteType = ref(0);
     const containerTypeArr = [
-      i18n.global.t('选择批量操作'),
-      i18n.global.t('启动容器'),
-      i18n.global.t('停止容器'),
-      i18n.global.t('重启容器'),
-      i18n.global.t('删除容器')
+      i18n.global.k('选择批量操作'),
+      i18n.global.k('启动容器'),
+      i18n.global.k('停止容器'),
+      i18n.global.k('重启容器'),
+      i18n.global.k('删除容器')
     ];
     const deleteTypeArr = [
-      i18n.global.t('选择批量操作'),
-      i18n.global.t('删除镜像'),
-      i18n.global.t('删除网络'),
-      i18n.global.t('删除数据卷')
+      i18n.global.k('选择批量操作'),
+      i18n.global.k('删除镜像'),
+      i18n.global.k('删除网络'),
+      i18n.global.k('删除数据卷')
     ];
     const containerOperate = () => {
       loading.value = true;
