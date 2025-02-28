@@ -127,7 +127,7 @@ import { QuestionFilled, VideoPlay, VideoPause, MostlyCloudy, ArrowRight, UserFi
 import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode";
 
 import i18n from "@/locales/i18n";
-import {cloud, load, syncUpload, syncDownload } from "@/utils/CloudUtil";
+import { cloud, load, syncUpload, syncDownload } from "@/utils/CloudUtil";
 import { deleteDialog } from "@/utils/DeleteDialog";
 import { calcType } from "@/components/calc/CalcType"
 
@@ -662,7 +662,7 @@ export default {
             } catch (error) {
               setTcodeStatus(transTcode, 'Compile Error');
               ElMessage({
-                message: 'TCode-' + transTcode + ' Compile Error: ' + error,
+                message: 'TCode-' + transTcode + ' ' + i18n.global.t('编译错误：') + error,
                 type: 'error',
                 grouping: true,
               });
@@ -674,14 +674,14 @@ export default {
           try {
             await tcodes.value[transTcode].execFlow(UserTcodeExecutor);
             ElMessage({
-              message: 'TCode-' + transTcode + ' Workflow Over',
+              message: 'TCode-' + transTcode + ' ' + i18n.global.t('工作流结束'),
               type: 'success',
               grouping: true,
             });
             setTcodeStatus(transTcode, 'Execute Success');
           } catch(error) {
             ElMessage({
-              message: 'TCode-' + transTcode + ' Execute Interrupt: ' + error,
+              message: 'TCode-' + transTcode + ' ' + i18n.global.t('执行中断：') + error,
               type: 'warning',
               grouping: true,
             });
@@ -692,7 +692,7 @@ export default {
         }
         else {
           ElMessage({
-            message: 'Another TCode is executing',
+            message: i18n.global.t('其它TCode正在执行'),
             type: 'warning',
             grouping: true,
           });
@@ -701,7 +701,7 @@ export default {
       else {
         if(transTcode[0] == '/' || transTcode[0] == 'S' || transTcode[0] == 'U') {
           ElMessage({
-            message: 'TCode-' + transTcode + ' does not exist',
+            message: 'TCode-' + transTcode + i18n.global.t('不存在'),
             type: 'warning',
             grouping: true,
           });
