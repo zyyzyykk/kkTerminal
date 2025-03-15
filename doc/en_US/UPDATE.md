@@ -1,5 +1,12 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.4.9: 
+
+- Add private key login method
+- Add automatic judging and save switch for file encoding
+- Add file mode switch
+- Add file indentation selection and content copying
+
 ##### zyyzyykk/kkterminal:3.4.5: 
 
 - Add file permission editing function

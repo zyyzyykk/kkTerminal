@@ -10,7 +10,7 @@
 >
 > Preview: https://ssh.kkbpro.com/
 >
-> Update Time: 2025-02-01
+> Update Time: 2025-03-15
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.png" alt="kkTerminal"></a></p>
@@ -59,13 +59,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 Visit the following website: https://ssh.kkbpro.com/
 
-![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/en/Connect.png)
+![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/en/Connect.png)
 
-![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/en/Preference.png)
+![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/en/Preference.png)
 
-![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/en/File.png)
+![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/en/File.png)
 
-![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/en/Editor.png)
+![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/en/Editor.png)
 
 [**More Module Previews**](./MODULE.md)
 
@@ -104,9 +104,18 @@ Visit the following website: https://ssh.kkbpro.com/
 
 13. Support operation recording and cloud synchronization functions
 
+14. Support Cooperate, Monitor and Docker functions
+
 ### 👨‍💻 Update Records
 
-##### zyyzyykk/kkterminal:3.5.6: latest
+##### zyyzyykk/kkterminal:3.6.0: latest
+
+- Add Advance Cooperate function
+- Add Advance Monitor function
+- Add Advance Docker function
+- Optimize packaging volume & webpage display
+
+##### zyyzyykk/kkterminal:3.5.6: 
 
 - Support more URL parameters
 - Add editor text & image size percentage
@@ -118,13 +127,6 @@ Visit the following website: https://ssh.kkbpro.com/
 - Fix bug of multi window restart
 - Add operation recording and cloud synchronization functions
 - Refactoring some code logic
-
-##### zyyzyykk/kkterminal:3.4.9: 
-
-- Add private key login method
-- Add automatic judging and save switch for file encoding
-- Add file mode switch
-- Add file indentation selection and content copying
 
 [**History Update Records**](./UPDATE.md)
 
@@ -139,11 +141,21 @@ Vue + Xterm              SpringBoot + SSHJ                Linux OS
 
 ### 🏘️ About this project
 
-Author: [zyyzyykk](https://github.com/zyyzyykk/)
+Dear Users,
 
-Sponsor: [<img src="https://api.gitsponsors.com/api/badge/img?id=704828551" height="20">](https://api.gitsponsors.com/api/badge/link?p=ZeY5IHF8NCpCNujm6upYNHtOtIhaIz5VvgUnIlPWJR9Ta0EgrNeq3P+SXzdv9I03XbxmzJe/sogYZPuCzSoEB2C+x9YgzNCl+5N/hx6Bn7wY7k/ajlj7EJJwQAJoiR3uK9o26so7BlUobWU0htzAlg==)
+I regret to announce that due to limited time and energy, I will not be able to maintenance on `kkTerminal` in the future.
 
-Welcome to provide valuable opinions or suggestions on this project, and you can also join us in maintaining and developing this project together
+If you are interested in `kkTerminal` or would like to continue maintaining, please feel free to contact me or raise an issue.
+
+If you discover bugs or wish to develop new features, please also raise an issue.
+
+Finally, thank you for your support of kkTerminal and I sincerely hope that kkTerminal can really help you.
+
+Best Regards,
+
+[zyyzyykk](https://github.com/zyyzyykk/)
+
+2025.03.15
 
 ### 🌟 Stars
 

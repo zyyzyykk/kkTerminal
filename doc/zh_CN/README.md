@@ -10,7 +10,7 @@
 >
 > 预览：https://ssh.kkbpro.com/
 >
-> 更新时间：2025-02-01
+> 更新时间：2025-03-15
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.png" alt="kkterminal"></a></p>
@@ -59,13 +59,13 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 
 访问以下网址：https://ssh.kkbpro.com/
 
-![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/zh/Connect.png)
+![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/zh/Connect.png)
 
-![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/zh/Preference.png)
+![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/zh/Preference.png)
 
-![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/zh/File.png)
+![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/zh/File.png)
 
-![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.5.6/zh/Editor.png)
+![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/zh/Editor.png)
 
 [**更多模块预览**](./MODULE.md)
 
@@ -99,10 +99,18 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 11. 支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
 12. 支持 [TCode (终端代码)](./TCODE.md)，能够通过自定义TCode实现类似Shell脚本的自动化Workflow
 13. 支持操作录像、云端同步功能
+14. 支持协作、监控、Docker功能
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.5.6：latest
+##### zyyzyykk/kkterminal:3.6.0：latest
+
+- 新增高级——协作功能
+- 新增高级——监控功能
+- 新增高级——Docker功能
+- 优化打包体积与界面显示
+
+##### zyyzyykk/kkterminal:3.5.6：
 
 - 支持更多URL参数
 - 新增编辑器文字&图片大小百分比
@@ -114,13 +122,6 @@ docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kktermin
 - 修复多窗口重启的bug
 - 新增操作录像和云端同步功能
 - 重构部分代码逻辑
-
-##### zyyzyykk/kkterminal:3.4.9：
-
-- 新增私钥方式登录
-- 新增文件编码自动识别与保存切换
-- 新增文件语言模式选择
-- 新增文件缩进选择和内容复制
 
 [**历史更新记录**](./UPDATE.md)
 
@@ -135,11 +136,21 @@ Vue + Xterm              SpringBoot + SSHJ                Linux OS
 
 ### 🏘️ 关于此项目
 
-作者：[zyyzyykk](https://github.com/zyyzyykk/)
+亲爱的用户们，
 
-赞助商：[<img src="https://api.gitsponsors.com/api/badge/img?id=704828551" height="20">](https://api.gitsponsors.com/api/badge/link?p=ZeY5IHF8NCpCNujm6upYNHtOtIhaIz5VvgUnIlPWJR9Ta0EgrNeq3P+SXzdv9I03XbxmzJe/sogYZPuCzSoEB2C+x9YgzNCl+5N/hx6Bn7wY7k/ajlj7EJJwQAJoiR3uK9o26so7BlUobWU0htzAlg==)
+我在此很遗憾地宣布，由于我的时间精力有限，后续无法再进行 `kkTerminal` 项目的维护。
 
-欢迎对此项目提出宝贵的意见或建议，也可以加入我们一起进行此项目的维护与开发
+如果你对 `kkTerminal` 项目感兴趣或者想要继续维护此项目，欢迎联系我或提出issue。
+
+如果你发现了bug或者希望开发新功能，也请提出issue。
+
+最后感谢你们对 `kkTerminal` 的支持，我也衷心希望 `kkTerminal` 能够帮助到你。
+
+顺致敬意，
+
+[zyyzyykk](https://github.com/zyyzyykk/)
+
+2025.03.15
 
 ### 🌟 点赞
 
