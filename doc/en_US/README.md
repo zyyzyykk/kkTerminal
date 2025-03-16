@@ -149,7 +149,7 @@ If you are interested in `kkTerminal` or would like to continue maintaining, ple
 
 If you discover bugs or wish to develop new features, please also raise an issue.
 
-Finally, thank you for your support of kkTerminal and I sincerely hope that kkTerminal can really help you.
+Finally, thank you for your support of `kkTerminal` and I sincerely hope that `kkTerminal` can really help you.
 
 Best Regards,
 
