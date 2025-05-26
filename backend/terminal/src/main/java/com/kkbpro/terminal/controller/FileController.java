@@ -139,8 +139,6 @@ public class FileController {
         try {
             SFTPClient sftp = getSftpClient(sshKey);
             List<RemoteResourceInfo> files = sftp.ls(path);
-            // 按照文件名排序
-            files.sort(Comparator.comparing(RemoteResourceInfo::getName));
             int index = 0;
             for(RemoteResourceInfo file : files) {
                 FileInfo fileInfo = new FileInfo();

@@ -167,7 +167,7 @@ import $ from 'jquery';
 import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/env/BaseUrl';
 import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
-import { escapeItem, escapePath } from '@/utils/StringUtil';
+import { escapeItem, escapePath, osFileNaturalSort } from '@/utils/StringUtil';
 import { isZipFile } from '@/components/preview/FileSuffix';
 import { getChmodValue } from '@/components/calc/CalcPriority';
 import { getUrlParams } from "@/utils/UrlUtil";
@@ -354,7 +354,7 @@ export default {
           if(now_dir == dir.value) {
             selectedFiles.value = [];
             if(resp.status == 'success') {
-              files.value = resp.data;
+              files.value = osFileNaturalSort(resp.data);
               noDataMsg.value = i18n.global.k('暂无文件');
               dirStatus.value = 0;
               lastSelectedIndex = -1;

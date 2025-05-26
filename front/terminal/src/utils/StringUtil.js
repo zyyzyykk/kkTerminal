@@ -5,7 +5,7 @@ export const changeStr = (str) => {
     if(str[i] != '/') result += str[i];
     else result += '@';
   }
-  
+
   return result;
 };
 
@@ -16,7 +16,7 @@ export const changeStr2 = (str) => {
     if(str[i] != '@') result += str[i];
     else result += '-';
   }
-  
+
   return result;
 };
 
@@ -43,4 +43,17 @@ export const escapePath = (str) => {
 // 转义字符串(文件项)
 export const escapeItem = (str) => {
   return escapePath(str);
+};
+
+// 文件自然排序
+export const osFileNaturalSort = (files) => {
+  return files.sort((a, b) => {
+    const nameA = a.name;
+    const nameB = b.name;
+    // 隐藏文件优先
+    if(nameA[0] === '.' && nameB[0] !== '.') return -1;
+    if(nameA[0] !== '.' && nameB[0] === '.') return 1;
+    // 启用数字感知并忽略大小写和变音符号
+    return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
+  });
 };
