@@ -1,20 +1,35 @@
-export const calcSize = (sizeRaw) => {
-    if(sizeRaw == null || sizeRaw == undefined) return "";
-    let size = "";
-    if (sizeRaw < 1024) {                                                       // B
-        size = sizeRaw.toFixed(2) + " B"
-    } else if (sizeRaw < 1024 * 1024) {                                         // KB
-        size = (sizeRaw / 1024).toFixed(2) + " KB"
-    } else if (sizeRaw < 1024 * 1024 * 1024) {                                  // MB
-        size = (sizeRaw / (1024 * 1024)).toFixed(2) + " MB"
-    } else {                                                                    // GB
-        size = (sizeRaw / (1024 * 1024 * 1024)).toFixed(2) + " GB"
+const BYTES_PER_KILOBYTE = 1024;
+const B = 1;
+const KB = BYTES_PER_KILOBYTE * B;
+const MB = BYTES_PER_KILOBYTE * KB;
+const GB = BYTES_PER_KILOBYTE * MB;
+
+export const calcSize = (size) => {
+    if(size == null) return "";
+
+    let value;
+    let unit;
+    if (size < KB) {                                                         // B
+        value = size / B;
+        unit = "B";
     }
-    let sizeStr = size + "";                                                    // 转成字符串
-    let index = sizeStr.indexOf(".");                                           // 获取小数点处的索引
-    let dou = sizeStr.substring(index + 1, index + 3)                           // 获取小数点后两位的值
-    if (dou == "00") {                                                          // 判断后两位是否为00，如果是则删除00               
-        return sizeStr.substring(0, index) + sizeStr.substring(index + 3)
+    else if (size < MB) {                                                   // KB
+        value = size / KB;
+        unit = "KB";
     }
-    return size;
+    else if (size < GB) {                                                   // MB
+        value = size / MB;
+        unit = "MB";
+    }
+    else {                                                                  // GB
+        value = size / GB;
+        unit = "GB";
+    }
+
+    let formattedValue = value.toFixed(2);
+    if (formattedValue.endsWith(".00")) {                                   // 移除 ".00"
+        formattedValue = formattedValue.substring(0, formattedValue.length - 3);
+    }
+
+    return `${formattedValue} ${unit}`;
 };

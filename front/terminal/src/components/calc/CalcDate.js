@@ -3,7 +3,7 @@ import i18n from "@/locales/i18n";
 // 将时间戳转为 2024年1月22日，20:40:38 格式
 export const calcDate = (time) => {
     if(!time) return "";
-    let date = new Date(time*1000);
+    let date = new Date(time * 1000);
     let year = date.getFullYear();
     let month = date.getMonth() + 1;
     let day = date.getDate();

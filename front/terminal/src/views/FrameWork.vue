@@ -72,7 +72,7 @@
           </div>
           <div style="margin-left: 20px;" ></div>
         </div>
-        <div v-else style="margin-left: 10px;" ></div>
+        <div v-else style="margin-left: 20px;" ></div>
       </div>
     </div>
     <!-- terminal主体 -->
@@ -365,9 +365,9 @@ export default {
       socket.value = new WebSocket(ws_base_url + changeStr(encrypt(JSON.stringify({...env.value, cooperateKey: urlParams.value.cooperate}))));
       socket.value.onopen = () => {
         termFit();
-      }
+      };
       socket.value.onmessage = resp => {
-        let result = JSON.parse(resp.data);
+        const result = JSON.parse(resp.data);
         // 协作失败
         if(result.code == -2) {
           term.clear();
@@ -415,7 +415,7 @@ export default {
         else if(result.code == 2) {
           onlineNumber.value = Number(decrypt(result.data));
         }
-      }
+      };
       socket.value.onclose = (e) => {
         if(now_connect_status.value == connect_status.value['Success'] && e.code != 3333) {
           sshKey.value = '';
@@ -429,7 +429,7 @@ export default {
           termWrite("\r\n" + now_connect_status.value);
         }
         userTcodeExecutorReset();
-      }
+      };
     };
 
     // 终端信息设置

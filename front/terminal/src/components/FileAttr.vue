@@ -53,7 +53,7 @@
       <div v-else class="kk-flex">
         <div class="form-width" >{{ $t('大小') }}：</div>
         <div class="ellipsis" >
-          {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size + ' ' + $t('字节') }})
+          {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size.toLocaleString() + ' ' + $t('字节') }})
         </div>
         <div v-if="fileInfo.isSymlink || unreliable" style="margin-left: 10px;" >
           <el-tag size="small" type="danger">unsure</el-tag>
@@ -257,6 +257,7 @@ export default {
             type:'',
           },
           permissions:'',
+          size: 0,
         },
       };
       rename.value = '';
