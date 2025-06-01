@@ -180,7 +180,7 @@ export default {
     });
 
     // 状态信息
-    const statusInfo = ref({
+    const initStatusInfo = {
       overview: {
         load: 0,
         cpu: 0,
@@ -194,7 +194,8 @@ export default {
       network: {},
       disk: {},
       time: [],
-    });
+    }
+    const statusInfo = ref({...initStatusInfo});
     const selectedNetwork = ref('all');
     const selectedDisk = ref('all');
     const getStatusInfo = () => {
@@ -367,21 +368,7 @@ export default {
     // 重置
     const reset = (deep=false) => {
       if(deep) {
-        statusInfo.value = {
-          overview: {
-            load: 0,
-            cpu: 0,
-            core: 0,
-            usedMemory: 0,
-            totalMemory: 1,
-            usedRoot: 0,
-            totalRoot: 1,
-          },
-          processes: [],
-          network: {},
-          disk: [],
-          time: [],
-        };
+        statusInfo.value = {...initStatusInfo};
         selectedNetwork.value = 'all';
         selectedDisk.value = 'all';
         stopMonitor();

@@ -41,8 +41,6 @@
           <div>
             <el-input
               v-model="tcode"
-              id="kkterminalTcode"
-              ref="tCodeInputRef"
               :style="{ width: '100px', height: '20px', fontSize: '12px'}"
               @keydown.enter="handleTcode"
               maxlength="6"
@@ -94,7 +92,7 @@
   <!--监控-->
   <StatusMonitor ref="statusMonitorRef" :sshKey="sshKey" :advance="env.advance" ></StatusMonitor>
   <!--Docker-->
-  <DockerBlock ref="dockerBlockRef" :sshKey="sshKey" :advance="env.advance" @install="installDocker" ></DockerBlock>
+  <DockerBlock ref="dockerBlockRef" :sshKey="sshKey" :advance="env.advance" @install="installDocker" @deploy="runContainer" ></DockerBlock>
 
 </template>
 
@@ -778,6 +776,10 @@ export default {
     const installDocker = (cmd) => {
       sendMessage(cmd);
     };
+    // 部署容器
+    const runContainer = (cmd) => {
+      sendMessage(cmd);
+    };
 
     onMounted(async () => {
       // 启动终端
@@ -871,6 +873,7 @@ export default {
       endCooperateConfirm,
       calcType,
       installDocker,
+      runContainer,
     }
 
   }

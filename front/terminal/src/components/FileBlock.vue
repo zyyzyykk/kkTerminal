@@ -970,7 +970,7 @@ export default {
           case 'c':
             if(selectedFiles.value.length > 0) {
               fileClipboard.value.path = dir.value;
-              fileClipboard.value.files = selectedFiles.value.slice(0);
+              fileClipboard.value.files = [...selectedFiles.value];
               isCtrlx.value = false;
             }
             break;
@@ -988,9 +988,11 @@ export default {
             break;
           // 剪切
           case 'x':
-            fileClipboard.value.path = dir.value;
-            fileClipboard.value.files = selectedFiles.value.slice(0);
-            isCtrlx.value = true;
+            if(selectedFiles.value.length > 0) {
+              fileClipboard.value.path = dir.value;
+              fileClipboard.value.files = [...selectedFiles.value];
+              isCtrlx.value = true;
+            }
             break;
         }
       }

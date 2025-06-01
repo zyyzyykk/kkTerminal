@@ -12,9 +12,108 @@
       draggable
   >
     <div class="no-select" >
-      <el-tabs v-if="noDocker === false" element-loading-text="Loading..." v-loading="loading" @tab-click="handleTabClick" type="border-card" >
-        <el-tab-pane :label="$t('容器')">
-          <el-table style="height: 200px; width: 100%" v-if="dockerInfo.container.length > 0" :data="dockerInfo.container" @selection-change="tableSelect" border stripe >
+      <el-tabs element-loading-text="Loading..." v-loading="loading" @tab-click="handleTabClick" type="border-card" >
+        <el-tab-pane :label="$t('部署')" >
+          <div v-if="noDocker" class="kk-flex-column" style="height: 240px" >
+            <div style="flex: 1" ></div>
+            <div><img style="height: 160px" src="@/assets/no_docker.png" ></div>
+            <div class="kk-flex" style="margin-top: 25px;" >
+              <div style="font-size: large;" >{{ $t('Docker未安装?') }}</div>
+              <div>
+                <el-button type="primary" @click="installDocker" style="margin-left: 15px;">
+                  {{ $t('安装') }}
+                </el-button>
+              </div>
+            </div>
+            <div style="flex: 1" ></div>
+          </div>
+          <div v-else style="height: 240px; overflow-y: scroll;" >
+            <div v-if="!deployInfo.isShow" >
+              <div class="kk-flex" >
+                <el-icon style="font-size: 18px;" ><Shop /></el-icon>
+                <div style="margin-left: 8px;" >{{ $t('Docker应用商店') }}</div>
+              </div>
+              <div class="kk-border" ></div>
+              <div style="margin-top: 20px;" ></div>
+              <div class="card-container" >
+                <div class="card-item" v-for="(app, index) in dockerAppStore" :key="index" >
+                  <el-card>
+                    <template #header>
+                      <div class="card-header">
+                        <div class="kk-flex" >
+                          <span class="app-title" >{{ app.name }}</span>
+                          <div style="flex: 1;" ></div>
+                          <el-button size="small" type="primary" @click="handleAppGet(app.deployInfo)" >
+                            {{ $t('获取') }}
+                          </el-button>
+                        </div>
+                      </div>
+                    </template>
+                    <div class="kk-flex" >
+                      <div style="margin-right: 10px;" ><img :src="app.img" style="height: 48px;" ></div>
+                      <div>{{ $t(app.desc) }}</div>
+                    </div>
+                  </el-card>
+                </div>
+              </div>
+            </div>
+            <div v-else >
+              <div class="kk-flex" >
+                <el-icon @click="handleReset(false)" style="cursor: pointer; font-size: 16px;" ><ArrowLeft /></el-icon>
+                <div style="margin-left: 8px;" >{{ $t('返回') }}</div>
+              </div>
+              <div class="kk-border" ></div>
+              <div style="padding: 0 120px;" >
+                <div class="kk-flex deploy-item" >
+                  <div class="form-width" >{{ $t('镜像') }}</div>
+                  <div class="kk-flex" style="flex: 1;" >
+                    <el-input style="flex: 1;" v-model="deployInfo.imageName" class="w-50 m-2" :placeholder="$t('镜像名称')"></el-input>
+                    <div style="margin: 0 5px" >:</div>
+                    <el-input v-model="deployInfo.imageVersion" style="width: 80px;" class="w-50 m-2" :placeholder="$t('版本号')"></el-input>
+                  </div>
+                </div>
+                <div class="kk-flex deploy-item" >
+                  <div class="form-width" >{{ $t('容器') }}</div>
+                  <div style="flex: 1;" >
+                    <el-input v-model="deployInfo.containerName" class="w-50 m-2" :placeholder="$t('容器名称')"></el-input>
+                  </div>
+                </div>
+                <div class="kk-flex deploy-item" >
+                  <div class="form-width" >{{ $t('端口映射') }}</div>
+                  <div style="flex: 1;" >
+                    <el-input v-model="deployInfo.portMapping" class="w-50 m-2" :placeholder="$t('每行一个，主机端口:容器端口')" type="textarea" ></el-input>
+                  </div>
+                </div>
+                <div class="kk-flex deploy-item" >
+                  <div class="form-width" >{{ $t('环境变量') }}</div>
+                  <div style="flex: 1;" >
+                    <el-input v-model="deployInfo.envVar" class="w-50 m-2" :placeholder="$t('每行一个，环境变量名=值')" type="textarea" ></el-input>
+                  </div>
+                </div>
+                <div class="kk-flex deploy-item" >
+                  <div class="form-width" >{{ $t('数据卷挂载') }}</div>
+                  <div style="flex: 1;" >
+                    <el-input v-model="deployInfo.volumeMounting" class="w-50 m-2" :placeholder="$t('每行一个，主机路径:容器路径')" type="textarea" ></el-input>
+                  </div>
+                </div>
+                <div style="height: 10px;" ></div>
+                <div class="kk-flex deploy-item" >
+                  <div style="flex: 1;" ></div>
+                  <el-button :disabled="!deployInfo.imageName" type="primary" @click="handleDeploy" >
+                    {{ $t('部署') }}
+                  </el-button>
+                  <div style="flex: 1;" ></div>
+                  <el-button text bg @click="handleReset(true)" >
+                    {{ $t('清空') }}
+                  </el-button>
+                  <div style="flex: 1;" ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane :disabled="noDocker" :label="$t('容器')">
+          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.container.length > 0" :data="dockerInfo.container" @selection-change="tableSelect" border stripe >
             <el-table-column show-overflow-tooltip type="selection" :selectable="selectable" width="40" />
             <el-table-column show-overflow-tooltip prop="id" label="ID" width="130" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="120" />
@@ -42,8 +141,8 @@
             </el-button>
           </div>
         </el-tab-pane>
-        <el-tab-pane :label="$t('镜像')">
-          <el-table style="height: 200px; width: 100%" v-if="dockerInfo.image.length > 0" :data="dockerInfo.image" @selection-change="tableSelect" border stripe >
+        <el-tab-pane :disabled="noDocker" :label="$t('镜像')">
+          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.image.length > 0" :data="dockerInfo.image" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" :selectable="selectable" width="40" />
             <el-table-column show-overflow-tooltip prop="id" label="ID" width="130" />
             <el-table-column show-overflow-tooltip prop="repository" :label="$t('仓库')" />
@@ -67,8 +166,8 @@
             </el-button>
           </div>
         </el-tab-pane>
-        <el-tab-pane :label="$t('网络')">
-          <el-table style="height: 200px; width: 100%" v-if="dockerInfo.network.length > 0" :data="dockerInfo.network" @selection-change="tableSelect" border stripe >
+        <el-tab-pane :disabled="noDocker" :label="$t('网络')">
+          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.network.length > 0" :data="dockerInfo.network" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" :selectable="selectable" width="40" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="140" />
             <el-table-column show-overflow-tooltip prop="ip" label="IP" />
@@ -92,8 +191,8 @@
             </el-button>
           </div>
         </el-tab-pane>
-        <el-tab-pane :label="$t('数据卷')">
-          <el-table style="height: 200px; width: 100%" v-if="dockerInfo.volume.length > 0" :data="dockerInfo.volume" @selection-change="tableSelect" border stripe >
+        <el-tab-pane :disabled="noDocker" :label="$t('数据卷')">
+          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.volume.length > 0" :data="dockerInfo.volume" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" :selectable="selectable" width="40" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="140" />
             <el-table-column show-overflow-tooltip prop="mount" :label="$t('挂载点')" />
@@ -117,21 +216,6 @@
           </div>
         </el-tab-pane>
       </el-tabs>
-      <div v-else element-loading-text="Loading..." v-loading="loading" >
-        <div class="kk-flex-column" style="height: 311px" >
-          <div style="flex: 1" ></div>
-          <div><img style="height: 160px" src="@/assets/no_docker.png" ></div>
-          <div class="kk-flex" style="margin-top: 25px;" >
-            <div>{{ $t('Docker未安装?') }}</div>
-            <div>
-              <el-button size="small" type="primary" @click="installDocker" style="margin-left: 15px;">
-                {{ $t('安装') }}
-              </el-button>
-            </div>
-          </div>
-          <div style="flex: 1" ></div>
-        </div>
-      </div>
     </div>
   </el-dialog>
 </template>
@@ -142,19 +226,26 @@ import NoData from "@/components/NoData.vue";
 import { computed, ref } from "vue";
 import $ from "jquery";
 import { http_base_url } from "@/env/BaseUrl";
-import { ArrowDown } from '@element-plus/icons-vue';
+import { ArrowDown, Shop, ArrowLeft } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
-import {ElMessage} from "element-plus";
+import { ElMessage } from "element-plus";
 import { deleteDialog } from "@/utils/DeleteDialog";
+import useClipboard from "vue-clipboard3";
+import dockerAppStore from "./DockerAppStore";
+import {generateRandomString} from "@/utils/StringUtil";
 
 export default {
   name: 'DockerBlock',
   components: {
     NoData,
     ArrowDown,
+    Shop,
+    ArrowLeft,
   },
   props:['sshKey', 'advance'],
   setup(props, context) {
+    // 拷贝
+    const { toClipboard } = useClipboard();
 
     // 控制Dialog显示
     const DialogVisible = ref(false);
@@ -171,12 +262,13 @@ export default {
 
     // Docker信息
     const noDocker = ref(true);
-    const dockerInfo = ref({
+    const initDockerInfo = {
       container: [],
       image: [],
       network: [],
       volume: [],
-    });
+    }
+    const dockerInfo = ref({...initDockerInfo});
     const getDockerVersion = (sshKey) => {
       loading.value = true;
       $.ajax({
@@ -359,20 +451,80 @@ export default {
 
     // 安装Docker
     const installDocker = () => {
+      ElMessage({
+        message: i18n.global.t('开始安装'),
+        type: 'success',
+        grouping: true,
+        repeatNum: Number.MIN_SAFE_INTEGER,
+      });
       context.emit('install', "curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh\n");
       deepCloseDialog();
+    };
+
+    // 复制表格数据
+    const tableDataCopy = async (row, column) => {
+      if(column.property === 'createTime') return;
+      await toClipboard(row[column.property]);
+      ElMessage({
+        message: i18n.global.t('复制成功'),
+        type: 'success',
+        grouping: true,
+        repeatNum: Number.MIN_SAFE_INTEGER,
+      });
+    };
+
+    // 部署
+    const initDeployInfo = {
+      isShow: false,
+      imageName: '',
+      imageVersion: '',
+      containerName: '',
+      portMapping: '',
+      envVar: '',
+      volumeMounting: '',
+    };
+    const deployInfo = ref({...initDeployInfo});
+    const handleAppGet = (appInfo) => {
+      deployInfo.value = {...initDeployInfo, ...appInfo};
+      deployInfo.value.containerName += "_" + generateRandomString(4);
+      deployInfo.value.isShow = true;
+    };
+    const handleReset = (isShow=true) => {
+      deployInfo.value = {...initDeployInfo};
+      deployInfo.value.isShow = isShow;
+    };
+    const handleDeploy = () => {
+      let deployCmd = "docker run -dit";
+      if(deployInfo.value.containerName) deployCmd += " --name " + deployInfo.value.containerName;
+      if(deployInfo.value.portMapping) {
+        deployCmd += deployInfo.value.portMapping.split("\n").filter(port => port).map(port => ` -p ${port}`).join("");
+      }
+      if(deployInfo.value.envVar) {
+        deployCmd += deployInfo.value.envVar.split("\n").filter(env => env).map(env => ` -e ${env}`).join("");
+      }
+      if(deployInfo.value.volumeMounting) {
+        deployCmd += deployInfo.value.volumeMounting.split("\n").filter(volume => volume).map(volume => ` -v ${volume}`).join("");
+      }
+      deployCmd += " --restart=unless-stopped";
+      deployCmd += " " + deployInfo.value.imageName + ":";
+      deployCmd += deployInfo.value.imageVersion || "latest";
+      deployCmd += "\n";
+      ElMessage({
+        message: i18n.global.t('开始部署'),
+        type: 'success',
+        grouping: true,
+        repeatNum: Number.MIN_SAFE_INTEGER,
+      });
+      handleReset(false);
+      context.emit('deploy', deployCmd);
     };
 
     // 重置
     const reset = (deep=false) => {
       if(deep) {
         noDocker.value = true;
-        dockerInfo.value = {
-          container: [],
-          image: [],
-          network: [],
-          volume: [],
-        };
+        dockerInfo.value = {...initDockerInfo};
+        deployInfo.value = {...initDeployInfo};
       }
       containerType.value = 0;
       deleteType.value = 0;
@@ -419,6 +571,12 @@ export default {
       deleteTypeArr,
       operateConfirm,
       deleteConfirm,
+      tableDataCopy,
+      deployInfo,
+      dockerAppStore,
+      handleAppGet,
+      handleReset,
+      handleDeploy,
     }
   }
 }
@@ -447,6 +605,42 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.kk-border {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.el-card__header {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.app-title {
+  color: #666;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* 卡片之间的间距 */
+  padding: 0 5px;
+  justify-content: space-between;
+}
+
+.card-item {
+  width: calc(50% - 10px);
+}
+
+.deploy-item {
+  margin-top: 20px;
+}
+
+.form-width {
+  width: 140px;
 }
 
 </style>
