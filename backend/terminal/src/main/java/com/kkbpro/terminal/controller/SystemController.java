@@ -1,12 +1,16 @@
 package com.kkbpro.terminal.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.kkbpro.terminal.config.AppConfig;
 import com.kkbpro.terminal.pojo.vo.OSInfo;
 import com.kkbpro.terminal.result.Result;
+import com.kkbpro.terminal.utils.AesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,7 +26,7 @@ public class SystemController {
 
     private static volatile Thread monitor;
 
-    private static ConcurrentHashMap<String, Long> windowActiveMap = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Long> windowActiveMap = new ConcurrentHashMap<>();
 
     @Autowired
     private AppConfig appConfig;
@@ -41,7 +45,10 @@ public class SystemController {
             windowActiveMap.put(windowId, new Date().getTime());
             startMonitor();
         }
-        return Result.success("初始化成功", osInfo);
+        Map<String, Object> map = new HashMap<>();
+        map.put("osInfo", osInfo);
+        map.put("aesKey", AesUtil.SECRET_KEY);
+        return Result.success(JSONObject.toJSONString(map));
     }
 
     private String getOSFromUA(String userAgent) {

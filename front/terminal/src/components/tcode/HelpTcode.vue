@@ -126,10 +126,11 @@ import { FuncTcode, SysTcode, TCodeStatusEnum } from "@/components/tcode/Tcode";
 import NoData from '../NoData.vue';
 import { ArrowRight, ArrowLeft, Edit, View, Finished, Delete } from '@element-plus/icons-vue';
 import AceEditor from '../preview/AceEditor.vue';
-import { decrypt } from '@/utils/Encrypt';
+import { aesDecrypt } from '@/utils/Encrypt';
 import TcodeStatus from './TcodeStatus.vue';
 import { deleteDialog } from '@/utils/DeleteDialog';
 import i18n from "@/locales/i18n";
+import { localStore } from "@/env/Store";
 
 export default {
   name:'HelpTcode',
@@ -172,7 +173,7 @@ export default {
     const userTcodeEditorRef = ref();
     const initTcodeEditor = (mode) => {
       userTcodeEditorRef.value.setLanguage('kk.js');
-      userTcodeEditorRef.value.setValue(JSON.parse(decrypt(localStorage.getItem('tcodes')))[nowTCode.value].workflow || '');
+      userTcodeEditorRef.value.setValue(JSON.parse(aesDecrypt(localStorage.getItem(localStore['tcodes'])))[nowTCode.value].workflow || '');
       userTcodeEditorRef.value.resetHistory();
       userTcodeEditorRef.value.setReadOnly(mode);
       modifyTag.value = '';

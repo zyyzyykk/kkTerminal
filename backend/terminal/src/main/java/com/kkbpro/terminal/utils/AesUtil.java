@@ -1,5 +1,7 @@
 package com.kkbpro.terminal.utils;
 
+import com.kkbpro.terminal.TerminalApplication;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import javax.crypto.Cipher;
@@ -9,9 +11,9 @@ import javax.crypto.spec.SecretKeySpec;
 public class AesUtil {
 
     /**
-     * 密钥 (需要前端和后端保持一致)
+     * 加密密钥
      */
-    private static final String SECRET_KEY = "P5P1SIqVe6kaOxMX";
+    public static final String SECRET_KEY = TerminalApplication.properties.getProperty("kk.aes.key");
 
     /**
      * 加密算法
@@ -114,5 +116,6 @@ public class AesUtil {
     public static String aesDecrypt(String encryptStr, String decryptKey) throws Exception {
         return StringUtil.isEmpty(encryptStr) ? null : aesDecryptByBytes(base64Decode(encryptStr), decryptKey);
     }
+
 }
 

@@ -12,7 +12,7 @@
       draggable
   >
     <div class="no-select" >
-      <el-tabs type="border-card" >
+      <el-tabs type="border-card" @tab-click="handleTabClick" >
         <el-tab-pane :label="$t('概览')">
           <div class="kk-flex" style="height: 200px" >
             <div style="margin-left: 5px" ></div>
@@ -61,7 +61,7 @@
           </div>
         </el-tab-pane>
         <el-tab-pane :label="$t('Top进程')">
-          <el-table style="height: 200px; width: 100%" v-if="statusInfo.processes.length > 0" :data="statusInfo.processes" border stripe >
+          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="statusInfo.processes.length > 0" :data="statusInfo.processes" border stripe >
             <el-table-column prop="pid" label="PID" width="80" />
             <el-table-column prop="user" label="User" width="100" />
             <el-table-column prop="cpu" label="%CPU" width="100" />
@@ -157,6 +157,8 @@ import { http_base_url } from "@/env/BaseUrl";
 import { calcNumber, calcStatus } from "@/components/calc/CalcType";
 import NoData from '@/components/NoData';
 import EChart from "@/components/advance/EChart";
+import { ElMessage } from "element-plus";
+import useClipboard from "vue-clipboard3";
 import { calcTime } from "@/components/calc/CalcDate";
 import i18n from "@/locales/i18n";
 
@@ -172,6 +174,8 @@ export default {
   },
   props:['sshKey', 'advance'],
   setup(props) {
+    // 拷贝
+    const { toClipboard } = useClipboard();
 
     // 控制Dialog显示
     const DialogVisible = ref(false);
@@ -364,6 +368,22 @@ export default {
       }
     };
 
+    const handleTabClick = (tab) => {
+      if(tab.index == 2 && !networkEChartRef.value.isFinished) networkEChartRef.value.loading = true;
+      if(tab.index == 3 && !diskEChartRef.value.isFinished) diskEChartRef.value.loading = true;
+    };
+
+    // 复制表格数据
+    const tableDataCopy = async (row, column) => {
+      if(!row[column.property]) return;
+      await toClipboard(row[column.property]);
+      ElMessage({
+        message: i18n.global.t('复制成功'),
+        type: 'success',
+        grouping: true,
+        repeatNum: Number.MIN_SAFE_INTEGER,
+      });
+    };
 
     // 重置
     const reset = (deep=false) => {
@@ -371,7 +391,6 @@ export default {
         statusInfo.value = {...initStatusInfo};
         selectedNetwork.value = 'all';
         selectedDisk.value = 'all';
-        stopMonitor();
       }
       DialogVisible.value = false;
     };
@@ -389,6 +408,7 @@ export default {
       setTimeout(() => {
         reset(true);
       },400);
+      stopMonitor();
       DialogVisible.value = false;
       if(done) done();
     };
@@ -410,6 +430,8 @@ export default {
       networkSeries,
       updateDiskData,
       diskSeries,
+      handleTabClick,
+      tableDataCopy,
     }
   }
 

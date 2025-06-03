@@ -52,7 +52,7 @@ public class Result {
         result.setCode(code);
         result.setInfo(info);
         try {
-            if(null == data) result.setData(null);
+            if(null == data || "null".equals(data)) result.setData(null);
             else result.setData(AesUtil.aesEncrypt(data));
         } catch (Exception e) {
             System.out.println("Encrypt Error");

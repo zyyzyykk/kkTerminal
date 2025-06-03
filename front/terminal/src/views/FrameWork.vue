@@ -99,7 +99,7 @@
 <script>
 import useClipboard from "vue-clipboard3";
 import { ref, onMounted, onUnmounted, getCurrentInstance } from 'vue';
-import { encrypt, decrypt } from '@/utils/Encrypt';
+import { aesEncrypt, aesDecrypt } from '@/utils/Encrypt';
 import { ElMessage } from 'element-plus';
 
 import { Terminal } from 'xterm';
@@ -128,6 +128,7 @@ import i18n from "@/locales/i18n";
 import { cloud, load, syncUpload, syncDownload } from "@/utils/CloudUtil";
 import { deleteDialog } from "@/utils/DeleteDialog";
 import { calcType } from "@/components/calc/CalcType"
+import { localStore, sessionStore } from "@/env/Store";
 
 export default {
   name: "FrameWork",
@@ -212,18 +213,18 @@ export default {
     };
 
     // 加载环境变量
-    const osInfo = ref({});
+    const osInfo = ref(JSON.parse(sessionStorage.getItem(sessionStore['os-info'])));
     const options = ref({});
     const loadOps = () => {
-      if(localStorage.getItem('options')) options.value = JSON.parse(decrypt(localStorage.getItem('options')));
+      if(localStorage.getItem(localStore['options'])) options.value = JSON.parse(aesDecrypt(localStorage.getItem(localStore['options'])));
       else options.value = {};
     };
     loadOps();
     const tcodes = ref({});
     const loadTCodes = () => {
       tcodes.value = {};
-      if(localStorage.getItem('tcodes')) {
-        tcodes.value = JSON.parse(decrypt(localStorage.getItem('tcodes')));
+      if(localStorage.getItem(localStore['tcodes'])) {
+        tcodes.value = JSON.parse(aesDecrypt(localStorage.getItem(localStore['tcodes'])));
       }
       setTimeout(() => {
         helpTcodeRef.value.userTCodes = {...tcodes.value};
@@ -233,7 +234,7 @@ export default {
     const env = ref(default_env);
     const urlParams = ref(getUrlParams());
     const loadEnv = () => {
-      if(localStorage.getItem('env')) env.value = {...env.value, ...JSON.parse(decrypt(localStorage.getItem('env')))};
+      if(localStorage.getItem(localStore['env'])) env.value = {...env.value, ...JSON.parse(aesDecrypt(localStorage.getItem(localStore['env'])))};
       // bg fg
       if(urlParams.value.bg && urlParams.value.bg[0] != '#') urlParams.value.bg = '#' + urlParams.value.bg;
       if(urlParams.value.fg && urlParams.value.fg[0] != '#') urlParams.value.fg = '#' + urlParams.value.fg;
@@ -272,7 +273,7 @@ export default {
     // 保存更改的配置
     const saveOp = (name,item) => {
       if(name) options.value = {...options.value,[name]:item};
-      localStorage.setItem('options',encrypt(JSON.stringify(options.value)));
+      localStorage.setItem(localStore['options'], aesEncrypt(JSON.stringify(options.value)));
       loadOps();
     };
     // 删除配置
@@ -314,7 +315,7 @@ export default {
       if(socket.value && socket.value.readyState == WebSocket.OPEN && term) {
         const new_rows = fitAddon.proposeDimensions().rows;
         const new_cols = fitAddon.proposeDimensions().cols;
-        socket.value.send(encrypt(JSON.stringify({type:1,content:"",rows:new_rows,cols:new_cols})));
+        socket.value.send(aesEncrypt(JSON.stringify({type:1,content:"",rows:new_rows,cols:new_cols})));
         term.resize(new_cols,new_rows);
       }
     };
@@ -360,7 +361,7 @@ export default {
     const sshKey = ref('');
     const socket = ref(null);
     const doSSHConnect = () => {
-      socket.value = new WebSocket(ws_base_url + changeStr(encrypt(JSON.stringify({...env.value, cooperateKey: urlParams.value.cooperate}))));
+      socket.value = new WebSocket(ws_base_url + changeStr(aesEncrypt(JSON.stringify({...env.value, cooperateKey: urlParams.value.cooperate}))));
       socket.value.onopen = () => {
         termFit();
       };
@@ -392,14 +393,14 @@ export default {
             termWrite(result.info + ".\n");
             return;
           }
-          sshKey.value = decrypt(result.data);
+          sshKey.value = aesDecrypt(result.data);
           if(urlParams.value.cmd) sendMessage(urlParams.value.cmd + "\n");
           if(env.value.advance && env.value.server_user === 'root' && statusMonitorRef.value) statusMonitorRef.value.doMonitor();
           if(env.value.advance && dockerBlockRef.value) dockerBlockRef.value.getDockerVersion(sshKey.value);
         }
         // 输出
         else if(result.code == 1) {
-          let output = decrypt(result.data);
+          let output = aesDecrypt(result.data);
           if(UserTcodeExecutor.active) UserTcodeExecutor.outArray.push(output);
           if(recording.value) {
             recordInfo.value.push({
@@ -411,7 +412,7 @@ export default {
         }
         // 更新协作者数量
         else if(result.code == 2) {
-          onlineNumber.value = Number(decrypt(result.data));
+          onlineNumber.value = Number(aesDecrypt(result.data));
         }
       };
       socket.value.onclose = (e) => {
@@ -456,9 +457,9 @@ export default {
     // 保存更改的环境变量
     const saveEnv = (new_env,restart=true) => {
       let save_env = default_env;
-      if(localStorage.getItem('env')) save_env = {...save_env,...JSON.parse(decrypt(localStorage.getItem('env')))};
+      if(localStorage.getItem(localStore['env'])) save_env = {...save_env,...JSON.parse(aesDecrypt(localStorage.getItem(localStore['env'])))};
       save_env = {...save_env,...new_env};
-      localStorage.setItem('env',encrypt(JSON.stringify(save_env)));
+      localStorage.setItem(localStore['env'], aesEncrypt(JSON.stringify(save_env)));
       for (const key in new_env) {
         if(key in urlParams.value) urlParams.value[key] = new_env[key];
       }
@@ -473,7 +474,7 @@ export default {
           termFit();
           isFirst.value = false;
         }
-        if(UserTcodeExecutor.active === active) socket.value.send(encrypt(JSON.stringify({type:0,content:text,rows:0,cols:0})));
+        if(UserTcodeExecutor.active === active) socket.value.send(aesEncrypt(JSON.stringify({type:0,content:text,rows:0,cols:0})));
       }
     };
 
@@ -579,6 +580,10 @@ export default {
       // 监控
       else if(type == 7) {
         showSettings(false);
+        setTimeout(() => {
+          statusMonitorRef.value.updateNetworkData();
+          statusMonitorRef.value.updateDiskData();
+        }, 1);
         statusMonitorRef.value.DialogVisible = true;
       }
       // Docker
@@ -594,7 +599,7 @@ export default {
       if(timer == null) {
         timer = setInterval(() => {
           if(socket.value && socket.value.readyState == WebSocket.OPEN) {
-            socket.value.send(encrypt(JSON.stringify({type:2,content:"",rows:0,cols:0})));
+            socket.value.send(aesEncrypt(JSON.stringify({type:2,content:"",rows:0,cols:0})));
           }
           // PC端
           if(osInfo.value.serverOS != "Linux") {
@@ -629,7 +634,7 @@ export default {
 
     const setTcodeStatus = (transTcode, state) => {
       tcodes.value[transTcode].status = state;
-      localStorage.setItem('tcodes',encrypt(JSON.stringify(tcodes.value)));
+      localStorage.setItem(localStore['tcodes'], aesEncrypt(JSON.stringify(tcodes.value)));
       setTimeout(() => {
         helpTcodeRef.value.userTCodes = {...tcodes.value};
       },1);
@@ -725,13 +730,13 @@ export default {
     const importTCodes = (data) => {
       let tCodeData = {};
       tCodeData = {...tcodes.value,...data};
-      localStorage.setItem('tcodes',encrypt(JSON.stringify(tCodeData)));
+      localStorage.setItem(localStore['tcodes'], aesEncrypt(JSON.stringify(tCodeData)));
       loadTCodes();
     };
     // 批量导出TCode
     const exportTcodes = () => {
       let content = {};
-      if(localStorage.getItem('tcodes')) content = JSON.parse(decrypt(localStorage.getItem('tcodes')));
+      if(localStorage.getItem(localStore['tcodes'])) content = JSON.parse(aesDecrypt(localStorage.getItem(localStore['tcodes'])));
       // 创建 Blob 对象
       const blob = new Blob([JSON.stringify(content, null, 4)], { type: 'text/plain' });
       // 创建指向 Blob 的 URL
@@ -796,23 +801,13 @@ export default {
       // 云端同步
       if(env.value.cloud) syncUpload();
 
-      // 初始化
-      $.ajax({
-        url: http_base_url + '/init',
-        type:'get',
-        data: {
-          time: new Date().getTime(),
-        },
-        success(resp){
-          osInfo.value = {...resp.data};
-          // 连接服务器
-          doSSHConnect();
-          // 监听窗口大小变化
-          listenResize();
-          // 心跳
-          doHeartBeat();
-        },
-      });
+      // 连接服务器
+      doSSHConnect();
+      // 监听窗口大小变化
+      listenResize();
+      // 心跳
+      doHeartBeat();
+
     });
 
     onUnmounted(() => {

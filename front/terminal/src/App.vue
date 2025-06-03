@@ -1,15 +1,44 @@
 <template>
-  <FrameWork></FrameWork>
+  <FrameWork v-if="isInitialized" ></FrameWork>
 </template>
 
 <script>
 import FrameWork from "./views/FrameWork";
+import $ from 'jquery';
+import { http_base_url } from '@/env/BaseUrl';
+import { ref, onBeforeMount } from "vue";
+import { sessionStore } from "@/env/Store";
 
 export default {
   name: 'App',
   components: {
     FrameWork,
-  }
+  },
+  setup() {
+
+    // 初始化
+    const isInitialized = ref(false);
+
+    onBeforeMount(async () => {
+      await $.ajax({
+        url: http_base_url + '/init',
+        type:'get',
+        data: {
+          time: new Date().getTime(),
+        },
+        success(resp){
+          const data = JSON.parse(resp.info);
+          sessionStorage.setItem(sessionStore['aes-key'], data.aesKey);
+          sessionStorage.setItem(sessionStore['os-info'], JSON.stringify(data.osInfo));
+          isInitialized.value = true;
+        },
+      });
+    });
+
+    return {
+      isInitialized,
+    }
+  },
 }
 </script>
 

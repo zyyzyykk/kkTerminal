@@ -88,6 +88,7 @@ import { ElMessage } from 'element-plus';
 import AceEditor from '../preview/AceEditor';
 import { CollectionTag, EditPen, Upload, Download, Refresh, Finished, DocumentDelete } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
+import { localStore } from "@/env/Store";
 
 export default {
   name: 'UserTcode',
@@ -127,7 +128,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
 
     // 保存
     const handleSave = (text) => {
-      localStorage.setItem('tcode-draft', text);
+      localStorage.setItem(localStore['tcode-draft'], text);
       ElMessage({
         message: i18n.global.t('保存成功'),
         type: 'success',
@@ -143,8 +144,8 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       // Workflow仅支持JS语法
       userTcodeEditorRef.value.setLanguage('kk.js');
       // 加载Draft
-      if(localStorage.getItem('tcode-draft')) {
-        userTcodeEditorRef.value.setValue(localStorage.getItem('tcode-draft'));
+      if(localStorage.getItem(localStore['tcode-draft'])) {
+        userTcodeEditorRef.value.setValue(localStorage.getItem(localStore['tcode-draft']));
         userTcodeEditorRef.value.resetHistory();
       }
     };
@@ -245,12 +246,12 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       switch(type) {
         case 1:
           // 刷新
-          localStorage.removeItem('tcode-draft');
+          localStorage.removeItem(localStore['tcode-draft']);
           setValue(workflowTemplate);
           break;
         case 2:
           // 删除
-          localStorage.removeItem('tcode-draft');
+          localStorage.removeItem(localStore['tcode-draft']);
           setValue('');
           break;
         case 3:
@@ -292,7 +293,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
         type: 'success',
         grouping: true,
       });
-      localStorage.removeItem('tcode-draft');
+      localStorage.removeItem(localStore['tcode-draft']);
       closeDialog();
     };
 

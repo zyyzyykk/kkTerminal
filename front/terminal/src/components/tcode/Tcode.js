@@ -1,6 +1,7 @@
-import { encrypt, decrypt } from '@/utils/Encrypt';
-const storageLocalKey = 'tcode-local-vars';
-const storageSessionPrefix = 'tcode-session-vars-';
+import { aesEncrypt, aesDecrypt } from '@/utils/Encrypt';
+import { localStore, sessionStore } from "@/env/Store";
+const storageLocalKey = localStore['tcode-vars'];
+const storageSessionPrefix = sessionStore['tcode-vars'];
 
 import i18n from "@/locales/i18n";
 
@@ -53,55 +54,48 @@ export const SysTcode = {
     'SC': {
         desc: i18n.global.k('连接设置'),
         execFlow(context) {
-            context.proxy.connectSettingRef.DialogVisible = true;
+            context.proxy.doSettings(1);
         }
     },
     'SP': {
         desc: i18n.global.k('偏好设置'),
         execFlow(context) {
-            context.proxy.styleSettingRef.DialogVisible = true;
+            context.proxy.doSettings(2);
         }
     },
     'SF': {
         desc: i18n.global.k('文件管理'),
         execFlow(context) {
-            context.proxy.fileBlockRef.DialogVisible = true;
-            context.proxy.fileBlockRef.getInitDir();
+            context.proxy.doSettings(4);
         }
     },
     'SAC': {
         desc: i18n.global.k('高级-协作'),
         execFlow(context) {
             if(!(context.proxy.sshKey && context.proxy.env.advance)) return;
-            context.proxy.cooperateGenRef.DialogVisible = true;
+            context.proxy.doSettings(6);
         }
     },
     'SAM': {
         desc: i18n.global.k('高级-监控'),
         execFlow(context) {
             if(!(context.proxy.sshKey && context.proxy.env.advance && context.proxy.env.server_user === 'root')) return;
-            context.proxy.statusMonitorRef.DialogVisible = true;
+            context.proxy.doSettings(7);
         }
     },
     'SAD': {
         desc: i18n.global.k('高级-Docker'),
         execFlow(context) {
             if(!(context.proxy.sshKey && context.proxy.env.advance)) return;
-            context.proxy.dockerBlockRef.DialogVisible = true;
+            context.proxy.doSettings(8);
         }
     },
     'SS': {
         desc: i18n.global.k('重启'),
         execFlow(context) {
-            context.proxy.now_connect_status = context.proxy.connect_status['Connecting'];
-            context.proxy.sshKey = '';
-            if(context.proxy.socket) context.proxy.socket.close(3333);  // 主动释放资源，必需
-            // 进行重启
-            context.proxy.closeBlock();
-            context.proxy.resetTerminal();
-            context.proxy.doSSHConnect();
+            context.proxy.doSettings(3);
         }
-    }
+    },
 };
 
 // 用户TCode, 以 U 开头
@@ -122,11 +116,11 @@ export const UserTcodeExecutor = {
         local(key,value) {
             let tcodeLocalVars = {};
             if(localStorage.getItem(storageLocalKey)) {
-                tcodeLocalVars = JSON.parse(decrypt(localStorage.getItem(storageLocalKey)));
+                tcodeLocalVars = JSON.parse(aesDecrypt(localStorage.getItem(storageLocalKey)));
             }
             if(value != undefined) {
                 tcodeLocalVars[key] = value;
-                localStorage.setItem(storageLocalKey,encrypt(JSON.stringify(tcodeLocalVars)));
+                localStorage.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tcodeLocalVars)));
             }
             else return tcodeLocalVars[key];
         },
@@ -137,12 +131,12 @@ export const UserTcodeExecutor = {
             }
             let tcodeLocalVars = {};
             if(localStorage.getItem(storageLocalKey)) {
-                tcodeLocalVars = JSON.parse(decrypt(localStorage.getItem(storageLocalKey)));
+                tcodeLocalVars = JSON.parse(aesDecrypt(localStorage.getItem(storageLocalKey)));
             }
             for (let i = 0; i < arguments.length; i++) {
                 delete tcodeLocalVars[arguments[i]];
             }
-            localStorage.setItem(storageLocalKey,encrypt(JSON.stringify(tcodeLocalVars)));
+            localStorage.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tcodeLocalVars)));
         }
     },
     // 仅向terminal写入，不等待

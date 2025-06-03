@@ -26,7 +26,7 @@ import java.util.UUID;
 @RequestMapping("/api")
 public class AdvanceController {
 
-    public static final String COOPERATE_SECRET_KEY = "o4D1fYuVp2js9xKX";
+    public static final String COOPERATE_SECRET_KEY = StringUtil.generateRandomString(16);
 
     public static final String[] DOCKER_INFO_CMD = new String[]{
             "echo -n \"$(docker ps -a --format \"{{.ID}}@{{.Names}}@{{.Status}}@{{.Image}}@{{.Ports}}\" | paste -sd '$' -)\"",

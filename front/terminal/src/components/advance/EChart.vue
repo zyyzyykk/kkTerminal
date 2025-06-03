@@ -1,5 +1,5 @@
 <template>
-    <div element-loading-text="Loading..." v-loading="loading" ref="echartRef" ></div>
+  <div element-loading-text="Loading..." v-loading="loading" ref="eChartRef" ></div>
 </template>
 
 <script>
@@ -12,7 +12,8 @@ export default {
   setup(props) {
 
     const loading = ref(true);
-    const echartRef = ref();
+    const isFinished = ref(false);
+    const eChartRef = ref();
     const option = {
       title: {
         text: '',
@@ -47,25 +48,27 @@ export default {
       option.series = series;
       // 更新图表
       if (chart) {
-        loading.value = true;
+        isFinished.value = false;
         chart.setOption(option);
       }
     };
 
     onMounted(() => {
       // 初始化ECharts实例并应用配置项
-      chart = echarts.init(echartRef.value);
-      chart.on('rendered', function() {
-        loading.value = false;
-      });
-      loading.value = true;
+      chart = echarts.init(eChartRef.value);
       chart.setOption(option);
       chart.resize();
+      chart.on('finished', function() {
+        isFinished.value = true;
+        loading.value = false;
+      });
     });
 
     return {
-      echartRef,
+      eChartRef,
       update,
+      loading,
+      isFinished,
     }
   }
 }

@@ -1,16 +1,17 @@
-import { decrypt, encrypt} from '@/utils/Encrypt';
+import { aesDecrypt, aesEncrypt } from '@/utils/Encrypt';
 import { generateRandomString } from '@/utils/StringUtil';
 
 import $ from 'jquery';
 import { http_base_url } from '@/env/BaseUrl';
 import { ElMessage } from 'element-plus';
 import i18n from "@/locales/i18n";
+import { localStore } from "@/env/Store";
 
 const getUserInfo = () => {
-  if(!localStorage.getItem('user')) {
-    localStorage.setItem('user', encrypt(crypto.randomUUID() + '@' + generateRandomString(16) + '@' + new Date().getTime()));
+  if(!localStorage.getItem(localStore['user'])) {
+    localStorage.setItem(localStore['user'], aesEncrypt(crypto.randomUUID() + '@' + generateRandomString(16) + '@' + new Date().getTime()));
   }
-  const userInfo = decrypt(localStorage.getItem('user')).split('@');
+  const userInfo = aesDecrypt(localStorage.getItem(localStore['user'])).split('@');
   return {
     name: userInfo[0],
     key: userInfo[1],
@@ -23,7 +24,7 @@ export const cloud = async (type, name, content) => {
   if(!content) return;
   const userInfo = getUserInfo();
   // 创建Blob对象
-  const blob = new Blob([encrypt(content, userInfo.key)], { type: 'application/octet-stream' });
+  const blob = new Blob([aesEncrypt(content, userInfo.key)], { type: 'application/octet-stream' });
   // 创建File对象
   const file = new File([blob], name);
   let formData = new FormData();
@@ -71,7 +72,7 @@ export const load = async (fileName) => {
       fileName: fileName,
     },
     success(resp) {
-      if(resp.status == 'success') content = JSON.parse(decrypt(resp.data, userInfo.key));
+      if(resp.status == 'success') content = JSON.parse(aesDecrypt(resp.data, userInfo.key));
       else {
         ElMessage({
           message: i18n.global.t('云端文件加载失败'),
@@ -92,7 +93,7 @@ export const syncUpload = async () => {
   const userInfo = getUserInfo();
   if(new Date().getTime() - userInfo.time < oneDayInMs) return;
   for(let i = 0; i < syncArr.length; i++) {
-    const content = decrypt(localStorage.getItem(syncArr[i]));
+    const content = aesDecrypt(localStorage.getItem(syncArr[i]));
     await cloud(syncArr[i],'',content);
   }
 };
@@ -100,7 +101,7 @@ export const syncUpload = async () => {
 export const syncDownload = async () => {
   for(let i = 0; i < syncArr.length; i++) {
     const content = await load(syncArr[i]);
-    if(content) localStorage.setItem(syncArr[i], encrypt(JSON.stringify(content)));
+    if(content) localStorage.setItem(syncArr[i], aesEncrypt(JSON.stringify(content)));
   }
   window.location.reload();
 };

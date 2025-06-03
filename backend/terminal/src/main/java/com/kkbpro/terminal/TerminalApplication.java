@@ -16,7 +16,7 @@ import java.util.Properties;
 @SpringBootApplication
 public class TerminalApplication {
 
-    private static final Properties properties;
+    public static final Properties properties;
 
     static {
         properties = new Properties();
