@@ -18,17 +18,21 @@ export default {
 
     // 初始化
     const isInitialized = ref(false);
+    const needAesKey = !sessionStorage.getItem(sessionStore['aes-key']);
+    const needPublicKey = !sessionStorage.getItem(sessionStore['public-key']);
 
     onBeforeMount(async () => {
       await $.ajax({
         url: http_base_url + '/init',
-        type:'get',
+        type:'post',
         data: {
-          time: new Date().getTime(),
+          aesKey: needAesKey,
+          publicKey: needPublicKey,
         },
         success(resp){
           const data = JSON.parse(resp.info);
-          sessionStorage.setItem(sessionStore['aes-key'], data.aesKey);
+          if(needAesKey) sessionStorage.setItem(sessionStore['aes-key'], data.aesKey);
+          if(needPublicKey) sessionStorage.setItem(sessionStore['public-key'], data.publicKey);
           sessionStorage.setItem(sessionStore['os-info'], JSON.stringify(data.osInfo));
           isInitialized.value = true;
         },

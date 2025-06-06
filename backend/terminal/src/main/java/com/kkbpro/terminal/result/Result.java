@@ -1,7 +1,7 @@
 package com.kkbpro.terminal.result;
 
 import com.alibaba.fastjson.JSON;
-import com.kkbpro.terminal.utils.AesUtil;
+import com.kkbpro.terminal.utils.AESUtil;
 import com.kkbpro.terminal.utils.I18nUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -53,7 +53,7 @@ public class Result {
         result.setInfo(info);
         try {
             if(null == data || "null".equals(data)) result.setData(null);
-            else result.setData(AesUtil.aesEncrypt(data));
+            else result.setData(AESUtil.encrypt(data));
         } catch (Exception e) {
             System.out.println("Encrypt Error");
             result.setData(null);
@@ -81,7 +81,7 @@ public class Result {
         result.setInfo(info);
         try {
             if(null == data) result.setData(null);
-            else result.setData(AesUtil.aesEncrypt(JSON.toJSONString(data)));
+            else result.setData(AESUtil.encrypt(JSON.toJSONString(data)));
         } catch (Exception e) {
             System.out.println("Encrypt Error");
             result.setData(null);

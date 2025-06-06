@@ -50,7 +50,7 @@
                       </div>
                     </template>
                     <div class="kk-flex" >
-                      <div style="margin-right: 10px;" ><img :src="app.img" style="height: 48px;" ></div>
+                      <div><img :src="app.img" class="app-img" ></div>
                       <div>{{ $t(app.desc) }}</div>
                     </div>
                   </el-card>
@@ -486,7 +486,7 @@ export default {
     const deployInfo = ref({...initDeployInfo});
     const handleAppGet = (appInfo) => {
       deployInfo.value = {...initDeployInfo, ...appInfo};
-      deployInfo.value.containerName += "_" + generateRandomString(4);
+      if(deployInfo.value.containerName) deployInfo.value.containerName += "_" + generateRandomString(4);
       deployInfo.value.isShow = true;
     };
     const handleReset = (isShow=true) => {
@@ -621,6 +621,20 @@ img {
   color: #666;
   font-weight: bold;
   font-size: 16px;
+}
+
+.app-img {
+  margin-right: 12px;
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  --un-border-opacity: 1;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 6px;
+  border-width: 1px;
+  border-color: rgb(238 238 238 / var(--un-border-opacity));
+  border-radius: 100%;
+  border-style: solid;
+  padding: 4px;
 }
 
 .card-container {

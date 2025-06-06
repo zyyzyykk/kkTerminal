@@ -99,7 +99,7 @@
 <script>
 import useClipboard from "vue-clipboard3";
 import { ref, onMounted, onUnmounted, getCurrentInstance } from 'vue';
-import { aesEncrypt, aesDecrypt } from '@/utils/Encrypt';
+import { aesEncrypt, aesDecrypt, rsaEncrypt } from '@/utils/Encrypt';
 import { ElMessage } from 'element-plus';
 
 import { Terminal } from 'xterm';
@@ -109,7 +109,7 @@ import "xterm/css/xterm.css";
 import $ from 'jquery';
 import { default_env } from '@/env/Env';
 import { ws_base_url } from '@/env/BaseUrl';
-import { changeStr } from '@/utils/StringUtil';
+import { changeStr, generateRandomString } from '@/utils/StringUtil';
 import { http_base_url } from '@/env/BaseUrl';
 
 import ConnectSetting from '@/components/ConnectSetting';
@@ -315,7 +315,7 @@ export default {
       if(socket.value && socket.value.readyState == WebSocket.OPEN && term) {
         const new_rows = fitAddon.proposeDimensions().rows;
         const new_cols = fitAddon.proposeDimensions().cols;
-        socket.value.send(aesEncrypt(JSON.stringify({type:1,content:"",rows:new_rows,cols:new_cols})));
+        socket.value.send(aesEncrypt(JSON.stringify({type:1,content:"",rows:new_rows,cols:new_cols}), secretKey.value));
         term.resize(new_cols,new_rows);
       }
     };
@@ -359,12 +359,25 @@ export default {
 
     // websocket连接
     const sshKey = ref('');
+    const secretKey = ref('');
     const socket = ref(null);
     const doSSHConnect = () => {
-      socket.value = new WebSocket(ws_base_url + changeStr(aesEncrypt(JSON.stringify({...env.value, cooperateKey: urlParams.value.cooperate}))));
+      // 生成密钥
+      secretKey.value = generateRandomString(16);
+      // ws连接信息
+      const wsInfo = {};
+      wsInfo.secretKey = rsaEncrypt(secretKey.value);
+      wsInfo.envInfo = aesEncrypt(JSON.stringify({
+        ...env.value,
+        cooperateKey: urlParams.value.cooperate
+      }), secretKey.value);
+      // ws连接
+      socket.value = new WebSocket(ws_base_url + changeStr(aesEncrypt(JSON.stringify(wsInfo))));
+      // 连接建立
       socket.value.onopen = () => {
         termFit();
       };
+      // 接收消息
       socket.value.onmessage = resp => {
         const result = JSON.parse(resp.data);
         // 协作失败
@@ -393,14 +406,14 @@ export default {
             termWrite(result.info + ".\n");
             return;
           }
-          sshKey.value = aesDecrypt(result.data);
+          sshKey.value = aesDecrypt(aesDecrypt(result.data), secretKey.value);
           if(urlParams.value.cmd) sendMessage(urlParams.value.cmd + "\n");
           if(env.value.advance && env.value.server_user === 'root' && statusMonitorRef.value) statusMonitorRef.value.doMonitor();
           if(env.value.advance && dockerBlockRef.value) dockerBlockRef.value.getDockerVersion(sshKey.value);
         }
         // 输出
         else if(result.code == 1) {
-          let output = aesDecrypt(result.data);
+          let output = aesDecrypt(aesDecrypt(result.data), secretKey.value);
           if(UserTcodeExecutor.active) UserTcodeExecutor.outArray.push(output);
           if(recording.value) {
             recordInfo.value.push({
@@ -412,9 +425,10 @@ export default {
         }
         // 更新协作者数量
         else if(result.code == 2) {
-          onlineNumber.value = Number(aesDecrypt(result.data));
+          onlineNumber.value = Number(aesDecrypt(aesDecrypt(result.data), secretKey.value));
         }
       };
+      // 断开连接
       socket.value.onclose = (e) => {
         if(now_connect_status.value == connect_status.value['Success'] && e.code != 3333) {
           sshKey.value = '';
@@ -474,7 +488,7 @@ export default {
           termFit();
           isFirst.value = false;
         }
-        if(UserTcodeExecutor.active === active) socket.value.send(aesEncrypt(JSON.stringify({type:0,content:text,rows:0,cols:0})));
+        if(UserTcodeExecutor.active === active) socket.value.send(aesEncrypt(JSON.stringify({type:0,content:text,rows:0,cols:0}), secretKey.value));
       }
     };
 
@@ -599,7 +613,7 @@ export default {
       if(timer == null) {
         timer = setInterval(() => {
           if(socket.value && socket.value.readyState == WebSocket.OPEN) {
-            socket.value.send(aesEncrypt(JSON.stringify({type:2,content:"",rows:0,cols:0})));
+            socket.value.send(aesEncrypt(JSON.stringify({type:2,content:"",rows:0,cols:0}), secretKey.value));
           }
           // PC端
           if(osInfo.value.serverOS != "Linux") {

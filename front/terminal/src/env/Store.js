@@ -11,4 +11,5 @@ export const sessionStore = {
     'tcode-vars': 'tcode-session-vars-',
     'os-info': 'os-info',
     'aes-key': 'aes-key',
+    'public-key': 'public-key',
 };

@@ -232,6 +232,7 @@
   "每行一个，主机路径:容器路径": "One per line, host-path:container-path",
   "开始安装": "Start Install",
   "开始部署": "Start Deploy",
-  "kkTerminal是一个Web SSH连接终端": "kkTerminal is a terminal for Web SSH connection",
+  "指定任意镜像进行应用部署": "Specify any image for application deployment",
+  "kkTerminal是一个强大的Web SSH连接终端": "kkTerminal is a powerful terminal for Web SSH connection",
   "Draw.io是一个开源的在线绘图工具": "Draw.io is an open-source online drawing tool"
 }

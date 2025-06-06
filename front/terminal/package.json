@@ -18,6 +18,7 @@
     "iconv-lite": "^0.6.3",
     "jquery": "^3.7.1",
     "jschardet": "^3.1.4",
+    "jsencrypt": "^3.3.2",
     "strip-ansi": "^7.1.0",
     "vue": "^3.2.13",
     "vue-clipboard3": "^2.0.0",

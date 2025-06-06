@@ -4,7 +4,7 @@ import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
 import com.kkbpro.terminal.consumer.WebSocketServer;
 import com.kkbpro.terminal.pojo.dto.CooperateInfo;
 import com.kkbpro.terminal.result.Result;
-import com.kkbpro.terminal.utils.AesUtil;
+import com.kkbpro.terminal.utils.AESUtil;
 import com.kkbpro.terminal.utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
@@ -72,7 +72,7 @@ public class AdvanceController {
         cooperateInfo.setMaxHeadCount(maxHeadCount);
         webSocketServer.setCooperateInfo(cooperateInfo);
 
-        String key = StringUtil.changeBase64Str(AesUtil.aesEncrypt(cooperateId + "^" + sshKey, COOPERATE_SECRET_KEY));
+        String key = StringUtil.changeBase64Str(AESUtil.encrypt(cooperateId + "^" + sshKey, COOPERATE_SECRET_KEY));
 
         return Result.success(successMsg, key);
     }
@@ -92,11 +92,11 @@ public class AdvanceController {
         }
 
         webSocketServer.setCooperateInfo(null);
-        List<javax.websocket.Session> sessions = WebSocketServer.cooperateMap.get(sshKey);
+        List<WebSocketServer> slaveSockets = WebSocketServer.cooperateMap.get(sshKey);
         WebSocketServer.cooperateMap.remove(sshKey);
-        if(sessions != null) {
-            for(javax.websocket.Session session : sessions) {
-                session.close();
+        if(slaveSockets != null) {
+            for(WebSocketServer slaveSocket : slaveSockets) {
+                slaveSocket.getSessionSocket().close();
             }
         }
 

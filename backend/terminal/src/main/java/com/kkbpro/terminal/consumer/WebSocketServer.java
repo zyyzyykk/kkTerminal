@@ -13,8 +13,9 @@ import com.kkbpro.terminal.pojo.dto.EnvInfo;
 import com.kkbpro.terminal.pojo.dto.MessageInfo;
 import com.kkbpro.terminal.pojo.dto.PrivateKey;
 import com.kkbpro.terminal.result.Result;
-import com.kkbpro.terminal.utils.AesUtil;
+import com.kkbpro.terminal.utils.AESUtil;
 import com.kkbpro.terminal.utils.FileUtil;
+import com.kkbpro.terminal.utils.RSAUtil;
 import com.kkbpro.terminal.utils.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,7 +42,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@ServerEndpoint("/socket/ssh/{env}")  // 注意不要以'/'结尾
+@ServerEndpoint("/socket/ssh/{ws}")  // 注意不要以'/'结尾
 public class WebSocketServer {
 
     public static ConcurrentHashMap<String, WebSocketServer> webSocketServerMap = new ConcurrentHashMap<>();
@@ -52,12 +53,14 @@ public class WebSocketServer {
 
     public static ConcurrentHashMap<String, SFTPClient> sftpClientMap = new ConcurrentHashMap<>();
 
-    public static ConcurrentHashMap<String, List<Session>> cooperateMap = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, List<WebSocketServer>> cooperateMap = new ConcurrentHashMap<>();
 
     private static AppConfig appConfig;
 
     @Getter
     private Session sessionSocket = null;
+
+    private String secretKey;
 
     @Getter @Setter
     private CooperateInfo cooperateInfo;
@@ -84,14 +87,19 @@ public class WebSocketServer {
     }
 
     @OnOpen
-    public void onOpen(Session sessionSocket, @PathParam("env") String env) throws IOException {
+    public void onOpen(Session sessionSocket, @PathParam("ws") String wsInfoStr) throws Exception {
 
-        EnvInfo envInfo =
-                JSONObject.parseObject(AesUtil.aesDecrypt(StringUtil.changeStr(env)),EnvInfo.class);
+        // 获取加密密钥
+        wsInfoStr = AESUtil.decrypt(StringUtil.changeStr(wsInfoStr));
+        JSONObject jsonObject = JSONObject.parseObject(wsInfoStr);
+        this.secretKey = RSAUtil.decrypt(jsonObject.getString("secretKey"));
+        // 获取连接信息
+        String envInfoStr = AESUtil.decrypt(jsonObject.getString("envInfo"), this.secretKey);
+        EnvInfo envInfo = JSONObject.parseObject(envInfoStr, EnvInfo.class);
 
         // 建立 web-socket 连接
         this.sessionSocket = sessionSocket;
-        // 设置最大空闲超时（上线后失效？？？）
+        // 设置最大空闲超时
         sessionSocket.setMaxIdleTimeout(appConfig.getMaxIdleTimeout());
 
         // 协作
@@ -100,38 +108,38 @@ public class WebSocketServer {
             Integer state = ResultCodeEnum.COOPERATE_KEY_INVALID.getState();
             String msg = ResultCodeEnum.COOPERATE_KEY_INVALID.getDesc();
             try {
-                String[] keyInfo = AesUtil.aesDecrypt(StringUtil.changeStrBase64(cooperateKey), AdvanceController.COOPERATE_SECRET_KEY).split("\\^");
+                String[] keyInfo = AESUtil.decrypt(StringUtil.changeStrBase64(cooperateKey), AdvanceController.COOPERATE_SECRET_KEY).split("\\^");
                 String cooperateId = keyInfo[0];
                 String sshKey = keyInfo[1];
-                WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
-                if(webSocketServer == null || webSocketServer.cooperateInfo == null || !webSocketServer.cooperateInfo.getId().equals(cooperateId))
+                WebSocketServer masterSocket = webSocketServerMap.get(sshKey);
+                if(masterSocket == null || masterSocket.cooperateInfo == null || !masterSocket.cooperateInfo.getId().equals(cooperateId))
                     throw new RuntimeException();
 
-                List<Session> sessions = WebSocketServer.cooperateMap.computeIfAbsent(sshKey, k -> new ArrayList<>());
-                synchronized (sessions) {
-                    Integer maxHeadCount = webSocketServer.cooperateInfo.getMaxHeadCount();
-                    Boolean readOnly = webSocketServer.cooperateInfo.getReadOnly();
+                List<WebSocketServer> slaveSockets = cooperateMap.computeIfAbsent(sshKey, k -> new ArrayList<>());
+                synchronized (slaveSockets) {
+                    Integer maxHeadCount = masterSocket.cooperateInfo.getMaxHeadCount();
+                    Boolean readOnly = masterSocket.cooperateInfo.getReadOnly();
                     // 成功加入协作
-                    if(maxHeadCount > sessions.size()) {
+                    if(maxHeadCount > slaveSockets.size()) {
                         state = ResultCodeEnum.CONNECT_SUCCESS.getState();
                         msg = (readOnly ? "ReadOnly" : "Edit") + " Cooperation Success";
-                        sessions.add(sessionSocket);
+                        slaveSockets.add(this);
                         this.sshKey = sshKey;
                         this.cooperator = true;
-                        this.serverCharset = webSocketServer.serverCharset;
+                        this.serverCharset = masterSocket.serverCharset;
                         if(!readOnly) {
-                            this.shell = webSocketServer.shell;
-                            this.shellOutputStream = webSocketServer.shellOutputStream;
+                            this.shell = masterSocket.shell;
+                            this.shellOutputStream = masterSocket.shellOutputStream;
                         }
-                        sendMessage(webSocketServer.sessionSocket, ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
-                                "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(sessions.size()));
+                        masterSocket.sendMessage(ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
+                                "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));
                     }
                     else msg = "Cooperators Limit Exceeded";
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            sendMessage(sessionSocket, msg, "fail", state, null);
+            this.sendMessage(msg, "fail", state, null);
             return;
         }
 
@@ -168,7 +176,7 @@ public class WebSocketServer {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            sendMessage(sessionSocket,"Fail to connect remote server !","fail", ResultCodeEnum.CONNECT_FAIL.getState(), null);
+            this.sendMessage("Fail to connect remote server !","fail", ResultCodeEnum.CONNECT_FAIL.getState(), null);
             return;
         } finally {
             // 删除本地私钥文件
@@ -190,14 +198,14 @@ public class WebSocketServer {
 
         // 连接成功，生成key标识
         sshKey = envInfo.getLang() + "-" + serverCharset.name().replace("-","@") + "-" + UUID.randomUUID();
-        sendMessage(sessionSocket, "SSHKey","success", ResultCodeEnum.CONNECT_SUCCESS.getState(), sshKey);
+        this.sendMessage("SSHKey","success", ResultCodeEnum.CONNECT_SUCCESS.getState(), sshKey);
         webSocketServerMap.put(sshKey, this);
         sshClientMap.put(sshKey, sshClient);
         fileUploadingMap.put(sshKey, new ConcurrentHashMap<>());
         // 欢迎语
-        sendMessage(sessionSocket, "Welcome","success", ResultCodeEnum.OUT_TEXT.getState(), appConfig.getWelcome() + "\r\n");
+        this.sendMessage("Welcome","success", ResultCodeEnum.OUT_TEXT.getState(), appConfig.getWelcome() + "\r\n");
         // github源地址
-        sendMessage(sessionSocket, "GitHub","success", ResultCodeEnum.OUT_TEXT.getState(), "source: " + appConfig.getSource() + "\r\n");
+        this.sendMessage("GitHub","success", ResultCodeEnum.OUT_TEXT.getState(), "source: " + appConfig.getSource() + "\r\n");
         // 生成艺术字
         String title = appConfig.getTitle();
         String titleArt = FigletFont.convertOneLine(title);
@@ -205,7 +213,7 @@ public class WebSocketServer {
         // 分割成多行
         String[] asciiArts = titleArt.split("\n");
         for (String asciiArt : asciiArts) {
-            sendMessage(sessionSocket, "ArtWord","success", ResultCodeEnum.OUT_TEXT.getState(), asciiArt + "\r\n");
+            this.sendMessage("ArtWord","success", ResultCodeEnum.OUT_TEXT.getState(), asciiArt + "\r\n");
         }
 
         shell = sshSession.startShell();
@@ -217,17 +225,17 @@ public class WebSocketServer {
             try {
                 while ((len = shellInputStream.read(buffer)) != -1) {
                     String shellOut = new String(buffer, 0, len, serverCharset);
-                    sendMessage(sessionSocket, "ShellOut",
+                    this.sendMessage("ShellOut",
                             "success", ResultCodeEnum.OUT_TEXT.getState(), shellOut);
-                    List<Session> sessions = cooperateMap.get(sshKey);
-                    if(sessions != null) {
-                        for (Session session : sessions) {
-                            sendMessage(session, "ShellOut",
+                    List<WebSocketServer> slaveSockets = cooperateMap.get(sshKey);
+                    if(slaveSockets != null) {
+                        for (WebSocketServer slaveSocket : slaveSockets) {
+                            slaveSocket.sendMessage("ShellOut",
                                     "success", ResultCodeEnum.OUT_TEXT.getState(), shellOut);
                         }
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
@@ -235,15 +243,15 @@ public class WebSocketServer {
     }
 
     @OnClose
-    public void onClose() throws IOException {
+    public void onClose() throws Exception {
         if(cooperator) {
-            List<Session> sessions = cooperateMap.get(sshKey);
-            if(sessions != null) {
-                sessions.remove(this.sessionSocket);
-                WebSocketServer webSocketServer = webSocketServerMap.get(sshKey);
-                if(webSocketServer != null) {
-                    sendMessage(webSocketServer.sessionSocket, ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
-                            "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(sessions.size()));
+            List<WebSocketServer> slaveSockets = cooperateMap.get(sshKey);
+            if(slaveSockets != null) {
+                slaveSockets.remove(this);
+                WebSocketServer masterSocket = webSocketServerMap.get(sshKey);
+                if(masterSocket != null) {
+                    masterSocket.sendMessage(ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
+                            "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));
                 }
             }
             return;
@@ -300,10 +308,10 @@ public class WebSocketServer {
 
     // 从Client接收消息
     @OnMessage
-    public void onMessage(String message) throws IOException {
+    public void onMessage(String message) throws Exception {
         if(shell == null || shellOutputStream == null) return;
 
-        message = AesUtil.aesDecrypt(message);
+        message = AESUtil.decrypt(message, this.secretKey);
         MessageInfo messageInfo = JSONObject.parseObject(message, MessageInfo.class);
 
         // 改变虚拟终端大小
@@ -321,10 +329,10 @@ public class WebSocketServer {
             shellOutputStream.write("".getBytes(StandardCharsets.UTF_8));
             shellOutputStream.flush();
             // 更新协作者数量
-            List<Session> sessions = cooperateMap.get(sshKey);
-            if(sessions != null) {
-                sendMessage(sessionSocket, ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
-                        "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(sessions.size()));
+            List<WebSocketServer> slaveSockets = cooperateMap.get(sshKey);
+            if(slaveSockets != null) {
+                this.sendMessage(ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
+                        "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));
             }
         }
 
@@ -336,16 +344,18 @@ public class WebSocketServer {
     }
 
     // 向Client发送信息
-    public void sendMessage(Session sessionSocket, String message, String type, Integer code, String data) {
+    public void sendMessage(String message, String type, Integer code, String data) {
 
-        synchronized (sessionSocket) {
+        synchronized (this.sessionSocket) {
             try {
-                Result result = null;
+                // 加密数据
+                if(data != null) data = AESUtil.encrypt(data, this.secretKey);
+                Result result;
                 if("success".equals(type)) result = Result.successStr(code,message,data);
                 else if("fail".equals(type)) result = Result.fail(code,message);
                 else result = Result.error(code,message);
-                sessionSocket.getBasicRemote().sendText(JSON.toJSONString(result));
-            } catch(IOException e) {
+                this.sessionSocket.getBasicRemote().sendText(JSON.toJSONString(result));
+            } catch(Exception e) {
                 e.printStackTrace();
             }
         }

@@ -4,7 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.kkbpro.terminal.config.AppConfig;
 import com.kkbpro.terminal.pojo.vo.OSInfo;
 import com.kkbpro.terminal.result.Result;
-import com.kkbpro.terminal.utils.AesUtil;
+import com.kkbpro.terminal.utils.AESUtil;
+import com.kkbpro.terminal.utils.RSAUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,8 +36,8 @@ public class SystemController {
     /**
      * 新建窗口初始化
      */
-    @GetMapping("/init")
-    public Result init(@RequestHeader("User-Agent") String userAgent) {
+    @PostMapping("/init")
+    public Result init(@RequestHeader("User-Agent") String userAgent, Boolean aesKey, Boolean publicKey) {
         String clientOS = getOSFromUA(userAgent);
         String windowId = UUID.randomUUID().toString();
         OSInfo osInfo = new OSInfo(serverOS, clientOS, windowId);
@@ -47,7 +48,8 @@ public class SystemController {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("osInfo", osInfo);
-        map.put("aesKey", AesUtil.SECRET_KEY);
+        if(aesKey) map.put("aesKey", AESUtil.SECRET_KEY);
+        if(publicKey) map.put("publicKey", RSAUtil.PUBLIC_KEY);
         return Result.success(JSONObject.toJSONString(map));
     }
 
