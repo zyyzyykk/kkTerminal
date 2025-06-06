@@ -27,8 +27,8 @@
             </div>
             <div style="flex: 1" ></div>
           </div>
-          <div v-else style="height: 240px; overflow-y: scroll;" >
-            <div v-if="!deployInfo.isShow" >
+          <div v-else >
+            <div id="docker-appstore" v-if="!deployInfo.isShow" style="height: 240px; overflow-y: scroll;" >
               <div class="kk-flex" >
                 <el-icon style="font-size: 18px;" ><Shop /></el-icon>
                 <div style="margin-left: 8px;" >{{ $t('Docker应用商店') }}</div>
@@ -57,7 +57,7 @@
                 </div>
               </div>
             </div>
-            <div v-else >
+            <div v-else style="height: 240px; overflow-y: scroll;" >
               <div class="kk-flex" >
                 <el-icon @click="handleReset(false)" style="cursor: pointer; font-size: 16px;" ><ArrowLeft /></el-icon>
                 <div style="margin-left: 8px;" >{{ $t('返回') }}</div>
@@ -655,6 +655,16 @@ img {
 
 .form-width {
   width: 140px;
+}
+
+/* 隐藏滚动条 */
+#docker-appstore {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* Internet Explorer 和 Edge */
+}
+
+#docker-appstore::-webkit-scrollbar {
+  display: none !important; /* Chrome 和 Safari */
 }
 
 </style>

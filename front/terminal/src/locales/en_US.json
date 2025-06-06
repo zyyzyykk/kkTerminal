@@ -1,5 +1,5 @@
 {
-  "220": "260",
+  "220": "272",
   "360": "380",
   "240": "300",
   "450": "480",
@@ -131,7 +131,7 @@
   "日，": " ",
   "终端": "terminal",
   "什么是 TCode (终端代码) ？": "What's TCode (Terminal Code)?",
-  "TCode（终端代码）是用于访问和执行特定操作流程的快捷方式": "TCode (Terminal Code) is shortcut to access and execute specific action process",
+  "TCode（终端代码）是用于访问和执行特定操作流程的快捷方式": "TCode (Terminal Code) is the shortcut to access and execute specific action process",
   "输入": "Input",
   "并按下回车，查看帮助信息": "and Enter to show Help Module",
   "并按下回车，自定义TCode": "and Enter to customize TCode",

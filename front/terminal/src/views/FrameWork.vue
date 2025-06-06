@@ -25,17 +25,17 @@
       <div class="ellipsis no-select" style="font-size: 14px;" ><span>kk Terminal</span></div>
       <div style="flex: 1;"></div>
       <div v-show="urlParams.mode != 'headless' && urlParams.mode != 'pure'" class="kk-flex" >
-        <div v-if="cooperating" style="margin-left: 10px; cursor: pointer;" >
+        <div v-if="cooperating" style="margin-right: 10px; cursor: pointer;" >
           <el-tag size="small" @click="endCooperateConfirm" :type="calcType(onlineNumber, maxNumber)" effect="plain" class="kk-flex no-select" ><el-icon class="el-icon--left" ><UserFilled /></el-icon>{{ onlineNumber }}</el-tag>
         </div>
-        <div v-if="env.cloud" style="margin-left: 10px; cursor: pointer;" >
+        <div v-if="env.cloud" style="margin-right: 10px; cursor: pointer;" >
           <el-tag v-if="recording == false" @click="startRecord" size="small" type="info" effect="plain" class="kk-flex no-select" style="color: #313131;" ><el-icon class="el-icon--left" ><VideoPlay /></el-icon>{{ $t('开始录制') }}</el-tag>
           <el-tag v-else size="small" @click="stopRecord" type="danger" effect="plain" class="kk-flex no-select" ><el-icon class="el-icon--left" ><VideoPause /></el-icon>{{ $t('录制中') }}</el-tag>
         </div>
-        <div v-if="env.cloud" style="margin-left: 10px; cursor: pointer;" >
+        <div v-if="env.cloud" style="margin-right: 10px; cursor: pointer;" >
           <el-tag @click="cloudSync" size="small" type="info" effect="plain" class="kk-flex no-select" style="color: #313131;" ><el-icon class="el-icon--left" ><MostlyCloudy /></el-icon>{{ $t('云端同步') }}</el-tag>
         </div>
-        <div v-if="env.tCode" class="kk-flex" style="margin-left: 10px;" >
+        <div v-if="env.tCode" class="kk-flex" style="margin-right: 10px;" >
           <div style="font-size: 12px; color: #313131; user-select: none;" > TCode </div>
           <div style="margin-left: 7px;" ></div>
           <div>
@@ -68,13 +68,11 @@
               </div>
             </el-popover>
           </div>
-          <div style="margin-left: 20px;" ></div>
         </div>
-        <div v-else style="margin-left: 20px;" ></div>
       </div>
     </div>
     <!-- terminal主体 -->
-    <div ref="terminal" class="terminal-class" ></div>
+    <div ref="terminal" class="terminal-class" :style="{backgroundColor: env.bg}" ></div>
   </div>
 
   <!-- 连接设置 -->

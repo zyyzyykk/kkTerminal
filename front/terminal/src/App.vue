@@ -100,4 +100,14 @@ img {
   user-select: none;
 }
 
+/* 隐藏滚动条 */
+.xterm-viewport {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* Internet Explorer 和 Edge */
+}
+
+.xterm-viewport::-webkit-scrollbar {
+  display: none !important; /* Chrome 和 Safari */
+}
+
 </style>
