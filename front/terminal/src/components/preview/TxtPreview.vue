@@ -16,7 +16,7 @@
       </div>
     </template>
     <div style="margin-top: -28px;"></div>
-    <div v-show="previewInfo.preview == 'editor'" class="kk-flex ellipsis" style="margin-bottom: 5px; overflow-x: auto;" >
+    <div v-show="previewInfo.preview === 'editor'" class="kk-flex ellipsis" style="margin-bottom: 5px; overflow-x: auto;" >
       <div class="kk-flex" >
         <div class="no-select" >{{ $t('保存编码') }}：</div>
         <el-dropdown size="small" hide-timeout="300" >
@@ -67,16 +67,16 @@
         </el-button>
       </div>
     </div>
-    <div element-loading-text="Loading..." v-loading="loading" style="padding: 0px 5px; width: 100%; height: 60vh; position: relative; margin-bottom: 10px">
-      <AceEditor class="preview" v-show="!loading && previewInfo.preview == 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
-      <iframe id="imgPreview" class="preview" v-if="!loading && previewInfo.preview == 'iframe' && previewUrl != ''" :src="previewUrl" ></iframe>
-      <audio controls class="preview" v-if="!loading && previewInfo.preview == 'audio' && previewUrl != ''" >
+    <div element-loading-text="Loading..." v-loading="loading" style="padding: 0 5px; width: 100%; height: 60vh; position: relative; margin-bottom: 10px">
+      <AceEditor class="preview" v-show="!loading && previewInfo.preview === 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
+      <iframe id="imgPreview" class="preview" v-if="!loading && previewInfo.preview === 'iframe' && previewUrl" :src="previewUrl" ></iframe>
+      <audio controls class="preview" v-if="!loading && previewInfo.preview === 'audio' && previewUrl" >
         <source :src="previewUrl" :type="previewInfo.type" >
       </audio>
-      <video controls class="preview" v-if="!loading && previewInfo.preview == 'video' && previewUrl != ''" >
+      <video controls class="preview" v-if="!loading && previewInfo.preview === 'video' && previewUrl" >
         <source :src="previewUrl" :type="previewInfo.type" >
       </video>
-      <div style="position: absolute; top: 0; right: 30px" v-if="!loading && previewInfo.preview == 'iframe' && previewUrl != ''" >
+      <div style="position: absolute; top: 0; right: 30px" v-if="!loading && previewInfo.preview === 'iframe' && previewInfo.type !== 'application/pdf' && previewInfo.type !== 'text/html' && previewUrl" >
         <el-input-number :style="{width: '105px'}" size="small" v-model="percentage" :min="20" :max="200" step="10" :step-strictly="true" @change="setPercentage" >
           <template #suffix>
             <span>%</span>
@@ -150,9 +150,9 @@ export default {
           if(url == fileUrl.value)
           {
             // 文件可预览
-            if(previewInfo.value.preview != 'editor') {
+            if(previewInfo.value.preview !== 'editor') {
               const blob = new Blob([resp], {type:previewInfo.value.type});
-              if(previewUrl.value != '') URL.revokeObjectURL(previewUrl.value);
+              if(previewUrl.value) URL.revokeObjectURL(previewUrl.value);
               previewUrl.value = URL.createObjectURL(blob);
               percentage.value = 100;
               imgHeight.value = -1;
@@ -287,7 +287,7 @@ export default {
         preview:'editor',
         type:'text',
       };
-      if(previewUrl.value != '') {
+      if(previewUrl.value) {
         URL.revokeObjectURL(previewUrl.value);
         previewUrl.value = '';
       }

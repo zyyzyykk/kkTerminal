@@ -1,22 +1,22 @@
 const zipSuffixs = {
-    "tar":"tar",
-    "tbz2":"tbz2",
-    "gz":"gz",
-    "xz":"xz",
-    "bz2":"bz2",
-    "zip":"zip",
+    "tar": "tar",
+    "tbz2": "tbz2",
+    "gz": "gz",
+    "xz": "xz",
+    "bz2": "bz2",
+    "zip": "zip",
 };
 
 export const isZipFile = (item) => {
     const index = item.lastIndexOf('.');
-    if(index == -1) return false;
+    if(index === -1) return false;
     const fileSuffix = item.substring(index + 1).toLowerCase();
     if(zipSuffixs[fileSuffix]) return true;
     return false;
 };
 
 const iframeSuffixs = {
-    "pdf":"application/pdf",
+    "pdf": "application/pdf",
     "html": "text/html",
     "jpg": "image/jpeg",
     "jpeg": "image/jpeg",
@@ -50,7 +50,7 @@ export const previewFileInfo = (item) => {
         type:'text',
     };
     const index = item.lastIndexOf('.');
-    if(index == -1) return previewInfo;
+    if(index === -1) return previewInfo;
     const fileSuffix = item.substring(index + 1).toLowerCase();
     if(iframeSuffixs[fileSuffix]) {
         previewInfo.preview = "iframe";
