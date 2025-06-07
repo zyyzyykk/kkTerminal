@@ -61,7 +61,7 @@ public class AESUtil {
      * @param encryptKey 加密密钥
      * @return 加密后的byte[]
      */
-    public static byte[] aesEncryptToBytes(String content, String encryptKey) throws Exception {
+    public static byte[] encryptToBytes(String content, String encryptKey) throws Exception {
         KeyGenerator kgen = KeyGenerator.getInstance("AES");
         kgen.init(128);
         Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -78,24 +78,26 @@ public class AESUtil {
      * @return 加密后的base 64 code
      */
     public static String encrypt(String content, String encryptKey) throws Exception {
-        return base64Encode(aesEncryptToBytes(content, encryptKey));
+        return base64Encode(encryptToBytes(content, encryptKey));
     }
 
     /**
      * AES解密
      * @param encryptBytes 待解密的byte[]
      * @param decryptKey 解密密钥
-     * @return 解密后的String
+     * @return 解密后的byte[]
      */
-    public static String aesDecryptByBytes(byte[] encryptBytes, String decryptKey) throws Exception {
+    public static byte[] decryptByBytes(byte[] encryptBytes, String decryptKey) throws Exception {
         KeyGenerator kgen = KeyGenerator.getInstance("AES");
         kgen.init(128);
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(decryptKey.getBytes(), "AES"));
-        byte[] decryptBytes = cipher.doFinal(encryptBytes);
-        return new String(decryptBytes);
+        return cipher.doFinal(encryptBytes);
     }
 
+    public static byte[] decryptToBytes(String encryptStr, String decryptKey) throws Exception {
+        return StringUtil.isEmpty(encryptStr) ? null : decryptByBytes(base64Decode(encryptStr), decryptKey);
+    }
 
     /**
      * 将base 64 code AES解密
@@ -104,7 +106,7 @@ public class AESUtil {
      * @return 解密后的string
      */
     public static String decrypt(String encryptStr, String decryptKey) throws Exception {
-        return StringUtil.isEmpty(encryptStr) ? null : aesDecryptByBytes(base64Decode(encryptStr), decryptKey);
+        return StringUtil.isEmpty(encryptStr) ? null : new String(decryptToBytes(encryptStr, decryptKey));
     }
 
 }

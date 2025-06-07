@@ -167,10 +167,12 @@ import $ from 'jquery';
 import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/env/BaseUrl';
 import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
-import { escapeItem, escapePath, osFileNaturalSort } from '@/utils/StringUtil';
+import { escapeItem, escapePath, generateRandomString, osFileNaturalSort } from '@/utils/StringUtil';
 import { isZipFile } from '@/components/preview/FileSuffix';
 import { getChmodValue } from '@/components/calc/CalcPriority';
 import { getUrlParams } from "@/utils/UrlUtil";
+import { aesEncryptBuffer, rsaEncrypt } from "@/utils/Encrypt";
+import { encodeStrToArray } from "@/components/preview/EncodeUtil";
 
 import ToolTip from './ToolTip.vue';
 import NoData from '@/components/NoData';
@@ -482,14 +484,19 @@ export default {
             grouping: true,
           });
         }
-
         // 分片上传
         for(let chunk=chunkIndex;chunk<=chunks;chunk++) {
-          // 上传逻辑
-          let start = (chunk-1) * chunkSize;
-          let end = start + chunkSize >= fileSize ? fileSize : start + chunkSize;
-          let chunkFile = file.slice(start, end);
-          let formData = new FormData();
+          // 计算分片
+          const start = (chunk-1) * chunkSize;
+          const end = start + chunkSize >= fileSize ? fileSize : start + chunkSize;
+          // 加密文件片
+          const aesKey = generateRandomString(16);
+          const chunkBuffer = await file.slice(start, end).arrayBuffer();
+          const encryptedBuffer = encodeStrToArray(aesEncryptBuffer(chunkBuffer, aesKey), "UTF-8");
+          const chunkFile = new File([new Blob([encryptedBuffer])], fileName);
+          // 上传文件片
+          const formData = new FormData();
+          formData.append('aesKey',rsaEncrypt(aesKey));
           formData.append('file',chunkFile);
           formData.append('fileName',fileName);
           formData.append('chunks',chunks);
@@ -498,7 +505,6 @@ export default {
           formData.append('id',fileId);
           formData.append('sshKey',props.sshKey);
           formData.append('path',path);
-
           await $.ajax({
             url: http_base_url + '/upload',
             type:'post',
@@ -506,58 +512,28 @@ export default {
             contentType : false,
             processData : false,
             success(resp){
-              // 文件后台上传中
-              if(resp.code == 202) {
-                ElMessage({
-                  message: data.alert ? data.alert : resp.info,
-                  type: resp.status,
-                  grouping: true,
-                });
-                if(path == dir.value) {
-                  setTimeout(() => {
-                    getDirList();
-                  }, Math.min(1000, 500 + chunks * 10));
+              if(resp.status == 'success') {
+                // 文件后台上传中
+                if(resp.code == 202) {
+                  ElMessage({
+                    message: data.alert ? data.alert : resp.info,
+                    type: resp.status,
+                    grouping: true,
+                  });
+                  if(path == dir.value) {
+                    setTimeout(() => {
+                      getDirList();
+                    }, Math.min(1000, 500 + chunks * 10));
+                  }
                 }
               }
-              // 文件片上传成功
-              // else if(resp.code == 203) {
-
-              // }
-              // 文件片上传失败
-              else if(resp.code == 502) {
+              else {
                 ElMessage({
                   message: resp.info,
                   type: resp.status,
                   grouping: true,
                 })
-                chunk = chunks + 1;
-              }
-              // 文件片缺失
-              else if(resp.code == 503) {
-                ElMessage({
-                  message: resp.info,
-                  type: resp.status,
-                  grouping: true,
-                })
-                chunk = chunks + 1;
-              }
-              // 上传文件大小不一致
-              else if(resp.code == 504) {
-                ElMessage({
-                  message: resp.info,
-                  type: resp.status,
-                  grouping: true,
-                })
-                chunk = chunks + 1;
-              }
-              // ssh连接断开
-              else if(resp.code == 602) {
-                ElMessage({
-                  message: resp.info,
-                  type: resp.status,
-                  grouping: true,
-                })
-                chunk = chunks + 1;
+                chunk = chunks + 10;
               }
             },
           });
@@ -567,7 +543,7 @@ export default {
           message: i18n.global.t("文件上传失败"),
           type: "error",
           grouping: true,
-        })
+        });
       }
     };
 

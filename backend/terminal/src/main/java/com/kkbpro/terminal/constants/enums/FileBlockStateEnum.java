@@ -6,6 +6,8 @@ public enum FileBlockStateEnum {
 
     CHUNK_UPLOAD_SUCCESS(203,"文件片上传成功"),
 
+    DECRYPT_ERROR(501,"文件片解密失败"),
+
     UPLOAD_ERROR(502,"文件片上传失败"),
 
     UPLOAD_CHUNK_LOST(503,"文件片缺失"),

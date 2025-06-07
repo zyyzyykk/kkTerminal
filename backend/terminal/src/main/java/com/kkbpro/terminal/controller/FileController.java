@@ -7,7 +7,9 @@ import com.kkbpro.terminal.exception.MyException;
 import com.kkbpro.terminal.pojo.dto.FileUploadInfo;
 import com.kkbpro.terminal.pojo.vo.FileInfo;
 import com.kkbpro.terminal.result.Result;
+import com.kkbpro.terminal.utils.AESUtil;
 import com.kkbpro.terminal.utils.FileUtil;
+import com.kkbpro.terminal.utils.RSAUtil;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.sftp.*;
@@ -600,8 +602,6 @@ public class FileController {
         Integer chunk = fileUploadInfo.getChunk();
         Long totalSize = fileUploadInfo.getTotalSize();
 
-        String folderPath = FileUtil.folderBasePath + "/" + sshKey + "-" + id;
-
         Map<String,Object> map = new HashMap<>();
         map.put("chunk",chunk);
         map.put("chunks",chunks);
@@ -609,8 +609,19 @@ public class FileController {
         map.put("fileName",fileName);
         map.put("totalSize",totalSize);
 
+        // 解密文件片
+        byte[] decryptedData;
+        try {
+            String aesKey = RSAUtil.decrypt(fileUploadInfo.getAesKey());
+            decryptedData = AESUtil.decryptToBytes(new String(file.getBytes()), aesKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error(FileBlockStateEnum.DECRYPT_ERROR.getState(), "文件片解密失败", map);
+        }
+
+        String folderPath = FileUtil.folderBasePath + "/" + sshKey + "-" + id;
         File temporaryFolder = new File(folderPath);
-        File temporaryFile = null;
+        File temporaryFile;
         if(!chunks.equals(1)) {
             temporaryFile = new File(folderPath + "/" + id + "-" + chunk);
         }
@@ -624,7 +635,7 @@ public class FileController {
             temporaryFile.delete();
         }
         try {
-            file.transferTo(temporaryFile);
+            Files.write(temporaryFile.toPath(), decryptedData);
         } catch (IOException e) {
             e.printStackTrace();
             return Result.error(FileBlockStateEnum.UPLOAD_ERROR.getState(), "文件片上传失败", map);

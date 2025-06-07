@@ -34,6 +34,7 @@
   "文件上传失败": "File Upload Failed",
   "文件后台上传中": "File uploading in the backend",
   "文件片上传成功": "File Chunk Upload Success",
+  "文件片解密失败": "File Chunk Decrypt Failed",
   "文件片上传失败": "File Chunk Upload Failed",
   "文件片缺失": "File Chunk Missing",
   "上传文件大小不一致": "File Upload Size Diff",

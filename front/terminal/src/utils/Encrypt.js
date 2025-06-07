@@ -15,6 +15,19 @@ export const aesEncrypt = (word, secretKey) => {
 };
 
 /**
+ * AES Buffer Encrypt
+ */
+export const aesEncryptBuffer = (arrayBuffer, secretKey) => {
+    const secret_key = secretKey || sessionStorage.getItem(sessionStore['aes-key']);
+    if(!secret_key) return null;
+    const key = CryptoJS.enc.Utf8.parse(secret_key);
+    const uint8Array = new Uint8Array(arrayBuffer);
+    const srcs = CryptoJS.lib.WordArray.create(uint8Array);
+    const encrypted = CryptoJS.AES.encrypt(srcs, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
+    return encrypted.toString();
+};
+
+/**
  * AES Decrypt
  */
 export const aesDecrypt = (word, secretKey) => {

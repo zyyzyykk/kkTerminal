@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class FileUploadInfo {
 
+    private String aesKey;
+
     private MultipartFile file;
 
     private String fileName;
