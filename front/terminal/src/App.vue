@@ -8,6 +8,7 @@ import $ from 'jquery';
 import { http_base_url } from '@/env/BaseUrl';
 import { ref, onBeforeMount } from "vue";
 import { sessionStore } from "@/env/Store";
+import { syncDownload } from "@/utils/CloudUtil";
 
 export default {
   name: 'App',
@@ -34,9 +35,11 @@ export default {
           if(needAesKey) sessionStorage.setItem(sessionStore['aes-key'], data.aesKey);
           if(needPublicKey) sessionStorage.setItem(sessionStore['public-key'], data.publicKey);
           sessionStorage.setItem(sessionStore['os-info'], JSON.stringify(data.osInfo));
-          isInitialized.value = true;
         },
       });
+      // 多端同步-下载
+      await syncDownload();
+      isInitialized.value = true;
     });
 
     return {

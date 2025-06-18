@@ -2,7 +2,7 @@
   <el-dialog
     v-model="DialogVisible"
     destroy-on-close
-    :width="$t('450')"
+    :width="$t('400')"
     :title="$t('偏好设置')"
     :modal="false"
     modal-class="kk-dialog-class"
@@ -12,25 +12,25 @@
     draggable
   >
     <div class="no-select">
-      <div class="item-class" style="margin-bottom: 13px;">
+      <div class="kk-flex item-class" >
         <div class="form-width" >{{ $t('颜色') }}：</div>
-        <div class="item-class">
+        <div class="kk-flex">
           <div>{{ $t('背景色') }}</div>
           <div style="margin: 0 20px;" >
             <el-color-picker v-model="setInfo.bg" />
           </div>
         </div>
         <div style="width: 20px;" ></div>
-        <div class="item-class">
+        <div class="kk-flex">
           <div>{{ $t('前景色') }}</div>
           <div style="margin: 0 20px;" >
             <el-color-picker v-model="setInfo.fg" />
           </div>
         </div>
       </div>
-      <div class="item-class" style="margin-bottom: 13px;">
+      <div class="kk-flex item-class" >
         <div class="form-width" >{{ $t('文本') }}：</div>
-        <div class="item-class">
+        <div class="kk-flex">
           <div>{{ $t('字体') }}</div>
           <el-dropdown style="margin: 0 20px;" hide-timeout="300" >
             <span class="a-link no-select" >{{ setInfo.fontFamily }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
@@ -43,7 +43,7 @@
             </template>
           </el-dropdown>
         </div>
-        <div class="item-class">
+        <div class="kk-flex">
           <div>{{ $t('字号') }}</div>
           <el-dropdown style="margin: 0 20px;" hide-timeout="300" >
             <span class="a-link no-select" >{{ setInfo.fontSize }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
@@ -57,9 +57,9 @@
           </el-dropdown>
         </div>
       </div>
-      <div class="item-class" style="margin-bottom: 8px;">
+      <div class="kk-flex item-class" >
         <div class="form-width" >{{ $t('光标') }}：</div>
-        <div class="item-class">
+        <div class="kk-flex">
           <div>{{ $t('样式') }}</div>
           <el-dropdown style="margin: 0 20px;" hide-timeout="300" >
             <span class="a-link no-select" >{{ setInfo.cursorStyle }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
@@ -73,37 +73,46 @@
           </el-dropdown>
         </div>
         <div style="width: 15px;" ></div>
-        <div class="item-class">
+        <div class="kk-flex">
           <div>{{ $t('闪烁') }}</div>
           <div style="margin: 0 20px;" >
             <el-switch v-model="setInfo.cursorBlink" />
           </div>
         </div>
       </div>
-      <div class="item-class" style="margin-bottom: 13px;">
-        <div class="form-width" >{{ $t('功能') }}：</div>
-        <div class="item-class">
-          <div>TCode</div>
-          <div style="margin: 0 20px;" >
+      <div class="kk-flex item-class" >
+        <div class="form-width" >{{ $t('标签') }}：</div>
+        <div class="kk-flex">
+          <div class="form-width-item1" >{{ $t('终端代码') }}</div>
+          <div class="func-switch" >
             <el-switch v-model="setInfo.tCode" />
           </div>
         </div>
-        <div class="item-class">
-          <div>{{ $t('云端') }}</div>
-          <div style="margin: 0 20px;" >
+        <div class="kk-flex">
+          <div class="form-width-item2" >{{ $t('多端同步') }}</div>
+          <div class="func-switch" >
             <el-switch v-model="setInfo.cloud" />
           </div>
         </div>
-        <div class="item-class">
-          <div>{{ $t('高级') }}</div>
-          <div style="margin: 0 20px;" >
+      </div>
+      <div class="kk-flex item-class" >
+        <div class="form-width" ></div>
+        <div class="kk-flex">
+          <div class="form-width-item1" >{{ $t('高级功能') }}</div>
+          <div class="func-switch" >
             <el-switch v-model="setInfo.advance" />
           </div>
         </div>
+        <div class="kk-flex">
+          <div class="form-width-item2" >{{ $t('传输列表') }}</div>
+          <div class="func-switch" >
+            <el-switch v-model="setInfo.transport" />
+          </div>
+        </div>
       </div>
-      <div class="item-class" style="margin-bottom: 5px;">
+      <div class="kk-flex item-class" >
         <div class="form-width" >{{ $t('其它') }}：</div>
-        <div class="item-class">
+        <div class="kk-flex">
           <div>{{ $t('语言') }}</div>
           <el-dropdown style="margin: 0 20px;" hide-timeout="300" >
             <span class="a-link no-select" >{{ mapValueToLabel(setInfo.lang) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
@@ -119,7 +128,7 @@
       </div>
     </div>
     <div style="margin-bottom: 5px;"></div>
-    <div style="display: flex; border-top: 1px solid #f1f2f4;">
+    <div style="display: flex; border-top: 1px solid #f1f2f4;" >
       <div style="flex: 1;"></div>
       <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;">
         {{ $t('确定') }}
@@ -178,6 +187,7 @@ export default {
       tCode: props.env.tCode,
       cloud: props.env.cloud,
       advance: props.env.advance,
+      transport: props.env.transport,
     });
     const confirm = () => {
       context.emit('callback',setInfo.value);
@@ -197,6 +207,7 @@ export default {
         tCode: props.env.tCode,
         cloud: props.env.cloud,
         advance: props.env.advance,
+        transport: props.env.transport,
       };
       DialogVisible.value = false;
     };
@@ -228,9 +239,13 @@ export default {
 </script>
 
 <style scoped>
-.item-class {
+.kk-flex {
   display: flex;
   align-items: center;
+}
+
+.item-class {
+  margin-bottom: 13px;
 }
 
 /* 文本不可选中 */
@@ -240,6 +255,19 @@ export default {
 
 .form-width {
   width: 60px;
+}
+
+.form-width-item1 {
+  width: 70px;
+}
+
+.form-width-item2 {
+  width: 70px;
+}
+
+.func-switch {
+  margin-left: 10px;
+  margin-right: 30px;
 }
 
 </style>

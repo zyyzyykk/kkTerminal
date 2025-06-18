@@ -174,9 +174,9 @@ import { getUrlParams } from "@/utils/UrlUtil";
 import { aesEncryptBuffer, rsaEncrypt } from "@/utils/Encrypt";
 import { encodeStrToArray } from "@/components/preview/EncodeUtil";
 
-import ToolTip from './ToolTip.vue';
+import ToolTip from '@/components/ToolTip';
 import NoData from '@/components/NoData';
-import TxtPreview from './preview/TxtPreview';
+import TxtPreview from '../preview/TxtPreview';
 import MkFile from './MkFile';
 import FileAttr from './FileAttr';
 import FileUrl from './FileUrl';

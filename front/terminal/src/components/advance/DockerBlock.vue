@@ -16,7 +16,7 @@
         <el-tab-pane :label="$t('部署')" >
           <div v-if="noDocker" class="kk-flex-column" style="height: 240px" >
             <div style="flex: 1" ></div>
-            <div><img style="height: 160px" src="@/assets/no_docker.png" ></div>
+            <div><img style="height: 160px" src="@/assets/no_docker.png" alt="docker" ></div>
             <div class="kk-flex" style="margin-top: 25px;" >
               <div style="font-size: large;" >{{ $t('Docker未安装?') }}</div>
               <div>
@@ -30,13 +30,31 @@
           <div v-else >
             <div id="docker-appstore" v-if="!deployInfo.isShow" style="height: 240px; overflow-y: scroll;" >
               <div class="kk-flex" >
-                <el-icon style="font-size: 18px;" ><Shop /></el-icon>
-                <div style="margin-left: 8px;" >{{ $t('Docker应用商店') }}</div>
+                <span><img src="@/assets/app_store.svg" alt="appstore" style="height: 32px;" ></span>
+                <div style="margin-left: 12px; font-size: 18px; font-weight: bolder;" >{{ $t('Docker应用商店') }}</div>
+                <div style="flex: 1;" ></div>
+                <div>
+                  <el-input v-model="appSearch" class="w-50 m-2" :placeholder="$t('搜索应用')">
+                    <template #suffix>
+                      <el-icon class="el-input__icon"><Search /></el-icon>
+                    </template>
+                  </el-input>
+                </div>
+                <el-dropdown style="margin-left: 20px;" hide-timeout="300" >
+                  <span class="a-link no-select" >{{ $t(dockerAppTypes[appType]) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <template v-for="(type,index) in dockerAppTypes" :key="index" >
+                        <el-dropdown-item class="no-select" @click="appType = index" >{{ $t(type) }}</el-dropdown-item>
+                      </template>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
               </div>
               <div class="kk-border" ></div>
               <div style="margin-top: 20px;" ></div>
               <div class="card-container" >
-                <div class="card-item" v-for="(app, index) in dockerAppStore" :key="index" >
+                <div class="card-item" v-for="(app, index) in dockerApps" :key="index" >
                   <el-card>
                     <template #header>
                       <div class="card-header">
@@ -50,7 +68,7 @@
                       </div>
                     </template>
                     <div class="kk-flex" >
-                      <div><img :src="app.img" class="app-img" ></div>
+                      <div><img :src="app.img" :alt="app.name" class="app-img" ></div>
                       <div>{{ $t(app.desc) }}</div>
                     </div>
                   </el-card>
@@ -222,16 +240,16 @@
 
 <script>
 
-import NoData from "@/components/NoData.vue";
+import NoData from "@/components/NoData";
 import { computed, ref } from "vue";
 import $ from "jquery";
 import { http_base_url } from "@/env/BaseUrl";
-import { ArrowDown, Shop, ArrowLeft } from '@element-plus/icons-vue';
+import { ArrowDown, ArrowLeft, Search } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 import { ElMessage } from "element-plus";
 import { deleteDialog } from "@/utils/DeleteDialog";
 import useClipboard from "vue-clipboard3";
-import dockerAppStore from "./DockerAppStore";
+import { dockerAppTypes, dockerAppStore } from "./DockerAppStore";
 import { generateRandomString } from "@/utils/StringUtil";
 
 export default {
@@ -239,8 +257,8 @@ export default {
   components: {
     NoData,
     ArrowDown,
-    Shop,
     ArrowLeft,
+    Search,
   },
   props:['sshKey', 'advance'],
   setup(props, context) {
@@ -518,6 +536,19 @@ export default {
       handleReset(false);
       context.emit('deploy', deployCmd);
     };
+    // 应用商店
+    const appSearch = ref('');
+    const appType = ref(0);
+    const dockerApps = computed(() => {
+      return dockerAppStore.filter(app => {
+        if(!app.name.toLowerCase().includes(appSearch.value.toLowerCase())
+            && !i18n.global.t(app.desc).toLowerCase().includes(appSearch.value.toLowerCase())) {
+          return false;
+        }
+        if(appType.value !== 0 && app.type !== appType.value) return false;
+        else return true;
+      });
+    });
 
     // 重置
     const reset = (deep=false) => {
@@ -529,6 +560,8 @@ export default {
       containerType.value = 0;
       deleteType.value = 0;
       selectedItems.value = [];
+      appSearch.value = '';
+      appType.value = 0;
       loading.value = false;
       DialogVisible.value = false;
     };
@@ -573,7 +606,10 @@ export default {
       deleteConfirm,
       tableDataCopy,
       deployInfo,
-      dockerAppStore,
+      dockerAppTypes,
+      dockerApps,
+      appSearch,
+      appType,
       handleAppGet,
       handleReset,
       handleDeploy,

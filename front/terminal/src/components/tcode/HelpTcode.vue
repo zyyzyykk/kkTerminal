@@ -123,11 +123,11 @@
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { FuncTcode, SysTcode, TCodeStatusEnum } from "@/components/tcode/Tcode";
-import NoData from '../NoData.vue';
+import NoData from '@/components/NoData';
 import { ArrowRight, ArrowLeft, Edit, View, Finished, Delete } from '@element-plus/icons-vue';
-import AceEditor from '../preview/AceEditor.vue';
+import AceEditor from '../preview/AceEditor';
 import { aesDecrypt } from '@/utils/Encrypt';
-import TcodeStatus from './TcodeStatus.vue';
+import TcodeStatus from './TcodeStatus';
 import { deleteDialog } from '@/utils/DeleteDialog';
 import i18n from "@/locales/i18n";
 import { localStore } from "@/env/Store";

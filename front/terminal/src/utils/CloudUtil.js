@@ -28,7 +28,7 @@ export const cloud = async (type, name, content) => {
   // 创建File对象
   const file = new File([blob], name);
   let formData = new FormData();
-  formData.append('user',userInfo.name);
+  formData.append('user',userInfo.name + '-' + userInfo.time);
   formData.append('type',type);
   formData.append('name',name);
   formData.append('file',file);
@@ -36,8 +36,8 @@ export const cloud = async (type, name, content) => {
     url: http_base_url + '/cloud',
     type:'post',
     data: formData,
-    contentType : false,
-    processData : false,
+    contentType: false,
+    processData: false,
     success(resp){
       if(resp.status != 'success') {
         if(resp.code == 506) {
@@ -67,18 +67,13 @@ export const load = async (fileName) => {
     url: http_base_url + '/load',
     method: 'GET',
     data: {
-      time:new Date().getTime(),
-      user: userInfo.name,
+      time: new Date().getTime(),
+      user: userInfo.name + '-' + userInfo.time,
       fileName: fileName,
     },
     success(resp) {
-      if(resp.status == 'success') content = JSON.parse(aesDecrypt(resp.data, userInfo.key));
-      else {
-        ElMessage({
-          message: i18n.global.t('云端文件加载失败'),
-          type: resp.status,
-          grouping: true,
-        });
+      if(resp.status == 'success') {
+        content = JSON.parse(aesDecrypt(resp.data, userInfo.key));
       }
     }
   });
@@ -86,22 +81,20 @@ export const load = async (fileName) => {
 };
 
 // 需要同步的内容
-const syncArr = ['options','tcodes'];
-const oneDayInMs = 24 * 60 * 60 * 1000;
+const syncArr = Object.values(localStore).filter(item => item !== localStore['user']);
 
 export const syncUpload = async () => {
-  const userInfo = getUserInfo();
-  if(new Date().getTime() - userInfo.time < oneDayInMs) return;
   for(let i = 0; i < syncArr.length; i++) {
-    const content = aesDecrypt(localStorage.getItem(syncArr[i]));
-    await cloud(syncArr[i],'',content);
+    const content = localStorage.getItem(syncArr[i]);
+    if(content) await cloud(syncArr[i],'',aesDecrypt(content));
   }
 };
 
-export const syncDownload = async () => {
+export const syncDownload = async (userInfo) => {
+  if(userInfo) localStorage.setItem(localStore['user'], userInfo);
   for(let i = 0; i < syncArr.length; i++) {
     const content = await load(syncArr[i]);
     if(content) localStorage.setItem(syncArr[i], aesEncrypt(JSON.stringify(content)));
   }
-  window.location.reload();
+  if(userInfo) window.location.reload();
 };

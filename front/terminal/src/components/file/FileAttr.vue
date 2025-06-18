@@ -109,8 +109,8 @@ import useClipboard from "vue-clipboard3";
 import { DocumentCopy, Refresh, Edit } from '@element-plus/icons-vue';
 import { calcSize } from '@/components/calc/CalcSize';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
-import ToolTip from './ToolTip.vue';
-import PermissionsEdit from './PermissionsEdit.vue';
+import ToolTip from '@/components/ToolTip';
+import PermissionsEdit from './PermissionsEdit';
 import i18n from "@/locales/i18n";
 
 // 引入文件图标组件

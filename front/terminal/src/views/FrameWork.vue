@@ -20,54 +20,75 @@
     </div>
     <div v-if="urlParams.mode != 'headless'" class="kk-flex bar">
       <div style="user-select: none;" @click="isShowSetting = !isShowSetting; isShowAdvance = false; showAdvance(false);" >
-        <img src="../assets/logo.png" :alt="$t('终端')" style="height: 16px; margin: 0 7px; cursor: pointer;" >
+        <img src="@/assets/terminal.svg" alt="terminal" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
       <div class="ellipsis no-select" style="font-size: 14px;" ><span>kk Terminal</span></div>
       <div style="flex: 1;"></div>
       <div v-show="urlParams.mode != 'headless' && urlParams.mode != 'pure'" class="kk-flex" >
-        <div v-if="cooperating" style="margin-right: 10px; cursor: pointer;" >
-          <el-tag size="small" @click="endCooperateConfirm" :type="calcType(onlineNumber, maxNumber)" effect="plain" class="kk-flex no-select" ><el-icon class="el-icon--left" ><UserFilled /></el-icon>{{ onlineNumber }}</el-tag>
+        <div v-if="cooperating" class="bar-tag" >
+          <el-tag size="small" @click="endCooperateConfirm" :type="calcType(onlineNumber, maxNumber)" effect="plain" >
+            <div class="kk-flex no-select" >
+              <el-icon class="el-icon--left" style="font-size: 18px;" ><UserFilled /></el-icon>
+              <div>{{ onlineNumber }}</div>
+            </div>
+          </el-tag>
         </div>
-        <div v-if="env.cloud" style="margin-right: 10px; cursor: pointer;" >
-          <el-tag v-if="recording == false" @click="startRecord" size="small" type="info" effect="plain" class="kk-flex no-select" style="color: #313131;" ><el-icon class="el-icon--left" ><VideoPlay /></el-icon>{{ $t('开始录制') }}</el-tag>
-          <el-tag v-else size="small" @click="stopRecord" type="danger" effect="plain" class="kk-flex no-select" ><el-icon class="el-icon--left" ><VideoPause /></el-icon>{{ $t('录制中') }}</el-tag>
+        <div v-if="env.cloud" class="bar-tag" >
+          <el-tag @click="recording ? stopRecord() : startRecord()" size="small" :type="recording ? 'danger' : 'info'" effect="plain" >
+            <div v-if="!recording" class="kk-flex no-select" style="color: #313131;" >
+              <el-icon class="el-icon--left" style="font-size: 18px;" ><VideoPlay /></el-icon>
+              <div>{{ $t('开始录制') }}</div>
+            </div>
+            <div v-else class="kk-flex no-select" >
+              <el-icon class="el-icon--left" style="font-size: 18px;" ><VideoPause /></el-icon>
+              <div>{{ $t('录制中') }}</div>
+            </div>
+          </el-tag>
         </div>
-        <div v-if="env.cloud" style="margin-right: 10px; cursor: pointer;" >
-          <el-tag @click="cloudSync" size="small" type="info" effect="plain" class="kk-flex no-select" style="color: #313131;" ><el-icon class="el-icon--left" ><MostlyCloudy /></el-icon>{{ $t('云端同步') }}</el-tag>
+        <div v-if="env.cloud" class="bar-tag" >
+          <el-tag @click="cloudSync" size="small" type="info" effect="plain" >
+            <div class="kk-flex no-select" style="color: #313131;" >
+              <el-icon class="el-icon--left" style="font-size: 18px;" ><ChromeFilled /></el-icon>
+              <div>{{ $t('多端同步') }}</div>
+            </div>
+          </el-tag>
         </div>
+        <el-dropdown v-if="env.transport" class="bar-tag" hide-timeout="300" >
+          <span><img src="@/assets/transport.svg" alt="transport" style="height: 20px;" ></span>
+          <template #dropdown>
+
+          </template>
+        </el-dropdown>
         <div v-if="env.tCode" class="kk-flex" style="margin-right: 10px;" >
-          <div style="font-size: 12px; color: #313131; user-select: none;" > TCode </div>
-          <div style="margin-left: 7px;" ></div>
-          <div>
+          <div style="margin-right: 3px;" >
             <el-input
               v-model="tcode"
               :style="{ width: '100px', height: '20px', fontSize: '12px'}"
               @keydown.enter="handleTcode"
               maxlength="6"
+              :placeholder="$t('终端代码')"
             >
             </el-input>
           </div>
-          <div style="cursor: pointer; margin-left: 5px;" >
-            <el-popover v-if="env.tCode" placement="bottom-end" :width="$t('220')" trigger="click" >
-              <template #reference>
-                <el-icon :style="{ color: '#606266' }" ><QuestionFilled /></el-icon>
-              </template>
-              <div v-if="env.tCode" style="font-size: 12px; color: #313131;" >
-                <div style="user-select: none; font-size: 14px; font-weight: bold;" >{{ $t('什么是 TCode (终端代码) ？') }}</div>
-                <div style="user-select: none; margin-top: 5px;">{{ $t('TCode（终端代码）是用于访问和执行特定操作流程的快捷方式') }}</div>
-                <div style="user-select: none; margin-top: 5px;">
-                  {{ $t('输入') }}
-                  <span style="background-color: #f3f4f4; user-select: text;" >/H</span>
-                  {{ $t('并按下回车，查看帮助信息') }}
-                </div>
-                <div style="user-select: none; margin-top: 5px;">
-                  {{ $t('输入') }}
-                  <span style="background-color: #f3f4f4; user-select: text;" >/A</span>
-                  {{ $t('并按下回车，自定义TCode') }}
-                </div>
+          <el-popover v-if="env.tCode" placement="bottom-end" :width="$t('220')" trigger="click" >
+            <template #reference>
+              <el-icon :style="{ color: '#606266', cursor: 'pointer' }" ><QuestionFilled /></el-icon>
+            </template>
+            <div v-if="env.tCode" style="font-size: 12px; color: #313131;" >
+              <div style="user-select: none; font-size: 14px; font-weight: bold;" >{{ $t('什么是 TCode (终端代码) ？') }}</div>
+              <div style="user-select: none; margin-top: 5px;">{{ $t('TCode（终端代码）是用于访问和执行特定操作流程的快捷方式') }}</div>
+              <div style="user-select: none; margin-top: 5px;">
+                {{ $t('输入') }}
+                <span style="background-color: #f3f4f4; user-select: text;" >/H</span>
+                {{ $t('并按下回车，查看帮助信息') }}
               </div>
-            </el-popover>
-          </div>
+              <div style="user-select: none; margin-top: 5px;">
+                {{ $t('输入') }}
+                <span style="background-color: #f3f4f4; user-select: text;" >/A</span>
+                {{ $t('并按下回车，自定义TCode') }}
+              </div>
+            </div>
+          </el-popover>
         </div>
       </div>
     </div>
@@ -82,7 +103,7 @@
   <!-- 文件管理 -->
   <FileBlock ref="fileBlockRef" :sshKey="sshKey" :os="osInfo.clientOS" ></FileBlock>
   <!-- 用户TCode -->
-  <UserTcode ref="userTcodeRef" @importTCodes="importTCodes" @exportTcodes="exportTcodes" ></UserTcode>
+  <UserTcode ref="userTcodeRef" @importTCodes="importTCodes" @exportTCodes="exportTCodes" ></UserTcode>
   <!-- 帮助TCode -->
   <HelpTcode ref="helpTcodeRef" :userTCodes="tcodes" @handleSaveTCode="handleSaveTCode" @handleDeleteTCode="handleDeleteTCode" ></HelpTcode>
   <!--协作-->
@@ -107,19 +128,19 @@ import "xterm/css/xterm.css";
 import $ from 'jquery';
 import { default_env } from '@/env/Env';
 import { ws_base_url } from '@/env/BaseUrl';
-import { changeStr, generateRandomString } from '@/utils/StringUtil';
+import { changeStr, changeBase64Str, changeStrBase64, generateRandomString } from '@/utils/StringUtil';
 import { http_base_url } from '@/env/BaseUrl';
 
-import ConnectSetting from '@/components/ConnectSetting';
+import ConnectSetting from '@/components/connect/ConnectSetting';
 import StyleSetting from '@/components/StyleSetting';
-import FileBlock from "@/components/FileBlock";
+import FileBlock from "@/components/file/FileBlock";
 import UserTcode from '@/components/tcode/UserTcode';
 import HelpTcode from "@/components/tcode/HelpTcode";
 import CooperateGen from '@/components/advance/CooperateGen';
 import StatusMonitor from '@/components/advance/StatusMonitor'
 import DockerBlock from "@/components/advance/DockerBlock";
 import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
-import { QuestionFilled, VideoPlay, VideoPause, MostlyCloudy, ArrowRight, UserFilled } from '@element-plus/icons-vue';
+import { QuestionFilled, VideoPlay, VideoPause, ChromeFilled, ArrowRight, UserFilled } from '@element-plus/icons-vue';
 import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode";
 
 import i18n from "@/locales/i18n";
@@ -142,7 +163,7 @@ export default {
     QuestionFilled,
     VideoPlay,
     VideoPause,
-    MostlyCloudy,
+    ChromeFilled,
     ArrowRight,
     UserFilled,
   },
@@ -205,9 +226,23 @@ export default {
       }
     };
 
-    // 云端同步
-    const cloudSync = () => {
-      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定从云端覆盖本地数据吗?'), syncDownload);
+    // 多端同步提示
+    const cloudSync = async () => {
+      if(urlParams.value.user) deleteDialog(i18n.global.t('提示'), i18n.global.t('确定从云端覆盖本地数据吗?'), doSyncDownload);
+      else {
+        await syncUpload();
+        const link = getPureUrl() + '?user=' + changeBase64Str(localStorage.getItem(localStore['user']));
+        await toClipboard(link);
+        ElMessage({
+          message: i18n.global.t('多端同步链接已复制'),
+          type: 'success',
+          grouping: true,
+          repeatNum: Number.MIN_SAFE_INTEGER,
+        });
+      }
+    };
+    const doSyncDownload = async () => {
+      await syncDownload(changeStrBase64(urlParams.value.user));
     };
 
     // 加载环境变量
@@ -360,7 +395,7 @@ export default {
     const secretKey = ref('');
     const socket = ref(null);
     const doSSHConnect = () => {
-      // 生成密钥
+      // ws密钥
       secretKey.value = generateRandomString(16);
       // ws连接信息
       const wsInfo = {};
@@ -571,6 +606,8 @@ export default {
         closeBlock();
         resetTerminal();
         doSSHConnect();
+        // 多端同步-上传
+        syncUpload();
       }
       // 文件管理
       else if(type == 4) {
@@ -746,7 +783,7 @@ export default {
       loadTCodes();
     };
     // 批量导出TCode
-    const exportTcodes = () => {
+    const exportTCodes = () => {
       let content = {};
       if(localStorage.getItem(localStore['tcodes'])) content = JSON.parse(aesDecrypt(localStorage.getItem(localStore['tcodes'])));
       // 创建 Blob 对象
@@ -810,9 +847,6 @@ export default {
         return;
       }
 
-      // 云端同步
-      if(env.value.cloud) syncUpload();
-
       // 连接服务器
       doSSHConnect();
       // 监听窗口大小变化
@@ -868,7 +902,7 @@ export default {
       userTcodeRef,
       sendMessage,
       importTCodes,
-      exportTcodes,
+      exportTCodes,
       helpTcodeRef,
       handleSaveTCode,
       handleDeleteTCode,
@@ -912,6 +946,11 @@ export default {
   border-bottom: 1px solid #d7d7d7;
   border-left: 1px solid #d7d7d7;
   border-right: 1px solid #d7d7d7;
+}
+
+.bar-tag {
+  margin-right: 10px;
+  cursor: pointer;
 }
 
 .terminal-class {

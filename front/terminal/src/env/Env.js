@@ -19,4 +19,5 @@ export const default_env = {
   tCode: true,
   cloud: true,
   advance: true,
+  transport: true,
 };

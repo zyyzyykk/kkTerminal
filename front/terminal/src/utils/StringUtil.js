@@ -20,6 +20,15 @@ export const changeStr2 = (str) => {
   return result;
 };
 
+// 将Base64编码转换为合法的URL参数
+export const changeBase64Str = (str) => {
+  return str.replace(/\+/g, '-').replace(/=/g, '@');
+};
+
+export const changeStrBase64 = (str) => {
+  return str.replace(/-/g, '+').replace(/@/g, '=');
+};
+
 // 生成随机字符串
 export const generateRandomString = (length) => {
   // 字符集合

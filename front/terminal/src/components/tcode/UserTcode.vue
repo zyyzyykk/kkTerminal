@@ -26,7 +26,7 @@
           <el-upload
             :show-file-list="false"
             :with-credentials="false"
-            :http-request="importTcodes"
+            :http-request="importTCodes"
             :multiple="false"
             >
             <el-button size="small" type="primary" >
@@ -44,7 +44,7 @@
         </el-input>
         <div style="flex: 1;" ></div>
         <div>
-          <el-button size="small" type="primary" @click="exportTcodes" >
+          <el-button size="small" type="primary" @click="exportTCodes" >
             <el-icon class="el-icon--left"><Download /></el-icon> {{ $t('导出') }}
           </el-button>
         </div>
@@ -155,8 +155,8 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       return regex.test(str);
     };
 
-    // 导入导出Tcode
-    const importTcodes = (data) => {
+    // 导入导出TCode
+    const importTCodes = (data) => {
       let file = data.file;
       const fileReader = new FileReader();
       fileReader.onload = () => {
@@ -232,8 +232,8 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       loading.value = true;
       fileReader.readAsText(file);
     };
-    const exportTcodes = () => {
-      context.emit('exportTcodes');
+    const exportTCodes = () => {
+      context.emit('exportTCodes');
       ElMessage({
         message: i18n.global.t('导出成功'),
         type: 'success',
@@ -325,8 +325,8 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       initText,
       loading,
       userTcodeInfo,
-      importTcodes,
-      exportTcodes,
+      importTCodes,
+      exportTCodes,
       setValue,
       workflowTab,
     }
