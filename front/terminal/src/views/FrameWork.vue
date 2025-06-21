@@ -144,7 +144,7 @@ import { QuestionFilled, VideoPlay, VideoPause, ChromeFilled, ArrowRight, UserFi
 import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode";
 
 import i18n from "@/locales/i18n";
-import { cloud, load, syncUpload, syncDownload } from "@/utils/CloudUtil";
+import { cloud, load, syncUpload, syncDownload, localStoreUtil } from "@/utils/CloudUtil";
 import { deleteDialog } from "@/utils/DeleteDialog";
 import { calcType } from "@/components/calc/CalcType"
 import { localStore, sessionStore } from "@/env/Store";
@@ -231,7 +231,7 @@ export default {
       if(urlParams.value.user) deleteDialog(i18n.global.t('提示'), i18n.global.t('确定从云端覆盖本地数据吗?'), doSyncDownload);
       else {
         await syncUpload();
-        const link = getPureUrl() + '?user=' + changeBase64Str(localStorage.getItem(localStore['user']));
+        const link = getPureUrl() + '?user=' + changeBase64Str(localStoreUtil.getItem(localStore['user']));
         await toClipboard(link);
         ElMessage({
           message: i18n.global.t('多端同步链接已复制'),
@@ -249,15 +249,15 @@ export default {
     const osInfo = ref(JSON.parse(sessionStorage.getItem(sessionStore['os-info'])));
     const options = ref({});
     const loadOps = () => {
-      if(localStorage.getItem(localStore['options'])) options.value = JSON.parse(aesDecrypt(localStorage.getItem(localStore['options'])));
+      if(localStoreUtil.getItem(localStore['options'])) options.value = JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['options'])));
       else options.value = {};
     };
     loadOps();
     const tcodes = ref({});
     const loadTCodes = () => {
       tcodes.value = {};
-      if(localStorage.getItem(localStore['tcodes'])) {
-        tcodes.value = JSON.parse(aesDecrypt(localStorage.getItem(localStore['tcodes'])));
+      if(localStoreUtil.getItem(localStore['tcodes'])) {
+        tcodes.value = JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['tcodes'])));
       }
       setTimeout(() => {
         helpTcodeRef.value.userTCodes = {...tcodes.value};
@@ -267,7 +267,7 @@ export default {
     const env = ref(default_env);
     const urlParams = ref(getUrlParams());
     const loadEnv = () => {
-      if(localStorage.getItem(localStore['env'])) env.value = {...env.value, ...JSON.parse(aesDecrypt(localStorage.getItem(localStore['env'])))};
+      if(localStoreUtil.getItem(localStore['env'])) env.value = {...env.value, ...JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['env'])))};
       // bg fg
       if(urlParams.value.bg && urlParams.value.bg[0] != '#') urlParams.value.bg = '#' + urlParams.value.bg;
       if(urlParams.value.fg && urlParams.value.fg[0] != '#') urlParams.value.fg = '#' + urlParams.value.fg;
@@ -306,7 +306,7 @@ export default {
     // 保存更改的配置
     const saveOp = (name,item) => {
       if(name) options.value = {...options.value,[name]:item};
-      localStorage.setItem(localStore['options'], aesEncrypt(JSON.stringify(options.value)));
+      localStoreUtil.setItem(localStore['options'], aesEncrypt(JSON.stringify(options.value)));
       loadOps();
     };
     // 删除配置
@@ -504,9 +504,9 @@ export default {
     // 保存更改的环境变量
     const saveEnv = (new_env,restart=true) => {
       let save_env = default_env;
-      if(localStorage.getItem(localStore['env'])) save_env = {...save_env,...JSON.parse(aesDecrypt(localStorage.getItem(localStore['env'])))};
+      if(localStoreUtil.getItem(localStore['env'])) save_env = {...save_env,...JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['env'])))};
       save_env = {...save_env,...new_env};
-      localStorage.setItem(localStore['env'], aesEncrypt(JSON.stringify(save_env)));
+      localStoreUtil.setItem(localStore['env'], aesEncrypt(JSON.stringify(save_env)));
       for (const key in new_env) {
         if(key in urlParams.value) urlParams.value[key] = new_env[key];
       }
@@ -606,8 +606,6 @@ export default {
         closeBlock();
         resetTerminal();
         doSSHConnect();
-        // 多端同步-上传
-        syncUpload();
       }
       // 文件管理
       else if(type == 4) {
@@ -683,7 +681,7 @@ export default {
 
     const setTcodeStatus = (transTcode, state) => {
       tcodes.value[transTcode].status = state;
-      localStorage.setItem(localStore['tcodes'], aesEncrypt(JSON.stringify(tcodes.value)));
+      localStoreUtil.setItem(localStore['tcodes'], aesEncrypt(JSON.stringify(tcodes.value)));
       setTimeout(() => {
         helpTcodeRef.value.userTCodes = {...tcodes.value};
       },1);
@@ -779,13 +777,13 @@ export default {
     const importTCodes = (data) => {
       let tCodeData = {};
       tCodeData = {...tcodes.value,...data};
-      localStorage.setItem(localStore['tcodes'], aesEncrypt(JSON.stringify(tCodeData)));
+      localStoreUtil.setItem(localStore['tcodes'], aesEncrypt(JSON.stringify(tCodeData)));
       loadTCodes();
     };
     // 批量导出TCode
     const exportTCodes = () => {
       let content = {};
-      if(localStorage.getItem(localStore['tcodes'])) content = JSON.parse(aesDecrypt(localStorage.getItem(localStore['tcodes'])));
+      if(localStoreUtil.getItem(localStore['tcodes'])) content = JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['tcodes'])));
       // 创建 Blob 对象
       const blob = new Blob([JSON.stringify(content, null, 4)], { type: 'text/plain' });
       // 创建指向 Blob 的 URL

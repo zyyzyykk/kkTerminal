@@ -5,7 +5,7 @@ import $ from 'jquery';
 import { http_base_url } from '@/env/BaseUrl';
 import { ElMessage } from 'element-plus';
 import i18n from "@/locales/i18n";
-import { localStore } from "@/env/Store";
+import { localStore, cloudStore } from "@/env/Store";
 
 const getUserInfo = () => {
   if(!localStorage.getItem(localStore['user'])) {
@@ -81,12 +81,13 @@ export const load = async (fileName) => {
 };
 
 // 需要同步的内容
-const syncArr = Object.values(localStore).filter(item => item !== localStore['user']);
+const syncArr = Object.values(cloudStore);
 
-export const syncUpload = async () => {
-  for(let i = 0; i < syncArr.length; i++) {
-    const content = localStorage.getItem(syncArr[i]);
-    if(content) await cloud(syncArr[i],'',aesDecrypt(content));
+export const syncUpload = async (items) => {
+  const syncItems = items || syncArr;
+  for(let i = 0; i < syncItems.length; i++) {
+    const content = localStorage.getItem(syncItems[i]);
+    if(content) await cloud(syncItems[i],'',aesDecrypt(content));
   }
 };
 
@@ -95,6 +96,21 @@ export const syncDownload = async (userInfo) => {
   for(let i = 0; i < syncArr.length; i++) {
     const content = await load(syncArr[i]);
     if(content) localStorage.setItem(syncArr[i], aesEncrypt(JSON.stringify(content)));
+    else localStorage.removeItem(syncArr[i]);
   }
   if(userInfo) window.location.reload();
+};
+
+export const localStoreUtil = {
+  setItem(key, value) {
+    localStorage.setItem(key, value);
+    // 多端同步-上传
+    syncUpload([key]);
+  },
+  getItem(key) {
+    return localStorage.getItem(key);
+  },
+  removeItem(key) {
+    localStorage.removeItem(key);
+  },
 };

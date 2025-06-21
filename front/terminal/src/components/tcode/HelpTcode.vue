@@ -131,6 +131,7 @@ import TcodeStatus from './TcodeStatus';
 import { deleteDialog } from '@/utils/DeleteDialog';
 import i18n from "@/locales/i18n";
 import { localStore } from "@/env/Store";
+import { localStoreUtil } from "@/utils/CloudUtil";
 
 export default {
   name:'HelpTcode',
@@ -173,7 +174,7 @@ export default {
     const userTcodeEditorRef = ref();
     const initTcodeEditor = (mode) => {
       userTcodeEditorRef.value.setLanguage('kk.js');
-      userTcodeEditorRef.value.setValue(JSON.parse(aesDecrypt(localStorage.getItem(localStore['tcodes'])))[nowTCode.value].workflow || '');
+      userTcodeEditorRef.value.setValue(JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['tcodes'])))[nowTCode.value].workflow || '');
       userTcodeEditorRef.value.resetHistory();
       userTcodeEditorRef.value.setReadOnly(mode);
       modifyTag.value = '';

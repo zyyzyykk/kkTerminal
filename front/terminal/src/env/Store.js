@@ -13,3 +13,9 @@ export const sessionStore = {
     'aes-key': 'aes-key',
     'public-key': 'public-key',
 };
+
+export const cloudStore = {
+    'tcodes': 'tcodes',
+    'options': 'options',
+    'env': 'env',
+};

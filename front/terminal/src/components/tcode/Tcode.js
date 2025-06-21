@@ -1,5 +1,6 @@
 import { aesEncrypt, aesDecrypt } from '@/utils/Encrypt';
 import { localStore, sessionStore } from "@/env/Store";
+import { localStoreUtil } from "@/utils/CloudUtil";
 const storageLocalKey = localStore['tcode-vars'];
 const storageSessionPrefix = sessionStore['tcode-vars'];
 
@@ -115,28 +116,28 @@ export const UserTcodeExecutor = {
         },
         local(key,value) {
             let tcodeLocalVars = {};
-            if(localStorage.getItem(storageLocalKey)) {
-                tcodeLocalVars = JSON.parse(aesDecrypt(localStorage.getItem(storageLocalKey)));
+            if(localStoreUtil.getItem(storageLocalKey)) {
+                tcodeLocalVars = JSON.parse(aesDecrypt(localStoreUtil.getItem(storageLocalKey)));
             }
             if(value != undefined) {
                 tcodeLocalVars[key] = value;
-                localStorage.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tcodeLocalVars)));
+                localStoreUtil.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tcodeLocalVars)));
             }
             else return tcodeLocalVars[key];
         },
         clean() {
             if(arguments.length == 0) {
-                localStorage.removeItem(storageLocalKey);
+                localStoreUtil.removeItem(storageLocalKey);
                 return;
             }
             let tcodeLocalVars = {};
-            if(localStorage.getItem(storageLocalKey)) {
-                tcodeLocalVars = JSON.parse(aesDecrypt(localStorage.getItem(storageLocalKey)));
+            if(localStoreUtil.getItem(storageLocalKey)) {
+                tcodeLocalVars = JSON.parse(aesDecrypt(localStoreUtil.getItem(storageLocalKey)));
             }
             for (let i = 0; i < arguments.length; i++) {
                 delete tcodeLocalVars[arguments[i]];
             }
-            localStorage.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tcodeLocalVars)));
+            localStoreUtil.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tcodeLocalVars)));
         }
     },
     // 仅向terminal写入，不等待
