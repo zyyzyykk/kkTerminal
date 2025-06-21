@@ -107,7 +107,7 @@
                   <div>{{ $t('以') }} <span style="background-color: #f3f4f4;" >U</span> {{ $t('开头，自定义实现类似Shell脚本的自动化Workflow') }}</div>
                   <div class="kk-border" ></div>
                   <NoData height="160px" >
-                    <template #myslot>
+                    <template #mySlot>
                       <div style="margin-top: 20px;"></div>
                     </template>
                   </NoData>

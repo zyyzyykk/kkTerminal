@@ -11,6 +11,7 @@ export const getUrlParams = (url) => {
 // 获取无参url
 export const getPureUrl = (url) => {
   let _url = url || window.location.href;
-  if(_url.indexOf('?') != -1) _url = _url.substring(0, _url.indexOf('?'));
+  const index = _url.indexOf('?');
+  if(index !== -1) _url = _url.substring(0, index);
   return _url;
 };

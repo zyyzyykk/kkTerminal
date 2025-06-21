@@ -280,7 +280,7 @@ export default {
       else if(urlParams.value.cloud === 'false') urlParams.value.cloud = false;
       // url参数
       for (const key in urlParams.value) {
-        if(key in env.value && key.lastIndexOf('_') == -1) env.value[key] = urlParams.value[key];
+        if(key in env.value && key.lastIndexOf('_') === -1) env.value[key] = urlParams.value[key];
       }
       // option
       let nowOpInfo = options.value[env.value['option']];

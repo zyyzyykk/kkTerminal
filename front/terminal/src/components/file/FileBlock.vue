@@ -445,11 +445,11 @@ export default {
     };
     // 返回上一级
     const doReturn = () => {
-      if(isShowDirInput.value == true) return;
+      if(isShowDirInput.value) return;
       if(dir.value == '/') return;
       if(dir.value[dir.value.length - 1] == '/') dir.value = dir.value.substring(0,dir.value.length - 1);
-      let index = dir.value.lastIndexOf('/');
-      if(index != -1) dir.value = dir.value.substring(0,index + 1);
+      const index = dir.value.lastIndexOf('/');
+      if(index !== -1) dir.value = dir.value.substring(0, index + 1);
       confirmDirCorrect();
       selectedFiles.value = [];
       doRefresh();
@@ -1026,10 +1026,10 @@ export default {
       let filesGroupByPath = {};
       // 根据文件路径进行分类
       for(let i=0;i<event.target.files['length'];i++) {
-        let file = event.target.files[i];
-        let fullPath = file['webkitRelativePath'];
-        let index = fullPath.lastIndexOf('/');
-        let filePath = fullPath.substring(0,index+1);
+        const file = event.target.files[i];
+        const fullPath = file['webkitRelativePath'];
+        const index = fullPath.lastIndexOf('/');
+        const filePath = fullPath.substring(0, index + 1);
         if(!filesGroupByPath[filePath]) {
           filesGroupByPath[filePath] = {
             path:filePath,
@@ -1039,7 +1039,7 @@ export default {
         filesGroupByPath[filePath].files.push(file);
       }
       // 根据文件路径长度进行升序排序，确保文件父目录存在
-      let filesArr = [];
+      const filesArr = [];
       for(let key in filesGroupByPath) {
         filesArr.push(filesGroupByPath[key]);
       }

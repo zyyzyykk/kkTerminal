@@ -1,7 +1,7 @@
 <template>
   <div class="no-data" :style="viewStyle" >
     <div style="flex: 1;" ></div>
-    <slot name="myslot" ></slot>
+    <slot name="mySlot" ></slot>
     <div style="display: flex; align-items: center;" >
       <div>
         <img src="../assets/no_data.png" :alt="$t('暂无数据')" style="width: 120px;">

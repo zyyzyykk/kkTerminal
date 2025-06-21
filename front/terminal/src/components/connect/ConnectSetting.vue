@@ -23,8 +23,8 @@
         </ToolTip>
         <div style="flex: 1;"></div>
         <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Switch /></el-icon>{{ $t('切换') }}</el-button></div>
-        <div><el-button v-if="isForbidInput == false" size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Finished /></el-icon>{{ $t('保存') }}</el-button></div>
-        <div><el-button v-if="isForbidInput == true" size="small" type="primary" @click="newOp" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Edit /></el-icon>{{ $t('新建') }}</el-button></div>
+        <div v-if="!isForbidInput" ><el-button size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Finished /></el-icon>{{ $t('保存') }}</el-button></div>
+        <div v-else ><el-button size="small" type="primary" @click="newOp" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Edit /></el-icon>{{ $t('新建') }}</el-button></div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;">
         <div class="no-select form-width">{{ $t('主机IP') }}：</div>
@@ -64,8 +64,8 @@
           <span>{{ setInfo.authType == 0 ? $t('密码') : $t('私钥') }}<el-icon class="el-icon--right"><arrow-down style="cursor: pointer;" /></el-icon></span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item class="no-select" @click="setInfo.authType = 0" >{{ $t('密码') }}</el-dropdown-item>
-              <el-dropdown-item class="no-select" @click="setInfo.authType = 1" >{{ $t('私钥') }}</el-dropdown-item>
+              <el-dropdown-item class="no-select" @click="switchAuthType(0)" >{{ $t('密码') }}</el-dropdown-item>
+              <el-dropdown-item class="no-select" @click="switchAuthType(1)" >{{ $t('私钥') }}</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -77,11 +77,11 @@
               </template>
             </el-input>
           </div>
-          <div v-if="isShowPassword == true" style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = false"><el-icon size="15"><View /></el-icon></div>
-          <div v-else style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = true"><el-icon size="15"><Hide /></el-icon></div>
+          <div v-if="isShowPassword" style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = false"><el-icon size="15"><View /></el-icon></div>
+          <div v-else style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = true" ><el-icon size="15"><Hide /></el-icon></div>
         </div>
         <div v-else >
-          <el-button :disabled="isForbidInput" type="primary" @click="openprivateKeyBlock" >
+          <el-button :disabled="isForbidInput" type="primary" @click="openPrivateKeyBlock" >
             <el-icon class="el-icon--left"><Key /></el-icon>{{ $t('导入') }}
           </el-button>
         </div>
@@ -168,17 +168,17 @@ export default {
         return false;
       }
       // 校验用户名
-      if (!(setInfo.value.server_user && setInfo.value.server_user != '')) {
+      if (!setInfo.value.server_user) {
         err_msg.value = i18n.global.k("用户名不能为空");
         return false;
       }
       // 校验密码
-      if (setInfo.value.authType == 0 && !(setInfo.value.server_password && setInfo.value.server_password != '')) {
+      if (setInfo.value.authType == 0 && !setInfo.value.server_password) {
         err_msg.value = i18n.global.k("密码不能为空");
         return false;
       }
       // 校验私钥
-      if(setInfo.value.authType == 1 && !(setInfo.value.server_key && setInfo.value.server_key.content != '')) {
+      if(setInfo.value.authType == 1 && !(setInfo.value.server_key && setInfo.value.server_key.content)) {
         err_msg.value = i18n.global.k("私钥不能为空");
         return false;
       }
@@ -191,16 +191,14 @@ export default {
     const optionBlockType = ref(0);
 
     const showOption = (type) => {
-      if(type == 1) {
-        if(verifyParams() == false) return;
-      }
+      if(type == 1 && verifyParams() == false) return;
       optionBlockType.value = type;
       optionBlockRef.value.aimOption = '';
       optionBlockRef.value.DialogVisible = true;
     };
 
     const isForbidInput = ref(false);
-    if(setInfo.value.option != '') isForbidInput.value = true;
+    if(setInfo.value.option) isForbidInput.value = true;
     const doOption = (option) => {
       // 切换
       if(optionBlockType.value == 0)
@@ -235,7 +233,7 @@ export default {
 
     // 私钥相关
     const privateKeyRef = ref();
-    const openprivateKeyBlock = () => {
+    const openPrivateKeyBlock = () => {
       privateKeyRef.value.content = setInfo.value.server_key ? setInfo.value.server_key.content : '';
       privateKeyRef.value.passphrase = setInfo.value.server_key ? setInfo.value.server_key.passphrase : '';
       privateKeyRef.value.DialogVisible = true;
@@ -245,6 +243,11 @@ export default {
         content:content,
         passphrase:passphrase,
       };
+    };
+    const switchAuthType = (type) => {
+      setInfo.value.authType = type;
+      // 选择密码登录
+      if(type == 0) privateKeyRef.value.closeDialog();
     };
 
     const confirm = () => {
@@ -297,7 +300,7 @@ export default {
         authType: props.env.authType || 0,
         option: props.env.option,
       };
-      if(setInfo.value.option != '') isForbidInput.value = true;
+      if(setInfo.value.option) isForbidInput.value = true;
       else isForbidInput.value = false;
       DialogVisible.value = false;
     };
@@ -331,8 +334,9 @@ export default {
       doCopy,
       isShowPassword,
       privateKeyRef,
-      openprivateKeyBlock,
+      openPrivateKeyBlock,
       savePrivateKey,
+      switchAuthType,
     }
   }
 
