@@ -1,112 +1,114 @@
 <template>
-  <el-dialog
-    v-model="DialogVisible"
-    :before-close="closeDialog"
-    :title="$t('文件管理')"
-    width="50%"
-    :modal="false"
-    modal-class="kk-dialog-class"
-    header-class="kk-header-class"
-    body-class="kk-body-class-0"
-    align-center
-    draggable
-    style="position: relative;"
-  >
-    <div>
-      <div class="title kk-flex" >
-        <div class="ellipsis" style="flex: 1;">
-          <div v-if="isShowDirInput == true" >
-            <el-input id="aimDirInput" v-model="dir" :placeholder="$t('输入目录路径')" size="small" @keydown.enter="isShowDirInput = false;" @blur="isShowDirInput = false;" @mousedown.stop @dblclick.stop @change="dirInputCallback" />
-          </div>
-          <div class="kk-flex no-select ellipsis" v-else @dblclick="doShowDirInput" >
-            <div v-for="(item, index) in dirLevels" :key="index" class="kk-flex" >
-              <div>/</div>
-              <div class="dir-level" @click="changeDirByLevel($event,index)" >{{ item }}</div>
+  <div v-resizable >
+    <el-dialog
+        v-model="DialogVisible"
+        :before-close="closeDialog"
+        :title="$t('文件管理')"
+        width="50%"
+        :modal="false"
+        modal-class="kk-dialog-class"
+        header-class="kk-header-class"
+        body-class="kk-body-class-0"
+        align-center
+        draggable
+        style="position: relative;"
+    >
+      <div>
+        <div class="title kk-flex" >
+          <div class="ellipsis" style="flex: 1;">
+            <div v-if="isShowDirInput == true" >
+              <el-input id="aimDirInput" v-model="dir" :placeholder="$t('输入目录路径')" size="small" @keydown.enter="isShowDirInput = false;" @blur="isShowDirInput = false;" @mousedown.stop @dblclick.stop @change="dirInputCallback" />
             </div>
-            <div>/</div>
+            <div class="kk-flex no-select ellipsis" v-else @dblclick="doShowDirInput" >
+              <div v-for="(item, index) in dirLevels" :key="index" class="kk-flex" >
+                <div>/</div>
+                <div class="dir-level" @click="changeDirByLevel($event,index)" >{{ item }}</div>
+              </div>
+              <div>/</div>
+            </div>
+          </div>
+          <div class="kk-flex" >
+            <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
+            <div v-if="dir && dir != '/'" class="hover-class" @click="doReturn" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
+            <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
+            <div v-if="selectedFiles.length == 1" class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
+            <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
+            <div v-if="dirStatus == 0" class="hover-class" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
+              <el-dropdown v-show="DialogVisible" style="line-height: unset;" placement="bottom-end" size="small" trigger="click" >
+                <div class="hover-class" style="font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
+                <template #dropdown>
+                  <el-dropdown-menu v-show="DialogVisible" class="no-select" style="text-align: center;">
+                    <el-dropdown-item @click="fileUploadTypeChoose(0)" >
+                      <div class="kk-flex" >
+                        <div><el-icon><DocumentAdd /></el-icon></div>
+                        <div>{{ $t('文件') }}</div>
+                      </div>
+                    </el-dropdown-item>
+                    <el-dropdown-item @click="fileUploadTypeChoose(1)" >
+                      <div class="kk-flex" >
+                        <div><el-icon><FolderAdd /></el-icon></div>
+                        <div>{{ $t('文件夹') }}</div>
+                      </div>
+                    </el-dropdown-item>
+                    <el-dropdown-item @click="fileUploadTypeChoose(2)" >
+                      <div class="kk-flex" >
+                        <div><el-icon><Link /></el-icon></div>
+                        <div>URL</div>
+                      </div>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+            <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
           </div>
         </div>
-        <div class="kk-flex" >
-          <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
-          <div v-if="dir && dir != '/'" class="hover-class" @click="doReturn" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
-          <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
-          <div v-if="selectedFiles.length == 1" class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
-          <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
-          <div v-if="dirStatus == 0" class="hover-class" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
-            <el-dropdown v-show="DialogVisible" style="line-height: unset;" placement="bottom-end" size="small" trigger="click" >
-              <div class="hover-class" style="font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
-              <template #dropdown>
-                <el-dropdown-menu v-show="DialogVisible" class="no-select" style="text-align: center;">
-                  <el-dropdown-item @click="fileUploadTypeChoose(0)" >
-                    <div class="kk-flex" >
-                      <div><el-icon><DocumentAdd /></el-icon></div>
-                      <div>{{ $t('文件') }}</div>
-                    </div>
-                  </el-dropdown-item>
-                  <el-dropdown-item @click="fileUploadTypeChoose(1)" >
-                    <div class="kk-flex" >
-                      <div><el-icon><FolderAdd /></el-icon></div>
-                      <div>{{ $t('文件夹') }}</div>
-                    </div>
-                  </el-dropdown-item>
-                  <el-dropdown-item @click="fileUploadTypeChoose(2)" >
-                    <div class="kk-flex" >
-                      <div><el-icon><Link /></el-icon></div>
-                      <div>URL</div>
-                    </div>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
+        <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select"
+             @contextmenu="handleContextMenu" @scroll="handleScroll"
+             @dragover="preventDefault" @drop="handleFileDrag"
+             tabindex="0" @keydown="handleShortcutKeys" >
+          <div v-if="files.length != 0" >
+            <div v-for="item in files" :key="item.id" >
+              <template v-if="item.isDirectory == true">
+                <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
+                  <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] == '.' || (isClipboard(item.id) != -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
+                  <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
+                    <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
+                  </div>
+                  <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
+                    <template #content>
+                      <div v-if="!(isShowRenameInput == true && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
+                        {{ item.name }}
+                      </div>
+                    </template>
+                  </ToolTip>
+                </div>
               </template>
-            </el-dropdown>
+              <template v-else>
+                <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
+                  <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] == '.' || (isClipboard(item.id) != -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
+                  <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
+                    <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
+                  </div>
+                  <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
+                    <template #content>
+                      <div v-if="!(isShowRenameInput == true && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
+                        {{ item.name }}
+                      </div>
+                    </template>
+                  </ToolTip>
+                </div>
+              </template>
+            </div>
           </div>
-          <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
-        </div>
-      </div>
-      <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select"
-        @contextmenu="handleContextMenu" @scroll="handleScroll"
-        @dragover="preventDefault" @drop="handleFileDrag"
-        tabindex="0" @keydown="handleShortcutKeys" >
-        <div v-if="files.length != 0" >
-          <div v-for="item in files" :key="item.id" >
-            <template v-if="item.isDirectory == true">
-              <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
-                <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] == '.' || (isClipboard(item.id) != -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
-                <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
-                  <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
-                </div>
-                <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
-                  <template #content>
-                    <div v-if="!(isShowRenameInput == true && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
-                      {{ item.name }}
-                    </div>
-                  </template>
-                </ToolTip>
-              </div>
-            </template>
-            <template v-else>
-              <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
-                <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] == '.' || (isClipboard(item.id) != -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
-                <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
-                  <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
-                </div>
-                <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
-                  <template #content>
-                    <div v-if="!(isShowRenameInput == true && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
-                      {{ item.name }}
-                    </div>
-                  </template>
-                </ToolTip>
-              </div>
-            </template>
+          <div v-else>
+            <NoData height="248px" @contextmenu="selectedFiles = []" v-if="loading == false" :msg="$t(noDataMsg)"></NoData>
           </div>
         </div>
-        <div v-else>
-          <NoData height="248px" @contextmenu="selectedFiles = []" v-if="loading == false" :msg="$t(noDataMsg)"></NoData>
-        </div>
       </div>
-    </div>
-    <div style="margin-top: -12px;"></div>
-  </el-dialog>
+      <div style="margin-top: -12px;"></div>
+    </el-dialog>
+  </div>
 
   <!-- 文件上传 -->
   <el-upload

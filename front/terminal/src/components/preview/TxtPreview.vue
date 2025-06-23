@@ -1,91 +1,93 @@
 <template>
-  <el-dialog
-    v-model="DialogVisible"
-    width="80%"
-    :modal="false"
-    modal-class="kk-dialog-class"
-    body-class="kk-body-class-12"
-    :before-close="closeDialog"
-    align-center
-    draggable
-  >
-    <template #title>
-      <div class="kk-flex no-select kk-header-class">
-        <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileName" :width="25" :height="25" :isFolder="false" />
-        <div class="ellipsis" style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
-      </div>
-    </template>
-    <div style="margin-top: -28px;"></div>
-    <div v-show="previewInfo.preview === 'editor'" class="kk-flex ellipsis" style="margin-bottom: 5px; overflow-x: auto;" >
-      <div class="kk-flex" >
-        <div class="no-select" >{{ $t('保存编码') }}：</div>
-        <el-dropdown size="small" hide-timeout="300" >
-          <span class="a-link no-select" >{{ encode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <template v-for="(name,index) in encodeSet" :key="index" >
-                <el-dropdown-item class="no-select" @click="encode = name; modifyTag = '*';" >{{ name }}</el-dropdown-item>
+  <div v-resizable >
+    <el-dialog
+        v-model="DialogVisible"
+        width="80%"
+        :modal="false"
+        modal-class="kk-dialog-class"
+        body-class="kk-body-class-12"
+        :before-close="closeDialog"
+        align-center
+        draggable
+    >
+      <template #title>
+        <div class="kk-flex no-select kk-header-class">
+          <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileName" :width="25" :height="25" :isFolder="false" />
+          <div class="ellipsis" style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
+        </div>
+      </template>
+      <div style="margin-top: -28px;"></div>
+      <div id="editor-bar" v-show="previewInfo.preview === 'editor'" class="kk-flex ellipsis" style="margin-bottom: 5px; overflow-x: auto;" >
+        <div class="kk-flex" >
+          <div class="no-select" >{{ $t('保存编码') }}：</div>
+          <el-dropdown size="small" hide-timeout="300" >
+            <span class="a-link no-select" >{{ encode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <template v-for="(name,index) in encodeSet" :key="index" >
+                  <el-dropdown-item class="no-select" @click="encode = name; modifyTag = '*';" >{{ name }}</el-dropdown-item>
+                </template>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+        <div style="margin-right: 20px;" ></div>
+        <div class="kk-flex" >
+          <div class="no-select" >{{ $t('模式') }}：</div>
+          <el-dropdown size="small" hide-timeout="300" >
+            <span class="a-link no-select" >{{ mode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <template v-for="(name,index) in modeSet" :key="index" >
+                  <el-dropdown-item class="no-select" @click="setMode(name)" >{{ name }}</el-dropdown-item>
+                </template>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+        <div style="margin-right: 20px;" ></div>
+        <div class="kk-flex" >
+          <div class="no-select" >{{ $t('缩进') }}：</div>
+          <div><el-input-number :style="{width: '80px'}" size="small" v-model="indent" :min="2" :max="4" step="2" :step-strictly="true" @change="setIndent" /></div>
+        </div>
+        <div style="margin-right: 20px;" ></div>
+        <div class="kk-flex" >
+          <div class="no-select" >{{ $t('字号') }}：</div>
+          <div>
+            <el-input-number :style="{width: '100px'}" size="small" v-model="fontSize" :min="12" :max="20" step="2" :step-strictly="true" @change="setFontSize" >
+              <template #suffix>
+                <span>px</span>
               </template>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
+            </el-input-number>
+          </div>
+        </div>
+        <div style="margin-right: 20px;" ></div>
+        <div class="kk-flex" >
+          <el-button size="small" type="primary" @click="doCopy" >
+            <el-icon class="el-icon--left"><DocumentCopy /></el-icon>{{ $t('复制') }}
+          </el-button>
+        </div>
       </div>
-      <div style="margin-right: 20px;" ></div>
-      <div class="kk-flex" >
-        <div class="no-select" >{{ $t('模式') }}：</div>
-        <el-dropdown size="small" hide-timeout="300" >
-          <span class="a-link no-select" >{{ mode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <template v-for="(name,index) in modeSet" :key="index" >
-                <el-dropdown-item class="no-select" @click="setMode(name)" >{{ name }}</el-dropdown-item>
-              </template>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </div>
-      <div style="margin-right: 20px;" ></div>
-      <div class="kk-flex" >
-        <div class="no-select" >{{ $t('缩进') }}：</div>
-        <div><el-input-number :style="{width: '80px'}" size="small" v-model="indent" :min="2" :max="4" step="2" :step-strictly="true" @change="setIndent" /></div>
-      </div>
-      <div style="margin-right: 20px;" ></div>
-      <div class="kk-flex" >
-        <div class="no-select" >{{ $t('字号') }}：</div>
-        <div>
-          <el-input-number :style="{width: '100px'}" size="small" v-model="fontSize" :min="12" :max="20" step="2" :step-strictly="true" @change="setFontSize" >
+      <div element-loading-text="Loading..." v-loading="loading" style="padding: 0 5px; width: 100%; height: 60vh; position: relative; margin-bottom: 10px">
+        <AceEditor class="preview" v-show="!loading && previewInfo.preview === 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
+        <iframe id="imgPreview" class="preview" v-if="!loading && previewInfo.preview === 'iframe' && previewUrl" :src="previewUrl" ></iframe>
+        <audio controls class="preview" v-if="!loading && previewInfo.preview === 'audio' && previewUrl" >
+          <source :src="previewUrl" :type="previewInfo.type" >
+        </audio>
+        <video controls class="preview" v-if="!loading && previewInfo.preview === 'video' && previewUrl" >
+          <source :src="previewUrl" :type="previewInfo.type" >
+        </video>
+        <div style="position: absolute; top: 0; right: 30px" v-if="!loading && previewInfo.preview === 'iframe' && previewInfo.type !== 'application/pdf' && previewInfo.type !== 'text/html' && previewUrl" >
+          <el-input-number :style="{width: '105px'}" size="small" v-model="percentage" :min="20" :max="200" step="10" :step-strictly="true" @change="setPercentage" >
             <template #suffix>
-              <span>px</span>
+              <span>%</span>
             </template>
           </el-input-number>
         </div>
       </div>
-      <div style="margin-right: 20px;" ></div>
-      <div class="kk-flex" >
-        <el-button size="small" type="primary" @click="doCopy" >
-          <el-icon class="el-icon--left"><DocumentCopy /></el-icon>{{ $t('复制') }}
-        </el-button>
-      </div>
-    </div>
-    <div element-loading-text="Loading..." v-loading="loading" style="padding: 0 5px; width: 100%; height: 60vh; position: relative; margin-bottom: 10px">
-      <AceEditor class="preview" v-show="!loading && previewInfo.preview === 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
-      <iframe id="imgPreview" class="preview" v-if="!loading && previewInfo.preview === 'iframe' && previewUrl" :src="previewUrl" ></iframe>
-      <audio controls class="preview" v-if="!loading && previewInfo.preview === 'audio' && previewUrl" >
-        <source :src="previewUrl" :type="previewInfo.type" >
-      </audio>
-      <video controls class="preview" v-if="!loading && previewInfo.preview === 'video' && previewUrl" >
-        <source :src="previewUrl" :type="previewInfo.type" >
-      </video>
-      <div style="position: absolute; top: 0; right: 30px" v-if="!loading && previewInfo.preview === 'iframe' && previewInfo.type !== 'application/pdf' && previewInfo.type !== 'text/html' && previewUrl" >
-        <el-input-number :style="{width: '105px'}" size="small" v-model="percentage" :min="20" :max="200" step="10" :step-strictly="true" @change="setPercentage" >
-          <template #suffix>
-            <span>%</span>
-          </template>
-        </el-input-number>
-      </div>
-    </div>
-    <div style="margin-top: -13px;"></div>
-  </el-dialog>
+      <div style="margin-top: -13px;"></div>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
@@ -369,6 +371,16 @@ export default {
 .preview {
   width: 100%;
   height: 100%;
+}
+
+/* 隐藏滚动条 */
+#editor-bar {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* Internet Explorer 和 Edge */
+}
+
+#editor-bar::-webkit-scrollbar {
+  display: none !important; /* Chrome 和 Safari */
 }
 
 </style>

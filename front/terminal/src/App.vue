@@ -113,4 +113,23 @@ img {
   display: none !important; /* Chrome 和 Safari */
 }
 
+/* 左右拉伸 */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background-color: transparent;
+  color: transparent;
+  cursor: ew-resize;
+}
+
+.handle-left {
+  left: 0;
+}
+
+.handle-right {
+  right: 0;
+}
+
 </style>

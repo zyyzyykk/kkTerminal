@@ -20,6 +20,10 @@ import App from './App.vue';
 
 const app = createApp(App);
 
+// 自定义指令
+import resizableDirective from '@/directives/Resizable';
+app.directive('resizable', resizableDirective);
+
 // 按需引入element-plus
 import 'element-plus/dist/index.css';
 import { ElButton, ElDialog, ElIcon, ElInput, ElUpload, ElColorPicker,ElDropdown, ElDropdownMenu, ElDropdownItem, ElSwitch, ElLoading, ElRadioGroup, ElRadio, ElPopover, ElTabs, ElTabPane, ElResult, ElTooltip, ElTag, ElPopconfirm, ElCheckbox, ElInputNumber, ElProgress, ElTable, ElCard } from 'element-plus';
