@@ -69,7 +69,7 @@
           </el-tooltip>
         </div>
       </div>
-      <div element-loading-text="Loading..." v-loading="loading" style="padding: 0px 5px; width: 100%; height: 30vh;">
+      <div element-loading-text="Loading..." v-loading="loading" style="width: 100%; height: 30vh;">
         <AceEditor ref="userTcodeEditorRef" @handleSave="handleSave" ></AceEditor>
       </div>
     </div>

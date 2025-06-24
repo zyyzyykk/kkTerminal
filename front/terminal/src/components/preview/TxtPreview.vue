@@ -16,26 +16,42 @@
           <div class="ellipsis" style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
         </div>
       </template>
-      <div style="margin-top: -28px;"></div>
-      <div id="editor-bar" v-show="previewInfo.preview === 'editor'" class="kk-flex ellipsis" style="margin-bottom: 5px; overflow-x: auto;" >
+      <div style="margin-top: -28px;" ></div>
+      <div id="editor-bar" v-show="previewInfo.preview === 'editor'" class="kk-flex ellipsis no-select" style="margin-bottom: 5px; overflow-x: auto;" >
         <div class="kk-flex" >
-          <div class="no-select" >{{ $t('保存编码') }}：</div>
-          <el-dropdown size="small" hide-timeout="300" >
-            <span class="a-link no-select" >{{ encode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <template v-for="(name,index) in encodeSet" :key="index" >
-                  <el-dropdown-item class="no-select" @click="encode = name; modifyTag = '*';" >{{ name }}</el-dropdown-item>
-                </template>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          <div>{{ $t('编码') }}：</div>
+          <div class="kk-flex" >
+            <el-tag size="small" type="info" style="margin-right: 5px;" >{{ $t('打开') }}</el-tag>
+            <el-dropdown size="small" hide-timeout="300" >
+              <span class="a-link" >{{ openEncode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <template v-for="(name,index) in encodeSet" :key="index" >
+                    <el-dropdown-item class="no-select" @click="changeEncode(0, name)" >{{ name }}</el-dropdown-item>
+                  </template>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+          <div class="kk-flex" >
+            <el-tag size="small" type="info" style="margin-left: 10px; margin-right: 5px;" >{{ $t('保存') }}</el-tag>
+            <el-dropdown size="small" hide-timeout="300" >
+              <span class="a-link" >{{ saveEncode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <template v-for="(name,index) in encodeSet" :key="index" >
+                    <el-dropdown-item class="no-select" @click="changeEncode(1, name)" >{{ name }}</el-dropdown-item>
+                  </template>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </div>
         <div style="margin-right: 20px;" ></div>
         <div class="kk-flex" >
-          <div class="no-select" >{{ $t('模式') }}：</div>
+          <div>{{ $t('模式') }}：</div>
           <el-dropdown size="small" hide-timeout="300" >
-            <span class="a-link no-select" >{{ mode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+            <span class="a-link" >{{ mode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>
                 <template v-for="(name,index) in modeSet" :key="index" >
@@ -47,12 +63,12 @@
         </div>
         <div style="margin-right: 20px;" ></div>
         <div class="kk-flex" >
-          <div class="no-select" >{{ $t('缩进') }}：</div>
+          <div>{{ $t('缩进') }}：</div>
           <div><el-input-number :style="{width: '80px'}" size="small" v-model="indent" :min="2" :max="4" step="2" :step-strictly="true" @change="setIndent" /></div>
         </div>
         <div style="margin-right: 20px;" ></div>
         <div class="kk-flex" >
-          <div class="no-select" >{{ $t('字号') }}：</div>
+          <div>{{ $t('字号') }}：</div>
           <div>
             <el-input-number :style="{width: '100px'}" size="small" v-model="fontSize" :min="12" :max="20" step="2" :step-strictly="true" @change="setFontSize" >
               <template #suffix>
@@ -68,7 +84,7 @@
           </el-button>
         </div>
       </div>
-      <div element-loading-text="Loading..." v-loading="loading" style="padding: 0 5px; width: 100%; height: 60vh; position: relative; margin-bottom: 10px">
+      <div element-loading-text="Loading..." v-loading="loading" style="width: 100%; height: 60vh; position: relative; margin-bottom: 10px">
         <AceEditor class="preview" v-show="!loading && previewInfo.preview === 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
         <iframe id="imgPreview" class="preview" v-if="!loading && previewInfo.preview === 'iframe' && previewUrl" :src="previewUrl" ></iframe>
         <audio controls class="preview" v-if="!loading && previewInfo.preview === 'audio' && previewUrl" >
@@ -85,7 +101,7 @@
           </el-input-number>
         </div>
       </div>
-      <div style="margin-top: -13px;"></div>
+      <div style="margin-top: -13px;" ></div>
     </el-dialog>
   </div>
 </template>
@@ -99,7 +115,7 @@ import { ElMessage } from 'element-plus';
 import { previewFileInfo } from '@/components/preview/FileSuffix';
 import { changeStr2 } from '@/utils/StringUtil';
 import { getUrlParams } from "@/utils/UrlUtil";
-import { detectEncoding, encodeStrToArray, decodeArrayToStr } from "@/components/preview/EncodeUtil";
+import { encodeStrToArray, decodeArrayToStr } from "@/components/preview/EncodeUtil";
 import { ArrowDown, DocumentCopy } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 
@@ -136,7 +152,7 @@ export default {
     const initText = async () => {
       loading.value = true;
       reset();
-      let url = fileUrl.value;
+      const url = fileUrl.value;
       previewInfo.value = previewFileInfo(fileName.value);
       initEncode(url);
       jqXHR.value = $.ajax({
@@ -149,8 +165,7 @@ export default {
           return resp;
         },
         success(resp) {
-          if(url == fileUrl.value)
-          {
+          if(url == fileUrl.value) {
             // 文件可预览
             if(previewInfo.value.preview !== 'editor') {
               const blob = new Blob([resp], {type:previewInfo.value.type});
@@ -160,9 +175,7 @@ export default {
               imgHeight.value = -1;
             }
             else {
-              encode.value = detectEncoding(String.fromCharCode(...new Uint8Array(resp.slice(0,100*1024))));
-              initEncode(url);
-              const text = decodeArrayToStr(new Uint8Array(resp),encode.value);
+              const text = decodeArrayToStr(new Uint8Array(resp), openEncode.value);
               codeEditorRef.value.setValue(text);
               codeEditorRef.value.resetHistory();
               mode.value = 'auto';
@@ -175,8 +188,7 @@ export default {
           }
         },
         error() {
-          if(url == fileUrl.value)
-          {
+          if(url == fileUrl.value) {
             ElMessage({
               message: i18n.global.t('文件加载失败'),
               type: 'error',
@@ -196,29 +208,40 @@ export default {
 
     const handleSave = (text) => {
       if(modifyTag.value != '*') return;
-      context.emit('doSave',fileName.value, fileUrl.value, encodeStrToArray(text, (encode.value || "UTF-8")));
+      context.emit('doSave',fileName.value, fileUrl.value, encodeStrToArray(text, (saveEncode.value || "UTF-8")));
       modifyTag.value = '';
     };
 
     // 编码
-    const encode = ref('');
+    const openEncode = ref('');
+    const saveEncode = ref('');
     const encodeSet = ref(['UTF-8','GBK','ISO-8859-1','Windows-1252']);
     const initEncode = (url) => {
-      let serverEncode = 'UTF-8';
       const urlParams = getUrlParams(url);
-      if(urlParams.sshKey) serverEncode = changeStr2(urlParams.sshKey.split('-')[1]);
-      if(encode.value && encode.value.toLowerCase() === 'gb2312') encode.value = 'GBK';
+      const serverEncode = urlParams.sshKey ? changeStr2(urlParams.sshKey.split('-')[1]) : 'UTF-8';
       encodeSet.value = ['UTF-8','GBK','ISO-8859-1','Windows-1252'];
       // 服务器编码不在默认编码集中
       if(!encodeSet.value.map(item => item.toLowerCase()).includes(serverEncode.toLowerCase())) encodeSet.value.unshift(serverEncode);
-      // 编码格式为ASCII，则默认使用服务器编码
-      if(!encode.value || encode.value.toLowerCase() === 'ascii') encode.value = serverEncode;
-      else if(!encodeSet.value.map(item => item.toLowerCase()).includes(encode.value.toLowerCase())) encodeSet.value.unshift(encode.value);
-      else encode.value = encodeSet.value.find(item => item.toLowerCase() === encode.value.toLowerCase());
+      // 设置编码
+      if(!openEncode.value) openEncode.value = serverEncode;
+      if(!saveEncode.value) saveEncode.value = serverEncode;
+    };
+    const changeEncode = (type, name) => {
+      // 打开编码
+      if(type === 0) {
+        if(!loading.value) initText();
+        openEncode.value = name;
+        DialogVisible.value = true;
+      }
+      // 保存编码
+      else if(type === 1) {
+        saveEncode.value = name;
+        modifyTag.value = '*';
+      }
     };
 
     // 语言模式
-    const mode = ref('');
+    const mode = ref('auto');
     const modeSet = ref(['auto','xml','bash','json']);
     const setMode = (name) => {
       if(mode.value == name) return;
@@ -248,7 +271,7 @@ export default {
     };
     const setPercentage = () => {
       const iframeImg = getIframeImg();
-      if(imgHeight.value == -1) imgHeight.value = iframeImg.height;
+      if(imgHeight.value === -1) imgHeight.value = iframeImg.height;
       iframeImg.height = (imgHeight.value * percentage.value) / 100;
     };
 
@@ -297,9 +320,10 @@ export default {
         jqXHR.value.abort();
         jqXHR.value = null;
       }
-      encode.value = '';
+      openEncode.value = '';
+      saveEncode.value = '';
       encodeSet.value = ['UTF-8','GBK','ISO-8859-1','Windows-1252'];
-      mode.value = '';
+      mode.value = 'auto';
       // indent.value = 4;
       // fontSize.value = 14;
       percentage.value = 100;
@@ -328,7 +352,9 @@ export default {
       modifyTag,
       handleChange,
       handleSave,
-      encode,
+      openEncode,
+      saveEncode,
+      changeEncode,
       encodeSet,
       initEncode,
       mode,

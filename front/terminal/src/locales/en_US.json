@@ -159,7 +159,7 @@
   "其他用户": "Others",
   "应用到子目录和文件": "Apply to sub directories and files",
   "TCode必须以 /,S,U 开头": "TCode must start with /,S,U",
-  "保存编码": "Save Encoding",
+  "编码": "Encode",
   "模式": "Mode",
   "缩进": "Indent",
   "复制": "Copy",
