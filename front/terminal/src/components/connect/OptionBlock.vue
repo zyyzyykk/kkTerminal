@@ -23,7 +23,7 @@
         </div>
       </div>
       <div v-else class="kk-border">
-        <NoData msg="暂无配置" ></NoData>
+        <NoData :msg="i18n.global.k('暂无配置')" ></NoData>
       </div>
       <div class="kk-flex">
         <div>{{ $t('配置名') }}：</div>
@@ -107,6 +107,7 @@ export default {
     };
 
     return {
+      i18n,
       DialogVisible,
       aimOption,
       confirm,
