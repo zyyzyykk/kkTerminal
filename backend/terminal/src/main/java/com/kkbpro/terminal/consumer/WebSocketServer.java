@@ -12,6 +12,7 @@ import com.kkbpro.terminal.pojo.dto.CooperateInfo;
 import com.kkbpro.terminal.pojo.dto.EnvInfo;
 import com.kkbpro.terminal.pojo.dto.MessageInfo;
 import com.kkbpro.terminal.pojo.dto.PrivateKey;
+import com.kkbpro.terminal.pojo.vo.FileTransInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.AESUtil;
 import com.kkbpro.terminal.utils.FileUtil;
@@ -49,11 +50,28 @@ public class WebSocketServer {
 
     public static ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
 
-    public static ConcurrentHashMap<String, ConcurrentHashMap<String, String>> fileUploadingMap = new ConcurrentHashMap<>();
-
     public static ConcurrentHashMap<String, SFTPClient> sftpClientMap = new ConcurrentHashMap<>();
 
     public static ConcurrentHashMap<String, List<WebSocketServer>> cooperateMap = new ConcurrentHashMap<>();
+
+    public static ConcurrentHashMap<String, ConcurrentHashMap<String, FileTransInfo>> fileTransportingMap = new ConcurrentHashMap<>();
+
+    public static void putFileTransportingMap(String sshKey, String key, FileTransInfo fileTransInfo) {
+        fileTransportingMap.get(sshKey).put(key, fileTransInfo);
+        webSocketServerMap.get(sshKey).sendMessage(ResultCodeEnum.FILE_TRANSPORT_UPDATE.getDesc() ,"success", ResultCodeEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
+    };
+
+    public static FileTransInfo getFileTransportingMap(String sshKey, String key) {
+        return fileTransportingMap.get(sshKey).get(key);
+    };
+
+    public static void removeFileTransportingMap(String sshKey, String key) {
+        FileTransInfo fileTransInfo = getFileTransportingMap(sshKey, key);
+        // 修改类型为已完成
+        fileTransInfo.setIndex(3);
+        fileTransportingMap.get(sshKey).remove(key);
+        webSocketServerMap.get(sshKey).sendMessage(ResultCodeEnum.FILE_TRANSPORT_UPDATE.getDesc() ,"success", ResultCodeEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
+    };
 
     private static AppConfig appConfig;
 
@@ -201,7 +219,7 @@ public class WebSocketServer {
         this.sendMessage("SSHKey","success", ResultCodeEnum.CONNECT_SUCCESS.getState(), sshKey);
         webSocketServerMap.put(sshKey, this);
         sshClientMap.put(sshKey, sshClient);
-        fileUploadingMap.put(sshKey, new ConcurrentHashMap<>());
+        fileTransportingMap.put(sshKey, new ConcurrentHashMap<>());
         // 欢迎语
         this.sendMessage("Welcome","success", ResultCodeEnum.OUT_TEXT.getState(), appConfig.getWelcome() + "\r\n");
         // github源地址
@@ -273,7 +291,7 @@ public class WebSocketServer {
                 // 判断是否是本次ssh对应的临时文件夹
                 if (file.isDirectory() && StringUtil.isPrefix(key, file.getName())) {
                     // 忽略正在进行文件上传的文件夹
-                    if(fileUploadingMap.get(key).get(file.getName().substring(key.length() + 1)) == null)
+                    if(getFileTransportingMap(key, file.getName().substring(key.length() + 1)) == null)
                         FileUtil.fileDelete(file);
                 }
             }
@@ -293,8 +311,8 @@ public class WebSocketServer {
         webSocketServerMap.remove(key);
         cooperateMap.remove(key);
         sessionSocket = null;
-        if(fileUploadingMap.get(key) == null || fileUploadingMap.get(key).isEmpty()) {
-            fileUploadingMap.remove(key);
+        if(fileTransportingMap.get(key) == null || fileTransportingMap.get(key).isEmpty()) {
+            fileTransportingMap.remove(key);
             if(sftpClientMap.get(key) != null)
                 sftpClientMap.get(key).close();
             sftpClientMap.remove(key);

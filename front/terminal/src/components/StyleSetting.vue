@@ -269,5 +269,4 @@ export default {
   margin-left: 10px;
   margin-right: 30px;
 }
-
 </style>

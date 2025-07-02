@@ -27,7 +27,7 @@ export const cloud = async (type, name, content) => {
   const blob = new Blob([aesEncrypt(content, userInfo.key)], { type: 'application/octet-stream' });
   // 创建File对象
   const file = new File([blob], name);
-  let formData = new FormData();
+  const formData = new FormData();
   formData.append('user',userInfo.name + '-' + userInfo.time);
   formData.append('type',type);
   formData.append('name',name);

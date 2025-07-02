@@ -10,7 +10,9 @@ public enum ResultCodeEnum {
 
     OUT_TEXT(1,"Text output to terminal"),
 
-    COOPERATE_NUMBER_UPDATE(2,"Update cooperate number");
+    COOPERATE_NUMBER_UPDATE(2,"Update cooperate number"),
+
+    FILE_TRANSPORT_UPDATE(3,"Update file transport");
 
     private Integer state;
 

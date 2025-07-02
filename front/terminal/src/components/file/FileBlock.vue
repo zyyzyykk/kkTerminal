@@ -15,8 +15,8 @@
     >
       <div>
         <div class="title kk-flex" >
-          <div class="ellipsis" style="flex: 1;">
-            <div v-if="isShowDirInput == true" >
+          <div class="ellipsis" style="flex: 1;" >
+            <div v-if="isShowDirInput" >
               <el-input id="aimDirInput" v-model="dir" :placeholder="$t('输入目录路径')" size="small" @keydown.enter="isShowDirInput = false;" @blur="isShowDirInput = false;" @mousedown.stop @dblclick.stop @change="dirInputCallback" />
             </div>
             <div class="kk-flex no-select ellipsis" v-else @dblclick="doShowDirInput" >
@@ -28,12 +28,12 @@
             </div>
           </div>
           <div class="kk-flex" >
-            <div class="hover-class" @click="doRefresh" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Refresh /></el-icon></div>
-            <div v-if="dir && dir != '/'" class="hover-class" @click="doReturn" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
-            <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Fold /></el-icon></div>
-            <div v-if="selectedFiles.length == 1" class="hover-class" @click="doDownload" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
-            <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Download /></el-icon></div>
-            <div v-if="dirStatus == 0" class="hover-class" style="margin-left: 10px; font-size: 18px; cursor: pointer;">
+            <div class="hover-class operate-icon" @click="doRefresh" ><el-icon><Refresh /></el-icon></div>
+            <div v-if="dir && dir != '/'" class="hover-class operate-icon" @click="doReturn" ><el-icon><Fold /></el-icon></div>
+            <div v-else class="disabled-function operate-icon" ><el-icon><Fold /></el-icon></div>
+            <div v-if="selectedFiles.length == 1" class="hover-class operate-icon" @click="doDownload" ><el-icon><Download /></el-icon></div>
+            <div v-else class="disabled-function operate-icon" ><el-icon><Download /></el-icon></div>
+            <div v-if="dirStatus == 0" class="hover-class operate-icon" >
               <el-dropdown v-show="DialogVisible" style="line-height: unset;" placement="bottom-end" size="small" trigger="click" >
                 <div class="hover-class" style="font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
                 <template #dropdown>
@@ -60,24 +60,24 @@
                 </template>
               </el-dropdown>
             </div>
-            <div v-else class="disabled-function" style="margin-left: 10px; font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
+            <div v-else class="disabled-function operate-icon" ><el-icon><Upload /></el-icon></div>
           </div>
         </div>
         <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select"
              @contextmenu="handleContextMenu" @scroll="handleScroll"
              @dragover="preventDefault" @drop="handleFileDrag"
              tabindex="0" @keydown="handleShortcutKeys" >
-          <div v-if="files.length != 0" >
+          <div v-if="files.length > 0" >
             <div v-for="item in files" :key="item.id" >
-              <template v-if="item.isDirectory == true">
+              <template v-if="item.isDirectory">
                 <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
                   <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] == '.' || (isClipboard(item.id) != -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
-                  <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
+                  <div style="margin: 0 10px;" v-if="isShowRenameInput && renameFile && item.id == renameFile.id" >
                     <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                   </div>
                   <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
                     <template #content>
-                      <div v-if="!(isShowRenameInput == true && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
+                      <div v-if="!(isShowRenameInput && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
                         {{ item.name }}
                       </div>
                     </template>
@@ -87,12 +87,12 @@
               <template v-else>
                 <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
                   <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] == '.' || (isClipboard(item.id) != -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
-                  <div style="margin: 0 10px;" v-if="isShowRenameInput == true && renameFile && item.id == renameFile.id" >
+                  <div style="margin: 0 10px;" v-if="isShowRenameInput && renameFile && item.id == renameFile.id" >
                     <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                   </div>
                   <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
                     <template #content>
-                      <div v-if="!(isShowRenameInput == true && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
+                      <div v-if="!(isShowRenameInput && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
                         {{ item.name }}
                       </div>
                     </template>
@@ -102,7 +102,7 @@
             </div>
           </div>
           <div v-else>
-            <NoData height="248px" @contextmenu="selectedFiles = []" v-if="loading == false" :msg="$t(noDataMsg)"></NoData>
+            <NoData height="248px" @contextmenu="selectedFiles = []" v-if="!loading" :msg="noDataMsg" ></NoData>
           </div>
         </div>
       </div>
@@ -207,7 +207,7 @@ export default {
     Link,
   },
   props:['sshKey','os'],
-  setup(props) {
+  setup(props, context) {
 
     // 加载
     const loading = ref(true);
@@ -305,7 +305,7 @@ export default {
     // 获取初始家目录
     const isShowDirInput = ref(false);
     const getInitDir = () => {
-      if(dir.value != '') return;
+      if(dir.value) return;
       $.ajax({
         url: http_base_url + '/home',
         type:'get',
@@ -337,11 +337,11 @@ export default {
     // 目录状态：0 正常 / 1 目录不存在、无权限等
     const dirStatus = ref(0);
     const getDirList = () => {
-      if(dir.value == '') {
+      if(!dir.value) {
         getInitDir();
         return;
       }
-      let now_dir = dir.value;
+      const now_dir = dir.value;
       $.ajax({
         url: http_base_url + '/ls',
         type:'get',
@@ -365,7 +365,7 @@ export default {
               fileAreaRef.value.tabindex = '0';
               fileAreaRef.value.focus();
               if(fileAttrRef.value && fileAttrRef.value.DialogVisible) {
-                let nowFileInfo = getFileInfoByName(fileAttrRef.value.fileInfo.name);
+                const nowFileInfo = getFileInfoByName(fileAttrRef.value.fileInfo.name);
                 if(nowFileInfo) {
                   fileAttrRef.value.reset();
                   fileAttrRef.value.DialogVisible = true;
@@ -405,8 +405,8 @@ export default {
 
     // 下载远程文件
     const downloadRemoteFile = (name) => {
-      if(isShowDirInput.value == true) return;
-      let a = document.createElement('a');
+      if(isShowDirInput.value) return;
+      const a = document.createElement('a');
       a.href = getRemoteFileUrl(name);
       document.body.appendChild(a);
       a.click();
@@ -415,8 +415,8 @@ export default {
 
     // 下载文件夹
     const downloadDir = (name) => {
-      if(isShowDirInput.value == true) return;
-      let a = document.createElement('a');
+      if(isShowDirInput.value) return;
+      const a = document.createElement('a');
       a.href = getRemoteFolderUrl(name);
       document.body.appendChild(a);
       a.click();
@@ -425,7 +425,7 @@ export default {
 
     // 更新目录路径
     const changeDir = (new_dir) => {
-      if(isShowDirInput.value == true) return;
+      if(isShowDirInput.value) return;
       dir.value = new_dir;
       confirmDirCorrect();
       selectedFiles.value = [];
@@ -458,7 +458,7 @@ export default {
     };
     // 下载文件/文件夹
     const doDownload = () => {
-      if(isShowDirInput.value == true) return;
+      if(isShowDirInput.value) return;
       if(selectedFiles.value.length == 1 && selectedFiles.value[0].name && selectedFiles.value[0].isDirectory) downloadDir(selectedFiles.value[0].name);
       if(selectedFiles.value.length == 1 && selectedFiles.value[0].name && !selectedFiles.value[0].isDirectory) downloadRemoteFile(selectedFiles.value[0].name);
     };
@@ -466,17 +466,27 @@ export default {
     const chunkSize = 1024 * 2173;   // 每一片大小2173kB
     const doUpload = async (fileData, data={}) => {
       try {
-        if(isShowDirInput.value == true) return;
-        let file = fileData.file;
+        if(isShowDirInput.value) return;
+        const file = fileData.file;
         if(!file) return;
         // 文件切片
         const fileName = file.name;
         const fileSize = file.size;
         // 允许上传空文件
         const chunks = parseInt(Math.ceil(fileSize / chunkSize)) == 0 ? 1 : parseInt(Math.ceil(fileSize / chunkSize));
-        const fileId = file.uid;
-        let chunkIndex = 1;
+        const fileId = file.uid.toString();
+        const chunkIndex = 1;
         const path = data.pathVal ? data.pathVal : dir.value;
+
+        // 添加到传输列表（等待中）
+        const fileTransInfo = {
+          id: fileId,
+          path: path,
+          name: fileName,
+          size: fileSize,
+          progress: 0,
+        };
+        context.emit('updateTransportLists', 0, 0, fileId, fileTransInfo);
 
         // 大文件开始上传提示
         if(fileSize > 20*1024*1024 && !data.noStartUpLoad) {
@@ -528,6 +538,11 @@ export default {
                     }, Math.min(1000, 500 + chunks * 10));
                   }
                 }
+                else {
+                  // 更新传输列表（等待中）进度
+                  fileTransInfo.progress = ((chunk / chunks) * 100).toFixed(0);
+                  context.emit('updateTransportLists', 0, 0, fileId, fileTransInfo);
+                }
               }
               else {
                 ElMessage({
@@ -536,6 +551,10 @@ export default {
                   grouping: true,
                 })
                 chunk = chunks + 10;
+                // 更新传输列表（等待中）状态
+                fileTransInfo.status = 1;
+                context.emit('updateTransportLists', 0, 1, fileId, null);
+                context.emit('updateTransportLists', 3, 0, fileId, fileTransInfo);
               }
             },
           });
@@ -592,9 +611,9 @@ export default {
       // 文件/文件夹项
       const items = event.dataTransfer.items;
       if(!(items && items.length > 0)) return;
-      let basePath = dir.value;
+      const basePath = dir.value;
       for (let i = 0; i < items.length; i++) {
-        let item = items[i].webkitGetAsEntry();
+        const item = items[i].webkitGetAsEntry();
         // 文件类型
         if(item.isFile && !item.isDirectory) {
           item.file(file => {
@@ -687,8 +706,8 @@ export default {
           break;
         // 打开
         case 2:
-          if(selectedFiles.value.length == 1 && selectedFiles.value[0].isDirectory == true) changeDir(dir.value + selectedFiles.value[0].name + '/');
-          else if(selectedFiles.value.length == 1 && selectedFiles.value[0].isDirectory == false) preViewFile(selectedFiles.value[0].name);
+          if(selectedFiles.value.length == 1 && selectedFiles.value[0].isDirectory) changeDir(dir.value + selectedFiles.value[0].name + '/');
+          else if(selectedFiles.value.length == 1 && !selectedFiles.value[0].isDirectory) preViewFile(selectedFiles.value[0].name);
           break;
         // 复制路径
         case 3:
@@ -802,8 +821,8 @@ export default {
         renameFile.value = {};
         return;
       }
-      let oldPath = dir.value + item.name;
-      let newPath = dir.value + renameFile.value.name;
+      const oldPath = dir.value + item.name;
+      const newPath = dir.value + renameFile.value.name;
       renameFile.value = {};
       doRename(oldPath,newPath);
     };
@@ -1024,8 +1043,8 @@ export default {
     };
     // 文件夹input框上传预处理
     const folderInputUploadPrehandle = (event) => {
-      let basePath = dir.value;
-      let filesGroupByPath = {};
+      const basePath = dir.value;
+      const filesGroupByPath = {};
       // 根据文件路径进行分类
       for(let i=0;i<event.target.files['length'];i++) {
         const file = event.target.files[i];
@@ -1042,7 +1061,7 @@ export default {
       }
       // 根据文件路径长度进行升序排序，确保文件父目录存在
       const filesArr = [];
-      for(let key in filesGroupByPath) {
+      for(const key in filesGroupByPath) {
         filesArr.push(filesGroupByPath[key]);
       }
       filesArr.sort((a, b) => a.path.length - b.path.length);
@@ -1229,6 +1248,7 @@ export default {
     return {
       DialogVisible,
       isShowDirInput,
+      confirmDirCorrect,
       dir,
       files,
       getInitDir,
@@ -1328,8 +1348,13 @@ export default {
   background-color: #f3f3f3;
 }
 
-.hover-class:hover
-{
+.operate-icon {
+  margin-left: 10px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.hover-class:hover {
   color: #409eff;
 }
 
@@ -1399,5 +1424,4 @@ export default {
   color: var(--link);
   cursor: pointer;
 }
-
 </style>

@@ -5,7 +5,8 @@ const MB = BYTES_PER_KILOBYTE * KB;
 const GB = BYTES_PER_KILOBYTE * MB;
 
 export const calcSize = (size) => {
-    if(size == null) return "";
+    if(!size) return "";
+    if(size < 0) size = 0;
 
     let value;
     let unit;

@@ -218,8 +218,8 @@ export default {
         })
         return;
       }
-      let oldPath = fileDir.value + fileInfo.value.name;
-      let newPath = fileDir.value + rename.value;
+      const oldPath = fileDir.value + fileInfo.value.name;
+      const newPath = fileDir.value + rename.value;
       context.emit('callback',oldPath,newPath);
       closeDialog();
     };

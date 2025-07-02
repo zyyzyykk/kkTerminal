@@ -20,7 +20,7 @@ export const FuncTcode = {
     '/O': {
         desc: i18n.global.k('新建窗口'),
         execFlow() {
-            let _url = window.location.href;
+            const _url = window.location.href;
             window.open(_url, '_blank');
         }
     },
@@ -173,22 +173,22 @@ export const UserTcodeExecutor = {
 
 // 处理过滤输出
 const filter = (arr) => {
-    let ret = [];
-    let tmp = filterRN(arr);
+    const ret = [];
+    const tmp = filterRN(arr);
     for(let i = 0; i < tmp.length; i++) {
-        let str = filterANSI(tmp[i]);
-        if(str && str != '') ret.push(str);
+        const str = filterANSI(tmp[i]);
+        if(str) ret.push(str);
     }
     return ret;
 };
 
 // 以 \r\n 分割
 const filterRN = (arr) => {
-    let ret = [];
+    const ret = [];
     for(let i = 0; i < arr.length; i++) {
-        let tmp = arr[i].split("\r\n");
+        const tmp = arr[i].split("\r\n");
         for(let j = 0; j < tmp.length; j++) {
-            if (tmp[j] && tmp[j] != '') ret.push(tmp[j]);
+            if (tmp[j]) ret.push(tmp[j]);
         }
     }
     return ret;

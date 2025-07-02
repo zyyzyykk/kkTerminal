@@ -12,7 +12,7 @@
     draggable
   >
     <div class="no-select">
-        <el-tabs type="border-card">
+        <el-tabs stretch type="border-card">
             <el-tab-pane :label="$t('功能TCode')">
               <div style="height: 210px; overflow-y: auto;" >
                   <div>{{ $t('以') }} <span style="background-color: #f3f4f4;" >/</span> {{ $t('开头，用于快速执行通用功能') }}</div>
@@ -269,7 +269,6 @@ export default {
 </script>
 
 <style scoped>
-
 .kk-flex {
   display: flex;
   align-items: center;

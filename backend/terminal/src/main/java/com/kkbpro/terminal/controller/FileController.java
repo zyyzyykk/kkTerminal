@@ -6,6 +6,7 @@ import com.kkbpro.terminal.consumer.WebSocketServer;
 import com.kkbpro.terminal.exception.MyException;
 import com.kkbpro.terminal.pojo.dto.FileUploadInfo;
 import com.kkbpro.terminal.pojo.vo.FileInfo;
+import com.kkbpro.terminal.pojo.vo.FileTransInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.AESUtil;
 import com.kkbpro.terminal.utils.FileUtil;
@@ -35,16 +36,15 @@ public class FileController {
     @GetMapping("/download/remote/file")
     public void downloadRemoteFile(HttpServletResponse response, String sshKey, String path, String fileName) throws IOException {
         SFTPClient sftpClient = getSftpClient(sshKey);
-        String remoteFilePath = path + fileName;
-
         // 构建 HTTP 响应，触发文件下载
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName,"UTF-8"));
-        readRemoteFile(sshKey, sftpClient, remoteFilePath, response);
+        readRemoteFile(sshKey, sftpClient, path, fileName, response);
     }
-    private void readRemoteFile(String sshKey, SFTPClient sftp, String remoteFilePath, HttpServletResponse response) throws IOException {
+    private void readRemoteFile(String sshKey, SFTPClient sftp, String path, String fileName, HttpServletResponse response) throws IOException {
         String id = UUID.randomUUID().toString();
-        WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
+        String remoteFilePath = path + fileName;
+        WebSocketServer.putFileTransportingMap(sshKey, id, new FileTransInfo(id, path, fileName, sftp.size(remoteFilePath), 2));
         try (RemoteFile file = sftp.open(remoteFilePath)) {
             try (InputStream is = file.new RemoteFileInputStream()) {
                 byte[] buffer = new byte[8096];
@@ -55,7 +55,7 @@ public class FileController {
                 }
             }
         } finally {
-            WebSocketServer.fileUploadingMap.get(sshKey).remove(id);
+            WebSocketServer.removeFileTransportingMap(sshKey, id);
             // 释放资源
             sshClose(sshKey);
         }
@@ -76,7 +76,7 @@ public class FileController {
         String id = UUID.randomUUID().toString();
         // 进入目录并打包
         String command = "cd " + path + " && tar -czvf - " + folderName + " | less";
-        WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
+        WebSocketServer.putFileTransportingMap(sshKey, id, new FileTransInfo(id, path, folderName, -1L, 2));
         try(Session session = ssh.startSession();
             Session.Command cmd = session.exec(command);
             InputStream tarStream = cmd.getInputStream())
@@ -95,7 +95,7 @@ public class FileController {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            WebSocketServer.fileUploadingMap.get(sshKey).remove(id);
+            WebSocketServer.removeFileTransportingMap(sshKey, id);
             // 释放资源
             sshClose(sshKey);
         }
@@ -642,9 +642,8 @@ public class FileController {
         }
 
         // 上传完毕
-        if(chunk.equals(chunks))
-        {
-            WebSocketServer.fileUploadingMap.get(sshKey).put(id, "kkterminal");
+        if(chunk.equals(chunks)) {
+            WebSocketServer.putFileTransportingMap(sshKey, id, new FileTransInfo(id, path, fileName, totalSize, 1));
             Thread FileThread = new Thread(() -> {
                 try {
                     // 将文件片合并
@@ -659,7 +658,7 @@ public class FileController {
                 } finally {
                     // 删除临时文件
                     FileUtil.fileDelete(temporaryFolder);
-                    WebSocketServer.fileUploadingMap.get(sshKey).remove(id);
+                    WebSocketServer.removeFileTransportingMap(sshKey, id);
                     // 释放资源
                     sshClose(sshKey);
                 }
@@ -692,9 +691,9 @@ public class FileController {
 
     private void sshClose(String sshKey) {
         if((WebSocketServer.webSocketServerMap.get(sshKey) == null || WebSocketServer.webSocketServerMap.get(sshKey).getSessionSocket() == null)
-                && (WebSocketServer.fileUploadingMap.get(sshKey) == null || WebSocketServer.fileUploadingMap.get(sshKey).isEmpty())) {
+                && (WebSocketServer.fileTransportingMap.get(sshKey) == null || WebSocketServer.fileTransportingMap.get(sshKey).isEmpty())) {
             try {
-                WebSocketServer.fileUploadingMap.remove(sshKey);
+                WebSocketServer.fileTransportingMap.remove(sshKey);
                 if(WebSocketServer.sftpClientMap.get(sshKey) != null)
                     WebSocketServer.sftpClientMap.get(sshKey).close();
                 WebSocketServer.sftpClientMap.remove(sshKey);

@@ -158,12 +158,12 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
 
     // 导入导出TCode
     const importTCodes = (data) => {
-      let file = data.file;
+      const file = data.file;
       const fileReader = new FileReader();
       fileReader.onload = () => {
         try {
           const tcodes = JSON.parse(fileReader.result);
-          let data = {};
+          const data = {};
           // 统计成功/失败数
           let scnt = 0;
           let fcnt = 0;
@@ -282,7 +282,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
         });
         return;
       }
-      let data = {};
+      const data = {};
       data['U' + userTcodeInfo.value.name.toUpperCase()] = {
         desc: userTcodeInfo.value.desc,
         workflow: userTcodeEditorRef.value.getValue(),
@@ -352,6 +352,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
 .no-select {
   user-select: none;
 }
+
 /* 不换行 */
 .nowrap {
   white-space: nowrap;
@@ -360,5 +361,4 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
 .form-width {
   width: 56px;
 }
-
 </style>

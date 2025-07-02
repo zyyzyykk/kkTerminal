@@ -117,7 +117,7 @@ img {
 .resize-handle {
   position: absolute;
   top: 0;
-  width: 4px;
+  width: 6px;
   height: 100%;
   background-color: transparent;
   color: transparent;
@@ -131,5 +131,4 @@ img {
 .handle-right {
   right: 0;
 }
-
 </style>

@@ -7,7 +7,7 @@
         <img src="../assets/no_data.png" :alt="$t('暂无数据')" style="width: 120px;">
       </div>
     </div>
-    <div class="msg">{{ msg }}</div>
+    <div class="msg" >{{ $t(msg) }}</div>
     <div style="flex: 1;" ></div>
   </div>
 </template>
@@ -24,7 +24,7 @@ export default {
     msg: {
       type:String,
       required:false,
-      default: i18n.global.t('暂无数据'),
+      default: i18n.global.k('暂无数据'),
     },
     width:{
       type:String,

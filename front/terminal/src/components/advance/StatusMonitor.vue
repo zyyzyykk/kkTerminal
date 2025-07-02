@@ -12,7 +12,7 @@
       draggable
   >
     <div class="no-select" >
-      <el-tabs type="border-card" @tab-click="handleTabClick" >
+      <el-tabs stretch type="border-card" @tab-click="handleTabClick" >
         <el-tab-pane :label="$t('概览')">
           <div class="kk-flex" style="height: 200px" >
             <div style="margin-left: 5px" ></div>
@@ -69,7 +69,7 @@
             <el-table-column prop="cmd" label="Command" />
           </el-table>
           <div v-else >
-            <NoData height="200px" msg="No Data"></NoData>
+            <NoData height="200px" ></NoData>
           </div>
         </el-tab-pane>
         <el-tab-pane :label="$t('网络')">
@@ -105,7 +105,7 @@
             </div>
           </div>
           <div v-if="statusInfo.time.length <= 1" >
-            <NoData height="200px" msg="No Data"></NoData>
+            <NoData height="200px" ></NoData>
           </div>
         </el-tab-pane>
         <el-tab-pane :label="$t('磁盘')">
@@ -141,7 +141,7 @@
             </div>
           </div>
           <div v-if="statusInfo.time.length <= 1" >
-            <NoData height="200px" msg="No Data"></NoData>
+            <NoData height="200px" ></NoData>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -440,7 +440,6 @@ export default {
 </script>
 
 <style scoped>
-
 .kk-flex {
   display: flex;
   align-items: center;

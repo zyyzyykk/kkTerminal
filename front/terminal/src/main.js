@@ -26,8 +26,8 @@ app.directive('resizable', resizableDirective);
 
 // 按需引入element-plus
 import 'element-plus/dist/index.css';
-import { ElButton, ElDialog, ElIcon, ElInput, ElUpload, ElColorPicker,ElDropdown, ElDropdownMenu, ElDropdownItem, ElSwitch, ElLoading, ElRadioGroup, ElRadio, ElPopover, ElTabs, ElTabPane, ElResult, ElTooltip, ElTag, ElPopconfirm, ElCheckbox, ElInputNumber, ElProgress, ElTable, ElCard } from 'element-plus';
-app.use(ElButton).use(ElDialog).use(ElIcon).use(ElInput).use(ElUpload).use(ElColorPicker).use(ElTabs).use(ElTabPane).use(ElResult).use(ElTooltip).use(ElCheckbox).use(ElProgress).use(ElTable);
+import { ElButton, ElDialog, ElIcon, ElInput, ElUpload, ElColorPicker,ElDropdown, ElDropdownMenu, ElDropdownItem, ElSwitch, ElLoading, ElRadioGroup, ElRadio, ElPopover, ElTabs, ElTabPane, ElResult, ElTooltip, ElTag, ElPopconfirm, ElCheckbox, ElInputNumber, ElProgress, ElTable, ElCard, ElBadge } from 'element-plus';
+app.use(ElButton).use(ElDialog).use(ElIcon).use(ElInput).use(ElUpload).use(ElColorPicker).use(ElTabs).use(ElTabPane).use(ElResult).use(ElTooltip).use(ElCheckbox).use(ElProgress).use(ElTable).use(ElBadge);
 app.use(ElDropdown).use(ElDropdownMenu).use(ElDropdownItem).use(ElSwitch).use(ElLoading).use(ElRadioGroup).use(ElRadio).use(ElPopover).use(ElTag).use(ElPopconfirm).use(ElInputNumber).use(ElCard);
 
 // i18n 国际化
@@ -43,8 +43,8 @@ import './assets/base.css';
 const debounce = (fn, delay) => {
     let timer = null;
     return function () {
-        let context = this;
-        let args = arguments;
+        const context = this;
+        const args = arguments;
         clearTimeout(timer);
         timer = setTimeout(function () {
             fn.apply(context, args);

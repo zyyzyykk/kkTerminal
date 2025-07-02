@@ -1,5 +1,5 @@
 <template>
-  <div class="golbal">
+  <div class="global">
     <!-- 设置栏 -->
     <div class="setting" v-show="isShowSetting && (urlParams.mode != 'headless' && urlParams.mode != 'pure')" >
       <div class="setting-menu no-select" @click="doSettings(1)" ><div>{{ $t('连接设置') }}</div></div>
@@ -22,7 +22,7 @@
       <div style="user-select: none;" @click="isShowSetting = !isShowSetting; isShowAdvance = false; showAdvance(false);" >
         <img src="@/assets/terminal.svg" alt="terminal" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
-      <div class="ellipsis no-select" style="font-size: 14px;" ><span>kk Terminal</span></div>
+      <div class="ellipsis no-select" style="font-size: 14px; line-height: 18px;" ><span>kk Terminal</span></div>
       <div style="flex: 1;"></div>
       <div v-show="urlParams.mode != 'headless' && urlParams.mode != 'pure'" class="kk-flex" >
         <div v-if="cooperating" class="bar-tag" >
@@ -53,10 +53,129 @@
             </div>
           </el-tag>
         </div>
-        <el-dropdown v-if="env.transport" class="bar-tag" hide-timeout="300" >
-          <span><img src="@/assets/transport.svg" alt="transport" style="height: 20px;" ></span>
+        <el-dropdown v-if="env.transport" @visible-change="changeDropdownShowStatus" class="bar-tag" hide-timeout="300" trigger="click" >
+          <el-badge :hidden="isShowDropdown || !isShowDot" :is-dot="true" :offset="[0, 4]" >
+            <span @click="isShowDot = false;" ><img src="@/assets/transport.svg" alt="transport" style="height: 20px;" ></span>
+          </el-badge>
           <template #dropdown>
-
+            <el-card class="no-select" style="width: 512px;" :body-style="{padding: '5px 5px'}" >
+              <el-tabs stretch type="border-card" class="trans-tabs" >
+                <el-tab-pane>
+                  <template #label >
+                    <el-badge :show-zero="false" :value="Object.keys(waitingList).length" :max="99" :offset="[6, 2]" type="warning" >
+                      <div>{{ $t('等待中') }}</div>
+                    </el-badge>
+                  </template>
+                  <div v-if="Object.keys(waitingList).length > 0" class="trans-items" >
+                    <div v-for="item in waitingList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
+                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size == -1" />
+                      <div style="margin-left: 15px;" ></div>
+                      <div class="kk-flex-column" >
+                        <ToolTip :content="item.path + item.name" :delay="1000" >
+                          <template #content>
+                            <div class="trans-item-name ellipsis" style="width: 360px;" >{{ item.path + item.name }}</div>
+                          </template>
+                        </ToolTip>
+                        <div class="trans-item-size" >{{ calcSize(item.size) }}</div>
+                      </div>
+                      <div style="flex: 1;" ></div>
+                      <el-progress class="trans-progress" width="48" type="circle" :percentage="item.progress" />
+                      <div style="flex: 1;" ></div>
+                    </div>
+                  </div>
+                  <div v-else>
+                    <NoData height="256px" ></NoData>
+                  </div>
+                </el-tab-pane>
+                <el-tab-pane>
+                  <template #label >
+                    <el-badge :show-zero="false" :value="Object.keys(uploadingList).length" :max="99" :offset="[6, 2]" type="danger" >
+                      <div>{{ $t('正在上传') }}</div>
+                    </el-badge>
+                  </template>
+                  <div v-if="Object.keys(uploadingList).length > 0" class="trans-items" >
+                    <div v-for="item in uploadingList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
+                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size == -1" />
+                      <div style="margin-left: 15px;" ></div>
+                      <div class="kk-flex-column" >
+                        <ToolTip :content="item.path + item.name" :delay="1000" >
+                          <template #content>
+                            <div class="trans-item-name ellipsis" style="width: 360px;" >{{ item.path + item.name }}</div>
+                          </template>
+                        </ToolTip>
+                        <div class="trans-item-size" >{{ calcSize(item.size) }}</div>
+                      </div>
+                      <div style="flex: 1;" ></div>
+                      <el-icon @click="openFolder(item.path)" class="el-icon--left folder-hover" ><FolderOpened /></el-icon>
+                      <div style="margin-left: 10px;" ></div>
+                      <el-icon @click="updateTransportLists(1, 1, item.id, null)" class="el-icon--left close-hover" ><CircleClose /></el-icon>
+                      <div style="flex: 1;" ></div>
+                    </div>
+                  </div>
+                  <div v-else>
+                    <NoData height="256px" ></NoData>
+                  </div>
+                </el-tab-pane>
+                <el-tab-pane>
+                  <template #label >
+                    <el-badge :show-zero="false" :value="Object.keys(downloadingList).length" :max="99" :offset="[6, 2]" type="danger" >
+                      <div>{{ $t('正在下载') }}</div>
+                    </el-badge>
+                  </template>
+                  <div v-if="Object.keys(downloadingList).length > 0" class="trans-items" >
+                    <div v-for="item in downloadingList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
+                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size == -1" />
+                      <div style="margin-left: 15px;" ></div>
+                      <div class="kk-flex-column" >
+                        <ToolTip :content="item.path + item.name" :delay="1000" >
+                          <template #content>
+                            <div class="trans-item-name ellipsis" style="width: 360px;" >{{ item.path + item.name }}</div>
+                          </template>
+                        </ToolTip>
+                        <div class="trans-item-size" >{{ calcSize(item.size) }}</div>
+                      </div>
+                      <div style="flex: 1;" ></div>
+                      <el-icon @click="openFolder(item.path)" class="el-icon--left folder-hover" ><FolderOpened /></el-icon>
+                      <div style="margin-left: 10px;" ></div>
+                      <el-icon @click="updateTransportLists(2, 1, item.id, null)" class="el-icon--left close-hover" ><CircleClose /></el-icon>
+                      <div style="flex: 1;" ></div>
+                    </div>
+                  </div>
+                  <div v-else>
+                    <NoData height="256px" ></NoData>
+                  </div>
+                </el-tab-pane>
+                <el-tab-pane>
+                  <template #label >
+                    <el-badge :show-zero="false" :value="Object.keys(finishedList).length" :max="99" :offset="[6, 2]" type="success" >
+                      <div>{{ $t('已完成') }}</div>
+                    </el-badge>
+                  </template>
+                  <div v-if="Object.keys(finishedList).length > 0" class="trans-items" >
+                    <div v-for="item in finishedList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
+                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size == -1" />
+                      <div style="margin-left: 15px;" ></div>
+                      <div class="kk-flex-column" >
+                        <ToolTip :content="item.path + item.name" :delay="1000" >
+                          <template #content>
+                            <div class="trans-item-name ellipsis" style="width: 360px;" >{{ item.path + item.name }}</div>
+                          </template>
+                        </ToolTip>
+                        <div class="trans-item-size" >{{ calcSize(item.size) }}</div>
+                      </div>
+                      <div style="flex: 1;" ></div>
+                      <el-icon @click="openFolder(item.path)" class="el-icon--left folder-hover" ><FolderOpened /></el-icon>
+                      <div style="margin-left: 10px;" ></div>
+                      <el-icon @click="updateTransportLists(3, 1, item.id, null)" class="el-icon--left close-hover" ><CircleClose /></el-icon>
+                      <div style="flex: 1;" ></div>
+                    </div>
+                  </div>
+                  <div v-else>
+                    <NoData height="256px" ></NoData>
+                  </div>
+                </el-tab-pane>
+              </el-tabs>
+            </el-card>
           </template>
         </el-dropdown>
         <div v-if="env.tCode" class="kk-flex" style="margin-right: 10px;" >
@@ -101,7 +220,7 @@
   <!-- 样式设置 -->
   <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" :os="osInfo.clientOS" ></StyleSetting>
   <!-- 文件管理 -->
-  <FileBlock ref="fileBlockRef" :sshKey="sshKey" :os="osInfo.clientOS" ></FileBlock>
+  <FileBlock ref="fileBlockRef" :sshKey="sshKey" :os="osInfo.clientOS" @updateTransportLists="updateTransportLists" ></FileBlock>
   <!-- 用户TCode -->
   <UserTcode ref="userTcodeRef" @importTCodes="importTCodes" @exportTCodes="exportTCodes" ></UserTcode>
   <!-- 帮助TCode -->
@@ -140,18 +259,25 @@ import CooperateGen from '@/components/advance/CooperateGen';
 import StatusMonitor from '@/components/advance/StatusMonitor'
 import DockerBlock from "@/components/advance/DockerBlock";
 import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
-import { QuestionFilled, VideoPlay, VideoPause, ChromeFilled, ArrowRight, UserFilled } from '@element-plus/icons-vue';
+import { QuestionFilled, VideoPlay, VideoPause, ChromeFilled, ArrowRight, UserFilled, FolderOpened, CircleClose } from '@element-plus/icons-vue';
 import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode";
 
 import i18n from "@/locales/i18n";
 import { cloud, load, syncUpload, syncDownload, localStoreUtil } from "@/utils/CloudUtil";
 import { deleteDialog } from "@/utils/DeleteDialog";
-import { calcType } from "@/components/calc/CalcType"
+import { calcType } from "@/components/calc/CalcType";
+import { calcSize } from '@/components/calc/CalcSize';
 import { localStore, sessionStore } from "@/env/Store";
+import NoData from "@/components/NoData";
+import ToolTip from "@/components/ToolTip";
+import FileIcons from "file-icons-vue";
 
 export default {
   name: "FrameWork",
   components: {
+    FileIcons,
+    NoData,
+    ToolTip,
     DockerBlock,
     ConnectSetting,
     StyleSetting,
@@ -166,6 +292,8 @@ export default {
     ChromeFilled,
     ArrowRight,
     UserFilled,
+    FolderOpened,
+    CircleClose,
   },
   setup() {
 
@@ -283,7 +411,7 @@ export default {
         if(key in env.value && key.lastIndexOf('_') === -1) env.value[key] = urlParams.value[key];
       }
       // option
-      let nowOpInfo = options.value[env.value['option']];
+      const nowOpInfo = options.value[env.value['option']];
       if(nowOpInfo) env.value = {...env.value,...nowOpInfo};
       else env.value.option = '';
       urlParams.value.option = env.value.option;
@@ -299,7 +427,8 @@ export default {
       }
       else urlParams.value.cooperate = '';
       // lang
-      i18n.global.locale = env.value.lang || 'en';
+      if(!env.value.lang) env.value.lang = 'en';
+      i18n.global.locale = env.value.lang;
     };
     loadEnv();
 
@@ -446,7 +575,7 @@ export default {
         }
         // 输出
         else if(result.code == 1) {
-          let output = aesDecrypt(aesDecrypt(result.data), secretKey.value);
+          const output = aesDecrypt(aesDecrypt(result.data), secretKey.value);
           if(UserTcodeExecutor.active) UserTcodeExecutor.outArray.push(output);
           if(recording.value) {
             recordInfo.value.push({
@@ -459,6 +588,23 @@ export default {
         // 更新协作者数量
         else if(result.code == 2) {
           onlineNumber.value = Number(aesDecrypt(aesDecrypt(result.data), secretKey.value));
+        }
+        // 更新文件传输列表
+        else if(result.code == 3) {
+          const fileTransInfo = JSON.parse(aesDecrypt(aesDecrypt(result.data), secretKey.value));
+          const index = parseInt(fileTransInfo.index);
+          const id = fileTransInfo.id;
+          // 已完成
+          if(index === 3) {
+            updateTransportLists(1, 1, id, null);
+            updateTransportLists(2, 1, id, null);
+            updateTransportLists(3, 0, id, fileTransInfo);
+          }
+          // 正在上传/正在下载
+          else {
+            updateTransportLists(0, 1, id, null);
+            updateTransportLists(index, 0, id, fileTransInfo);
+          }
         }
       };
       // 断开连接
@@ -535,7 +681,7 @@ export default {
     // 右键事件函数
     const doPaste = async function(event) {
       event.preventDefault();   // 阻止默认的上下文菜单弹出
-      let pasteText = await navigator.clipboard.readText();
+      const pasteText = await navigator.clipboard.readText();
       sendMessage(pasteText);
     };
 
@@ -569,8 +715,8 @@ export default {
       // 监听选中文本，自动复制
       term.onSelectionChange(async () => {
         if (term.hasSelection()) {
-          let copyText = term.getSelection();
-          let copyTextTrim = copyText.trim();
+          const copyText = term.getSelection();
+          const copyTextTrim = copyText.trim();
           if(copyTextTrim && copyTextTrim != '') await toClipboard(copyText);
         }
       });
@@ -677,6 +823,8 @@ export default {
       if(statusMonitorRef.value) statusMonitorRef.value.deepCloseDialog();
       // 高级-Docker模块
       if(dockerBlockRef.value) dockerBlockRef.value.deepCloseDialog();
+      // 传输列表
+      resetTransportLists();
     };
 
     const setTcodeStatus = (transTcode, state) => {
@@ -691,7 +839,7 @@ export default {
     const tcode = ref('');
     const handleTcode = async () => {
       if(!tcode.value || tcode.value.length < 2) return;
-      let transTcode = tcode.value.toUpperCase();
+      const transTcode = tcode.value.toUpperCase();
       tcode.value = '';
       // 功能TCode
       if(transTcode[0] == '/' && FuncTcode[transTcode]) FuncTcode[transTcode].execFlow(instance);
@@ -706,9 +854,9 @@ export default {
           UserTcodeExecutor.active = true;
           // 执行流未被定义
           if(!tcodes.value[transTcode].execFlow || !(tcodes.value[transTcode].execFlow instanceof Function)) {
-            let textflow = tcodes.value[transTcode].workflow.toString();
+            const textFlow = tcodes.value[transTcode].workflow.toString();
             try {
-              tcodes.value[transTcode].execFlow = new Function('kkTerminal', `return (async function() { ${textflow} })()`);
+              tcodes.value[transTcode].execFlow = new Function('kkTerminal', `return (async function() { ${textFlow} })()`);
             } catch (error) {
               setTcodeStatus(transTcode, 'Compile Error');
               ElMessage({
@@ -775,8 +923,7 @@ export default {
     const userTcodeRef = ref();
     // 批量导入TCode
     const importTCodes = (data) => {
-      let tCodeData = {};
-      tCodeData = {...tcodes.value,...data};
+      const tCodeData = {...tcodes.value,...data};
       localStoreUtil.setItem(localStore['tcodes'], aesEncrypt(JSON.stringify(tCodeData)));
       loadTCodes();
     };
@@ -800,7 +947,7 @@ export default {
     // 帮助
     const helpTcodeRef = ref();
     const handleSaveTCode = (name, content) => {
-      let data = {};
+      const data = {};
       data[name] = {
         desc: tcodes.value[name].desc || '',
         workflow: content || '',
@@ -831,6 +978,52 @@ export default {
     // 部署容器
     const runContainer = (cmd) => {
       sendMessage(cmd);
+    };
+
+    // 传输列表
+    const waitingList = ref({});
+    const uploadingList = ref({});
+    const downloadingList = ref({});
+    const finishedList = ref({});       // status: 0成功 1失败
+    const transportLists = {
+      0: waitingList,
+      1: uploadingList,
+      2: downloadingList,
+      3: finishedList
+    };
+    const resetTransportLists = () => {
+      waitingList.value = {};
+      uploadingList.value = {};
+      downloadingList.value = {};
+      finishedList.value = {};
+      isShowDot.value = false;
+    };
+    // type: 0增/改 1删 2查
+    const updateTransportLists = (index, type, id, item) => {
+      const operateList = transportLists[index % 4];
+      // 查询
+      if(type === 2) return operateList.value[id];
+      // 删除
+      delete operateList.value[id];
+      // 新增/修改
+      if(type === 0) {
+        const delta = {};
+        delta[id] = item;
+        operateList.value = {...delta, ...operateList.value};
+      }
+      isShowDot.value = true;
+    };
+    const isShowDot = ref(false);
+    const isShowDropdown = ref(false);
+    const changeDropdownShowStatus = (status) => {
+      isShowDropdown.value = status;
+      isShowDot.value = false;
+    };
+    const openFolder = (path) => {
+      fileBlockRef.value.dir = path;
+      fileBlockRef.value.confirmDirCorrect();
+      fileBlockRef.value.getDirList();
+      fileBlockRef.value.DialogVisible = true;
     };
 
     onMounted(async () => {
@@ -911,8 +1104,18 @@ export default {
       handleCooperate,
       endCooperateConfirm,
       calcType,
+      calcSize,
       installDocker,
       runContainer,
+      waitingList,
+      uploadingList,
+      downloadingList,
+      finishedList,
+      updateTransportLists,
+      isShowDot,
+      isShowDropdown,
+      changeDropdownShowStatus,
+      openFolder,
     }
 
   }
@@ -921,8 +1124,7 @@ export default {
 
 
 <style scoped>
-
-.golbal {
+.global {
   position: relative;
   width: 100%;
   display: flex;
@@ -933,6 +1135,12 @@ export default {
 .kk-flex {
   display: flex;
   align-items: center;
+}
+
+.kk-flex-column {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
 }
 
 .bar {
@@ -1001,12 +1209,74 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 18px;
 }
 
 .disabled {
   background-color: #f5f7fa;
   color: #a8abb2;
   pointer-events: none;
+}
+
+.trans-items {
+  height: 256px;
+  overflow-y: scroll;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* Internet Explorer 和 Edge */
+}
+
+/* 隐藏滚动条 */
+.trans-items::-webkit-scrollbar {
+  display: none !important; /* Chrome 和 Safari */
+}
+
+.trans-item {
+  padding: 10px 15px;
+  border-bottom: 1px solid #efefef;
+  width: 100%;
+}
+
+.trans-item:hover {
+  background-color: #f3f3f3;
+}
+
+.folder-hover {
+  font-size: 20px;
+  cursor: pointer;
+  color: #606266;
+}
+
+.folder-hover:hover {
+  color: #409eff;
+}
+
+.close-hover {
+  font-size: 20px;
+  cursor: pointer;
+  color: #606266;
+}
+
+.close-hover:hover {
+  color: #F56C6C;
+}
+
+.trans-item-name {
+  color: #4f4f4f;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.trans-item-size {
+  color: #474747;
+  font-size: 12px;
+}
+</style>
+
+<style>
+.trans-tabs .el-tabs__content {
+  padding: 0 0 !important;
+}
+
+.trans-progress .el-progress__text {
+  font-size: 12px !important;
 }
 </style>

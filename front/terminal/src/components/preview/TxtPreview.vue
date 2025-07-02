@@ -229,6 +229,7 @@ export default {
     const changeEncode = (type, name) => {
       // 打开编码
       if(type === 0) {
+        if(openEncode.value == name) return;
         if(!loading.value) initText();
         openEncode.value = name;
         DialogVisible.value = true;
@@ -408,5 +409,4 @@ export default {
 #editor-bar::-webkit-scrollbar {
   display: none !important; /* Chrome 和 Safari */
 }
-
 </style>

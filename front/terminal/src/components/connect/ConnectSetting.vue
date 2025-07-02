@@ -345,7 +345,6 @@ export default {
 </script>
 
 <style scoped>
-
 .item-class {
   display: flex;
   align-items: center;
@@ -384,5 +383,4 @@ export default {
 .form-width {
   width: 56px;
 }
-
 </style>

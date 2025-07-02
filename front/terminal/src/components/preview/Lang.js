@@ -70,7 +70,7 @@ const langs = {
 const getSuffix = (name) => {
     let suffix = 'txt';
     if(name && name.length > 0) {
-      let index = name.lastIndexOf('.');
+      const index = name.lastIndexOf('.');
       if(index !== -1) suffix = name.substring(index + 1).toLowerCase();
     }
     return suffix;

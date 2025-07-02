@@ -12,7 +12,7 @@
       draggable
   >
     <div class="no-select" >
-      <el-tabs element-loading-text="Loading..." v-loading="loading" @tab-click="handleTabClick" type="border-card" >
+      <el-tabs stretch element-loading-text="Loading..." v-loading="loading" @tab-click="handleTabClick" type="border-card" >
         <el-tab-pane :label="$t('部署')" >
           <div v-if="noDocker" class="kk-flex-column" style="height: 240px" >
             <div style="flex: 1" ></div>
@@ -140,7 +140,7 @@
             <el-table-column show-overflow-tooltip prop="port" :label="$t('端口')" />
           </el-table>
           <div v-else >
-            <NoData height="240px" msg="No Data"></NoData>
+            <NoData height="240px" ></NoData>
           </div>
           <div class="kk-flex" v-if="dockerInfo.container.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
@@ -168,7 +168,7 @@
             <el-table-column show-overflow-tooltip prop="createTime" :label="$t('创建时间')" width="140" sortable />
           </el-table>
           <div v-else >
-            <NoData height="240px" msg="No Data"></NoData>
+            <NoData height="240px" ></NoData>
           </div>
           <div class="kk-flex" v-if="dockerInfo.image.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
@@ -193,7 +193,7 @@
             <el-table-column show-overflow-tooltip prop="createTime" :label="$t('创建时间')" width="140" sortable />
           </el-table>
           <div v-else >
-            <NoData height="240px" msg="No Data"></NoData>
+            <NoData height="240px" ></NoData>
           </div>
           <div class="kk-flex" v-if="dockerInfo.network.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
@@ -217,7 +217,7 @@
             <el-table-column show-overflow-tooltip prop="createTime" :label="$t('创建时间')" width="140" sortable />
           </el-table>
           <div v-else >
-            <NoData height="240px" msg="No Data"></NoData>
+            <NoData height="240px" ></NoData>
           </div>
           <div class="kk-flex" v-if="dockerInfo.volume.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
@@ -694,5 +694,4 @@ export default {
 #docker-appstore::-webkit-scrollbar {
   display: none !important; /* Chrome 和 Safari */
 }
-
 </style>

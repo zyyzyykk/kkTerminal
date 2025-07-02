@@ -23,7 +23,7 @@
         </div>
       </div>
       <div v-else class="kk-border">
-        <NoData :msg="$t(noDataMsg)"></NoData>
+        <NoData msg="暂无配置" ></NoData>
       </div>
       <div class="kk-flex">
         <div>{{ $t('配置名') }}：</div>
@@ -63,7 +63,6 @@ export default {
   setup(props,context) {
     // 控制Dialog显示
     const DialogVisible = ref(false);
-    const noDataMsg = ref(i18n.global.k('暂无配置'));
 
     // 目标配置
     const aimOption = ref('');
@@ -93,7 +92,6 @@ export default {
 
     // 重置
     const reset = () => {
-      noDataMsg.value = i18n.global.k('暂无配置');
       aimOption.value = '';
       deleteOption.value = '';
       DialogVisible.value = false;
@@ -110,7 +108,6 @@ export default {
 
     return {
       DialogVisible,
-      noDataMsg,
       aimOption,
       confirm,
       confirmDeleteOption,

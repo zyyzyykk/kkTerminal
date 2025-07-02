@@ -3,11 +3,11 @@ import { generateRandomString } from "@/utils/StringUtil";
 
 export const dockerAppTypes = [
     i18n.global.k('全部'),
-    i18n.global.k('工具'),
-    i18n.global.k('开发'),
-    i18n.global.k('建站'),
+    i18n.global.k('实用工具'),
+    i18n.global.k('开发&运维'),
+    i18n.global.k('个人建站'),
     i18n.global.k('数据库'),
-    i18n.global.k('网盘'),
+    i18n.global.k('网盘存储'),
 ];
 
 export const dockerAppStore = [
