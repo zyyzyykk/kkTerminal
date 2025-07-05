@@ -11,7 +11,7 @@ import { computed } from 'vue';
 import { SuccessFilled, WarningFilled, CircleCloseFilled, InfoFilled } from '@element-plus/icons-vue'
 
 export default {
-  name: 'TcodeStatus',
+  name: 'TCodeStatus',
   components: {
     SuccessFilled,
     WarningFilled,

@@ -191,7 +191,7 @@ export default {
     const optionBlockType = ref(0);
 
     const showOption = (type) => {
-      if(type == 1 && verifyParams() == false) return;
+      if(type == 1 && !verifyParams()) return;
       optionBlockType.value = type;
       optionBlockRef.value.aimOption = '';
       optionBlockRef.value.DialogVisible = true;
@@ -251,7 +251,7 @@ export default {
     };
 
     const confirm = () => {
-      if(verifyParams() == false) return;
+      if(!verifyParams()) return;
       if(isNewWindow.value && (setInfo.value.option && setInfo.value.option.length > 0)) {
         window.open(getPureUrl() + '?option=' + setInfo.value.option, '_blank');
         return;

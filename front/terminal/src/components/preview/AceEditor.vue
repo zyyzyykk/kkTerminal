@@ -55,7 +55,7 @@ import 'ace-builds/src-noconflict/snippets/xml';
 import 'ace-builds/src-noconflict/snippets/yaml';
 
 import langToMode from './Lang';
-import { userTcodeExecutorCompleter } from '@/components/tcode/Tcode';
+import { userTCodeExecutorCompleter } from '@/components/tcode/TCode';
 
 export default {
   name: 'AceEditor',
@@ -88,8 +88,7 @@ export default {
       if (aceEditor.value) {
         aceEditor.value.setReadOnly(isReadOnly);
         // 只读时设置背景色，非只读时恢复默认
-        const backgroundColor = isReadOnly ? '#f0f0f0' : '';
-        aceEditorRef.value.style.backgroundColor = backgroundColor;
+        aceEditorRef.value.style.backgroundColor = isReadOnly ? '#f0f0f0' : '';
       }
     };
     // 设置缩进
@@ -139,7 +138,7 @@ export default {
         mode: 'ace/mode/text',                                // 高亮
       });
       // 自定义智能提示
-      aceEditor.value.completers.push(userTcodeExecutorCompleter);
+      aceEditor.value.completers.push(userTCodeExecutorCompleter);
 
       // 禁用 Web Workers
       aceEditor.value.session.setOption("useWorker", false);

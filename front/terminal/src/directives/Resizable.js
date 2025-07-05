@@ -14,7 +14,7 @@ const getTransformX = (element) => {
  * v-resizable: width resize for Dialog
  */
 const resizableDirective = {
-    updated(el) {
+    updated(el, binding) {
         setTimeout(() => {
             // 获取必要的DOM元素
             const header = el.querySelector('.el-dialog__header');
@@ -25,8 +25,9 @@ const resizableDirective = {
             if(handle) return;
             const dialog = el.querySelector('.el-dialog');
             // 最小/最大宽度
-            const minWidth = dialog.offsetWidth / 2;
-            const maxWidth = Math.min(dialog.offsetWidth * 2, document.documentElement.clientWidth * 0.8);
+            const { minWidthRate, maxWidthRate } = binding.value || {};
+            const minWidth = dialog.offsetWidth / (minWidthRate || 2);
+            const maxWidth = Math.min(dialog.offsetWidth * (maxWidthRate || 2), document.documentElement.clientWidth * 0.8);
             // 创建拖拽条
             const leftHandle = document.createElement('div');
             leftHandle.classList.add('resize-handle', 'handle-left');

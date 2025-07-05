@@ -1,5 +1,5 @@
 <template>
-  <div v-resizable >
+  <div v-resizable="{ maxWidthRate: 1.2 }" >
     <el-dialog
         v-model="DialogVisible"
         :before-close="closeDialog"

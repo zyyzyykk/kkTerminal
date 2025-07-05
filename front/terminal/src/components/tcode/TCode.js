@@ -7,7 +7,7 @@ const storageSessionPrefix = sessionStore['tcode-vars'];
 import i18n from "@/locales/i18n";
 
 // 功能TCode, 以 / 开头
-export const FuncTcode = {
+export const FuncTCode = {
     '/A': {
         desc: i18n.global.k('自定义TCode'),
         execFlow(context) {
@@ -51,7 +51,7 @@ export const FuncTcode = {
 };
 
 // 系统TCode, 以 S 开头
-export const SysTcode = {
+export const SysTCode = {
     'SC': {
         desc: i18n.global.k('连接设置'),
         execFlow(context) {
@@ -100,7 +100,7 @@ export const SysTcode = {
 };
 
 // 用户TCode, 以 U 开头
-export const UserTcodeExecutor = {
+export const UserTCodeExecutor = {
     active: false,
     display: true,
     outArray: [],
@@ -115,29 +115,29 @@ export const UserTcodeExecutor = {
             }
         },
         local(key,value) {
-            let tcodeLocalVars = {};
+            let tCodeLocalVars = {};
             if(localStoreUtil.getItem(storageLocalKey)) {
-                tcodeLocalVars = JSON.parse(aesDecrypt(localStoreUtil.getItem(storageLocalKey)));
+                tCodeLocalVars = JSON.parse(aesDecrypt(localStoreUtil.getItem(storageLocalKey)));
             }
             if(value != undefined) {
-                tcodeLocalVars[key] = value;
-                localStoreUtil.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tcodeLocalVars)));
+                tCodeLocalVars[key] = value;
+                localStoreUtil.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tCodeLocalVars)));
             }
-            else return tcodeLocalVars[key];
+            else return tCodeLocalVars[key];
         },
         clean() {
             if(arguments.length == 0) {
                 localStoreUtil.removeItem(storageLocalKey);
                 return;
             }
-            let tcodeLocalVars = {};
+            let tCodeLocalVars = {};
             if(localStoreUtil.getItem(storageLocalKey)) {
-                tcodeLocalVars = JSON.parse(aesDecrypt(localStoreUtil.getItem(storageLocalKey)));
+                tCodeLocalVars = JSON.parse(aesDecrypt(localStoreUtil.getItem(storageLocalKey)));
             }
             for (let i = 0; i < arguments.length; i++) {
-                delete tcodeLocalVars[arguments[i]];
+                delete tCodeLocalVars[arguments[i]];
             }
-            localStoreUtil.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tcodeLocalVars)));
+            localStoreUtil.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tCodeLocalVars)));
         }
     },
     // 仅向terminal写入，不等待
@@ -214,7 +214,7 @@ export const TCodeStatusEnum = {
 
 
 // 编辑器添加kkTerminal智能提示
-export const userTcodeExecutorCompleter = {
+export const userTCodeExecutorCompleter = {
   getCompletions: function(editor, session, pos, prefix, callback) {
     const userTcodeExecutorCompletions = [
       {
@@ -298,4 +298,29 @@ export const userTcodeExecutorCompleter = {
       };
     }));
   }
+};
+
+// 历史TCode
+export const historyTCode = {
+    tCodes: [],
+    index: 0,
+    add(latestTCode) {
+        this.tCodes.push(latestTCode);
+        this.index = this.tCodes.length;
+    },
+    up(currentTCode) {
+        if(this.tCodes.length === 0) return currentTCode;
+        this.index--;
+        if(this.index < 0) this.index = 0;
+        return this.tCodes[this.index];
+    },
+    down(currentTCode) {
+        if(this.tCodes.length === 0) return currentTCode;
+        this.index++;
+        if(this.index >= this.tCodes.length) {
+            this.index = this.tCodes.length;
+            return '';
+        }
+        return this.tCodes[this.index];
+    },
 };

@@ -455,17 +455,4 @@ export default {
 .no-select {
   user-select: none;
 }
-
-/* 文本溢出省略 */
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 18px;
-}
-
-/* 不换行 */
-.nowrap {
-  white-space: nowrap;
-}
 </style>

@@ -73,10 +73,3 @@ export default {
   }
 }
 </script>
-
-<style scoped >
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
-</style>

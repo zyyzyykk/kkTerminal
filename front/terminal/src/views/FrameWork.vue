@@ -183,7 +183,7 @@
             <el-input
               v-model="tcode"
               :style="{ width: '100px', height: '20px', fontSize: '12px'}"
-              @keydown.enter="handleTcode"
+              @keydown="handleTCode"
               maxlength="6"
               :placeholder="$t('终端代码')"
             >
@@ -222,9 +222,9 @@
   <!-- 文件管理 -->
   <FileBlock ref="fileBlockRef" :sshKey="sshKey" :os="osInfo.clientOS" @updateTransportLists="updateTransportLists" ></FileBlock>
   <!-- 用户TCode -->
-  <UserTcode ref="userTcodeRef" @importTCodes="importTCodes" @exportTCodes="exportTCodes" ></UserTcode>
+  <UserTCode ref="userTCodeRef" @importTCodes="importTCodes" @exportTCodes="exportTCodes" ></UserTCode>
   <!-- 帮助TCode -->
-  <HelpTcode ref="helpTcodeRef" :userTCodes="tcodes" @handleSaveTCode="handleSaveTCode" @handleDeleteTCode="handleDeleteTCode" ></HelpTcode>
+  <HelpTCode ref="helpTCodeRef" :userTCodes="tcodes" @handleSaveTCode="handleSaveTCode" @handleDeleteTCode="handleDeleteTCode" ></HelpTCode>
   <!--协作-->
   <CooperateGen ref="cooperateGenRef" :sshKey="sshKey" :advance="env.advance" @handleCooperate="handleCooperate" ></CooperateGen>
   <!--监控-->
@@ -253,14 +253,14 @@ import { http_base_url } from '@/env/BaseUrl';
 import ConnectSetting from '@/components/connect/ConnectSetting';
 import StyleSetting from '@/components/StyleSetting';
 import FileBlock from "@/components/file/FileBlock";
-import UserTcode from '@/components/tcode/UserTcode';
-import HelpTcode from "@/components/tcode/HelpTcode";
+import UserTCode from '@/components/tcode/UserTCode';
+import HelpTCode from "@/components/tcode/HelpTCode";
 import CooperateGen from '@/components/advance/CooperateGen';
 import StatusMonitor from '@/components/advance/StatusMonitor'
 import DockerBlock from "@/components/advance/DockerBlock";
 import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
 import { QuestionFilled, VideoPlay, VideoPause, ChromeFilled, ArrowRight, UserFilled, FolderOpened, CircleClose } from '@element-plus/icons-vue';
-import { FuncTcode, SysTcode, UserTcodeExecutor } from "@/components/tcode/Tcode";
+import {FuncTCode, SysTCode, UserTCodeExecutor, tCodeHistory, historyTCode} from "@/components/tcode/TCode";
 
 import i18n from "@/locales/i18n";
 import { cloud, load, syncUpload, syncDownload, localStoreUtil } from "@/utils/CloudUtil";
@@ -282,8 +282,8 @@ export default {
     ConnectSetting,
     StyleSetting,
     FileBlock,
-    UserTcode,
-    HelpTcode,
+    UserTCode,
+    HelpTCode,
     CooperateGen,
     StatusMonitor,
     QuestionFilled,
@@ -388,7 +388,7 @@ export default {
         tcodes.value = JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['tcodes'])));
       }
       setTimeout(() => {
-        helpTcodeRef.value.userTCodes = {...tcodes.value};
+        helpTCodeRef.value.userTCodes = {...tcodes.value};
       },1);
     };
     loadTCodes();
@@ -576,14 +576,14 @@ export default {
         // 输出
         else if(result.code == 1) {
           const output = aesDecrypt(aesDecrypt(result.data), secretKey.value);
-          if(UserTcodeExecutor.active) UserTcodeExecutor.outArray.push(output);
+          if(UserTCodeExecutor.active) UserTCodeExecutor.outArray.push(output);
           if(recording.value) {
             recordInfo.value.push({
               time: new Date().getTime(),
               content: output,
             });
           }
-          if(!(UserTcodeExecutor.active && !UserTcodeExecutor.display)) termWrite(output);
+          if(!(UserTCodeExecutor.active && !UserTCodeExecutor.display)) termWrite(output);
         }
         // 更新协作者数量
         else if(result.code == 2) {
@@ -620,7 +620,7 @@ export default {
           now_connect_status.value = connect_status.value['Disconnected'];
           termWrite("\r\n" + now_connect_status.value);
         }
-        userTcodeExecutorReset();
+        userTCodeExecutorReset();
       };
     };
 
@@ -667,7 +667,7 @@ export default {
           termFit();
           isFirst.value = false;
         }
-        if(UserTcodeExecutor.active === active) socket.value.send(aesEncrypt(JSON.stringify({type:0,content:text,rows:0,cols:0}), secretKey.value));
+        if(UserTCodeExecutor.active === active) socket.value.send(aesEncrypt(JSON.stringify({type:0,content:text,rows:0,cols:0}), secretKey.value));
       }
     };
 
@@ -716,8 +716,7 @@ export default {
       term.onSelectionChange(async () => {
         if (term.hasSelection()) {
           const copyText = term.getSelection();
-          const copyTextTrim = copyText.trim();
-          if(copyTextTrim && copyTextTrim != '') await toClipboard(copyText);
+          if(copyText.trim()) await toClipboard(copyText);
         }
       });
 
@@ -827,65 +826,75 @@ export default {
       resetTransportLists();
     };
 
-    const setTcodeStatus = (transTcode, state) => {
-      tcodes.value[transTcode].status = state;
+    const setTCodeStatus = (transTCode, state) => {
+      tcodes.value[transTCode].status = state;
       localStoreUtil.setItem(localStore['tcodes'], aesEncrypt(JSON.stringify(tcodes.value)));
       setTimeout(() => {
-        helpTcodeRef.value.userTCodes = {...tcodes.value};
+        helpTCodeRef.value.userTCodes = {...tcodes.value};
       },1);
     };
 
     // 处理终端代码
     const tcode = ref('');
-    const handleTcode = async () => {
+    const handleTCode = async (event) => {
+      // 历史TCode
+      if(event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        if(event.key === 'ArrowUp') tcode.value = historyTCode.up(tcode.value);
+        else tcode.value = historyTCode.down(tcode.value);
+        return;
+      }
+      if(event.key !== 'Enter') return;
+      event.preventDefault();
       if(!tcode.value || tcode.value.length < 2) return;
-      const transTcode = tcode.value.toUpperCase();
+      const transTCode = tcode.value.toUpperCase();
       tcode.value = '';
+      historyTCode.add(transTCode);
       // 功能TCode
-      if(transTcode[0] == '/' && FuncTcode[transTcode]) FuncTcode[transTcode].execFlow(instance);
+      if(transTCode[0] == '/' && FuncTCode[transTCode]) FuncTCode[transTCode].execFlow(instance);
       // 系统TCode
-      else if(transTcode[0] == 'S' && SysTcode[transTcode]) SysTcode[transTcode].execFlow(instance);
+      else if(transTCode[0] == 'S' && SysTCode[transTCode]) SysTCode[transTCode].execFlow(instance);
       // 用户TCode
-      else if(transTcode[0] == 'U' && tcodes.value[transTcode]) {
-        if(!UserTcodeExecutor.writeOnly) UserTcodeExecutor.writeOnly = sendMessage;
+      else if(transTCode[0] == 'U' && tcodes.value[transTCode]) {
+        if(!UserTCodeExecutor.writeOnly) UserTCodeExecutor.writeOnly = sendMessage;
         // 未激活
-        if(UserTcodeExecutor.active == false) {
-          userTcodeExecutorReset();
-          UserTcodeExecutor.active = true;
+        if(!UserTCodeExecutor.active) {
+          userTCodeExecutorReset();
+          UserTCodeExecutor.active = true;
           // 执行流未被定义
-          if(!tcodes.value[transTcode].execFlow || !(tcodes.value[transTcode].execFlow instanceof Function)) {
-            const textFlow = tcodes.value[transTcode].workflow.toString();
+          if(!tcodes.value[transTCode].execFlow || !(tcodes.value[transTCode].execFlow instanceof Function)) {
+            const textFlow = tcodes.value[transTCode].workflow.toString();
             try {
-              tcodes.value[transTcode].execFlow = new Function('kkTerminal', `return (async function() { ${textFlow} })()`);
+              tcodes.value[transTCode].execFlow = new Function('kkTerminal', `return (async function() { ${textFlow} })()`);
             } catch (error) {
-              setTcodeStatus(transTcode, 'Compile Error');
+              setTCodeStatus(transTCode, 'Compile Error');
               ElMessage({
-                message: 'TCode-' + transTcode + ' ' + i18n.global.t('编译错误：') + error,
+                message: 'TCode-' + transTCode + ' ' + i18n.global.t('编译错误：') + error,
                 type: 'error',
                 grouping: true,
               });
-              userTcodeExecutorReset();
+              userTCodeExecutorReset();
               return;
             }
           }
           // 执行Workflow
           try {
-            await tcodes.value[transTcode].execFlow(UserTcodeExecutor);
+            await tcodes.value[transTCode].execFlow(UserTCodeExecutor);
             ElMessage({
-              message: 'TCode-' + transTcode + ' ' + i18n.global.t('工作流结束'),
+              message: 'TCode-' + transTCode + ' ' + i18n.global.t('工作流结束'),
               type: 'success',
               grouping: true,
             });
-            setTcodeStatus(transTcode, 'Execute Success');
+            setTCodeStatus(transTCode, 'Execute Success');
           } catch(error) {
             ElMessage({
-              message: 'TCode-' + transTcode + ' ' + i18n.global.t('执行中断：') + error,
+              message: 'TCode-' + transTCode + ' ' + i18n.global.t('执行中断：') + error,
               type: 'warning',
               grouping: true,
             });
-            setTcodeStatus(transTcode, 'Execute Interrupt');
+            setTCodeStatus(transTCode, 'Execute Interrupt');
           } finally {
-            userTcodeExecutorReset();
+            userTCodeExecutorReset();
           }
         }
         else {
@@ -897,9 +906,9 @@ export default {
         }
       }
       else {
-        if(transTcode[0] == '/' || transTcode[0] == 'S' || transTcode[0] == 'U') {
+        if(transTCode[0] == '/' || transTCode[0] == 'S' || transTCode[0] == 'U') {
           ElMessage({
-            message: 'TCode-' + transTcode + i18n.global.t('不存在'),
+            message: 'TCode-' + transTCode + i18n.global.t('不存在'),
             type: 'warning',
             grouping: true,
           });
@@ -914,13 +923,13 @@ export default {
       }
     };
     // 重置用户TCode执行器
-    const userTcodeExecutorReset = () => {
-      UserTcodeExecutor.active = false;
-      UserTcodeExecutor.display = true;
-      UserTcodeExecutor.outArray = [];
-      UserTcodeExecutor.cnt = 0;
+    const userTCodeExecutorReset = () => {
+      UserTCodeExecutor.active = false;
+      UserTCodeExecutor.display = true;
+      UserTCodeExecutor.outArray = [];
+      UserTCodeExecutor.cnt = 0;
     };
-    const userTcodeRef = ref();
+    const userTCodeRef = ref();
     // 批量导入TCode
     const importTCodes = (data) => {
       const tCodeData = {...tcodes.value,...data};
@@ -945,7 +954,7 @@ export default {
       URL.revokeObjectURL(url);
     };
     // 帮助
-    const helpTcodeRef = ref();
+    const helpTCodeRef = ref();
     const handleSaveTCode = (name, content) => {
       const data = {};
       data[name] = {
@@ -1086,15 +1095,15 @@ export default {
       saveOp,
       deleteOp,
       tcode,
-      handleTcode,
+      handleTCode,
       closeBlock,
       resetTerminal,
       tcodes,
-      userTcodeRef,
+      userTCodeRef,
       sendMessage,
       importTCodes,
       exportTCodes,
-      helpTcodeRef,
+      helpTCodeRef,
       handleSaveTCode,
       handleDeleteTCode,
       osInfo,
