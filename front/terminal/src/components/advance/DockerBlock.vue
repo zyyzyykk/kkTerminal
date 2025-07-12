@@ -296,7 +296,7 @@ export default {
           sshKey:sshKey,
         },
         success(resp) {
-          if(resp.status == 'success') {
+          if(resp.status === 'success') {
             noDocker.value = false;
             handleTabClick({index: 0});
           }
@@ -317,7 +317,7 @@ export default {
           type:currentType,
         },
         success(resp) {
-          if(resp.status == 'success') {
+          if(resp.status === 'success') {
             noDocker.value = false;
             let container = dockerInfo.value.container;
             let image = dockerInfo.value.image;

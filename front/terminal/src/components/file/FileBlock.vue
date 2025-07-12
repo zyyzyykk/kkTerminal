@@ -29,11 +29,11 @@
           </div>
           <div class="kk-flex" >
             <div class="hover-class operate-icon" @click="doRefresh" ><el-icon><Refresh /></el-icon></div>
-            <div v-if="dir && dir != '/'" class="hover-class operate-icon" @click="doReturn" ><el-icon><Fold /></el-icon></div>
+            <div v-if="dir && dir !== '/'" class="hover-class operate-icon" @click="doReturn" ><el-icon><Fold /></el-icon></div>
             <div v-else class="disabled-function operate-icon" ><el-icon><Fold /></el-icon></div>
-            <div v-if="selectedFiles.length == 1" class="hover-class operate-icon" @click="doDownload" ><el-icon><Download /></el-icon></div>
+            <div v-if="selectedFiles.length === 1" class="hover-class operate-icon" @click="doDownload" ><el-icon><Download /></el-icon></div>
             <div v-else class="disabled-function operate-icon" ><el-icon><Download /></el-icon></div>
-            <div v-if="dirStatus == 0" class="hover-class operate-icon" >
+            <div v-if="dirStatus === 0" class="hover-class operate-icon" >
               <el-dropdown v-show="DialogVisible" style="line-height: unset;" placement="bottom-end" size="small" trigger="click" >
                 <div class="hover-class" style="font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
                 <template #dropdown>
@@ -85,14 +85,14 @@
                 </div>
               </template>
               <template v-else>
-                <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
-                  <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] == '.' || (isClipboard(item.id) != -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
-                  <div style="margin: 0 10px;" v-if="isShowRenameInput && renameFile && item.id == renameFile.id" >
+                <div :class="[isSelected(item.id) !== -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
+                  <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] === '.' || (isClipboard(item.id) !== -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
+                  <div style="margin: 0 10px;" v-if="isShowRenameInput && renameFile && item.id === renameFile.id" >
                     <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                   </div>
                   <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
                     <template #content>
-                      <div v-if="!(isShowRenameInput && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
+                      <div v-if="!(isShowRenameInput && renameFile && item.id === renameFile.id)" class="ellipsis" style="margin: 0 10px;">
                         {{ item.name }}
                       </div>
                     </template>
@@ -139,12 +139,12 @@
   <!-- 菜单项 -->
   <div ref="menuBlockRef" @contextmenu="preventDefault" v-show="isShowMenu" class="kk-menu no-select">
     <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(1)" key="1" >{{ $t('刷新') }}</div>
-    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >{{ $t('打开') }}</div>
+    <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >{{ $t('打开') }}</div>
     <div style="border-bottom: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length > 1 ? 'disabled':'']" @click="handleMenuSelect(3)" key="3" >{{ $t('复制路径') }}</div>
-    <div style="border-bottom: 1px solid #ddd;" v-show="selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)" :class="['kk-menu-item', !(selectedFiles.length == 1 && isZipFile(selectedFiles[0].name)) ? 'disabled':'']" @click="handleMenuSelect(9)" key="9" >{{ $t('解压') }}</div>
-    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >{{ $t('下载') }}</div>
-    <div :class="['kk-menu-item', dirStatus == 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >{{ $t('新建') }}</div>
-    <div :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >{{ $t('重命名') }}</div>
+    <div style="border-bottom: 1px solid #ddd;" v-show="selectedFiles.length === 1 && isZipFile(selectedFiles[0].name)" :class="['kk-menu-item', !(selectedFiles.length === 1 && isZipFile(selectedFiles[0].name)) ? 'disabled':'']" @click="handleMenuSelect(9)" key="9" >{{ $t('解压') }}</div>
+    <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >{{ $t('下载') }}</div>
+    <div :class="['kk-menu-item', dirStatus === 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >{{ $t('新建') }}</div>
+    <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >{{ $t('重命名') }}</div>
     <el-popconfirm :title="$t('确定删除此文件吗?')"
       :confirm-button-text="$t('确定')" :cancel-button-text="$t('取消')"
       @confirm="confirmPopConfirm" @cancel="cancelPopConfirm"
@@ -152,12 +152,12 @@
       :popper-style="{zIndex: 3466,fontSize:'13px',color:'black'}" popper-class="confirmPop"
       placement="right" confirm-button-type="danger" >
       <template #reference>
-        <div :class="['kk-menu-item', selectedFiles.length == 0 ? 'disabled':'']" key="7" >
+        <div :class="['kk-menu-item', selectedFiles.length === 0 ? 'disabled':'']" key="7" >
           <div @click="handleMenuSelect(7)" >{{ $t('删除') }}</div>
         </div>
       </template>
     </el-popconfirm>
-    <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length != 1 ? 'disabled':'']" @click="handleMenuSelect(8)" key="8" >{{ $t('属性') }}</div>
+    <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(8)" key="8" >{{ $t('属性') }}</div>
   </div>
 
 </template>
@@ -223,7 +223,7 @@ export default {
       const index = isSelected(item.id);
       // 右键
       if(!click) {
-        if(index == -1) {
+        if(index === -1) {
           lastSelectedIndex = item.index;
           selectedFiles.value = [];
           selectedFiles.value.push(item);
@@ -233,22 +233,22 @@ export default {
       // 单击
       // shift
       if(event.shiftKey) {
-        if(selectedFiles.value.length == 0 || lastSelectedIndex == -1 || lastSelectedIndex >= files.value.length) {
+        if(selectedFiles.value.length === 0 || lastSelectedIndex === -1 || lastSelectedIndex >= files.value.length) {
           selectedFiles.value = [];
           for(let i=0;i<=item.index;i++) selectedFiles.value.push({...files.value[i]});
           lastSelectedIndex = -1;
         }
         else {
           selectedFiles.value = [];
-          const start = Math.min(item.index,lastSelectedIndex);
-          const end = Math.max(item.index,lastSelectedIndex);
+          const start = Math.min(item.index, lastSelectedIndex);
+          const end = Math.max(item.index, lastSelectedIndex);
           for(let i=start;i<=end;i++) selectedFiles.value.push({...files.value[i]});
         }
       }
       // ctrl
-      else if((props.os == "Windows" && event.ctrlKey) || ((props.os == "Mac" || props.os == "iOS") && event.metaKey)) {
+      else if((props.os === "Windows" && event.ctrlKey) || ((props.os === "Mac" || props.os === "iOS") && event.metaKey)) {
         lastSelectedIndex = item.index;
-        if(index != -1) selectedFiles.value.splice(index, 1);
+        if(index !== -1) selectedFiles.value.splice(index, 1);
         else selectedFiles.value.push(item);
       }
       else {
@@ -259,19 +259,19 @@ export default {
     };
     const isSelected = (id) => {
       for(let i=0;i<selectedFiles.value.length;i++) {
-        if(id == selectedFiles.value[i].id) return i;
+        if(id === selectedFiles.value[i].id) return i;
       }
       return -1;
     };
     const isClipboard = (id) => {
       for(let i=0;i<fileClipboard.value.files.length;i++) {
-        if(id == fileClipboard.value.files[i].id) return i;
+        if(id === fileClipboard.value.files[i].id) return i;
       }
       return -1;
     };
     const getFileInfoByName = (name) => {
       for(let i=0;i<files.value.length;i++) {
-        if(files.value[i].name == name) return files.value[i];
+        if(files.value[i].name === name) return files.value[i];
       }
       return null;
     };
@@ -280,19 +280,19 @@ export default {
     const dirLevels = ref([]);
     // 保证路径正确
     const confirmDirCorrect = () => {
-      if(dir.value == '' || dir.value[0] != '/') dir.value = '/' + dir.value;
-      if(dir.value[dir.value.length - 1] != '/') dir.value = dir.value + '/';
+      if(dir.value === '' || dir.value[0] !== '/') dir.value = '/' + dir.value;
+      if(dir.value[dir.value.length - 1] !== '/') dir.value = dir.value + '/';
       dir.value = dir.value.replace(/\/{2,}/g, '/');
       // 更新路径显示
       calcDirLevel(dir.value);
     };
     const calcDirLevel = (fullPath) => {
-      if(fullPath == '/') dirLevels.value = [];
+      if(fullPath === '/') dirLevels.value = [];
       else dirLevels.value = fullPath.substring(1,fullPath.length - 1).split('/');
     };
     const changeDirByLevel = (event,index) => {
       // not ctrl
-      if(!((props.os == "Windows" && event.ctrlKey) || ((props.os == "Mac" || props.os == "iOS") && event.metaKey))) return;
+      if(!((props.os === "Windows" && event.ctrlKey) || ((props.os === "Mac" || props.os === "iOS") && event.metaKey))) return;
       event.preventDefault();
       let aimDir = '/';
       for(let i=0;i<=index;i++) {
@@ -308,13 +308,13 @@ export default {
       if(dir.value) return;
       $.ajax({
         url: http_base_url + '/home',
-        type:'get',
-        data:{
-          time:new Date().getTime(),
-          sshKey:props.sshKey,
+        type: 'get',
+        data: {
+          time: new Date().getTime(),
+          sshKey: props.sshKey,
         },
-        success(resp){
-          if(resp.status == 'success') {
+        success(resp) {
+          if(resp.status === 'success') {
             noDataMsg.value = i18n.global.k('暂无文件');
             dirStatus.value = 0;
             dir.value = resp.data;
@@ -336,7 +336,7 @@ export default {
     const noDataMsg = ref(i18n.global.k('暂无文件'));
     // 目录状态：0 正常 / 1 目录不存在、无权限等
     const dirStatus = ref(0);
-    const getDirList = () => {
+    const getDirList = (callback) => {
       if(!dir.value) {
         getInitDir();
         return;
@@ -344,20 +344,20 @@ export default {
       const now_dir = dir.value;
       $.ajax({
         url: http_base_url + '/ls',
-        type:'get',
-        data:{
-          time:new Date().getTime(),
-          sshKey:props.sshKey,
-          path:now_dir,
+        type: 'get',
+        data: {
+          time: new Date().getTime(),
+          sshKey: props.sshKey,
+          path: now_dir,
         },
         beforeSend: function() { // 发送请求前执行的方法
           loading.value = true;
           files.value = [];
         },
-        success(resp){
-          if(now_dir == dir.value) {
+        success(resp) {
+          if(now_dir === dir.value) {
             selectedFiles.value = [];
-            if(resp.status == 'success') {
+            if(resp.status === 'success') {
               files.value = osFileNaturalSort(resp.data);
               noDataMsg.value = i18n.global.k('暂无文件');
               dirStatus.value = 0;
@@ -377,6 +377,7 @@ export default {
                 }
                 else fileAttrRef.value.closeDialog();
               }
+              if(callback) callback();
             }
             else {
               files.value = [];
@@ -389,14 +390,30 @@ export default {
           }
         },
         complete: function() { // 发送请求完成后执行的方法
-          if(now_dir == dir.value) loading.value = false;
+          if(now_dir === dir.value) loading.value = false;
         }
       });
+    };
+    const fileBlockView = (path, name) => {
+      dir.value = path;
+      confirmDirCorrect();
+      getDirList(() => {
+        const fileInfo = getFileInfoByName(name);
+        if(fileInfo) {
+          lastSelectedIndex = fileInfo.index;
+          selectedFiles.value = [];
+          selectedFiles.value.push(fileInfo);
+          setTimeout(() => {
+            fileAreaRef.value.scrollTop = 31 * fileInfo.index;
+          }, 1);
+        }
+      });
+      DialogVisible.value = true;
     };
 
     // 获取远程文件url
     const getRemoteFileUrl = (name, path) => {
-      return http_base_url + '/download/remote/file' + '?time=' + new Date().getTime() + '&fileName=' + encodeURIComponent(name) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(path ? path : dir.value);
+      return http_base_url + '/download/remote/file' + '?time=' + new Date().getTime() + '&fileName=' + encodeURIComponent(name) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(path ? path : dir.value) + '&type=download';
     };
     // 获取远程文件夹url
     const getRemoteFolderUrl = (name, path) => {
@@ -448,8 +465,8 @@ export default {
     // 返回上一级
     const doReturn = () => {
       if(isShowDirInput.value) return;
-      if(dir.value == '/') return;
-      if(dir.value[dir.value.length - 1] == '/') dir.value = dir.value.substring(0,dir.value.length - 1);
+      if(dir.value === '/') return;
+      if(dir.value[dir.value.length - 1] === '/') dir.value = dir.value.substring(0,dir.value.length - 1);
       const index = dir.value.lastIndexOf('/');
       if(index !== -1) dir.value = dir.value.substring(0, index + 1);
       confirmDirCorrect();
@@ -459,8 +476,8 @@ export default {
     // 下载文件/文件夹
     const doDownload = () => {
       if(isShowDirInput.value) return;
-      if(selectedFiles.value.length == 1 && selectedFiles.value[0].name && selectedFiles.value[0].isDirectory) downloadDir(selectedFiles.value[0].name);
-      if(selectedFiles.value.length == 1 && selectedFiles.value[0].name && !selectedFiles.value[0].isDirectory) downloadRemoteFile(selectedFiles.value[0].name);
+      if(selectedFiles.value.length === 1 && selectedFiles.value[0].name && selectedFiles.value[0].isDirectory) downloadDir(selectedFiles.value[0].name);
+      if(selectedFiles.value.length === 1 && selectedFiles.value[0].name && !selectedFiles.value[0].isDirectory) downloadRemoteFile(selectedFiles.value[0].name);
     };
     // 上传文件
     const chunkSize = 1024 * 2173;   // 每一片大小2173kB
@@ -473,8 +490,10 @@ export default {
         const fileName = file.name;
         const fileSize = file.size;
         // 允许上传空文件
-        const chunks = parseInt(Math.ceil(fileSize / chunkSize)) == 0 ? 1 : parseInt(Math.ceil(fileSize / chunkSize));
-        const fileId = file.uid.toString();
+        const chunks = (Math.ceil(fileSize / chunkSize) === 0) ? 1 : Math.ceil(fileSize / chunkSize);
+        // 文件id统一为UUID
+        file.uid = crypto.randomUUID();
+        const fileId = file.uid;
         const chunkIndex = 1;
         const path = data.pathVal ? data.pathVal : dir.value;
 
@@ -519,12 +538,12 @@ export default {
           formData.append('path',path);
           await $.ajax({
             url: http_base_url + '/upload',
-            type:'post',
+            type: 'post',
             data: formData,
             contentType : false,
             processData : false,
-            success(resp){
-              if(resp.status == 'success') {
+            success(resp) {
+              if(resp.status === 'success') {
                 // 文件后台上传中
                 if(resp.code == 202) {
                   ElMessage({
@@ -532,7 +551,7 @@ export default {
                     type: resp.status,
                     grouping: true,
                   });
-                  if(path == dir.value) {
+                  if(path === dir.value) {
                     setTimeout(() => {
                       getDirList();
                     }, Math.min(1000, 500 + chunks * 10));
@@ -540,7 +559,7 @@ export default {
                 }
                 else {
                   // 更新传输列表（等待中）进度
-                  fileTransInfo.progress = ((chunk / chunks) * 100).toFixed(0);
+                  fileTransInfo.progress = Math.floor((chunk / chunks) * 100);
                   context.emit('updateTransportLists', 0, 0, fileId, fileTransInfo);
                 }
               }
@@ -570,7 +589,7 @@ export default {
 
     const doShowDirInput = (event) => {
       // ctrl
-      if((props.os == "Windows" && event.ctrlKey) || ((props.os == "Mac" || props.os == "iOS") && event.metaKey)) return;
+      if((props.os === "Windows" && event.ctrlKey) || ((props.os === "Mac" || props.os === "iOS") && event.metaKey)) return;
       isShowDirInput.value = true;
       setTimeout(() => {
         document.querySelector('#aimDirInput').focus();
@@ -592,12 +611,11 @@ export default {
     // 保存文本，写回服务器
     const doSave = (name, url, arrayBuffer) => {
       const urlParams = getUrlParams(url);
-      if(urlParams.sshKey != props.sshKey) return;
+      if(urlParams.sshKey !== props.sshKey) return;
       // 创建Blob对象
       const blob = new Blob([arrayBuffer], { type: 'application/octet-stream' });
       // 创建File对象
       const file = new File([blob], name);
-      file.uid = Math.random().toString(36).substring(2);
       doUpload({file:file}, {pathVal: urlParams.path, startUpLoad:i18n.global.t("修改保存中"),alert:i18n.global.t('文件后台保存中')});
     };
 
@@ -617,7 +635,6 @@ export default {
         // 文件类型
         if(item.isFile && !item.isDirectory) {
           item.file(file => {
-            file.uid = Math.random().toString(36).substring(2);
             doUpload({file:file}, {pathVal: basePath});
           });
         }
@@ -626,14 +643,14 @@ export default {
           const nowPath = basePath + item.name;
           $.ajax({
             url: http_base_url + '/mkdir',
-            type:'post',
-            data:{
-              sshKey:props.sshKey,
-              path:basePath,
-              item:item.name,
+            type: 'post',
+            data: {
+              sshKey: props.sshKey,
+              path: basePath,
+              item: item.name,
             },
-            success(resp){
-              if(resp.status == 'success') {
+            success(resp) {
+              if(resp.status === 'success') {
                 getDirList();
                 folderUpload(item, nowPath + '/');
               }
@@ -658,7 +675,6 @@ export default {
           // 文件类型
           if(item.isFile && !item.isDirectory) {
             item.file(file => {
-              file.uid = Math.random().toString(36).substring(2);
               doUpload({file:file}, {pathVal: basePath, noStartUpLoad: true});
             });
           }
@@ -667,14 +683,14 @@ export default {
             const nowPath = basePath + item.name;
             $.ajax({
               url: http_base_url + '/mkdir',
-              type:'post',
-              data:{
-                sshKey:props.sshKey,
-                path:basePath,
-                item:item.name,
+              type: 'post',
+              data: {
+                sshKey: props.sshKey,
+                path: basePath,
+                item: item.name,
               },
-              success(resp){
-                if(resp.status == 'success') {
+              success(resp) {
+                if(resp.status === 'success') {
                   folderUpload(item, nowPath + '/');
                 }
                 else {
@@ -706,8 +722,8 @@ export default {
           break;
         // 打开
         case 2:
-          if(selectedFiles.value.length == 1 && selectedFiles.value[0].isDirectory) changeDir(dir.value + selectedFiles.value[0].name + '/');
-          else if(selectedFiles.value.length == 1 && !selectedFiles.value[0].isDirectory) preViewFile(selectedFiles.value[0].name);
+          if(selectedFiles.value.length === 1 && selectedFiles.value[0].isDirectory) changeDir(dir.value + selectedFiles.value[0].name + '/');
+          else if(selectedFiles.value.length === 1 && !selectedFiles.value[0].isDirectory) preViewFile(selectedFiles.value[0].name);
           break;
         // 复制路径
         case 3:
@@ -720,7 +736,7 @@ export default {
             });
           }
           else {
-            const path = dir.value + (selectedFiles.value.length == 1 ? selectedFiles.value[0].name : '');
+            const path = dir.value + (selectedFiles.value.length === 1 ? selectedFiles.value[0].name : '');
             await toClipboard(path);
             ElMessage({
               message: i18n.global.t('复制成功'),
@@ -732,7 +748,7 @@ export default {
           break;
         // 下载
         case 4:
-          if(selectedFiles.value.length == 1) doDownload();
+          if(selectedFiles.value.length === 1) doDownload();
           break;
         // 新建
         case 5:
@@ -741,7 +757,7 @@ export default {
           break;
         // 重命名
         case 6:
-          if(selectedFiles.value.length == 1) {
+          if(selectedFiles.value.length === 1) {
             renameFile.value = {...selectedFiles.value[0]};
             isShowRenameInput.value = true;
             setTimeout(() => {
@@ -755,7 +771,7 @@ export default {
           break;
         // 属性
         case 8:
-          if(selectedFiles.value.length == 1) {
+          if(selectedFiles.value.length === 1) {
             fileAttrRef.value.reset();
             fileAttrRef.value.fileInfo = {...selectedFiles.value[0]};
             fileAttrRef.value.fileDir = dir.value;
@@ -767,14 +783,14 @@ export default {
           break;
         // 解压
         case 9:
-          if(selectedFiles.value.length == 1 && isZipFile(selectedFiles.value[0].name)) {
+          if(selectedFiles.value.length === 1 && isZipFile(selectedFiles.value[0].name)) {
             untar();
           }
           break;
         default:
           break;
       }
-      if(type != 7) {
+      if(type !== 7) {
         isShowMenu.value = false;
         isShowPop.value = false;
       }
@@ -787,7 +803,7 @@ export default {
     // 右键显示
     const handleContextMenu = (event) => {
       // 点击空白处
-      if(event.target.id == 'fileArea') selectedFiles.value = [];
+      if(event.target.id === 'fileArea') selectedFiles.value = [];
       menuBlockRef.value.style.top = event.clientY - 135 + 'px';
       menuBlockRef.value.style.left = event.clientX + 1 + 'px';
       isShowMenu.value = true;
@@ -798,7 +814,7 @@ export default {
     const handleRename = (item) => {
       isShowRenameInput.value = false;
       // 校验
-      if(item.name == renameFile.value.name) {
+      if(item.name === renameFile.value.name) {
         renameFile.value = {};
         return;
       }
@@ -829,13 +845,13 @@ export default {
     const doRename = (oldPath,newPath) => {
       $.ajax({
         url: http_base_url + '/rename',
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
-          oldPath:oldPath,
-          newPath:newPath,
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
+          oldPath: oldPath,
+          newPath: newPath,
         },
-        success(resp){
+        success(resp) {
           ElMessage({
             message: resp.info,
             type: resp.status,
@@ -849,16 +865,16 @@ export default {
     const confirmPopConfirm = () => {
       isShowMenu.value = false;
       isShowPop.value = false;
-      if(selectedFiles.value.length == 0) return;
+      if(selectedFiles.value.length === 0) return;
       $.ajax({
         url: http_base_url + '/rm-rf',
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
-          path:escapePath(dir.value),
-          items:selectedFiles.value.map(e => escapeItem(e.name)).join(' '),
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
+          path: escapePath(dir.value),
+          items: selectedFiles.value.map(e => escapeItem(e.name)).join(' '),
         },
-        success(resp){
+        success(resp) {
           ElMessage({
             message: resp.info,
             type: resp.status,
@@ -876,13 +892,13 @@ export default {
     const handleMkFile = (isFolder, name, nowDir) => {
       $.ajax({
         url: http_base_url + (isFolder ? '/mkdir' : '/touch'),
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
-          path:isFolder ? nowDir : escapePath(nowDir),
-          item:isFolder ? name : escapeItem(name),
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
+          path: isFolder ? nowDir : escapePath(nowDir),
+          item: isFolder ? name : escapeItem(name),
         },
-        success(resp){
+        success(resp) {
           ElMessage({
             message: resp.info,
             type: resp.status,
@@ -905,12 +921,12 @@ export default {
       const upDistance = index * itemWidth;
       const downDistance = upDistance + itemWidth;
       // 获取可视区域的高度
-      const viewWidth = fileAreaRef.value.clientHeight;
+      const viewHeight = fileAreaRef.value.clientHeight;
       // 获取当前滚动位置
       const currentScrollTop = fileAreaRef.value.scrollTop;
       // 当前项不完全在可视区内
       if(upDistance < currentScrollTop) fileAreaRef.value.scrollTop = upDistance;
-      else if(downDistance > currentScrollTop + viewWidth) fileAreaRef.value.scrollTop = downDistance - viewWidth;
+      else if(downDistance > currentScrollTop + viewHeight) fileAreaRef.value.scrollTop = downDistance - viewHeight;
     };
 
     // 文件快捷键操作
@@ -927,14 +943,14 @@ export default {
       if(event.key === 'ArrowUp' || event.key === 'ArrowDown') {
         // 上箭头
         if(event.key === 'ArrowUp') {
-          if(lastSelectedIndex == -1 || lastSelectedIndex > files.value.length) lastSelectedIndex = files.value.length;
+          if(lastSelectedIndex === -1 || lastSelectedIndex > files.value.length) lastSelectedIndex = files.value.length;
           lastSelectedIndex--;
-          lastSelectedIndex = Math.max(0,lastSelectedIndex);
+          lastSelectedIndex = Math.max(0, lastSelectedIndex);
         }
         // 下箭头
         else if(event.key === 'ArrowDown') {
           lastSelectedIndex++;
-          lastSelectedIndex = Math.min(files.value.length - 1,lastSelectedIndex);
+          lastSelectedIndex = Math.min(files.value.length - 1, lastSelectedIndex);
         }
         isShowMenu.value = false;
         isShowPop.value = false;
@@ -949,14 +965,14 @@ export default {
           isShowPop.value = false;
           return;
         }
-        if(selectedFiles.value.length == 1) {
+        if(selectedFiles.value.length === 1) {
           const item = selectedFiles.value[0];
           if(item.isDirectory) changeDir(dir.value + item.name + '/');
           else preViewFile(item.name);
         }
       }
       // ctrl
-      if ((props.os == "Windows" && event.ctrlKey) || ((props.os == "Mac" || props.os == "iOS") && event.metaKey)) {
+      if ((props.os === "Windows" && event.ctrlKey) || ((props.os === "Mac" || props.os === "iOS") && event.metaKey)) {
         switch (String.fromCharCode(event.which).toLowerCase()) {
           // 全选
           case 'a':
@@ -973,7 +989,7 @@ export default {
             break;
           // 粘贴
           case 'v':
-            if(fileClipboard.value.files.length == 0) return;
+            if(fileClipboard.value.files.length === 0) return;
             fileCopyMove(isCtrlx.value ? 'mv' : 'cp');
             if(isCtrlx.value) {
               isCtrlx.value = false;
@@ -997,18 +1013,18 @@ export default {
 
     // 文件复制/剪切
     const fileCopyMove = (mode) => {
-      if(fileClipboard.value.path == dir.value) return;
+      if(fileClipboard.value.path === dir.value) return;
       $.ajax({
         url: http_base_url + '/' + mode,
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
-          src:escapePath(fileClipboard.value.path),
-          dst:escapePath(dir.value),
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
+          src: escapePath(fileClipboard.value.path),
+          dst: escapePath(dir.value),
           items: fileClipboard.value.files.map(e => escapeItem(e.name)).join(' '),
         },
-        success(resp){
-          if(resp.status == 'success') getDirList();
+        success(resp) {
+          if(resp.status === 'success') getDirList();
           // 复制剪切失败
           else {
             ElMessage({
@@ -1028,16 +1044,16 @@ export default {
     // 文件上传类型
     const fileUploadTypeChoose = (type) => {
       // 文件上传
-      if(type == 0) {
+      if(type === 0) {
         document.querySelector('#fileUploadInputButton').click();
       }
       // 文件夹上传
-      else if(type == 1) {
+      else if(type === 1) {
         document.querySelector('#folderUploadInput').value = '';
         document.querySelector('#folderUploadInput').click();
       }
       // URL上传
-      else if(type == 2) {
+      else if(type === 2) {
         fileUrlRef.value.DialogVisible = true;
       }
     };
@@ -1073,20 +1089,19 @@ export default {
       const fileObj = filesArr[now];
       $.ajax({
         url: http_base_url + '/mkdir',
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
-          path:basePath,
-          item:fileObj.path,
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
+          path: basePath,
+          item: fileObj.path,
         },
-        success(resp){
-          if(resp.status == 'success') {
-            if(now == 0) getDirList();
+        success(resp) {
+          if(resp.status === 'success') {
+            if(now === 0) getDirList();
             if(now < filesArr.length - 1) folderInputUpload(basePath,filesArr, now+1);
             // 子文件上传
             for(let i=0;i<fileObj.files.length;i++) {
               const file = fileObj.files[i];
-              file.uid = Math.random().toString(36).substring(2);
               doUpload({file:file}, {pathVal: basePath + fileObj.path, noStartUpLoad: true});
             }
           }
@@ -1107,14 +1122,14 @@ export default {
     const fileUrlUpload = (url,fileName) => {
       $.ajax({
         url: http_base_url + '/wget',
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
-          path:escapePath(dir.value),
-          item:escapeItem(fileName),
-          url:encodeURI(url),
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
+          path: escapePath(dir.value),
+          item: escapeItem(fileName),
+          url: encodeURI(url),
         },
-        success(resp){
+        success(resp) {
           ElMessage({
             message: resp.info,
             type: resp.status,
@@ -1129,13 +1144,13 @@ export default {
     const untar = () => {
       $.ajax({
         url: http_base_url + '/untar',
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
-          path:escapePath(dir.value),
-          item:escapeItem(selectedFiles.value[0].name),
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
+          path: escapePath(dir.value),
+          item: escapeItem(selectedFiles.value[0].name),
         },
-        success(resp){
+        success(resp) {
           ElMessage({
             message: resp.info,
             type: resp.status,
@@ -1150,21 +1165,21 @@ export default {
     const editPermissions = (path,item, permissionsInfo) => {
       $.ajax({
         url: http_base_url + '/chmod',
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
-          path:escapePath(path),
-          item:escapeItem(item),
-          perms:getChmodValue(permissionsInfo),
-          sub:permissionsInfo.sub || false,
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
+          path: escapePath(path),
+          item: escapeItem(item),
+          perms: getChmodValue(permissionsInfo),
+          sub: permissionsInfo.sub || false,
         },
-        success(resp){
+        success(resp) {
           ElMessage({
             message: resp.info,
             type: resp.status,
             grouping: true,
           });
-          if(resp.status == 'success') {
+          if(resp.status === 'success') {
             if(fileAttrRef.value && fileAttrRef.value.permissionsEditRef) fileAttrRef.value.permissionsEditRef.closeDialog();
             getDirList();
           }
@@ -1253,6 +1268,7 @@ export default {
       files,
       getInitDir,
       getDirList,
+      fileBlockView,
       downloadRemoteFile,
       downloadDir,
       changeDir,

@@ -161,6 +161,9 @@ export default {
         xhrFields: {
           responseType: 'arraybuffer'
         },
+        data: {
+          type: 'open',
+        },
         dataFilter(resp) {
           return resp;
         },

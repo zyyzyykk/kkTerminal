@@ -12,9 +12,9 @@ export const FuncTCode = {
         desc: i18n.global.k('自定义TCode'),
         execFlow(context) {
             setTimeout(() => {
-                context.proxy.userTcodeRef.initText();
+                context.proxy.userTCodeRef.initText();
             },1);
-            context.proxy.userTcodeRef.DialogVisible = true;
+            context.proxy.userTCodeRef.DialogVisible = true;
         }
     },
     '/O': {
@@ -45,7 +45,7 @@ export const FuncTCode = {
     '/H': {
         desc: i18n.global.k('帮助'),
         execFlow(context) {
-            context.proxy.helpTcodeRef.DialogVisible = true;
+            context.proxy.helpTCodeRef.DialogVisible = true;
         }
     },
 };
@@ -108,7 +108,7 @@ export const UserTCodeExecutor = {
     // 变量
     variables: {
         session(key,value) {
-            if(value != undefined) sessionStorage.setItem(storageSessionPrefix + key,JSON.stringify(value));
+            if(value) sessionStorage.setItem(storageSessionPrefix + key,JSON.stringify(value));
             else {
                 if(sessionStorage.getItem(storageSessionPrefix + key)) return JSON.parse(sessionStorage.getItem(storageSessionPrefix + key));
                 else return null;
@@ -119,14 +119,14 @@ export const UserTCodeExecutor = {
             if(localStoreUtil.getItem(storageLocalKey)) {
                 tCodeLocalVars = JSON.parse(aesDecrypt(localStoreUtil.getItem(storageLocalKey)));
             }
-            if(value != undefined) {
+            if(value) {
                 tCodeLocalVars[key] = value;
                 localStoreUtil.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tCodeLocalVars)));
             }
             else return tCodeLocalVars[key];
         },
         clean() {
-            if(arguments.length == 0) {
+            if(arguments.length === 0) {
                 localStoreUtil.removeItem(storageLocalKey);
                 return;
             }
@@ -144,10 +144,11 @@ export const UserTCodeExecutor = {
     writeOnly: null,
     // 向terminal写入并等待
     async writeAndWait(content, time = 200) {
-        if(content && content.length > 0 && content[content.length - 1] != '\n' && content[content.length - 1] != '\r') content += '\n';
+        if(!content) content = '\n';
+        else if(content[content.length - 1] != '\n' && content[content.length - 1] != '\r') content += '\n';
         this.cnt = this.outArray.length;
-        this.writeOnly(content,true);
-        await new Promise(resolve => setTimeout(resolve, time > 0 ? time : 0));
+        this.writeOnly(content, true);
+        await new Promise(resolve => setTimeout(resolve, Math.max(0, time)));
     },
     // writeAndWait简写
     write(content, time = 200) {
@@ -216,7 +217,7 @@ export const TCodeStatusEnum = {
 // 编辑器添加kkTerminal智能提示
 export const userTCodeExecutorCompleter = {
   getCompletions: function(editor, session, pos, prefix, callback) {
-    const userTcodeExecutorCompletions = [
+    const userTCodeExecutorCompletions = [
       {
         name: "kkTerminal",
         value: "kkTerminal",
@@ -289,7 +290,7 @@ export const userTCodeExecutorCompleter = {
       }
     ];
 
-    callback(null, userTcodeExecutorCompletions.map((completion) => {
+    callback(null, userTCodeExecutorCompletions.map((completion) => {
       return {
         caption: completion.caption || completion.name,
         value: completion.value,

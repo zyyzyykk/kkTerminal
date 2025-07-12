@@ -2,7 +2,7 @@
 export const changeStr = (str) => {
   let result = '';
   for (let i = 0; i < str.length; i++) {
-    if(str[i] != '/') result += str[i];
+    if(str[i] !== '/') result += str[i];
     else result += '@';
   }
 
@@ -13,7 +13,7 @@ export const changeStr = (str) => {
 export const changeStr2 = (str) => {
   let result = '';
   for (let i = 0; i < str.length; i++) {
-    if(str[i] != '@') result += str[i];
+    if(str[i] !== '@') result += str[i];
     else result += '-';
   }
 
@@ -56,7 +56,7 @@ export const escapeItem = (str) => {
 
 // 文件自然排序
 export const osFileNaturalSort = (files) => {
-  return files.sort((a, b) => {
+  const naturalSortedFiles = files.sort((a, b) => {
     const nameA = a.name;
     const nameB = b.name;
     // 隐藏文件优先
@@ -65,4 +65,6 @@ export const osFileNaturalSort = (files) => {
     // 启用数字感知并忽略大小写和变音符号
     return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
   });
+  for(let i = 0; i < naturalSortedFiles.length; i++) naturalSortedFiles[i].index = i;
+  return naturalSortedFiles;
 };

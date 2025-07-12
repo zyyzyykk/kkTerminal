@@ -1,7 +1,7 @@
 <template>
-  <el-tooltip popper-class="no-select" :content="content" :disabled="!(isShow && isShowTooltip)" :show-after="delay" placement="top">
-    <div ref="tooltipContent" class="tooltip-content">
-      <slot name="content"></slot>
+  <el-tooltip popper-class="no-select" :content="content" :disabled="!(isShow && isShowTooltip)" :show-after="delay" placement="top" >
+    <div ref="toolTipContentRef" class="tooltip-content" >
+      <slot name="content" ></slot>
     </div>
   </el-tooltip>
 </template>
@@ -30,14 +30,14 @@ export default {
   },
   setup() {
 
-    const tooltipContent = ref(null);
+    const toolTipContentRef = ref(null);
     const isShowTooltip = ref(false);
 
     // 检查内容是否溢出
     const checkOverflow = () => {
       setTimeout(() => {
-        if(tooltipContent.value && tooltipContent.value.firstElementChild) {
-          isShowTooltip.value = tooltipContent.value.firstElementChild.scrollWidth > tooltipContent.value.firstElementChild.offsetWidth;
+        if(toolTipContentRef.value && toolTipContentRef.value.firstElementChild) {
+          isShowTooltip.value = toolTipContentRef.value.firstElementChild.scrollWidth > toolTipContentRef.value.firstElementChild.offsetWidth;
         }
         else isShowTooltip.value = false;
       },1);
@@ -47,11 +47,11 @@ export default {
     let resizeObserver = null;
 
     const observeSizeChanges = () => {
-      if(tooltipContent.value) {
+      if(toolTipContentRef.value) {
         resizeObserver = new ResizeObserver(() => {
           checkOverflow();
         });
-        resizeObserver.observe(tooltipContent.value);
+        resizeObserver.observe(toolTipContentRef.value);
       }
     };
 
@@ -61,14 +61,14 @@ export default {
     });
 
     onBeforeUnmount(() => {
-      if(resizeObserver && tooltipContent.value) {
-        resizeObserver.unobserve(tooltipContent.value);
+      if(resizeObserver && toolTipContentRef.value) {
+        resizeObserver.unobserve(toolTipContentRef.value);
         resizeObserver.disconnect();
       }
     });
 
     return {
-      tooltipContent,
+      toolTipContentRef,
       isShowTooltip,
       checkOverflow,
     };
@@ -83,4 +83,4 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-</style>  
+</style>

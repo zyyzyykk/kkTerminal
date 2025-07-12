@@ -34,17 +34,20 @@ public class FileController {
      * 下载远程文件
      */
     @GetMapping("/download/remote/file")
-    public void downloadRemoteFile(HttpServletResponse response, String sshKey, String path, String fileName) throws IOException {
+    public void downloadRemoteFile(HttpServletResponse response, String sshKey, String path, String fileName, String type) throws IOException {
         SFTPClient sftpClient = getSftpClient(sshKey);
         // 构建 HTTP 响应，触发文件下载
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName,"UTF-8"));
-        readRemoteFile(sshKey, sftpClient, path, fileName, response);
+        readRemoteFile(response, sshKey, sftpClient, path, fileName, type);
     }
-    private void readRemoteFile(String sshKey, SFTPClient sftp, String path, String fileName, HttpServletResponse response) throws IOException {
+    private void readRemoteFile(HttpServletResponse response, String sshKey, SFTPClient sftp, String path, String fileName, String type) throws IOException {
         String id = UUID.randomUUID().toString();
         String remoteFilePath = path + fileName;
-        WebSocketServer.putFileTransportingMap(sshKey, id, new FileTransInfo(id, path, fileName, sftp.size(remoteFilePath), 2));
+        FileTransInfo fileTransInfo = new FileTransInfo(id, path, fileName, sftp.size(remoteFilePath), 2);
+        // 非浏览器下载
+        if(!"download".equals(type)) fileTransInfo.setId(null);
+        WebSocketServer.putFileTransportingMap(sshKey, id, fileTransInfo);
         try (RemoteFile file = sftp.open(remoteFilePath)) {
             try (InputStream is = file.new RemoteFileInputStream()) {
                 byte[] buffer = new byte[8096];
@@ -76,7 +79,8 @@ public class FileController {
         String id = UUID.randomUUID().toString();
         // 进入目录并打包
         String command = "cd " + path + " && tar -czvf - " + folderName + " | less";
-        WebSocketServer.putFileTransportingMap(sshKey, id, new FileTransInfo(id, path, folderName, -1L, 2));
+        FileTransInfo fileTransInfo = new FileTransInfo(id, path, folderName, -1L, 2);
+        WebSocketServer.putFileTransportingMap(sshKey, id, fileTransInfo);
         try(Session session = ssh.startSession();
             Session.Command cmd = session.exec(command);
             InputStream tarStream = cmd.getInputStream())
@@ -141,10 +145,8 @@ public class FileController {
         try {
             SFTPClient sftp = getSftpClient(sshKey);
             List<RemoteResourceInfo> files = sftp.ls(path);
-            int index = 0;
             for(RemoteResourceInfo file : files) {
                 FileInfo fileInfo = new FileInfo();
-                fileInfo.setIndex(index++);
                 fileInfo.setId(UUID.randomUUID().toString());
                 fileInfo.setName(file.getName());
                 // 是否为引用文件
@@ -158,7 +160,7 @@ public class FileController {
                 {
                     try {
                         fileInfo.setIsDirectory(FileMode.Type.DIRECTORY.equals(sftp.stat(path + "/" + file.getName()).getType()));
-                    } catch (net.schmizz.sshj.sftp.SFTPException e) {
+                    } catch (SFTPException e) {
                         e.printStackTrace();
                         fileInfo.setIsDirectory(false);
                     }
@@ -167,7 +169,7 @@ public class FileController {
                 fileInfo.setAttributes(file.getAttributes());
                 fileInfoList.add(fileInfo);
             }
-        } catch (net.schmizz.sshj.sftp.SFTPException e) {
+        } catch (SFTPException e) {
             e.printStackTrace();
             Response.StatusCode statusCode  = e.getStatusCode();
             if(Response.StatusCode.NO_SUCH_FILE.equals(statusCode)) {
@@ -643,7 +645,8 @@ public class FileController {
 
         // 上传完毕
         if(chunk.equals(chunks)) {
-            WebSocketServer.putFileTransportingMap(sshKey, id, new FileTransInfo(id, path, fileName, totalSize, 1));
+            FileTransInfo fileTransInfo = new FileTransInfo(id, path, fileName, totalSize, 1);
+            WebSocketServer.putFileTransportingMap(sshKey, id, fileTransInfo);
             Thread FileThread = new Thread(() -> {
                 try {
                     // 将文件片合并

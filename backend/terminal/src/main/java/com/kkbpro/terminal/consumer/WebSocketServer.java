@@ -58,6 +58,7 @@ public class WebSocketServer {
 
     public static void putFileTransportingMap(String sshKey, String key, FileTransInfo fileTransInfo) {
         fileTransportingMap.get(sshKey).put(key, fileTransInfo);
+        if(fileTransInfo.getId() == null) return;
         webSocketServerMap.get(sshKey).sendMessage(ResultCodeEnum.FILE_TRANSPORT_UPDATE.getDesc() ,"success", ResultCodeEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
     };
 
@@ -67,7 +68,8 @@ public class WebSocketServer {
 
     public static void removeFileTransportingMap(String sshKey, String key) {
         FileTransInfo fileTransInfo = getFileTransportingMap(sshKey, key);
-        // 修改类型为已完成
+        if(fileTransInfo == null || fileTransInfo.getId() == null) return;
+        // 修改类型为 已完成
         fileTransInfo.setIndex(3);
         fileTransportingMap.get(sshKey).remove(key);
         webSocketServerMap.get(sshKey).sendMessage(ResultCodeEnum.FILE_TRANSPORT_UPDATE.getDesc() ,"success", ResultCodeEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));

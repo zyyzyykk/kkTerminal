@@ -53,7 +53,7 @@
                     <div style="margin-top: 3px;" > {{ modifyTag + nowTCode }} </div>
                     <div style="cursor: pointer; margin-left: 10px;" >
                       <el-tooltip :content="TCodeStatusEnum[userTCodes[nowTCode].status]" placement="top">
-                        <TcodeStatus :style="{fontSize: '18px'}" :status="userTCodes[nowTCode].status" ></TcodeStatus>
+                        <TCodeStatus :style="{fontSize: '18px'}" :status="userTCodes[nowTCode].status" ></TCodeStatus>
                       </el-tooltip>
                     </div>
                     <div style="flex: 1;" ></div>

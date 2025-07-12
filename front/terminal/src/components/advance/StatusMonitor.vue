@@ -210,7 +210,7 @@ export default {
           sshKey:props.sshKey,
         },
         success(resp) {
-          if(resp.status == 'success') {
+          if(resp.status === 'success') {
             const statusArr = resp.data.split('^');
             const overviewArr = statusArr[0].split('@').map(item => {return calcNumber(item)});
             const top4Process = statusArr[1].split('$');
@@ -354,7 +354,7 @@ export default {
       if(timer.value == null) {
         setTimeout(() => {
           getStatusInfo();
-        }, 0);
+        }, 1);
         timer.value = setInterval(() => {
           getStatusInfo();
         },interval);

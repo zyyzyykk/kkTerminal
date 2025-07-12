@@ -80,7 +80,7 @@ export default {
           maxHeadCount:maxHC,
         },
         async success(resp) {
-          if(resp.status == 'success') {
+          if(resp.status === 'success') {
             const link = getPureUrl() + '?cooperate=' + resp.data;
             await toClipboard(link);
             ElMessage({

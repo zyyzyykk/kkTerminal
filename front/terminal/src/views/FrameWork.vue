@@ -1,7 +1,7 @@
 <template>
   <div class="global">
     <!-- 设置栏 -->
-    <div class="setting" v-show="isShowSetting && (urlParams.mode != 'headless' && urlParams.mode != 'pure')" >
+    <div class="setting" v-show="isShowSetting && (urlParams.mode !== 'headless' && urlParams.mode !== 'pure')" >
       <div class="setting-menu no-select" @click="doSettings(1)" ><div>{{ $t('连接设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(2)" ><div>{{ $t('偏好设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(4)" ><div>{{ $t('文件管理') }}</div></div>
@@ -13,18 +13,18 @@
       </div>
       <div class="setting-menu no-select" @click="doSettings(3)" ><div>{{ $t('重启') }}</div></div>
     </div>
-    <div @mousemove="showAdvance(true)" @mouseleave="showAdvance(false)" :class="['advance', (sshKey && env.advance) ? '':'disabled']" v-show="isShowSetting && isShowAdvance && (urlParams.mode != 'headless' && urlParams.mode != 'pure')" >
+    <div @mousemove="showAdvance(true)" @mouseleave="showAdvance(false)" :class="['advance', (sshKey && env.advance) ? '':'disabled']" v-show="isShowSetting && isShowAdvance && (urlParams.mode !== 'headless' && urlParams.mode !== 'pure')" >
       <div class="setting-menu no-select" @click="doSettings(6)" ><div>{{ $t('协作') }}</div></div>
       <div :class="['setting-menu', 'no-select', (env.server_user === 'root') ? '':'disabled']" @click="doSettings(7)" ><div>{{ $t('监控') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(8)" ><div>Docker</div></div>
     </div>
-    <div v-if="urlParams.mode != 'headless'" class="kk-flex bar">
+    <div v-if="urlParams.mode !== 'headless'" class="kk-flex bar">
       <div style="user-select: none;" @click="isShowSetting = !isShowSetting; isShowAdvance = false; showAdvance(false);" >
         <img src="@/assets/terminal.svg" alt="terminal" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
       <div class="ellipsis no-select" style="font-size: 14px; line-height: 18px;" ><span>kk Terminal</span></div>
       <div style="flex: 1;"></div>
-      <div v-show="urlParams.mode != 'headless' && urlParams.mode != 'pure'" class="kk-flex" >
+      <div v-show="urlParams.mode !== 'headless' && urlParams.mode !== 'pure'" class="kk-flex" >
         <div v-if="cooperating" class="bar-tag" >
           <el-tag size="small" @click="endCooperateConfirm" :type="calcType(onlineNumber, maxNumber)" effect="plain" >
             <div class="kk-flex no-select" >
@@ -106,7 +106,7 @@
                         <div class="trans-item-size" >{{ calcSize(item.size) }}</div>
                       </div>
                       <div style="flex: 1;" ></div>
-                      <el-icon @click="openFolder(item.path)" class="el-icon--left folder-hover" ><FolderOpened /></el-icon>
+                      <el-icon @click="fileBlockView(item.path, item.name)" class="el-icon--left folder-hover" ><FolderOpened /></el-icon>
                       <div style="margin-left: 10px;" ></div>
                       <el-icon @click="updateTransportLists(1, 1, item.id, null)" class="el-icon--left close-hover" ><CircleClose /></el-icon>
                       <div style="flex: 1;" ></div>
@@ -135,7 +135,7 @@
                         <div class="trans-item-size" >{{ calcSize(item.size) }}</div>
                       </div>
                       <div style="flex: 1;" ></div>
-                      <el-icon @click="openFolder(item.path)" class="el-icon--left folder-hover" ><FolderOpened /></el-icon>
+                      <el-icon @click="fileBlockView(item.path, item.name)" class="el-icon--left folder-hover" ><FolderOpened /></el-icon>
                       <div style="margin-left: 10px;" ></div>
                       <el-icon @click="updateTransportLists(2, 1, item.id, null)" class="el-icon--left close-hover" ><CircleClose /></el-icon>
                       <div style="flex: 1;" ></div>
@@ -164,7 +164,7 @@
                         <div class="trans-item-size" >{{ calcSize(item.size) }}</div>
                       </div>
                       <div style="flex: 1;" ></div>
-                      <el-icon @click="openFolder(item.path)" class="el-icon--left folder-hover" ><FolderOpened /></el-icon>
+                      <el-icon @click="fileBlockView(item.path, item.name)" class="el-icon--left folder-hover" ><FolderOpened /></el-icon>
                       <div style="margin-left: 10px;" ></div>
                       <el-icon @click="updateTransportLists(3, 1, item.id, null)" class="el-icon--left close-hover" ><CircleClose /></el-icon>
                       <div style="flex: 1;" ></div>
@@ -260,13 +260,14 @@ import StatusMonitor from '@/components/advance/StatusMonitor'
 import DockerBlock from "@/components/advance/DockerBlock";
 import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
 import { QuestionFilled, VideoPlay, VideoPause, ChromeFilled, ArrowRight, UserFilled, FolderOpened, CircleClose } from '@element-plus/icons-vue';
-import {FuncTCode, SysTCode, UserTCodeExecutor, tCodeHistory, historyTCode} from "@/components/tcode/TCode";
+import { FuncTCode, SysTCode, UserTCodeExecutor, historyTCode } from "@/components/tcode/TCode";
 
 import i18n from "@/locales/i18n";
 import { cloud, load, syncUpload, syncDownload, localStoreUtil } from "@/utils/CloudUtil";
 import { deleteDialog } from "@/utils/DeleteDialog";
 import { calcType } from "@/components/calc/CalcType";
 import { calcSize } from '@/components/calc/CalcSize';
+import { calcBgColor } from "@/components/calc/CalcColor";
 import { localStore, sessionStore } from "@/env/Store";
 import NoData from "@/components/NoData";
 import ToolTip from "@/components/ToolTip";
@@ -397,8 +398,8 @@ export default {
     const loadEnv = () => {
       if(localStoreUtil.getItem(localStore['env'])) env.value = {...env.value, ...JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['env'])))};
       // bg fg
-      if(urlParams.value.bg && urlParams.value.bg[0] != '#') urlParams.value.bg = '#' + urlParams.value.bg;
-      if(urlParams.value.fg && urlParams.value.fg[0] != '#') urlParams.value.fg = '#' + urlParams.value.fg;
+      if(urlParams.value.bg && urlParams.value.bg[0] !== '#') urlParams.value.bg = '#' + urlParams.value.bg;
+      if(urlParams.value.fg && urlParams.value.fg[0] !== '#') urlParams.value.fg = '#' + urlParams.value.fg;
       // cursorBlink tCode cloud
       if(urlParams.value.cursorBlink === 'true') urlParams.value.cursorBlink = true;
       else if(urlParams.value.cursorBlink === 'false') urlParams.value.cursorBlink = false;
@@ -417,13 +418,13 @@ export default {
       urlParams.value.option = env.value.option;
       // record
       if(urlParams.value.record) {
-        if(urlParams.value.mode != 'headless' && urlParams.value.mode != 'pure') urlParams.value.mode = 'pure';
+        if(urlParams.value.mode !== 'headless' && urlParams.value.mode !== 'pure') urlParams.value.mode = 'pure';
         now_connect_status.value = '';
       }
       else urlParams.value.record = '';
       // cooperate
       if(urlParams.value.cooperate) {
-        if(urlParams.value.mode != 'headless' && urlParams.value.mode != 'pure') urlParams.value.mode = 'pure';
+        if(urlParams.value.mode !== 'headless' && urlParams.value.mode !== 'pure') urlParams.value.mode = 'pure';
       }
       else urlParams.value.cooperate = '';
       // lang
@@ -451,27 +452,28 @@ export default {
     const isFirst = ref(true);
     const initTerminal = () => {
       term = new Terminal({
-        rendererType: "canvas",                               // 渲染类型
-        convertEol: true,                                     // 启用时，光标将设置为下一行的开头
-        scrollback: 0,                                        // 终端中的回滚量
-        disableStdin: false,                                  // 是否应禁用输入
-        cursorStyle: env.value.cursorStyle,                   // 光标样式 block
-        cursorBlink: env.value.cursorBlink,                   // 光标闪烁
+        convertEol: true,                                     // 设置光标为下一行开头
+        scrollback: 0,                                        // 终端回滚量
+        disableStdin: false,                                  // 是否禁用输入
+        cursorStyle: env.value.cursorStyle,                   // 光标样式(默认block)
+        cursorInactiveStyle: env.value.cursorStyle,           // 光标样式(失去焦点)
+        cursorBlink: env.value.cursorBlink,                   // 光标是否闪烁
         theme:{
-          foreground: env.value.fg,                           // 前景色
-          background: env.value.bg,                           // 背景色
-          cursor: "help",                                     // 设置光标
+          foreground: env.value.fg,                           // 终端前景色
+          background: env.value.bg,                           // 终端背景色
+          cursor: env.value.fg,                               // 光标颜色
+          selectionBackground: calcBgColor(env.value.bg),     // 选中文本背景色
         },
-        lineHeight: 1.2,
-        fontFamily: env.value.fontFamily,                     // 设置字体为 Consolas
-        fontSize: env.value.fontSize,                         // 设置字号为 16
+        lineHeight: 1.2,                                      // 文本行高
+        fontFamily: env.value.fontFamily,                     // 字体(默认Consolas)
+        fontSize: env.value.fontSize,                         // 字号(默认16)
       });
       term.loadAddon(fitAddon);
     };
 
     // 终端视高自适应
     const termFit = () => {
-      terminal.value.style.height = (window.innerHeight - (urlParams.value.mode != 'headless' ? 25 : 0)) + 'px';
+      terminal.value.style.height = (window.innerHeight - (urlParams.value.mode !== 'headless' ? 25 : 0)) + 'px';
       fitAddon.fit();
       // 修改虚拟终端行列大小
       if(socket.value && socket.value.readyState == WebSocket.OPEN && term) {
@@ -504,7 +506,7 @@ export default {
           sshKey:sshKey.value,
         },
         async success(resp) {
-          if(resp.status == 'success') {
+          if(resp.status === 'success') {
             maxNumber.value = 0;
             cooperating.value = false;
           }
@@ -569,7 +571,17 @@ export default {
             return;
           }
           sshKey.value = aesDecrypt(aesDecrypt(result.data), secretKey.value);
-          if(urlParams.value.cmd) sendMessage(urlParams.value.cmd + "\n");
+          if(urlParams.value.cmd) {
+            // bash命令
+            if(urlParams.value.cmd.toLowerCase().startsWith('bash:')) sendMessage(urlParams.value.cmd.substring(5) + "\n");
+            // TCode命令
+            else if(urlParams.value.cmd.toLowerCase().startsWith('tcode:')) {
+              setTimeout(() => {
+                tcode.value = urlParams.value.cmd.substring(6);
+                handleTCode({key: 'Enter'});
+              }, 400);
+            }
+          }
           if(env.value.advance && env.value.server_user === 'root' && statusMonitorRef.value) statusMonitorRef.value.doMonitor();
           if(env.value.advance && dockerBlockRef.value) dockerBlockRef.value.getDockerVersion(sshKey.value);
         }
@@ -845,17 +857,16 @@ export default {
         return;
       }
       if(event.key !== 'Enter') return;
-      event.preventDefault();
       if(!tcode.value || tcode.value.length < 2) return;
       const transTCode = tcode.value.toUpperCase();
       tcode.value = '';
       historyTCode.add(transTCode);
       // 功能TCode
-      if(transTCode[0] == '/' && FuncTCode[transTCode]) FuncTCode[transTCode].execFlow(instance);
+      if(transTCode[0] === '/' && FuncTCode[transTCode]) FuncTCode[transTCode].execFlow(instance);
       // 系统TCode
-      else if(transTCode[0] == 'S' && SysTCode[transTCode]) SysTCode[transTCode].execFlow(instance);
+      else if(transTCode[0] === 'S' && SysTCode[transTCode]) SysTCode[transTCode].execFlow(instance);
       // 用户TCode
-      else if(transTCode[0] == 'U' && tcodes.value[transTCode]) {
+      else if(transTCode[0] === 'U' && tcodes.value[transTCode]) {
         if(!UserTCodeExecutor.writeOnly) UserTCodeExecutor.writeOnly = sendMessage;
         // 未激活
         if(!UserTCodeExecutor.active) {
@@ -906,7 +917,7 @@ export default {
         }
       }
       else {
-        if(transTCode[0] == '/' || transTCode[0] == 'S' || transTCode[0] == 'U') {
+        if(transTCode[0] === '/' || transTCode[0] === 'S' || transTCode[0] === 'U') {
           ElMessage({
             message: 'TCode-' + transTCode + i18n.global.t('不存在'),
             type: 'warning',
@@ -1028,11 +1039,8 @@ export default {
       isShowDropdown.value = status;
       isShowDot.value = false;
     };
-    const openFolder = (path) => {
-      fileBlockRef.value.dir = path;
-      fileBlockRef.value.confirmDirCorrect();
-      fileBlockRef.value.getDirList();
-      fileBlockRef.value.DialogVisible = true;
+    const fileBlockView = (path, name) => {
+      fileBlockRef.value.fileBlockView(path, name);
     };
 
     onMounted(async () => {
@@ -1124,7 +1132,7 @@ export default {
       isShowDot,
       isShowDropdown,
       changeDropdownShowStatus,
-      openFolder,
+      fileBlockView,
     }
 
   }

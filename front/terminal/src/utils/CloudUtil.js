@@ -39,7 +39,7 @@ export const cloud = async (type, name, content) => {
     contentType: false,
     processData: false,
     success(resp){
-      if(resp.status != 'success') {
+      if(resp.status !== 'success') {
         if(resp.code == 506) {
           ElMessage({
             message: i18n.global.t('云端文件过多'),
@@ -72,7 +72,7 @@ export const load = async (fileName) => {
       fileName: fileName,
     },
     success(resp) {
-      if(resp.status == 'success') {
+      if(resp.status === 'success') {
         content = JSON.parse(aesDecrypt(resp.data, userInfo.key));
       }
     }

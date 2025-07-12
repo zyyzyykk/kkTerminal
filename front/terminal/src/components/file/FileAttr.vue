@@ -159,7 +159,7 @@ export default {
           loading.value = true;
         },
         success(resp){
-          if(resp.status == 'success') fileInfo.value.attributes.size = parseInt(resp.data, 10);
+          if(resp.status === 'success') fileInfo.value.attributes.size = parseInt(resp.data, 10);
           else unreliable.value = true;
         },
         complete: function() { // 发送请求完成后执行的方法
@@ -183,7 +183,7 @@ export default {
           loading.value = true;
         },
         success(resp){
-          if(resp.status == 'success') {
+          if(resp.status === 'success') {
             includeInfo.value = resp.data[0] + i18n.global.t(' 个文件，') + (Math.max(0,parseInt(resp.data[1], 10) - 1)) + i18n.global.t(' 个文件夹');
           }
           else unreliable.value = true;
