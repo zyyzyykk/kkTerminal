@@ -10,7 +10,7 @@
     body-class="kk-body-class-0"
     draggable
   >
-    <div class="no-select">
+    <div class="no-select" >
       <div class="kk-flex" >
         <div class="form-width" >{{ $t('私钥') }}：</div>
         <el-upload
@@ -19,21 +19,21 @@
           :http-request="readPrivateKeyContent"
           :multiple="false"
         >
-          <el-button size="small" type="primary" ><el-icon class="el-icon--left"><Lock /></el-icon>{{ $t('选择') }}</el-button>
+          <el-button size="small" type="primary" ><el-icon class="el-icon--left" ><Lock /></el-icon>{{ $t('选择') }}</el-button>
         </el-upload>
       </div>
-      <div v-if="err_msg && err_msg.length > 0" class="errInfo no-select"> {{ err_msg }} </div>
+      <div v-if="err_msg && err_msg.length > 0" class="errInfo no-select" > {{ err_msg }} </div>
       <div v-else style="height: 7px;" ></div>
-      <div class="kk-flex">
+      <div class="kk-flex" >
         <div class="form-width" >{{ $t('密码') }}：</div>
-        <div style="flex: 1;">
-          <el-input size="small" v-model="passphrase" @keydown.enter="confirm" class="w-50 m-2" :placeholder="$t('请输入私钥密码')">
+        <div style="flex: 1;" >
+          <el-input size="small" v-model="passphrase" @keydown.enter="confirm" class="w-50 m-2" :placeholder="$t('请输入私钥密码')" >
             <template #prefix>
               <el-icon><Key /></el-icon>
             </template>
           </el-input>
         </div>
-        <div style="margin-left: 10px;">
+        <div style="margin-left: 10px;" >
           <el-button size="small" type="primary" @click="confirm" >{{ $t('确定') }}</el-button>
         </div>
       </div>

@@ -145,7 +145,7 @@ export const UserTCodeExecutor = {
     // 向terminal写入并等待
     async writeAndWait(content, time = 200) {
         if(!content) content = '\n';
-        else if(content[content.length - 1] != '\n' && content[content.length - 1] != '\r') content += '\n';
+        else if(content[content.length - 1] !== '\n' && content[content.length - 1] !== '\r') content += '\n';
         this.cnt = this.outArray.length;
         this.writeOnly(content, true);
         await new Promise(resolve => setTimeout(resolve, Math.max(0, time)));

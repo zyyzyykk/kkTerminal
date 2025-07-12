@@ -10,23 +10,23 @@
     body-class="kk-body-class-0"
     draggable
   >
-    <div class="no-select">
-      <el-radio-group v-model="isDirectory" class="ml-4">
-        <el-radio :label="false" size="large">{{ $t('文件') }}</el-radio>
-        <el-radio :label="true" size="large">{{ $t('文件夹') }}</el-radio>
+    <div class="no-select" >
+      <el-radio-group v-model="isDirectory" class="ml-4" >
+        <el-radio :label="false" size="large" >{{ $t('文件') }}</el-radio>
+        <el-radio :label="true" size="large" >{{ $t('文件夹') }}</el-radio>
       </el-radio-group>
-      <div class="errInfo no-select"> {{ $t(err_msg) }} </div>
-      <div class="kk-flex">
+      <div class="errInfo no-select" > {{ $t(err_msg) }} </div>
+      <div class="kk-flex" >
         <div>
           <FileIcons :style="{display: 'flex', alignItems: 'center'}" :width="24" :height="24" v-if="isDirectory" name="kk.txt" :isFolder="true" />
           <FileIcons :style="{display: 'flex', alignItems: 'center'}" :width="24" :height="24" v-else :name="name" :isFolder="false" />
         </div>
-        <div style="width: 10px;"></div>
-        <div style="flex: 1;">
-          <el-input size="small" v-model="name" @keydown.enter="confirm" class="w-50 m-2" placeholder="">
+        <div style="width: 10px;" ></div>
+        <div style="flex: 1;" >
+          <el-input size="small" v-model="name" @keydown.enter="confirm" class="w-50 m-2" placeholder="" >
           </el-input>
         </div>
-        <div style="margin-left: 10px;">
+        <div style="margin-left: 10px;" >
           <el-button size="small" type="primary" @click="confirm" >{{ $t('确定') }}</el-button>
         </div>
       </div>

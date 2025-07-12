@@ -11,27 +11,27 @@
     body-class="kk-body-class-6"
     draggable
   >
-    <div class="no-select">
-      <div v-if="Object.keys(sshOptions).length > 0" class="kk-border">
+    <div class="no-select" >
+      <div v-if="Object.keys(sshOptions).length > 0" class="kk-border" >
         <div v-for="(value, key) in sshOptions" :key="key" >
-          <div :class="['item-class', (aimOption == key) ? 'item-selected' : '']" @click="aimOption = key">
+          <div :class="['item-class', (aimOption == key) ? 'item-selected' : '']" @click="aimOption = key" >
             <FileIcons :style="{display: 'flex', alignItems: 'center'}" name="kk.ini" :width="20" :height="20" :isFolder="false" />
-            <div class="ellipsis" style="margin: 0 10px;">{{ key }}</div>
+            <div class="ellipsis" style="margin: 0 10px;" >{{ key }}</div>
             <div style="flex: 1;" ></div>
             <div @click="confirmDeleteOption(key)" ><el-icon><CircleClose /></el-icon></div>
           </div>
         </div>
       </div>
-      <div v-else class="kk-border">
+      <div v-else class="kk-border" >
         <NoData :msg="i18n.global.k('暂无配置')" ></NoData>
       </div>
-      <div class="kk-flex">
+      <div class="kk-flex" >
         <div>{{ $t('配置名') }}：</div>
-        <div style="flex: 1;">
-          <el-input size="small" v-model="aimOption" :disabled="opType == 0" @keydown.enter="confirm" class="w-50 m-2" placeholder="">
+        <div style="flex: 1;" >
+          <el-input size="small" v-model="aimOption" :disabled="opType == 0" @keydown.enter="confirm" class="w-50 m-2" placeholder="" >
           </el-input>
         </div>
-        <div style="margin-left: 10px;">
+        <div style="margin-left: 10px;" >
           <el-button size="small" type="primary" @click="confirm" >
             {{ opType ? $t('保存') : $t('选择') }}
           </el-button>

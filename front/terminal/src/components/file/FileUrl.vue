@@ -10,29 +10,29 @@
     body-class="kk-body-class-0"
     draggable
   >
-    <div class="no-select">
+    <div class="no-select" >
       <div class="kk-flex" >
         <div class="form-width" >URL：</div>
-        <div style="flex: 1;">
-          <el-input size="small" v-model="url" class="w-50 m-2" :placeholder="$t('请输入文件URL')">
+        <div style="flex: 1;" >
+          <el-input size="small" v-model="url" class="w-50 m-2" :placeholder="$t('请输入文件URL')" >
             <template #prefix>
               <el-icon><Connection /></el-icon>
             </template>
           </el-input>
         </div>
       </div>
-      <div v-if="err_msg && err_msg.length > 0" class="errInfo no-select"> {{ $t(err_msg) }} </div>
+      <div v-if="err_msg && err_msg.length > 0" class="errInfo no-select" > {{ $t(err_msg) }} </div>
       <div v-else style="height: 7px;" ></div>
-      <div class="kk-flex">
+      <div class="kk-flex" >
         <div class="form-width" >{{ $t('文件名') }}：</div>
-        <div style="flex: 1;">
-          <el-input size="small" v-model="name" @keydown.enter="confirm" class="w-50 m-2" :placeholder="$t('请输入文件名')">
+        <div style="flex: 1;" >
+          <el-input size="small" v-model="name" @keydown.enter="confirm" class="w-50 m-2" :placeholder="$t('请输入文件名')" >
             <template #prefix>
               <el-icon><Document /></el-icon>
             </template>
           </el-input>
         </div>
-        <div style="margin-left: 10px;">
+        <div style="margin-left: 10px;" >
           <el-button size="small" type="primary" @click="confirm" >{{ $t('确定') }}</el-button>
         </div>
       </div>

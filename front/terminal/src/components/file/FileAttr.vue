@@ -10,87 +10,86 @@
     draggable
   >
     <template #title>
-      <div class="kk-flex-0 nowrap kk-header-class">
+      <div class="kk-flex-0 nowrap kk-header-class" >
         <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="16" :height="16" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" />
-        <div class="ellipsis" style="margin: 0 5px; font-size: small;">{{ fileInfo.name }}</div>
-        <div style="font-size: small;">{{ $t('属性') }}</div>
+        <div class="ellipsis" style="margin: 0 5px; font-size: small;" >{{ fileInfo.name }}</div>
+        <div style="font-size: small;" >{{ $t('属性') }}</div>
       </div>
     </template>
-    <div style="margin-top: -32px;"></div>
+    <div style="margin-top: -32px;" ></div>
     <div class="no-select" element-loading-text="Loading..." v-loading="loading" >
-      <div class="kk-flex">
+      <div class="kk-flex" >
         <div style="margin-right: 10px;" ><FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="32" :height="32" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" /></div>
         <div>
           <el-input @keydown.enter="confirm" v-model="rename" placeholder="" />
         </div>
       </div>
       <div class="kk-border" ></div>
-      <div class="kk-flex nowrap">
+      <div class="kk-flex nowrap" >
         <div class="form-width" >{{ $t('位置') }}：</div>
         <ToolTip :content="fileDir + fileInfo.name" >
           <template #content>
-            <div class="ellipsis">
+            <div class="ellipsis" >
               {{ fileDir + fileInfo.name }}
             </div>
           </template>
         </ToolTip>
-        <div style="cursor: pointer; margin-left: 7px;" @click="doCopy(fileDir + fileInfo.name)">
-          <el-icon size="18"><DocumentCopy /></el-icon>
+        <div style="cursor: pointer; margin-left: 7px;" @click="doCopy(fileDir + fileInfo.name)" >
+          <el-icon size="18" ><DocumentCopy /></el-icon>
         </div>
       </div>
-      <div v-if="fileInfo.isDirectory" class="kk-flex">
+      <div v-if="fileInfo.isDirectory" class="kk-flex" >
         <div class="form-width" >{{ $t('包含') }}：</div>
         <div class="ellipsis" >
           {{ $t(includeInfo) }}
         </div>
         <div v-if="fileInfo.isSymlink || unreliable" style="margin-left: 10px;" >
-          <el-tag size="small" type="danger">unsure</el-tag>
+          <el-tag size="small" type="danger" >unsure</el-tag>
         </div>
         <div style="cursor: pointer; margin-left: 7px;" @click="getFolderInclude" >
-          <el-icon size="18"><Refresh /></el-icon>
+          <el-icon size="18" ><Refresh /></el-icon>
         </div>
       </div>
-      <div v-else class="kk-flex">
+      <div v-else class="kk-flex" >
         <div class="form-width" >{{ $t('大小') }}：</div>
         <div class="ellipsis" >
           {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size.toLocaleString() + ' ' + $t('字节') }})
         </div>
         <div v-if="fileInfo.isSymlink || unreliable" style="margin-left: 10px;" >
-          <el-tag size="small" type="danger">unsure</el-tag>
+          <el-tag size="small" type="danger" >unsure</el-tag>
         </div>
         <div style="cursor: pointer; margin-left: 7px;" @click="getFileSize" >
-          <el-icon size="18"><Refresh /></el-icon>
+          <el-icon size="18" ><Refresh /></el-icon>
         </div>
       </div>
       <div class="kk-border" ></div>
-      <div class="kk-flex">
+      <div class="kk-flex" >
         <div class="form-width" >{{ $t('修改时间') }}：</div>
         <div>
           {{ calcDate(fileInfo.attributes.mtime) }}
         </div>
       </div>
-      <div class="kk-flex">
+      <div class="kk-flex" >
         <div class="form-width" >{{ $t('访问时间') }}：</div>
         <div>
           {{ calcDate(fileInfo.attributes.atime) }}
         </div>
       </div>
       <div class="kk-border" ></div>
-      <div class="kk-flex">
+      <div class="kk-flex" >
         <div class="form-width" >{{ $t('权限') }}：</div>
         <div>
           {{ calcPriority(fileInfo.attributes.mode.type,fileInfo.attributes.permissions) }}
         </div>
-        <div style="cursor: pointer; margin-left: 7px;" @click="openEditPermissions">
-          <el-icon size="18"><Edit /></el-icon>
+        <div style="cursor: pointer; margin-left: 7px;" @click="openEditPermissions" >
+          <el-icon size="18" ><Edit /></el-icon>
         </div>
-        <div style="flex: 1;"></div>
+        <div style="flex: 1;" ></div>
         <div>
           <el-button size="small" type="primary" @click="confirm" >{{ $t('确定') }}</el-button>
         </div>
       </div>
     </div>
-<!--    <div style="margin-top: -15px;"></div>-->
   </el-dialog>
 
   <!-- 权限修改 -->
@@ -148,17 +147,17 @@ export default {
     const getFileSize = () => {
       $.ajax({
         url: http_base_url + '/du',
-        type:'get',
-        data:{
-          time:new Date().getTime(),
-          sshKey:props.sshKey,
-          path:escapePath(fileDir.value),
-          item:escapeItem(fileInfo.value.name),
+        type: 'get',
+        data: {
+          time: new Date().getTime(),
+          sshKey: props.sshKey,
+          path: escapePath(fileDir.value),
+          item: escapeItem(fileInfo.value.name),
         },
         beforeSend: function() { // 发送请求前执行的方法
           loading.value = true;
         },
-        success(resp){
+        success(resp) {
           if(resp.status === 'success') fileInfo.value.attributes.size = parseInt(resp.data, 10);
           else unreliable.value = true;
         },
@@ -172,17 +171,17 @@ export default {
     const getFolderInclude = () => {
       $.ajax({
         url: http_base_url + '/find',
-        type:'get',
-        data:{
-          time:new Date().getTime(),
-          sshKey:props.sshKey,
-          path:escapePath(fileDir.value),
-          item:escapeItem(fileInfo.value.name),
+        type: 'get',
+        data: {
+          time: new Date().getTime(),
+          sshKey: props.sshKey,
+          path: escapePath(fileDir.value),
+          item: escapeItem(fileInfo.value.name),
         },
         beforeSend: function() { // 发送请求前执行的方法
           loading.value = true;
         },
-        success(resp){
+        success(resp) {
           if(resp.status === 'success') {
             includeInfo.value = resp.data[0] + i18n.global.t(' 个文件，') + (Math.max(0,parseInt(resp.data[1], 10) - 1)) + i18n.global.t(' 个文件夹');
           }
@@ -197,7 +196,7 @@ export default {
     // 确定
     const confirm = () => {
       // 校验
-      if(fileInfo.value.name == rename.value) {
+      if(fileInfo.value.name === rename.value) {
         closeDialog();
         return;
       }

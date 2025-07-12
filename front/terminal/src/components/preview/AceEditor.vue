@@ -1,5 +1,5 @@
 <template>
-  <div ref="aceEditorRef" class="kk-code-editor"></div>
+  <div ref="aceEditorRef" class="kk-code-editor" ></div>
 </template>
 
 <script>

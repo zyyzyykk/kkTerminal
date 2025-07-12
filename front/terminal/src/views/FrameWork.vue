@@ -1,5 +1,5 @@
 <template>
-  <div class="global">
+  <div class="global" >
     <!-- 设置栏 -->
     <div class="setting" v-show="isShowSetting && (urlParams.mode !== 'headless' && urlParams.mode !== 'pure')" >
       <div class="setting-menu no-select" @click="doSettings(1)" ><div>{{ $t('连接设置') }}</div></div>
@@ -18,12 +18,12 @@
       <div :class="['setting-menu', 'no-select', (env.server_user === 'root') ? '':'disabled']" @click="doSettings(7)" ><div>{{ $t('监控') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(8)" ><div>Docker</div></div>
     </div>
-    <div v-if="urlParams.mode !== 'headless'" class="kk-flex bar">
+    <div v-if="urlParams.mode !== 'headless'" class="kk-flex bar" >
       <div style="user-select: none;" @click="isShowSetting = !isShowSetting; isShowAdvance = false; showAdvance(false);" >
         <img src="@/assets/terminal.svg" alt="terminal" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
       <div class="ellipsis no-select" style="font-size: 14px; line-height: 18px;" ><span>kk Terminal</span></div>
-      <div style="flex: 1;"></div>
+      <div style="flex: 1;" ></div>
       <div v-show="urlParams.mode !== 'headless' && urlParams.mode !== 'pure'" class="kk-flex" >
         <div v-if="cooperating" class="bar-tag" >
           <el-tag size="small" @click="endCooperateConfirm" :type="calcType(onlineNumber, maxNumber)" effect="plain" >
@@ -195,13 +195,13 @@
             </template>
             <div v-if="env.tCode" style="font-size: 12px; color: #313131;" >
               <div style="user-select: none; font-size: 14px; font-weight: bold;" >{{ $t('什么是 TCode (终端代码) ？') }}</div>
-              <div style="user-select: none; margin-top: 5px;">{{ $t('TCode（终端代码）是用于访问和执行特定操作流程的快捷方式') }}</div>
-              <div style="user-select: none; margin-top: 5px;">
+              <div style="user-select: none; margin-top: 5px;" >{{ $t('TCode（终端代码）是用于访问和执行特定操作流程的快捷方式') }}</div>
+              <div style="user-select: none; margin-top: 5px;" >
                 {{ $t('输入') }}
                 <span style="background-color: #f3f4f4; user-select: text;" >/H</span>
                 {{ $t('并按下回车，查看帮助信息') }}
               </div>
-              <div style="user-select: none; margin-top: 5px;">
+              <div style="user-select: none; margin-top: 5px;" >
                 {{ $t('输入') }}
                 <span style="background-color: #f3f4f4; user-select: text;" >/A</span>
                 {{ $t('并按下回车，自定义TCode') }}
@@ -216,7 +216,7 @@
   </div>
 
   <!-- 连接设置 -->
-  <ConnectSetting ref="connectSettingRef" :env="env" :sshOptions="options" @saveOp="saveOp" @deleteOp="deleteOp" @callback="saveEnv"></ConnectSetting>
+  <ConnectSetting ref="connectSettingRef" :env="env" :sshOptions="options" @saveOp="saveOp" @deleteOp="deleteOp" @callback="saveEnv" ></ConnectSetting>
   <!-- 样式设置 -->
   <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" :os="osInfo.clientOS" ></StyleSetting>
   <!-- 文件管理 -->
@@ -443,7 +443,7 @@ export default {
     const deleteOp = (name) => {
       delete options.value[name];
       saveOp(null,null);
-      if(env.value.option && env.value.option == name) saveEnv({option:''},false);
+      if(env.value.option && env.value.option === name) saveEnv({option:''},false);
     };
 
     // 初始化终端
@@ -501,9 +501,9 @@ export default {
     const endCooperate = () => {
       $.ajax({
         url: http_base_url + '/cooperate/end',
-        type:'post',
-        data:{
-          sshKey:sshKey.value,
+        type: 'post',
+        data: {
+          sshKey: sshKey.value,
         },
         async success(resp) {
           if(resp.status === 'success') {
@@ -621,7 +621,7 @@ export default {
       };
       // 断开连接
       socket.value.onclose = (e) => {
-        if(now_connect_status.value == connect_status.value['Success'] && e.code != 3333) {
+        if(now_connect_status.value === connect_status.value['Success'] && e.code != 3333) {
           sshKey.value = '';
           if(urlParams.value.cooperate) {
             now_connect_status.value = connect_status.value['End'];
@@ -809,11 +809,11 @@ export default {
           if(osInfo.value.serverOS != "Linux") {
             $.ajax({
               url: http_base_url + '/beat',
-              type:'post',
-              data:{
-                windowId:osInfo.value.windowId,
+              type: 'post',
+              data: {
+                windowId: osInfo.value.windowId,
               },
-              success(){
+              success() {
               }
             });
           }

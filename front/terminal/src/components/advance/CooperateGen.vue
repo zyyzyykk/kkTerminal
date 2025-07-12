@@ -10,18 +10,18 @@
       body-class="kk-body-class-0"
       draggable
   >
-    <div class="no-select">
-      <div class="kk-flex">
+    <div class="no-select" >
+      <div class="kk-flex" >
         <div>{{ $t('编辑权限') }}：</div>
         <div style="flex: 1" ></div>
-        <el-radio-group v-model="isReadonly" class="ml-4">
-          <el-radio :label="false" size="large">{{ $t('是') }}</el-radio>
-          <el-radio :label="true" size="large">{{ $t('否') }}</el-radio>
+        <el-radio-group v-model="isReadonly" class="ml-4" >
+          <el-radio :label="false" size="large" >{{ $t('是') }}</el-radio>
+          <el-radio :label="true" size="large" >{{ $t('否') }}</el-radio>
         </el-radio-group>
         <div style="flex: 1" ></div>
       </div>
       <div style="margin-top: 10px" ></div>
-      <div class="kk-flex">
+      <div class="kk-flex" >
         <div>{{ $t('人数上限') }}：</div>
         <div style="flex: 1" ></div>
         <div>
@@ -31,9 +31,9 @@
         <div style="flex: 1" ></div>
       </div>
       <div style="margin-top: 10px" ></div>
-      <div style="display: flex; border-top: 1px solid #f1f2f4;">
-        <div style="flex: 1;"></div>
-        <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;">
+      <div style="display: flex; border-top: 1px solid #f1f2f4;" >
+        <div style="flex: 1;" ></div>
+        <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;" >
           {{ $t('确定') }}
         </el-button>
       </div>
@@ -72,12 +72,12 @@ export default {
       const maxHC = maxHeadCount.value;
       $.ajax({
         url: http_base_url + '/cooperate/key',
-        type:'get',
-        data:{
-          time:new Date().getTime(),
-          sshKey:props.sshKey,
-          readOnly:isReadonly.value,
-          maxHeadCount:maxHC,
+        type: 'get',
+        data: {
+          time: new Date().getTime(),
+          sshKey: props.sshKey,
+          readOnly: isReadonly.value,
+          maxHeadCount: maxHC,
         },
         async success(resp) {
           if(resp.status === 'success') {

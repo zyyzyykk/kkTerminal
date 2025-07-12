@@ -25,12 +25,12 @@ export default {
     onBeforeMount(async () => {
       await $.ajax({
         url: http_base_url + '/init',
-        type:'post',
+        type: 'post',
         data: {
           aesKey: needAesKey,
           publicKey: needPublicKey,
         },
-        success(resp){
+        success(resp) {
           const data = JSON.parse(resp.info);
           if(needAesKey) sessionStorage.setItem(sessionStore['aes-key'], data.aesKey);
           if(needPublicKey) sessionStorage.setItem(sessionStore['public-key'], data.publicKey);

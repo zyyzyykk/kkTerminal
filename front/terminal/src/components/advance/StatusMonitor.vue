@@ -13,7 +13,7 @@
   >
     <div class="no-select" >
       <el-tabs stretch type="border-card" @tab-click="handleTabClick" >
-        <el-tab-pane :label="$t('概览')">
+        <el-tab-pane :label="$t('概览')" >
           <div class="kk-flex" style="height: 200px" >
             <div style="margin-left: 5px" ></div>
             <div class="kk-flex-column" >
@@ -60,7 +60,7 @@
             <div style="margin-left: 5px" ></div>
           </div>
         </el-tab-pane>
-        <el-tab-pane :label="$t('Top进程')">
+        <el-tab-pane :label="$t('Top进程')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="statusInfo.processes.length > 0" :data="statusInfo.processes" border stripe >
             <el-table-column prop="pid" label="PID" width="80" />
             <el-table-column prop="user" label="User" width="100" />
@@ -72,7 +72,7 @@
             <NoData height="200px" ></NoData>
           </div>
         </el-tab-pane>
-        <el-tab-pane :label="$t('网络')">
+        <el-tab-pane :label="$t('网络')" >
           <div style="position: relative" >
             <EChart v-show="statusInfo.time.length > 1"
               style="width: 650px; height: 200px;" ref="networkEChartRef"
@@ -80,7 +80,7 @@
             </EChart>
             <div v-show="statusInfo.time.length > 1" style="position: absolute; top: 0; right: 0" >
               <el-dropdown size="small" style="margin-top: 2px; margin-right: 25px;" hide-timeout="300" >
-                <span class="a-link no-select" >{{ selectedNetwork }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+                <span class="a-link no-select" >{{ selectedNetwork }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
                 <template #dropdown>
                   <el-dropdown-menu>
                     <template v-for="(key, val) in statusInfo.network" :key="key" >
@@ -96,7 +96,7 @@
                   <el-icon><SortUp /></el-icon>
                   <div>{{ (networkSeries[0].data[networkSeries[0].data.length - 1] || 0) + 'K' }}</div>
                 </div>
-                <div style="margin-left: 10px"></div>
+                <div style="margin-left: 10px" ></div>
                 <div class="kk-flex" style="color: #9eca7f" >
                   <el-icon><SortDown /></el-icon>
                   <div>{{ (networkSeries[1].data[networkSeries[1].data.length - 1] || 0) + 'K' }}</div>
@@ -108,7 +108,7 @@
             <NoData height="200px" ></NoData>
           </div>
         </el-tab-pane>
-        <el-tab-pane :label="$t('磁盘')">
+        <el-tab-pane :label="$t('磁盘')" >
           <div style="position: relative" >
             <EChart v-show="statusInfo.time.length > 1"
                     style="width: 650px; height: 200px;" ref="diskEChartRef"
@@ -116,7 +116,7 @@
             </EChart>
             <div v-show="statusInfo.time.length > 1" style="position: absolute; top: 0; right: 0" >
               <el-dropdown size="small" style="margin-top: 2px; margin-right: 25px;" hide-timeout="300" >
-                <span class="a-link no-select" >{{ selectedDisk }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+                <span class="a-link no-select" >{{ selectedDisk }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
                 <template #dropdown>
                   <el-dropdown-menu>
                     <template v-for="(key, val) in statusInfo.disk" :key="key" >
@@ -132,7 +132,7 @@
                   <el-icon><SortUp /></el-icon>
                   <div>{{ (diskSeries[0].data[diskSeries[0].data.length - 1] || 0) + 'K' }}</div>
                 </div>
-                <div style="margin-left: 10px"></div>
+                <div style="margin-left: 10px" ></div>
                 <div class="kk-flex" style="color: #9eca7f" >
                   <el-icon><SortDown /></el-icon>
                   <div>{{ (diskSeries[1].data[diskSeries[1].data.length - 1] || 0) + 'K' }}</div>
@@ -205,9 +205,9 @@ export default {
     const getStatusInfo = () => {
       $.ajax({
         url: http_base_url + '/monitor',
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
         },
         success(resp) {
           if(resp.status === 'success') {

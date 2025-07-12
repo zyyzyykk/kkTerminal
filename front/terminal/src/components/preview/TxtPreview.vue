@@ -11,9 +11,9 @@
         draggable
     >
       <template #title>
-        <div class="kk-flex no-select kk-header-class">
+        <div class="kk-flex no-select kk-header-class" >
           <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileName" :width="25" :height="25" :isFolder="false" />
-          <div class="ellipsis" style="margin: 0 5px; font-size: larger;">{{ modifyTag + fileName }}</div>
+          <div class="ellipsis" style="margin: 0 5px; font-size: larger;" >{{ modifyTag + fileName }}</div>
         </div>
       </template>
       <div style="margin-top: -28px;" ></div>
@@ -23,7 +23,7 @@
           <div class="kk-flex" >
             <el-tag size="small" type="info" style="margin-right: 5px;" >{{ $t('打开') }}</el-tag>
             <el-dropdown size="small" hide-timeout="300" >
-              <span class="a-link" >{{ openEncode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <span class="a-link" >{{ openEncode }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <template v-for="(name,index) in encodeSet" :key="index" >
@@ -36,7 +36,7 @@
           <div class="kk-flex" >
             <el-tag size="small" type="info" style="margin-left: 10px; margin-right: 5px;" >{{ $t('保存') }}</el-tag>
             <el-dropdown size="small" hide-timeout="300" >
-              <span class="a-link" >{{ saveEncode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <span class="a-link" >{{ saveEncode }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <template v-for="(name,index) in encodeSet" :key="index" >
@@ -51,7 +51,7 @@
         <div class="kk-flex" >
           <div>{{ $t('模式') }}：</div>
           <el-dropdown size="small" hide-timeout="300" >
-            <span class="a-link" >{{ mode }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+            <span class="a-link" >{{ mode }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>
                 <template v-for="(name,index) in modeSet" :key="index" >
@@ -80,11 +80,11 @@
         <div style="margin-right: 20px;" ></div>
         <div class="kk-flex" >
           <el-button size="small" type="primary" @click="doCopy" >
-            <el-icon class="el-icon--left"><DocumentCopy /></el-icon>{{ $t('复制') }}
+            <el-icon class="el-icon--left" ><DocumentCopy /></el-icon>{{ $t('复制') }}
           </el-button>
         </div>
       </div>
-      <div element-loading-text="Loading..." v-loading="loading" style="width: 100%; height: 60vh; position: relative; margin-bottom: 10px">
+      <div element-loading-text="Loading..." v-loading="loading" style="width: 100%; height: 60vh; position: relative; margin-bottom: 10px" >
         <AceEditor class="preview" v-show="!loading && previewInfo.preview === 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
         <iframe id="imgPreview" class="preview" v-if="!loading && previewInfo.preview === 'iframe' && previewUrl" :src="previewUrl" ></iframe>
         <audio controls class="preview" v-if="!loading && previewInfo.preview === 'audio' && previewUrl" >
@@ -168,7 +168,7 @@ export default {
           return resp;
         },
         success(resp) {
-          if(url == fileUrl.value) {
+          if(url === fileUrl.value) {
             // 文件可预览
             if(previewInfo.value.preview !== 'editor') {
               const blob = new Blob([resp], {type:previewInfo.value.type});
@@ -191,7 +191,7 @@ export default {
           }
         },
         error() {
-          if(url == fileUrl.value) {
+          if(url === fileUrl.value) {
             ElMessage({
               message: i18n.global.t('文件加载失败'),
               type: 'error',
@@ -210,7 +210,7 @@ export default {
     };
 
     const handleSave = (text) => {
-      if(modifyTag.value != '*') return;
+      if(modifyTag.value !== '*') return;
       context.emit('doSave',fileName.value, fileUrl.value, encodeStrToArray(text, (saveEncode.value || "UTF-8")));
       modifyTag.value = '';
     };
@@ -232,7 +232,7 @@ export default {
     const changeEncode = (type, name) => {
       // 打开编码
       if(type === 0) {
-        if(openEncode.value == name) return;
+        if(openEncode.value === name) return;
         if(!loading.value) initText();
         openEncode.value = name;
         DialogVisible.value = true;
@@ -248,9 +248,9 @@ export default {
     const mode = ref('auto');
     const modeSet = ref(['auto','xml','bash','json']);
     const setMode = (name) => {
-      if(mode.value == name) return;
+      if(mode.value === name) return;
       mode.value = name;
-      codeEditorRef.value.setLanguage((name == 'auto') ? fileName.value : ("kk." + name));
+      codeEditorRef.value.setLanguage((name === 'auto') ? fileName.value : ("kk." + name));
     };
 
     // 缩进

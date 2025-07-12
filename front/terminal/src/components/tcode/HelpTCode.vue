@@ -12,7 +12,7 @@
         :before-close="closeDialog"
         draggable
     >
-      <div class="no-select">
+      <div class="no-select" >
         <el-tabs stretch type="border-card" >
           <el-tab-pane :label="$t('功能TCode')" >
             <div class="pane-body" >
@@ -52,34 +52,34 @@
                     <div @click="toOverview" style="margin-right: 10px; cursor: pointer; font-size: 16px;" ><el-icon><ArrowLeft /></el-icon></div>
                     <div style="margin-top: 3px;" > {{ modifyTag + nowTCode }} </div>
                     <div style="cursor: pointer; margin-left: 10px;" >
-                      <el-tooltip :content="TCodeStatusEnum[userTCodes[nowTCode].status]" placement="top">
+                      <el-tooltip :content="TCodeStatusEnum[userTCodes[nowTCode].status]" placement="top" >
                         <TCodeStatus :style="{fontSize: '18px'}" :status="userTCodes[nowTCode].status" ></TCodeStatus>
                       </el-tooltip>
                     </div>
                     <div style="flex: 1;" ></div>
                     <div @click="doModifyTCode" v-if="!mode" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                      <el-tooltip :content="$t('编辑')" placement="top">
+                      <el-tooltip :content="$t('编辑')" placement="top" >
                         <el-icon><Edit /></el-icon>
                       </el-tooltip>
                     </div>
                     <div @click="confirmDeleteTCode" v-if="!mode" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                      <el-tooltip :content="$t('删除')" placement="top">
+                      <el-tooltip :content="$t('删除')" placement="top" >
                         <el-icon><Delete /></el-icon>
                       </el-tooltip>
                     </div>
                     <div @click="doOnlyRead" v-if="mode" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                      <el-tooltip :content="$t('只读')" placement="top">
+                      <el-tooltip :content="$t('只读')" placement="top" >
                         <el-icon><View /></el-icon>
                       </el-tooltip>
                     </div>
                     <div @click="doSaveTCode" v-if="mode" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                      <el-tooltip :content="$t('保存修改')" placement="top">
+                      <el-tooltip :content="$t('保存修改')" placement="top" >
                         <el-icon><Finished /></el-icon>
                       </el-tooltip>
                     </div>
                     <div style="margin-left: 10px;" ></div>
                   </div>
-                  <div style="width: 100%; height: 178px;">
+                  <div style="width: 100%; height: 178px;" >
                     <AceEditor ref="userTCodeEditorRef" @handleChange="handleChange" @handleSave="doSaveTCode" ></AceEditor>
                   </div>
                 </template>
@@ -99,7 +99,7 @@
                       </ToolTip>
                       <div style="flex: 1;" ></div>
                       <div style="cursor: pointer; margin-left: 10px;" >
-                        <el-tooltip :content="TCodeStatusEnum[item.status]" placement="top">
+                        <el-tooltip :content="TCodeStatusEnum[item.status]" placement="top" >
                           <TCodeStatus :style="{fontSize: '18px'}" :status="item.status" ></TCodeStatus>
                         </el-tooltip>
                       </div>
@@ -113,7 +113,7 @@
                 <div class="kk-border" ></div>
                 <NoData height="160px" >
                   <template #mySlot>
-                    <div style="margin-top: 20px;"></div>
+                    <div style="margin-top: 20px;" ></div>
                   </template>
                 </NoData>
               </template>

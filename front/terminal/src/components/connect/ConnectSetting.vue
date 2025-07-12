@@ -14,54 +14,54 @@
     draggable
   >
     <div>
-      <div class="item-class" style="margin-bottom: 15px;">
-        <div class="no-select form-width nowrap">{{ $t('配\u00A0\u00A0\u00A0置') }}：</div>
+      <div class="item-class" style="margin-bottom: 15px;" >
+        <div class="no-select form-width nowrap" >{{ $t('配\u00A0\u00A0\u00A0置') }}：</div>
         <ToolTip :content="!(setInfo.option && setInfo.option.length > 0) ? $t('新建配置') : setInfo.option" >
           <template #content>
             <div class="ellipsis" style="user-select: none;" :class="!(setInfo.option && setInfo.option.length > 0) ? 'new-option': 'old-option'" >{{ !(setInfo.option && setInfo.option.length > 0) ? $t('新建配置') : setInfo.option }}</div>
           </template>
         </ToolTip>
-        <div style="flex: 1;"></div>
-        <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Switch /></el-icon>{{ $t('切换') }}</el-button></div>
-        <div v-if="!isForbidInput" ><el-button size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Finished /></el-icon>{{ $t('保存') }}</el-button></div>
-        <div v-else ><el-button size="small" type="primary" @click="newOp" style="margin-left: 10px;" ><el-icon class="el-icon--left"><Edit /></el-icon>{{ $t('新建') }}</el-button></div>
+        <div style="flex: 1;" ></div>
+        <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" ><el-icon class="el-icon--left" ><Switch /></el-icon>{{ $t('切换') }}</el-button></div>
+        <div v-if="!isForbidInput" ><el-button size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" ><el-icon class="el-icon--left" ><Finished /></el-icon>{{ $t('保存') }}</el-button></div>
+        <div v-else ><el-button size="small" type="primary" @click="newOp" style="margin-left: 10px;" ><el-icon class="el-icon--left" ><Edit /></el-icon>{{ $t('新建') }}</el-button></div>
       </div>
-      <div class="item-class" style="margin-bottom: 15px;">
-        <div class="no-select form-width">{{ $t('主机IP') }}：</div>
+      <div class="item-class" style="margin-bottom: 15px;" >
+        <div class="no-select form-width" >{{ $t('主机IP') }}：</div>
         <div>
-          <el-input :disabled="isForbidInput" v-model="setInfo.server_ip" class="w-50 m-2" :placeholder="$t('输入主机IP')">
+          <el-input :disabled="isForbidInput" v-model="setInfo.server_ip" class="w-50 m-2" :placeholder="$t('输入主机IP')" >
             <template #prefix>
               <el-icon><HomeFilled /></el-icon>
             </template>
           </el-input>
         </div>
-        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_ip)"><el-icon size="15"><DocumentCopy /></el-icon></div>
+        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_ip)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
       </div>
-      <div class="item-class" style="margin-bottom: 15px;">
-        <div class="no-select form-width">{{ $t('端口号') }}：</div>
+      <div class="item-class" style="margin-bottom: 15px;" >
+        <div class="no-select form-width" >{{ $t('端口号') }}：</div>
         <div>
-          <el-input :disabled="isForbidInput" v-model="setInfo.server_port" class="w-50 m-2" :placeholder="$t('输入端口号')">
+          <el-input :disabled="isForbidInput" v-model="setInfo.server_port" class="w-50 m-2" :placeholder="$t('输入端口号')" >
             <template #prefix>
               <el-icon><Paperclip /></el-icon>
             </template>
           </el-input>
         </div>
-        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_port)"><el-icon size="15"><DocumentCopy /></el-icon></div>
+        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_port)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
       </div>
-      <div class="item-class" style="margin-bottom: 15px;">
-        <div class="no-select form-width">{{ $t('用户名') }}：</div>
+      <div class="item-class" style="margin-bottom: 15px;" >
+        <div class="no-select form-width" >{{ $t('用户名') }}：</div>
         <div>
-          <el-input :disabled="isForbidInput" v-model="setInfo.server_user" class="w-50 m-2" :placeholder="$t('输入用户名')">
+          <el-input :disabled="isForbidInput" v-model="setInfo.server_user" class="w-50 m-2" :placeholder="$t('输入用户名')" >
             <template #prefix>
-              <el-icon class="el-input__icon"><User /></el-icon>
+              <el-icon class="el-input__icon" ><User /></el-icon>
             </template>
           </el-input>
         </div>
-        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_user)"><el-icon size="15"><DocumentCopy /></el-icon></div>
+        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_user)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
       </div>
-      <div class="item-class" style="margin-bottom: 5px;">
+      <div class="item-class" style="margin-bottom: 5px;" >
         <el-dropdown :disabled="isForbidInput" class="no-select form-width" hide-timeout="300" >
-          <span>{{ setInfo.authType == 0 ? $t('密码') : $t('私钥') }}<el-icon class="el-icon--right"><arrow-down style="cursor: pointer;" /></el-icon></span>
+          <span>{{ setInfo.authType == 0 ? $t('密码') : $t('私钥') }}<el-icon class="el-icon--right" ><arrow-down style="cursor: pointer;" /></el-icon></span>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item class="no-select" @click="switchAuthType(0)" >{{ $t('密码') }}</el-dropdown-item>
@@ -69,30 +69,30 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-        <div v-if="setInfo.authType == 0" class="item-class">
+        <div v-if="setInfo.authType == 0" class="item-class" >
           <div>
-            <el-input :disabled="isForbidInput" v-model="setInfo.server_password" :type="isShowPassword ? 'text': 'password'" class="w-50 m-2" :placeholder="$t('输入密码')">
+            <el-input :disabled="isForbidInput" v-model="setInfo.server_password" :type="isShowPassword ? 'text': 'password'" class="w-50 m-2" :placeholder="$t('输入密码')" >
               <template #prefix>
-                <el-icon class="el-input__icon"><Lock /></el-icon>
+                <el-icon class="el-input__icon" ><Lock /></el-icon>
               </template>
             </el-input>
           </div>
-          <div v-if="isShowPassword" style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = false"><el-icon size="15"><View /></el-icon></div>
-          <div v-else style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = true" ><el-icon size="15"><Hide /></el-icon></div>
+          <div v-if="isShowPassword" style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = false" ><el-icon size="15" ><View /></el-icon></div>
+          <div v-else style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = true" ><el-icon size="15" ><Hide /></el-icon></div>
         </div>
         <div v-else >
           <el-button :disabled="isForbidInput" type="primary" @click="openPrivateKeyBlock" >
-            <el-icon class="el-icon--left"><Key /></el-icon>{{ $t('导入') }}
+            <el-icon class="el-icon--left" ><Key /></el-icon>{{ $t('导入') }}
           </el-button>
         </div>
       </div>
     </div>
-    <div class="errInfo no-select"> {{ $t(err_msg) }} </div>
-    <div style="margin-bottom: 5px;"></div>
-    <div style="display: flex; border-top: 1px solid #f1f2f4;">
+    <div class="errInfo no-select" > {{ $t(err_msg) }} </div>
+    <div style="margin-bottom: 5px;" ></div>
+    <div style="display: flex; border-top: 1px solid #f1f2f4;" >
       <el-checkbox v-if="setInfo.option && setInfo.option.length > 0" v-model="isNewWindow" :label="$t('新窗口打开')" size="small" style="margin-top: 10px;" />
-      <div style="flex: 1;"></div>
-      <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;">
+      <div style="flex: 1;" ></div>
+      <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;" >
         {{ $t('确定') }}
       </el-button>
     </div>

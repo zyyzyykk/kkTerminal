@@ -35,9 +35,9 @@
             <div v-else class="disabled-function operate-icon" ><el-icon><Download /></el-icon></div>
             <div v-if="dirStatus === 0" class="hover-class operate-icon" >
               <el-dropdown v-show="DialogVisible" style="line-height: unset;" placement="bottom-end" size="small" trigger="click" >
-                <div class="hover-class" style="font-size: 18px; cursor: pointer;"><el-icon><Upload /></el-icon></div>
+                <div class="hover-class" style="font-size: 18px; cursor: pointer;" ><el-icon><Upload /></el-icon></div>
                 <template #dropdown>
-                  <el-dropdown-menu v-show="DialogVisible" class="no-select" style="text-align: center;">
+                  <el-dropdown-menu v-show="DialogVisible" class="no-select" style="text-align: center;" >
                     <el-dropdown-item @click="fileUploadTypeChoose(0)" >
                       <div class="kk-flex" >
                         <div><el-icon><DocumentAdd /></el-icon></div>
@@ -69,7 +69,7 @@
              tabindex="0" @keydown="handleShortcutKeys" >
           <div v-if="files.length > 0" >
             <div v-for="item in files" :key="item.id" >
-              <template v-if="item.isDirectory">
+              <template v-if="item.isDirectory" >
                 <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
                   <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] == '.' || (isClipboard(item.id) != -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
                   <div style="margin: 0 10px;" v-if="isShowRenameInput && renameFile && item.id == renameFile.id" >
@@ -77,7 +77,7 @@
                   </div>
                   <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
                     <template #content>
-                      <div v-if="!(isShowRenameInput && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;">
+                      <div v-if="!(isShowRenameInput && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;" >
                         {{ item.name }}
                       </div>
                     </template>
@@ -92,7 +92,7 @@
                   </div>
                   <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
                     <template #content>
-                      <div v-if="!(isShowRenameInput && renameFile && item.id === renameFile.id)" class="ellipsis" style="margin: 0 10px;">
+                      <div v-if="!(isShowRenameInput && renameFile && item.id === renameFile.id)" class="ellipsis" style="margin: 0 10px;" >
                         {{ item.name }}
                       </div>
                     </template>
@@ -106,7 +106,7 @@
           </div>
         </div>
       </div>
-      <div style="margin-top: -12px;"></div>
+      <div style="margin-top: -12px;" ></div>
     </el-dialog>
   </div>
 
@@ -137,7 +137,7 @@
   <FileAttr :sshKey="sshKey" ref="fileAttrRef" @callback="doRename" @editPermissions="editPermissions" ></FileAttr>
 
   <!-- 菜单项 -->
-  <div ref="menuBlockRef" @contextmenu="preventDefault" v-show="isShowMenu" class="kk-menu no-select">
+  <div ref="menuBlockRef" @contextmenu="preventDefault" v-show="isShowMenu" class="kk-menu no-select" >
     <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(1)" key="1" >{{ $t('刷新') }}</div>
     <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >{{ $t('打开') }}</div>
     <div style="border-bottom: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length > 1 ? 'disabled':'']" @click="handleMenuSelect(3)" key="3" >{{ $t('复制路径') }}</div>

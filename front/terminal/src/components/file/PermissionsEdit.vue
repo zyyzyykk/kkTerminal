@@ -10,13 +10,13 @@
     draggable
   >
     <template #title>
-      <div class="kk-flex-0 nowrap kk-header-class">
+      <div class="kk-flex-0 nowrap kk-header-class" >
         <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="16" :height="16" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" />
-        <div class="ellipsis" style="margin: 0 5px; font-size: small;">{{ fileInfo.name }}</div>
-        <div style="font-size: small;">{{ $t('权限修改') }}</div>
+        <div class="ellipsis" style="margin: 0 5px; font-size: small;" >{{ fileInfo.name }}</div>
+        <div style="font-size: small;" >{{ $t('权限修改') }}</div>
       </div>
     </template>
-    <div style="margin-top: -25px;"></div>
+    <div style="margin-top: -25px;" ></div>
     <div class="kk-flex" >
       <div class="form-width no-select" >{{ $t('所有者') }}：</div>
       <el-checkbox v-model="permissionsInfo.owner[0]" :label="$t('读取')" size="large" />
@@ -35,10 +35,10 @@
       <el-checkbox v-model="permissionsInfo.others[1]" :label="$t('写入')" size="large" />
       <el-checkbox v-model="permissionsInfo.others[2]" :label="$t('执行')" size="large" />
     </div>
-    <div style="margin-bottom: 5px;"></div>
-    <div style="display: flex; align-items: center; border-top: 1px solid #f1f2f4;">
+    <div style="margin-bottom: 5px;" ></div>
+    <div style="display: flex; align-items: center; border-top: 1px solid #f1f2f4;" >
       <el-checkbox v-if="fileInfo.isDirectory" v-model="permissionsInfo.sub" :label="$t('应用到子目录和文件')" size="small" style="margin-top: 10px;" />
-      <div style="flex: 1;"></div>
+      <div style="flex: 1;" ></div>
       <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;" >
         {{ $t('确定') }}
       </el-button>

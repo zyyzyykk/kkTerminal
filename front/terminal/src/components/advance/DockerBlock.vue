@@ -20,7 +20,7 @@
             <div class="kk-flex" style="margin-top: 25px;" >
               <div style="font-size: large;" >{{ $t('Docker未安装?') }}</div>
               <div>
-                <el-button type="primary" @click="installDocker" style="margin-left: 15px;">
+                <el-button type="primary" @click="installDocker" style="margin-left: 15px;" >
                   {{ $t('安装') }}
                 </el-button>
               </div>
@@ -34,14 +34,14 @@
                 <div style="margin-left: 12px; font-size: 18px; font-weight: bolder;" >{{ $t('Docker应用商店') }}</div>
                 <div style="flex: 1;" ></div>
                 <div>
-                  <el-input v-model="appSearch" class="w-50 m-2" :placeholder="$t('搜索应用')">
+                  <el-input v-model="appSearch" class="w-50 m-2" :placeholder="$t('搜索应用')" >
                     <template #suffix>
-                      <el-icon class="el-input__icon"><Search /></el-icon>
+                      <el-icon class="el-input__icon" ><Search /></el-icon>
                     </template>
                   </el-input>
                 </div>
                 <el-dropdown style="margin-left: 20px;" hide-timeout="300" >
-                  <span class="a-link no-select" >{{ $t(dockerAppTypes[appType]) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+                  <span class="a-link no-select" >{{ $t(dockerAppTypes[appType]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
                   <template #dropdown>
                     <el-dropdown-menu>
                       <template v-for="(type,index) in dockerAppTypes" :key="index" >
@@ -57,7 +57,7 @@
                 <div class="card-item" v-for="(app, index) in dockerApps" :key="index" >
                   <el-card>
                     <template #header>
-                      <div class="card-header">
+                      <div class="card-header" >
                         <div class="kk-flex" >
                           <span class="app-title" >{{ app.name }}</span>
                           <div style="flex: 1;" ></div>
@@ -85,15 +85,15 @@
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('镜像') }}</div>
                   <div class="kk-flex" style="flex: 1;" >
-                    <el-input style="flex: 1;" v-model="deployInfo.imageName" class="w-50 m-2" :placeholder="$t('镜像名称')"></el-input>
+                    <el-input style="flex: 1;" v-model="deployInfo.imageName" class="w-50 m-2" :placeholder="$t('镜像名称')" ></el-input>
                     <div style="margin: 0 5px" >:</div>
-                    <el-input v-model="deployInfo.imageVersion" style="width: 80px;" class="w-50 m-2" :placeholder="$t('版本号')"></el-input>
+                    <el-input v-model="deployInfo.imageVersion" style="width: 80px;" class="w-50 m-2" :placeholder="$t('版本号')" ></el-input>
                   </div>
                 </div>
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('容器') }}</div>
                   <div style="flex: 1;" >
-                    <el-input v-model="deployInfo.containerName" class="w-50 m-2" :placeholder="$t('容器名称')"></el-input>
+                    <el-input v-model="deployInfo.containerName" class="w-50 m-2" :placeholder="$t('容器名称')" ></el-input>
                   </div>
                 </div>
                 <div class="kk-flex deploy-item" >
@@ -130,7 +130,7 @@
             </div>
           </div>
         </el-tab-pane>
-        <el-tab-pane :disabled="noDocker" :label="$t('容器')">
+        <el-tab-pane :disabled="noDocker" :label="$t('容器')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.container.length > 0" :data="dockerInfo.container" @selection-change="tableSelect" border stripe >
             <el-table-column show-overflow-tooltip type="selection" :selectable="selectable" width="40" />
             <el-table-column show-overflow-tooltip prop="id" label="ID" width="130" />
@@ -144,7 +144,7 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.container.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ $t(containerTypeArr[containerType % containerTypeArr.length]) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(containerTypeArr[containerType % containerTypeArr.length]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item class="no-select" @click="containerType = 1" >{{ $t(containerTypeArr[1]) }}</el-dropdown-item>
@@ -159,7 +159,7 @@
             </el-button>
           </div>
         </el-tab-pane>
-        <el-tab-pane :disabled="noDocker" :label="$t('镜像')">
+        <el-tab-pane :disabled="noDocker" :label="$t('镜像')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.image.length > 0" :data="dockerInfo.image" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" :selectable="selectable" width="40" />
             <el-table-column show-overflow-tooltip prop="id" label="ID" width="130" />
@@ -172,7 +172,7 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.image.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item class="no-select" @click="deleteType = 1" >{{ $t(deleteTypeArr[1]) }}</el-dropdown-item>
@@ -184,7 +184,7 @@
             </el-button>
           </div>
         </el-tab-pane>
-        <el-tab-pane :disabled="noDocker" :label="$t('网络')">
+        <el-tab-pane :disabled="noDocker" :label="$t('网络')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.network.length > 0" :data="dockerInfo.network" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" :selectable="selectable" width="40" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="140" />
@@ -197,7 +197,7 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.network.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item class="no-select" @click="deleteType = 2" >{{ $t(deleteTypeArr[2]) }}</el-dropdown-item>
@@ -209,7 +209,7 @@
             </el-button>
           </div>
         </el-tab-pane>
-        <el-tab-pane :disabled="noDocker" :label="$t('数据卷')">
+        <el-tab-pane :disabled="noDocker" :label="$t('数据卷')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.volume.length > 0" :data="dockerInfo.volume" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" :selectable="selectable" width="40" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="140" />
@@ -221,7 +221,7 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.volume.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right"><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item class="no-select" @click="deleteType = 3" >{{ $t(deleteTypeArr[3]) }}</el-dropdown-item>
@@ -291,9 +291,9 @@ export default {
       loading.value = true;
       $.ajax({
         url: http_base_url + '/docker/version',
-        type:'post',
-        data:{
-          sshKey:sshKey,
+        type: 'post',
+        data: {
+          sshKey: sshKey,
         },
         success(resp) {
           if(resp.status === 'success') {
@@ -311,10 +311,10 @@ export default {
       const currentType = (type || 0) % 4;
       $.ajax({
         url: http_base_url + '/docker/info',
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
-          type:currentType,
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
+          type: currentType,
         },
         success(resp) {
           if(resp.status === 'success') {
@@ -419,9 +419,9 @@ export default {
       const type = containerType.value - 1;
       $.ajax({
         url: http_base_url + '/docker/container',
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
           type: type,
           items: selectedItems.value.map(item => {return (item.id || item.name)}).join(' '),
         },
@@ -442,9 +442,9 @@ export default {
       const type = deleteType.value;
       $.ajax({
         url: http_base_url + '/docker/delete',
-        type:'post',
-        data:{
-          sshKey:props.sshKey,
+        type: 'post',
+        data: {
+          sshKey: props.sshKey,
           type: type,
           items: selectedItems.value.map(item => {return (item.id || item.name)}).join(' '),
         },

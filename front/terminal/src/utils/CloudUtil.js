@@ -34,11 +34,11 @@ export const cloud = async (type, name, content) => {
   formData.append('file',file);
   await $.ajax({
     url: http_base_url + '/cloud',
-    type:'post',
+    type: 'post',
     data: formData,
     contentType: false,
     processData: false,
-    success(resp){
+    success(resp) {
       if(resp.status !== 'success') {
         if(resp.code == 506) {
           ElMessage({
