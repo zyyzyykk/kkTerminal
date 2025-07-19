@@ -1,8 +1,8 @@
 <template>
-  <div v-if="statusType == -2" :style="statusStyle" ><el-icon><CircleCloseFilled /></el-icon></div>
-  <div v-else-if="statusType == -1" :style="statusStyle" ><el-icon><WarningFilled /></el-icon></div>
-  <div v-else-if="statusType == 1" :style="statusStyle" ><el-icon><SuccessFilled /></el-icon></div>
-  <div v-else :style="statusStyle" ><el-icon><InfoFilled /></el-icon></div>
+  <el-icon v-if="statusType == -2" :style="statusStyle" ><CircleCloseFilled /></el-icon>
+  <el-icon v-else-if="statusType == -1" :style="statusStyle" ><WarningFilled /></el-icon>
+  <el-icon v-else-if="statusType == 1" :style="statusStyle" ><SuccessFilled /></el-icon>
+  <el-icon v-else :style="statusStyle" ><InfoFilled /></el-icon>
 </template>
 
 <script>

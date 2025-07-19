@@ -5,7 +5,7 @@
         :before-close="closeDialog"
         destroy-on-close
         :width="550"
-        :title="$t('自定义TCode')"
+        :title="$t('TCode工作流')"
         :modal="false"
         modal-class="kk-dialog-class"
         header-class="kk-header-class"
@@ -94,7 +94,7 @@ import { localStore } from "@/env/Store";
 import { localStoreUtil } from "@/utils/CloudUtil";
 
 export default {
-  name: 'UserTCode',
+  name: 'TCodeWorkflow',
   components: {
     AceEditor,
     CollectionTag,
@@ -170,7 +170,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
           let scnt = 0;
           let fcnt = 0;
           for (const key in tcodes) {
-            if(key && key.length >= 2 && key.length <= 6 && (key[0] == 'U' || key[0] == 'u') && isAlphaNumeric(key)) {
+            if(key && key.length >= 2 && key.length <= 6 && (key[0] === 'U' || key[0] === 'u') && isAlphaNumeric(key)) {
               data[key.toUpperCase()] = {
                 desc: tcodes[key].desc || '',
                 workflow:  tcodes[key].workflow || '',

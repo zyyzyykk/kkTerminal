@@ -1,96 +1,102 @@
 <template>
-  <el-dialog
-    v-model="DialogVisible"
-    :before-close="closeDialog"
-    :width="400"
-    :modal="false"
-    modal-class="kk-dialog-class"
-    body-class="kk-body-class-12"
-    align-center
-    draggable
-  >
-    <template #title>
-      <div class="kk-flex-0 nowrap kk-header-class" >
-        <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="16" :height="16" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" />
-        <div class="ellipsis" style="margin: 0 5px; font-size: small;" >{{ fileInfo.name }}</div>
-        <div style="font-size: small;" >{{ $t('属性') }}</div>
-      </div>
-    </template>
-    <div style="margin-top: -32px;" ></div>
-    <div class="no-select" element-loading-text="Loading..." v-loading="loading" >
-      <div class="kk-flex" >
-        <div style="margin-right: 10px;" ><FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="32" :height="32" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" /></div>
-        <div>
-          <el-input @keydown.enter="confirm" v-model="rename" placeholder="" />
+  <div v-resizable="{ minWidthRate: 1, maxWidthRate: 1.2 }" >
+    <el-dialog
+        v-model="DialogVisible"
+        :before-close="closeDialog"
+        :width="400"
+        :modal="false"
+        modal-class="kk-dialog-class"
+        body-class="kk-body-class-12"
+        align-center
+        draggable
+    >
+      <template #title>
+        <div class="kk-flex-0 nowrap kk-header-class" >
+          <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="16" :height="16" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" />
+          <div class="ellipsis" style="margin: 0 5px; font-size: small;" >{{ fileInfo.name }}</div>
+          <div style="font-size: small;" >{{ $t('属性') }}</div>
+        </div>
+      </template>
+      <div style="margin-top: -32px;" ></div>
+      <div class="no-select" element-loading-text="Loading..." v-loading="loading" >
+        <div class="kk-flex" >
+          <div style="margin-right: 10px;" ><FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="32" :height="32" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" /></div>
+          <div><el-input @keydown.enter="confirm" v-model="rename" placeholder="" /></div>
+        </div>
+        <div class="kk-border" ></div>
+        <div class="kk-flex nowrap" >
+          <div class="form-width" >{{ $t('位置') }}：</div>
+          <ToolTip :content="fileDir + fileInfo.name" >
+            <template #content>
+              <div class="ellipsis" >
+                {{ fileDir + fileInfo.name }}
+              </div>
+            </template>
+          </ToolTip>
+          <div style="cursor: pointer; margin-left: 7px;" @click="doCopy(fileDir + fileInfo.name)" >
+            <el-icon size="18" ><DocumentCopy /></el-icon>
+          </div>
+        </div>
+        <div v-if="fileInfo.isDirectory" class="kk-flex" >
+          <div class="form-width" >{{ $t('包含') }}：</div>
+          <div class="ellipsis" >
+            {{ $t(includeInfo) }}
+          </div>
+          <div v-if="uploading" style="margin-left: 10px;" >
+            <el-tag size="small" type="warning" >{{ $t('正在上传').toLowerCase() }}</el-tag>
+          </div>
+          <div v-else-if="fileInfo.isSymlink || unreliable" style="margin-left: 10px;" >
+            <el-tag size="small" type="danger" >{{ $t('未确认').toLowerCase() }}</el-tag>
+          </div>
+          <div style="cursor: pointer; margin-left: 7px;" @click="getFolderInclude" >
+            <el-icon size="18" ><Refresh /></el-icon>
+          </div>
+        </div>
+        <div v-else class="kk-flex" >
+          <div class="form-width" >{{ $t('大小') }}：</div>
+          <div class="ellipsis" >
+            {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size.toLocaleString() + ' ' + $t('字节') }})
+          </div>
+          <div v-if="uploading" style="margin-left: 10px;" >
+            <el-tag size="small" type="warning" >{{ $t('正在上传').toLowerCase() }}</el-tag>
+          </div>
+          <div v-else-if="fileInfo.isSymlink || unreliable" style="margin-left: 10px;" >
+            <el-tag size="small" type="danger" >{{ $t('未确认').toLowerCase() }}</el-tag>
+          </div>
+          <div style="cursor: pointer; margin-left: 7px;" @click="getFileSize" >
+            <el-icon size="18" ><Refresh /></el-icon>
+          </div>
+        </div>
+        <div class="kk-border" ></div>
+        <div class="kk-flex" >
+          <div class="form-width" >{{ $t('修改时间') }}：</div>
+          <div>
+            {{ calcDate(fileInfo.attributes.mtime) }}
+          </div>
+        </div>
+        <div class="kk-flex" >
+          <div class="form-width" >{{ $t('访问时间') }}：</div>
+          <div>
+            {{ calcDate(fileInfo.attributes.atime) }}
+          </div>
+        </div>
+        <div class="kk-border" ></div>
+        <div class="kk-flex" >
+          <div class="form-width" >{{ $t('权限') }}：</div>
+          <div>
+            {{ calcPriority(fileInfo.attributes.mode.type,fileInfo.attributes.permissions) }}
+          </div>
+          <div style="cursor: pointer; margin-left: 7px;" @click="openEditPermissions" >
+            <el-icon size="18" ><Edit /></el-icon>
+          </div>
+          <div style="flex: 1;" ></div>
+          <div>
+            <el-button size="small" type="primary" @click="confirm" >{{ $t('确定') }}</el-button>
+          </div>
         </div>
       </div>
-      <div class="kk-border" ></div>
-      <div class="kk-flex nowrap" >
-        <div class="form-width" >{{ $t('位置') }}：</div>
-        <ToolTip :content="fileDir + fileInfo.name" >
-          <template #content>
-            <div class="ellipsis" >
-              {{ fileDir + fileInfo.name }}
-            </div>
-          </template>
-        </ToolTip>
-        <div style="cursor: pointer; margin-left: 7px;" @click="doCopy(fileDir + fileInfo.name)" >
-          <el-icon size="18" ><DocumentCopy /></el-icon>
-        </div>
-      </div>
-      <div v-if="fileInfo.isDirectory" class="kk-flex" >
-        <div class="form-width" >{{ $t('包含') }}：</div>
-        <div class="ellipsis" >
-          {{ $t(includeInfo) }}
-        </div>
-        <div v-if="fileInfo.isSymlink || unreliable" style="margin-left: 10px;" >
-          <el-tag size="small" type="danger" >unsure</el-tag>
-        </div>
-        <div style="cursor: pointer; margin-left: 7px;" @click="getFolderInclude" >
-          <el-icon size="18" ><Refresh /></el-icon>
-        </div>
-      </div>
-      <div v-else class="kk-flex" >
-        <div class="form-width" >{{ $t('大小') }}：</div>
-        <div class="ellipsis" >
-          {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size.toLocaleString() + ' ' + $t('字节') }})
-        </div>
-        <div v-if="fileInfo.isSymlink || unreliable" style="margin-left: 10px;" >
-          <el-tag size="small" type="danger" >unsure</el-tag>
-        </div>
-        <div style="cursor: pointer; margin-left: 7px;" @click="getFileSize" >
-          <el-icon size="18" ><Refresh /></el-icon>
-        </div>
-      </div>
-      <div class="kk-border" ></div>
-      <div class="kk-flex" >
-        <div class="form-width" >{{ $t('修改时间') }}：</div>
-        <div>
-          {{ calcDate(fileInfo.attributes.mtime) }}
-        </div>
-      </div>
-      <div class="kk-flex" >
-        <div class="form-width" >{{ $t('访问时间') }}：</div>
-        <div>
-          {{ calcDate(fileInfo.attributes.atime) }}
-        </div>
-      </div>
-      <div class="kk-border" ></div>
-      <div class="kk-flex" >
-        <div class="form-width" >{{ $t('权限') }}：</div>
-        <div>
-          {{ calcPriority(fileInfo.attributes.mode.type,fileInfo.attributes.permissions) }}
-        </div>
-        <div style="cursor: pointer; margin-left: 7px;" @click="openEditPermissions" >
-          <el-icon size="18" ><Edit /></el-icon>
-        </div>
-        <div style="flex: 1;" ></div>
-        <div>
-          <el-button size="small" type="primary" @click="confirm" >{{ $t('确定') }}</el-button>
-        </div>
-      </div>
-    </div>
-  </el-dialog>
+    </el-dialog>
+  </div>
 
   <!-- 权限修改 -->
   <PermissionsEdit ref="permissionsEditRef" @editPermissions="editPermissions" ></PermissionsEdit>
@@ -98,7 +104,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import $ from 'jquery';
 import { http_base_url } from '@/env/BaseUrl';
 import { calcDate } from '@/components/calc/CalcDate';
@@ -125,7 +131,7 @@ export default {
     Edit,
     PermissionsEdit,
   },
-  props:['sshKey'],
+  props:['sshKey','uploadingList'],
   setup(props,context) {
     // 拷贝
     const { toClipboard } = useClipboard();
@@ -276,6 +282,23 @@ export default {
       permissionsEditRef.value.init();
     };
 
+    // 是否正在上传
+    const uploading = computed(() => {
+      for(const key in props.uploadingList) {
+        const uploadingFile = props.uploadingList[key];
+        if((uploadingFile.path + uploadingFile.name).startsWith(fileDir.value + fileInfo.value.name)) return true;
+      }
+      return false;
+    });
+    watch(uploading, (newVal) => {
+      if(newVal === false) {
+        setTimeout(() => {
+          if(fileInfo.value.isDirectory) getFolderInclude();
+          else getFileSize();
+        }, 1);
+      }
+    });
+
     // 关闭
     const closeDialog = (done) => {
       if(permissionsEditRef.value) permissionsEditRef.value.closeDialog();
@@ -306,6 +329,7 @@ export default {
       permissionsEditRef,
       openEditPermissions,
       editPermissions,
+      uploading,
     }
   }
 }
@@ -346,6 +370,7 @@ export default {
 
 .form-width {
   text-align: left;
-  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
 }
 </style>

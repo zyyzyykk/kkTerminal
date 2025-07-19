@@ -6,10 +6,9 @@
       <div class="setting-menu no-select" @click="doSettings(2)" ><div>{{ $t('偏好设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(4)" ><div>{{ $t('文件管理') }}</div></div>
       <div @mousemove="showAdvance(true)" @mouseleave="showAdvance(false)" :class="['setting-menu', 'no-select', (sshKey && env.advance) ? '':'disabled']" @click="doSettings(5)" >
-        <div style="flex: 2" ></div>
         <div>{{ $t('高级') }}</div>
         <div style="flex: 1" ></div>
-        <el-icon style="margin-right: 2px" ><ArrowRight /></el-icon>
+        <el-icon><ArrowRight /></el-icon>
       </div>
       <div class="setting-menu no-select" @click="doSettings(3)" ><div>{{ $t('重启') }}</div></div>
     </div>
@@ -19,7 +18,7 @@
       <div class="setting-menu no-select" @click="doSettings(8)" ><div>Docker</div></div>
     </div>
     <div v-if="urlParams.mode !== 'headless'" class="kk-flex bar" >
-      <div style="user-select: none;" @click="isShowSetting = !isShowSetting; isShowAdvance = false; showAdvance(false);" >
+      <div class="no-select" @click="isShowSetting = !isShowSetting; isShowAdvance = false; showAdvance(false);" >
         <img src="@/assets/terminal.svg" alt="terminal" style="height: 16px; margin: 0 7px; cursor: pointer;" >
       </div>
       <div class="ellipsis no-select" style="font-size: 14px; line-height: 18px;" ><span>kk Terminal</span></div>
@@ -189,22 +188,22 @@
             >
             </el-input>
           </div>
-          <el-popover v-if="env.tCode" placement="bottom-end" :width="$t('220')" trigger="click" >
+          <el-popover v-if="env.tCode" placement="bottom-end" :width="$t('232')" trigger="click" >
             <template #reference>
               <el-icon :style="{ color: '#606266', cursor: 'pointer' }" ><QuestionFilled /></el-icon>
             </template>
-            <div v-if="env.tCode" style="font-size: 12px; color: #313131;" >
-              <div style="user-select: none; font-size: 14px; font-weight: bold;" >{{ $t('什么是 TCode (终端代码) ？') }}</div>
-              <div style="user-select: none; margin-top: 5px;" >{{ $t('TCode（终端代码）是用于访问和执行特定操作流程的快捷方式') }}</div>
-              <div style="user-select: none; margin-top: 5px;" >
-                {{ $t('输入') }}
-                <span style="background-color: #f3f4f4; user-select: text;" >/H</span>
-                {{ $t('并按下回车，查看帮助信息') }}
+            <div v-if="env.tCode" class="no-select" style="font-size: 12px; color: #313131;" >
+              <div style="font-size: 14px; font-weight: bold;" >{{ $t('什么是 TCode (终端代码) ？') }}</div>
+              <div style="margin-top: 5px;" >{{ $t('TCode（终端代码）是用于访问和执行特定操作流程的快捷方式') }}</div>
+              <div class="kk-flex" style="margin-top: 5px;" >
+                <div>{{ $t('输入') }}&nbsp;</div>
+                <div style="background-color: #f3f4f4; user-select: text;" >STC</div>
+                <div>&nbsp;{{ $t('并按下回车以查看更多信息') }}</div>
               </div>
-              <div style="user-select: none; margin-top: 5px;" >
-                {{ $t('输入') }}
-                <span style="background-color: #f3f4f4; user-select: text;" >/A</span>
-                {{ $t('并按下回车，自定义TCode') }}
+              <div class="kk-flex" style="margin-top: 5px;" >
+                <div>{{ $t('输入') }}&nbsp;</div>
+                <div style="background-color: #f3f4f4; user-select: text;" >STW</div>
+                <div>&nbsp;{{ $t('并按下回车以自定义工作流') }}</div>
               </div>
             </div>
           </el-popover>
@@ -217,19 +216,19 @@
 
   <!-- 连接设置 -->
   <ConnectSetting ref="connectSettingRef" :env="env" :sshOptions="options" @saveOp="saveOp" @deleteOp="deleteOp" @callback="saveEnv" ></ConnectSetting>
-  <!-- 样式设置 -->
-  <StyleSetting ref="styleSettingRef" :env="env" @callback="saveEnv" :os="osInfo.clientOS" ></StyleSetting>
+  <!-- 偏好设置 -->
+  <PreferenceSetting ref="preferenceSettingRef" :env="env" @callback="saveEnv" :os="osInfo.clientOS" ></PreferenceSetting>
   <!-- 文件管理 -->
-  <FileBlock ref="fileBlockRef" :sshKey="sshKey" :os="osInfo.clientOS" @updateTransportLists="updateTransportLists" ></FileBlock>
-  <!-- 用户TCode -->
-  <UserTCode ref="userTCodeRef" @importTCodes="importTCodes" @exportTCodes="exportTCodes" ></UserTCode>
-  <!-- 帮助TCode -->
-  <HelpTCode ref="helpTCodeRef" :userTCodes="tcodes" @handleSaveTCode="handleSaveTCode" @handleDeleteTCode="handleDeleteTCode" ></HelpTCode>
-  <!--协作-->
+  <FileBlock ref="fileBlockRef" :sshKey="sshKey" :os="osInfo.clientOS" @updateTransportLists="updateTransportLists" :uploadingList="uploadingList" ></FileBlock>
+  <!-- TCode工作流 -->
+  <TCodeWorkflow ref="tCodeWorkflowRef" @importTCodes="importTCodes" @exportTCodes="exportTCodes" ></TCodeWorkflow>
+  <!-- TCode中心 -->
+  <TCodeCenter ref="tCodeCenterRef" :userTCodes="tcodes" @handleSaveTCode="handleSaveTCode" @handleDeleteTCode="handleDeleteTCode" ></TCodeCenter>
+  <!-- 协作 -->
   <CooperateGen ref="cooperateGenRef" :sshKey="sshKey" :advance="env.advance" @handleCooperate="handleCooperate" ></CooperateGen>
-  <!--监控-->
+  <!-- 监控 -->
   <StatusMonitor ref="statusMonitorRef" :sshKey="sshKey" :advance="env.advance" ></StatusMonitor>
-  <!--Docker-->
+  <!-- Docker -->
   <DockerBlock ref="dockerBlockRef" :sshKey="sshKey" :advance="env.advance" @install="installDocker" @deploy="runContainer" ></DockerBlock>
 
 </template>
@@ -251,16 +250,16 @@ import { changeStr, changeBase64Str, changeStrBase64, generateRandomString } fro
 import { http_base_url } from '@/env/BaseUrl';
 
 import ConnectSetting from '@/components/connect/ConnectSetting';
-import StyleSetting from '@/components/StyleSetting';
+import PreferenceSetting from '@/components/PreferenceSetting';
 import FileBlock from "@/components/file/FileBlock";
-import UserTCode from '@/components/tcode/UserTCode';
-import HelpTCode from "@/components/tcode/HelpTCode";
+import TCodeWorkflow from '@/components/tcode/TCodeWorkflow';
+import TCodeCenter from "@/components/tcode/TCodeCenter";
 import CooperateGen from '@/components/advance/CooperateGen';
 import StatusMonitor from '@/components/advance/StatusMonitor'
 import DockerBlock from "@/components/advance/DockerBlock";
 import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
 import { QuestionFilled, VideoPlay, VideoPause, ChromeFilled, ArrowRight, UserFilled, FolderOpened, CircleClose } from '@element-plus/icons-vue';
-import { FuncTCode, SysTCode, UserTCodeExecutor, historyTCode } from "@/components/tcode/TCode";
+import { FuncTCode, SysTCode, UserTCodeExecutor, UserTCodeHelper, historyTCode } from "@/components/tcode/TCode";
 
 import i18n from "@/locales/i18n";
 import { cloud, load, syncUpload, syncDownload, localStoreUtil } from "@/utils/CloudUtil";
@@ -281,10 +280,10 @@ export default {
     ToolTip,
     DockerBlock,
     ConnectSetting,
-    StyleSetting,
+    PreferenceSetting,
     FileBlock,
-    UserTCode,
-    HelpTCode,
+    TCodeWorkflow,
+    TCodeCenter,
     CooperateGen,
     StatusMonitor,
     QuestionFilled,
@@ -389,7 +388,7 @@ export default {
         tcodes.value = JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['tcodes'])));
       }
       setTimeout(() => {
-        helpTCodeRef.value.userTCodes = {...tcodes.value};
+        tCodeCenterRef.value.userTCodes = {...tcodes.value};
       },1);
     };
     loadTCodes();
@@ -588,14 +587,14 @@ export default {
         // 输出
         else if(result.code == 1) {
           const output = aesDecrypt(aesDecrypt(result.data), secretKey.value);
-          if(UserTCodeExecutor.active) UserTCodeExecutor.outArray.push(output);
+          if(UserTCodeHelper.active) UserTCodeHelper.outArray.push(output);
           if(recording.value) {
             recordInfo.value.push({
               time: new Date().getTime(),
               content: output,
             });
           }
-          if(!(UserTCodeExecutor.active && !UserTCodeExecutor.display)) termWrite(output);
+          if(!(UserTCodeHelper.active && !UserTCodeHelper.display)) termWrite(output);
         }
         // 更新协作者数量
         else if(result.code == 2) {
@@ -632,7 +631,7 @@ export default {
           now_connect_status.value = connect_status.value['Disconnected'];
           termWrite("\r\n" + now_connect_status.value);
         }
-        userTCodeExecutorReset();
+        UserTCodeHelper.reset();
       };
     };
 
@@ -647,14 +646,14 @@ export default {
     let advanceTimer = null;
     const showAdvance = (newVal) => {
       if(advanceTimer) clearTimeout(advanceTimer);
-      if(isShowAdvance.value != newVal) {
+      if(isShowAdvance.value !== newVal) {
         advanceTimer = setTimeout(() => {
           isShowAdvance.value = newVal;
         }, 400);
       }
     };
     const connectSettingRef = ref();
-    const styleSettingRef = ref();
+    const preferenceSettingRef = ref();
     const fileBlockRef = ref();
     const cooperateGenRef = ref();
     const statusMonitorRef = ref();
@@ -679,7 +678,7 @@ export default {
           termFit();
           isFirst.value = false;
         }
-        if(UserTCodeExecutor.active === active) socket.value.send(aesEncrypt(JSON.stringify({type:0,content:text,rows:0,cols:0}), secretKey.value));
+        if(UserTCodeHelper.active === active) socket.value.send(aesEncrypt(JSON.stringify({type:0,content:text,rows:0,cols:0}), secretKey.value));
       }
     };
 
@@ -744,17 +743,17 @@ export default {
     // 终端设置
     const doSettings = (type) => {
       // 连接设置
-      if(type == 1) {
+      if(type === 1) {
         showSettings(false);
         connectSettingRef.value.DialogVisible = true;
       }
       // 偏好设置
-      else if (type == 2) {
+      else if (type === 2) {
         showSettings(false);
-        styleSettingRef.value.DialogVisible = true;
+        preferenceSettingRef.value.DialogVisible = true;
       }
       // 重启
-      else if (type == 3) {
+      else if (type === 3) {
         showSettings(false);
         now_connect_status.value = connect_status.value['Connecting'];
         sshKey.value = '';
@@ -765,24 +764,24 @@ export default {
         doSSHConnect();
       }
       // 文件管理
-      else if(type == 4) {
+      else if(type === 4) {
         showSettings(false);
         fileBlockRef.value.getInitDir();
         fileBlockRef.value.DialogVisible = true;
       }
       // 高级
-      else if(type == 5) {
+      else if(type === 5) {
         isShowSetting.value = true;
         isShowAdvance.value = true;
         showAdvance(true);
       }
       // 协作
-      else if(type == 6) {
+      else if(type === 6) {
         showSettings(false);
         cooperateGenRef.value.DialogVisible = true;
       }
       // 监控
-      else if(type == 7) {
+      else if(type === 7) {
         showSettings(false);
         setTimeout(() => {
           statusMonitorRef.value.updateNetworkData();
@@ -791,7 +790,7 @@ export default {
         statusMonitorRef.value.DialogVisible = true;
       }
       // Docker
-      else if(type == 8) {
+      else if(type === 8) {
         showSettings(false);
         dockerBlockRef.value.DialogVisible = true;
       }
@@ -806,7 +805,7 @@ export default {
             socket.value.send(aesEncrypt(JSON.stringify({type:2,content:"",rows:0,cols:0}), secretKey.value));
           }
           // PC端
-          if(osInfo.value.serverOS != "Linux") {
+          if(osInfo.value.serverOS !== "Linux") {
             $.ajax({
               url: http_base_url + '/beat',
               type: 'post',
@@ -842,7 +841,7 @@ export default {
       tcodes.value[transTCode].status = state;
       localStoreUtil.setItem(localStore['tcodes'], aesEncrypt(JSON.stringify(tcodes.value)));
       setTimeout(() => {
-        helpTCodeRef.value.userTCodes = {...tcodes.value};
+        tCodeCenterRef.value.userTCodes = {...tcodes.value};
       },1);
     };
 
@@ -867,11 +866,12 @@ export default {
       else if(transTCode[0] === 'S' && SysTCode[transTCode]) SysTCode[transTCode].execFlow(instance);
       // 用户TCode
       else if(transTCode[0] === 'U' && tcodes.value[transTCode]) {
-        if(!UserTCodeExecutor.writeOnly) UserTCodeExecutor.writeOnly = sendMessage;
+        if(!UserTCodeHelper.writeNoAwait) UserTCodeHelper.writeNoAwait = sendMessage;
+        if(!UserTCodeHelper.context) UserTCodeHelper.fileBlockRef = fileBlockRef.value;
         // 未激活
-        if(!UserTCodeExecutor.active) {
-          userTCodeExecutorReset();
-          UserTCodeExecutor.active = true;
+        if(!UserTCodeHelper.active) {
+          UserTCodeHelper.reset();
+          UserTCodeHelper.active = true;
           // 执行流未被定义
           if(!tcodes.value[transTCode].execFlow || !(tcodes.value[transTCode].execFlow instanceof Function)) {
             const textFlow = tcodes.value[transTCode].workflow.toString();
@@ -884,7 +884,7 @@ export default {
                 type: 'error',
                 grouping: true,
               });
-              userTCodeExecutorReset();
+              UserTCodeHelper.reset();
               return;
             }
           }
@@ -905,7 +905,7 @@ export default {
             });
             setTCodeStatus(transTCode, 'Execute Interrupt');
           } finally {
-            userTCodeExecutorReset();
+            UserTCodeHelper.reset();
           }
         }
         else {
@@ -933,14 +933,7 @@ export default {
         }
       }
     };
-    // 重置用户TCode执行器
-    const userTCodeExecutorReset = () => {
-      UserTCodeExecutor.active = false;
-      UserTCodeExecutor.display = true;
-      UserTCodeExecutor.outArray = [];
-      UserTCodeExecutor.cnt = 0;
-    };
-    const userTCodeRef = ref();
+    const tCodeWorkflowRef = ref();
     // 批量导入TCode
     const importTCodes = (data) => {
       const tCodeData = {...tcodes.value,...data};
@@ -964,8 +957,8 @@ export default {
       // 释放 URL 对象
       URL.revokeObjectURL(url);
     };
-    // 帮助
-    const helpTCodeRef = ref();
+    // TCode中心
+    const tCodeCenterRef = ref();
     const handleSaveTCode = (name, content) => {
       const data = {};
       data[name] = {
@@ -1039,8 +1032,8 @@ export default {
       isShowDropdown.value = status;
       isShowDot.value = false;
     };
-    const fileBlockView = (path, name) => {
-      fileBlockRef.value.fileBlockView(path, name);
+    const fileBlockView = async (path, name) => {
+      await fileBlockRef.value.fileBlockView(path, name);
     };
 
     onMounted(async () => {
@@ -1092,7 +1085,7 @@ export default {
       isShowAdvance,
       doSettings,
       connectSettingRef,
-      styleSettingRef,
+      preferenceSettingRef,
       fileBlockRef,
       cooperateGenRef,
       statusMonitorRef,
@@ -1107,11 +1100,11 @@ export default {
       closeBlock,
       resetTerminal,
       tcodes,
-      userTCodeRef,
+      tCodeWorkflowRef,
       sendMessage,
       importTCodes,
       exportTCodes,
-      helpTCodeRef,
+      tCodeCenterRef,
       handleSaveTCode,
       handleDeleteTCode,
       osInfo,
@@ -1192,10 +1185,10 @@ export default {
 .setting-menu {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
   background-color: #f2f2f2;
-  text-align: center;
-  width: 80px;
+  padding-left: 8px;
+  width: 84px;
   height: 25px;
   line-height: 25px;
   font-size: 13px;
@@ -1208,7 +1201,7 @@ export default {
 
 .advance {
   position: absolute;
-  left: 84px;
+  left: 88px;
   top: 100px;
   z-index: 100;
   cursor: pointer;

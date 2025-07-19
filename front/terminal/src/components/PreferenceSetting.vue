@@ -143,7 +143,7 @@ import { ArrowDown } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 
 export default {
-  name:'StyleSetting',
+  name:'PreferenceSetting',
   components: {
     ArrowDown,
   },
@@ -162,10 +162,10 @@ export default {
 
     // 字体列表
     const fontFamilyList = computed(() => {
-      if(props.os == "Windows") {
+      if(props.os === "Windows") {
         return ['Courier New','Consolas','Monospace','Lucida Console'];
       }
-      else if(props.os == "Mac" || props.os == "iOS") {
+      else if(props.os === "Mac" || props.os === "iOS") {
         return ['Courier New','Menlo','Monaco','Courier'];
       }
       else return ['Courier New','Consolas','Monospace','Lucida Console'];

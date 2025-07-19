@@ -26,8 +26,8 @@
               <span class="a-link" >{{ openEncode }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <template v-for="(name,index) in encodeSet" :key="index" >
-                    <el-dropdown-item class="no-select" @click="changeEncode(0, name)" >{{ name }}</el-dropdown-item>
+                  <template v-for="(item,index) in encodeSet" :key="index" >
+                    <el-dropdown-item class="no-select" @click="changeEncode(0, item)" >{{ item }}</el-dropdown-item>
                   </template>
                 </el-dropdown-menu>
               </template>
@@ -39,8 +39,8 @@
               <span class="a-link" >{{ saveEncode }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <template v-for="(name,index) in encodeSet" :key="index" >
-                    <el-dropdown-item class="no-select" @click="changeEncode(1, name)" >{{ name }}</el-dropdown-item>
+                  <template v-for="(item,index) in encodeSet" :key="index" >
+                    <el-dropdown-item class="no-select" @click="changeEncode(1, item)" >{{ item }}</el-dropdown-item>
                   </template>
                 </el-dropdown-menu>
               </template>
@@ -54,8 +54,8 @@
             <span class="a-link" >{{ mode }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>
-                <template v-for="(name,index) in modeSet" :key="index" >
-                  <el-dropdown-item class="no-select" @click="setMode(name)" >{{ name }}</el-dropdown-item>
+                <template v-for="(item,index) in modeSet" :key="index" >
+                  <el-dropdown-item class="no-select" @click="setMode(item)" >{{ item }}</el-dropdown-item>
                 </template>
               </el-dropdown-menu>
             </template>
@@ -149,12 +149,18 @@ export default {
 
     const jqXHR = ref(null);
 
-    const initText = async () => {
+    const initText = async (config={}) => {
       loading.value = true;
       reset();
       const url = fileUrl.value;
       previewInfo.value = previewFileInfo(fileName.value);
       initEncode(url);
+      if(config) {
+        if(config.encode) openEncode.value = config.encode;
+        if(config.mode) mode.value = config.mode;
+        if(config.indent) indent.value = config.indent;
+        if(config.size) fontSize.value = config.size;
+      }
       jqXHR.value = $.ajax({
         url: url,
         method: 'GET',
@@ -178,11 +184,8 @@ export default {
               imgHeight.value = -1;
             }
             else {
-              const text = decodeArrayToStr(new Uint8Array(resp), openEncode.value);
-              codeEditorRef.value.setValue(text);
-              codeEditorRef.value.resetHistory();
-              mode.value = 'auto';
-              codeEditorRef.value.setLanguage(fileName.value);
+              const content = decodeArrayToStr(new Uint8Array(resp), openEncode.value);
+              initEditor(content);
               setIndent();
               setFontSize();
             }
@@ -209,9 +212,9 @@ export default {
       modifyTag.value = '*';
     };
 
-    const handleSave = (text) => {
+    const handleSave = (content) => {
       if(modifyTag.value !== '*') return;
-      context.emit('doSave',fileName.value, fileUrl.value, encodeStrToArray(text, (saveEncode.value || "UTF-8")));
+      context.emit('doSave',fileName.value, fileUrl.value, encodeStrToArray(content, (saveEncode.value || "UTF-8")));
       modifyTag.value = '';
     };
 
@@ -229,17 +232,17 @@ export default {
       if(!openEncode.value) openEncode.value = serverEncode;
       if(!saveEncode.value) saveEncode.value = serverEncode;
     };
-    const changeEncode = (type, name) => {
+    const changeEncode = (type, encode) => {
       // 打开编码
       if(type === 0) {
-        if(openEncode.value === name) return;
+        if(openEncode.value === encode) return;
         if(!loading.value) initText();
-        openEncode.value = name;
+        openEncode.value = encode;
         DialogVisible.value = true;
       }
       // 保存编码
       else if(type === 1) {
-        saveEncode.value = name;
+        saveEncode.value = encode;
         modifyTag.value = '*';
       }
     };
@@ -247,10 +250,15 @@ export default {
     // 语言模式
     const mode = ref('auto');
     const modeSet = ref(['auto','xml','bash','json']);
-    const setMode = (name) => {
-      if(mode.value === name) return;
-      mode.value = name;
-      codeEditorRef.value.setLanguage((name === 'auto') ? fileName.value : ("kk." + name));
+    const setMode = (type) => {
+      if(mode.value === type) return;
+      mode.value = type;
+      codeEditorRef.value.setLanguage((mode.value === 'auto') ? fileName.value : ("kk." + mode.value));
+    };
+    const initEditor = (content) => {
+      codeEditorRef.value.setValue(content);
+      codeEditorRef.value.resetHistory();
+      codeEditorRef.value.setLanguage((mode.value === 'auto') ? fileName.value : ("kk." + mode.value));
     };
 
     // 缩进
@@ -332,7 +340,6 @@ export default {
       // fontSize.value = 14;
       percentage.value = 100;
       imgHeight.value = -1;
-      DialogVisible.value = false;
     };
 
     // 关闭
@@ -364,6 +371,7 @@ export default {
       mode,
       modeSet,
       setMode,
+      initEditor,
       indent,
       setIndent,
       fontSize,

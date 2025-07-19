@@ -8,44 +8,35 @@ import i18n from "@/locales/i18n";
 
 // 功能TCode, 以 / 开头
 export const FuncTCode = {
-    '/A': {
-        desc: i18n.global.k('自定义TCode'),
+    '/S': {
+        desc: i18n.global.k('重启终端'),
         execFlow(context) {
-            setTimeout(() => {
-                context.proxy.userTCodeRef.initText();
-            },1);
-            context.proxy.userTCodeRef.DialogVisible = true;
+            context.proxy.doSettings(3);
+        }
+    },
+    '/L': {
+        desc: i18n.global.k('刷新页面'),
+        execFlow() {
+            window.location.reload();
+        }
+    },
+    '/E': {
+        desc: i18n.global.k('用户退出登录'),
+        execFlow(context) {
+            if(context.proxy.socket) context.proxy.socket.close(3131);
         }
     },
     '/O': {
-        desc: i18n.global.k('新建窗口'),
+        desc: i18n.global.k('新建终端窗口'),
         execFlow() {
             const _url = window.location.href;
             window.open(_url, '_blank');
         }
     },
     '/C': {
-        desc: i18n.global.k('关闭窗口'),
+        desc: i18n.global.k('关闭终端窗口'),
         execFlow() {
             window.close();
-        }
-    },
-    '/E': {
-        desc: i18n.global.k('退出登录'),
-        execFlow(context) {
-            if(context.proxy.socket) context.proxy.socket.close(3131);
-        }
-    },
-    '/R': {
-        desc: i18n.global.k('刷新页面'),
-        execFlow() {
-            window.location.reload();
-        }
-    },
-    '/H': {
-        desc: i18n.global.k('帮助'),
-        execFlow(context) {
-            context.proxy.helpTCodeRef.DialogVisible = true;
         }
     },
 };
@@ -91,22 +82,60 @@ export const SysTCode = {
             context.proxy.doSettings(8);
         }
     },
-    'SS': {
-        desc: i18n.global.k('重启'),
+    'STC': {
+        desc: i18n.global.k('TCode中心'),
         execFlow(context) {
-            context.proxy.doSettings(3);
+            context.proxy.tCodeCenterRef.DialogVisible = true;
+        }
+    },
+    'STW': {
+        desc: i18n.global.k('TCode工作流'),
+        execFlow(context) {
+            setTimeout(() => {
+                context.proxy.tCodeWorkflowRef.initText();
+            },1);
+            context.proxy.tCodeWorkflowRef.DialogVisible = true;
         }
     },
 };
 
 // 用户TCode, 以 U 开头
 export const UserTCodeExecutor = {
-    active: false,
-    display: true,
-    outArray: [],
-    cnt: 0,
+    // 文件
+    file: {
+        async cd(dir) {
+            await UserTCodeHelper.fileBlockRef.fileBlockView(dir);
+        },
+        async open(path, config={}) {
+            const { dir, name } = UserTCodeHelper.parsePath(path);
+            const fileInfo = await UserTCodeHelper.fileBlockRef.fileBlockView(dir, name);
+            if(fileInfo && !fileInfo.isDirectory) await UserTCodeHelper.fileBlockRef.preViewFile(name, config);
+            else throw new Error(i18n.global.t('无法打开文件：') + name);
+        },
+        edit(editFlow) {
+            if(editFlow && editFlow instanceof Function) editFlow(UserTCodeHelper.fileBlockRef.txtPreviewRef.codeEditorRef.aceEditor);
+        },
+        save(encode) {
+            const txtPreviewInstance = UserTCodeHelper.fileBlockRef.txtPreviewRef;
+            if(encode) txtPreviewInstance.saveEncode = encode;
+            txtPreviewInstance.handleSave(txtPreviewInstance.codeEditorRef.getValue());
+        },
+        close(block=false) {
+            if(block) UserTCodeHelper.fileBlockRef.closeDialog();
+            else UserTCodeHelper.fileBlockRef.txtPreviewRef.closeDialog();
+        },
+        async download(path) {
+            const { dir, name } = UserTCodeHelper.parsePath(path);
+            const fileInfo = await UserTCodeHelper.fileBlockRef.fileBlockView(dir, name);
+            if(fileInfo) {
+                if(fileInfo.isDirectory) UserTCodeHelper.fileBlockRef.downloadDir(name);
+                else UserTCodeHelper.fileBlockRef.downloadRemoteFile(name);
+            }
+            else throw new Error(i18n.global.t('无法下载文件：') + name);
+        },
+    },
     // 变量
-    variables: {
+    var: {
         session(key,value) {
             if(value) sessionStorage.setItem(storageSessionPrefix + key,JSON.stringify(value));
             else {
@@ -140,35 +169,51 @@ export const UserTCodeExecutor = {
             localStoreUtil.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tCodeLocalVars)));
         }
     },
-    // 仅向terminal写入，不等待
-    writeOnly: null,
-    // 向terminal写入并等待
-    async writeAndWait(content, time = 200) {
+    // 写入后等待
+    async write(content, time = 200) {
         if(!content) content = '\n';
-        else if(content[content.length - 1] !== '\n' && content[content.length - 1] !== '\r') content += '\n';
-        this.cnt = this.outArray.length;
-        this.writeOnly(content, true);
-        await new Promise(resolve => setTimeout(resolve, Math.max(0, time)));
-    },
-    // writeAndWait简写
-    write(content, time = 200) {
-        return this.writeAndWait(content, time);
+        else if(!content.endsWith('\n') && !content.endsWith('\r')) content += '\n';
+        UserTCodeHelper.cnt = UserTCodeHelper.outArray.length;
+        UserTCodeHelper.writeNoAwait(content, true);
+        await new Promise(resolve => setTimeout(resolve, Math.max(200, time)));
+        return this.read();
     },
     // 读取输出
     read() {
-        return filter(this.outArray.slice(this.cnt));
+        return filter(UserTCodeHelper.outArray.slice(UserTCodeHelper.cnt));
     },
     // 读取全部输出
     readAll() {
-        return filter(this.outArray.slice(0));
+        return filter(UserTCodeHelper.outArray.slice(0));
     },
     // 隐藏
     hide() {
-        this.display = false;
+        UserTCodeHelper.display = false;
     },
     // 显示
     show() {
+        UserTCodeHelper.display = true;
+    },
+};
+export const UserTCodeHelper = {
+    active: false,
+    display: true,
+    outArray: [],
+    cnt: 0,
+    fileBlockRef: null,
+    writeNoAwait: null,
+    parsePath(path) {
+        if(path.endsWith('/')) path = path.slice(0, -1);
+        const index = path.lastIndexOf('/');
+        const dir = path.substring(0, index) || this.fileBlockRef.dir;
+        const name = path.substring(index + 1);
+        return { dir, name };
+    },
+    reset() {
+        this.active = false;
         this.display = true;
+        this.outArray = [];
+        this.cnt = 0;
     },
 };
 
@@ -182,7 +227,6 @@ const filter = (arr) => {
     }
     return ret;
 };
-
 // 以 \r\n 分割
 const filterRN = (arr) => {
     const ret = [];
@@ -213,81 +257,129 @@ export const TCodeStatusEnum = {
     'Execute Success': 'Success',
 };
 
-
 // 编辑器添加kkTerminal智能提示
 export const userTCodeExecutorCompleter = {
   getCompletions: function(editor, session, pos, prefix, callback) {
     const userTCodeExecutorCompletions = [
-      {
-        name: "kkTerminal",
-        value: "kkTerminal",
-        meta: "kkTerminal",
-        description: "kkTerminal API",
-        score: 1000,
-      },
-      {
-        name: "variables",
-        value: "variables",
-        meta: "kkTerminal",
-        description: "access variables",
-        score: 1000,
-      },
-      {
-        name: "session",
-        value: "session()",
-        meta: "kkTerminal",
-        description: "get or set session variables",
-        score: 1000,
-      },
-      {
-          name: "local",
-          value: "local()",
-          meta: "kkTerminal",
-          description: "get or set local variables",
-          score: 1000,
-      },
-      {
-        name: "clean",
-        value: "clean()",
-        meta: "kkTerminal",
-        description: "remove local variables",
-        score: 1000,
-      },
-      {
-        name: "write",
-        value: "write()",
-        meta: "kkTerminal",
-        description: "write to terminal",
-        score: 1000,
-      },
-      {
-        name: "read",
-        value: "read()",
-        meta: "kkTerminal",
-        description: "read lastest from terminal",
-        score: 1000,
-      },
-      {
-        name: "readAll",
-        value: "readAll()",
-        meta: "kkTerminal",
-        description: "read all from terminal",
-        score: 1000,
-      },
-      {
-        name: "hide",
-        value: "hide()",
-        meta: "kkTerminal",
-        description: "hide TCode display",
-        score: 1000,
-      },
-      {
-        name: "show",
-        value: "show()",
-        meta: "kkTerminal",
-        description: "show TCode display",
-        score: 1000,
-      }
+        {
+            name: "kkTerminal",
+            value: "kkTerminal",
+            meta: "kkTerminal",
+            description: "kkTerminal API",
+            score: 1000,
+        },
+        {
+            name: "file",
+            value: "file",
+            meta: "kkTerminal",
+            description: "operate file module",
+            score: 1000,
+        },
+        {
+            name: "cd",
+            value: "cd()",
+            meta: "kkTerminal",
+            description: "change directory",
+            score: 1000,
+        },
+        {
+            name: "open",
+            value: "open()",
+            meta: "kkTerminal",
+            description: "open file editor",
+            score: 1000,
+        },
+        {
+            name: "edit",
+            value: "edit((editor) => {\n\n})",
+            meta: "kkTerminal",
+            description: "edit file content",
+            score: 1000,
+        },
+        {
+            name: "save",
+            value: "save()",
+            meta: "kkTerminal",
+            description: "save file changes",
+            score: 1000,
+        },
+        {
+            name: "close",
+            value: "close()",
+            meta: "kkTerminal",
+            description: "close editor or file module",
+            score: 1000,
+        },
+        {
+            name: "download",
+            value: "download()",
+            meta: "kkTerminal",
+            description: "download file or folder",
+            score: 1000,
+        },
+        {
+            name: "var",
+            value: "var",
+            meta: "kkTerminal",
+            description: "operate variables",
+            score: 1000,
+        },
+        {
+            name: "session",
+            value: "session()",
+            meta: "kkTerminal",
+            description: "get or set session variables",
+            score: 1000,
+        },
+        {
+            name: "local",
+            value: "local()",
+            meta: "kkTerminal",
+            description: "get or set local variables",
+            score: 1000,
+        },
+        {
+            name: "clean",
+            value: "clean()",
+            meta: "kkTerminal",
+            description: "remove local variables",
+            score: 1000,
+        },
+        {
+            name: "write",
+            value: "write()",
+            meta: "kkTerminal",
+            description: "write to terminal",
+            score: 1000,
+        },
+        {
+            name: "read",
+            value: "read()",
+            meta: "kkTerminal",
+            description: "read latest from terminal",
+            score: 1000,
+        },
+        {
+            name: "readAll",
+            value: "readAll()",
+            meta: "kkTerminal",
+            description: "read all from terminal",
+            score: 1000,
+        },
+        {
+            name: "hide",
+            value: "hide()",
+            meta: "kkTerminal",
+            description: "hide TCode display",
+            score: 1000,
+        },
+        {
+            name: "show",
+            value: "show()",
+            meta: "kkTerminal",
+            description: "show TCode display",
+            score: 1000,
+        }
     ];
 
     callback(null, userTCodeExecutorCompletions.map((completion) => {

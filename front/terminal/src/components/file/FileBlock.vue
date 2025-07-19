@@ -70,14 +70,14 @@
           <div v-if="files.length > 0" >
             <div v-for="item in files" :key="item.id" >
               <template v-if="item.isDirectory" >
-                <div :class="[isSelected(item.id) != -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
-                  <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] == '.' || (isClipboard(item.id) != -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
-                  <div style="margin: 0 10px;" v-if="isShowRenameInput && renameFile && item.id == renameFile.id" >
+                <div :class="[isSelected(item.id) !== -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
+                  <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] === '.' || (isClipboard(item.id) !== -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
+                  <div style="margin: 0 10px;" v-if="isShowRenameInput && renameFile && item.id === renameFile.id" >
                     <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                   </div>
                   <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
                     <template #content>
-                      <div v-if="!(isShowRenameInput && renameFile && item.id == renameFile.id)" class="ellipsis" style="margin: 0 10px;" >
+                      <div v-if="!(isShowRenameInput && renameFile && item.id === renameFile.id)" class="ellipsis" style="margin: 0 10px;" >
                         {{ item.name }}
                       </div>
                     </template>
@@ -134,7 +134,7 @@
   <MkFile ref="mkFileRef" @callback="handleMkFile" ></MkFile>
 
   <!-- 文件属性 -->
-  <FileAttr :sshKey="sshKey" ref="fileAttrRef" @callback="doRename" @editPermissions="editPermissions" ></FileAttr>
+  <FileAttr :sshKey="sshKey" ref="fileAttrRef" @callback="doRename" @editPermissions="editPermissions" :uploadingList="uploadingList" ></FileAttr>
 
   <!-- 菜单项 -->
   <div ref="menuBlockRef" @contextmenu="preventDefault" v-show="isShowMenu" class="kk-menu no-select" >
@@ -206,7 +206,7 @@ export default {
     FolderAdd,
     Link,
   },
-  props:['sshKey','os'],
+  props:['sshKey','os','uploadingList'],
   setup(props, context) {
 
     // 加载
@@ -336,13 +336,13 @@ export default {
     const noDataMsg = ref(i18n.global.k('暂无文件'));
     // 目录状态：0 正常 / 1 目录不存在、无权限等
     const dirStatus = ref(0);
-    const getDirList = (callback) => {
+    const getDirList = async () => {
       if(!dir.value) {
         getInitDir();
         return;
       }
       const now_dir = dir.value;
-      $.ajax({
+      await $.ajax({
         url: http_base_url + '/ls',
         type: 'get',
         data: {
@@ -362,8 +362,10 @@ export default {
               noDataMsg.value = i18n.global.k('暂无文件');
               dirStatus.value = 0;
               lastSelectedIndex = -1;
-              fileAreaRef.value.tabindex = '0';
-              fileAreaRef.value.focus();
+              setTimeout(() => {
+                fileAreaRef.value.tabindex = '0';
+                fileAreaRef.value.focus();
+              }, 1);
               if(fileAttrRef.value && fileAttrRef.value.DialogVisible) {
                 const nowFileInfo = getFileInfoByName(fileAttrRef.value.fileInfo.name);
                 if(nowFileInfo) {
@@ -377,15 +379,16 @@ export default {
                 }
                 else fileAttrRef.value.closeDialog();
               }
-              if(callback) callback();
             }
             else {
               files.value = [];
               noDataMsg.value = resp.info;
               dirStatus.value = 1;
               lastSelectedIndex = -1;
-              fileAreaRef.value.tabindex = '0';
-              fileAreaRef.value.focus();
+              setTimeout(() => {
+                fileAreaRef.value.tabindex = '0';
+                fileAreaRef.value.focus();
+              }, 1);
             }
           }
         },
@@ -394,21 +397,21 @@ export default {
         }
       });
     };
-    const fileBlockView = (path, name) => {
+    const fileBlockView = async (path, name) => {
       dir.value = path;
       confirmDirCorrect();
-      getDirList(() => {
-        const fileInfo = getFileInfoByName(name);
-        if(fileInfo) {
-          lastSelectedIndex = fileInfo.index;
-          selectedFiles.value = [];
-          selectedFiles.value.push(fileInfo);
-          setTimeout(() => {
-            fileAreaRef.value.scrollTop = 31 * fileInfo.index;
-          }, 1);
-        }
-      });
       DialogVisible.value = true;
+      await getDirList();
+      const fileInfo = getFileInfoByName(name);
+      if(fileInfo) {
+        lastSelectedIndex = fileInfo.index;
+        selectedFiles.value = [];
+        selectedFiles.value.push(fileInfo);
+        setTimeout(() => {
+          fileAreaRef.value.scrollTop = 31 * fileInfo.index;
+        }, 1);
+      }
+      return fileInfo;
     };
 
     // 获取远程文件url
@@ -601,12 +604,12 @@ export default {
 
     // 文本文件编辑
     const txtPreviewRef = ref();
-    const preViewFile = (name) => {
+    const preViewFile = async (name, config={}) => {
       txtPreviewRef.value.fileName = name;
       txtPreviewRef.value.fileUrl = getRemoteFileUrl(name);
       txtPreviewRef.value.loading = true;
-      txtPreviewRef.value.initText();
       txtPreviewRef.value.DialogVisible = true;
+      await txtPreviewRef.value.initText(config);
     };
     // 保存文本，写回服务器
     const doSave = (name, url, arrayBuffer) => {
@@ -1397,7 +1400,7 @@ export default {
 {
   position: absolute;
   z-index: 3466;
-  text-align: center;
+  text-align: left;
   border-radius: 8px;
   border-top: 8px solid #fff;
   border-bottom: 8px solid #fff;
@@ -1405,6 +1408,7 @@ export default {
 }
 
 .kk-menu-item {
+  padding-left: 15px;
   height: 30px;
   font-size: 13px;
   line-height: 30px;

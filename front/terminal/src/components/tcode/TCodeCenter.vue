@@ -4,7 +4,7 @@
         v-model="DialogVisible"
         destroy-on-close
         :width="480"
-        :title="$t('帮助')"
+        :title="$t('TCode中心')"
         :modal="false"
         modal-class="kk-dialog-class"
         header-class="kk-header-class"
@@ -16,7 +16,11 @@
         <el-tabs stretch type="border-card" >
           <el-tab-pane :label="$t('功能TCode')" >
             <div class="pane-body" >
-              <div>{{ $t('以') }} <span style="background-color: #f3f4f4;" >/</span> {{ $t('开头，用于快速执行通用功能') }}</div>
+              <div class="kk-flex" >
+                <div>{{ $t('以') }}&nbsp;</div>
+                <div style="background-color: #f3f4f4;" >/</div>
+                <div>&nbsp;{{ $t('开头，用于执行通用功能') }}</div>
+              </div>
               <div class="kk-border" ></div>
               <div v-for="(item, key) in FuncTCode" :key="key" >
                 <div class="kk-flex tcode-item" style="padding: 12px 10px;" >
@@ -31,7 +35,11 @@
           </el-tab-pane>
           <el-tab-pane :label="$t('系统TCode')" >
             <div class="pane-body" >
-              <div>{{ $t('以') }} <span style="background-color: #f3f4f4;" >S</span> {{ $t('开头，用于快速访问系统模块') }}</div>
+              <div class="kk-flex" >
+                <div>{{ $t('以') }}&nbsp;</div>
+                <div style="background-color: #f3f4f4;" >S</div>
+                <div>&nbsp;{{ $t('开头，用于访问系统模块') }}</div>
+              </div>
               <div class="kk-border" ></div>
               <div v-for="(item, key) in SysTCode" :key="key" >
                 <div class="kk-flex tcode-item" style="padding: 12px 10px;" >
@@ -48,43 +56,37 @@
             <div class="pane-body" >
               <template v-if="userTCodes && Object.keys(userTCodes).length > 0" >
                 <template v-if="nowTCode && nowTCode.length >= 2 && nowTCode.length <= 6" >
-                  <div class="kk-flex" style="margin-bottom: 12px; margin-top: -6px;" >
-                    <div @click="toOverview" style="margin-right: 10px; cursor: pointer; font-size: 16px;" ><el-icon><ArrowLeft /></el-icon></div>
-                    <div style="margin-top: 3px;" > {{ modifyTag + nowTCode }} </div>
-                    <div style="cursor: pointer; margin-left: 10px;" >
-                      <el-tooltip :content="TCodeStatusEnum[userTCodes[nowTCode].status]" placement="top" >
-                        <TCodeStatus :style="{fontSize: '18px'}" :status="userTCodes[nowTCode].status" ></TCodeStatus>
-                      </el-tooltip>
-                    </div>
-                    <div style="flex: 1;" ></div>
-                    <div @click="doModifyTCode" v-if="!mode" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                      <el-tooltip :content="$t('编辑')" placement="top" >
-                        <el-icon><Edit /></el-icon>
-                      </el-tooltip>
-                    </div>
-                    <div @click="confirmDeleteTCode" v-if="!mode" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                      <el-tooltip :content="$t('删除')" placement="top" >
-                        <el-icon><Delete /></el-icon>
-                      </el-tooltip>
-                    </div>
-                    <div @click="doOnlyRead" v-if="mode" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                      <el-tooltip :content="$t('只读')" placement="top" >
-                        <el-icon><View /></el-icon>
-                      </el-tooltip>
-                    </div>
-                    <div @click="doSaveTCode" v-if="mode" style="margin-top: -3px; font-size: 18px; cursor: pointer; margin-left: 15px;" >
-                      <el-tooltip :content="$t('保存修改')" placement="top" >
-                        <el-icon><Finished /></el-icon>
-                      </el-tooltip>
-                    </div>
+                  <div class="kk-flex" style="margin-bottom: 10px;" >
+                    <el-icon @click="toOverview" style="margin-right: 10px; cursor: pointer; font-size: 16px;" ><ArrowLeft /></el-icon>
+                    <div> {{ modifyTag + nowTCode }} </div>
                     <div style="margin-left: 10px;" ></div>
+                    <el-tooltip :content="TCodeStatusEnum[userTCodes[nowTCode].status]" placement="top" >
+                      <TCodeStatus :style="{fontSize: '18px', cursor: 'pointer'}" :status="userTCodes[nowTCode].status" ></TCodeStatus>
+                    </el-tooltip>
+                    <div style="flex: 1;" ></div>
+                    <el-tooltip v-if="!mode" :content="$t('编辑')" placement="top" >
+                      <el-icon @click="doModifyTCode" class="editor-operator" ><Edit /></el-icon>
+                    </el-tooltip>
+                    <el-tooltip v-if="!mode" :content="$t('删除')" placement="top" >
+                      <el-icon @click="confirmDeleteTCode" class="editor-operator" ><Delete /></el-icon>
+                    </el-tooltip>
+                    <el-tooltip v-if="mode" :content="$t('只读')" placement="top" >
+                      <el-icon @click="doOnlyRead" class="editor-operator" ><View /></el-icon>
+                    </el-tooltip>
+                    <el-tooltip v-if="mode" :content="$t('保存修改')" placement="top" >
+                      <el-icon @click="doSaveTCode" class="editor-operator" ><Finished /></el-icon>
+                    </el-tooltip>
                   </div>
-                  <div style="width: 100%; height: 178px;" >
+                  <div style="width: 100%; height: 180px;" >
                     <AceEditor ref="userTCodeEditorRef" @handleChange="handleChange" @handleSave="doSaveTCode" ></AceEditor>
                   </div>
                 </template>
                 <template v-else >
-                  <div>{{ $t('以') }} <span style="background-color: #f3f4f4;" >U</span> {{ $t('开头，自定义实现类似Shell脚本的自动化Workflow') }}</div>
+                  <div class="kk-flex" >
+                    <div>{{ $t('以') }}&nbsp;</div>
+                    <div style="background-color: #f3f4f4;" >U</div>
+                    <div>&nbsp;{{ $t('开头，用于自定义工作流') }}</div>
+                  </div>
                   <div class="kk-border" ></div>
                   <div v-for="(item, key) in userTCodes" :key="key" >
                     <div class="kk-flex tcode-item" style="padding: 12px 10px;" >
@@ -98,18 +100,21 @@
                         </template>
                       </ToolTip>
                       <div style="flex: 1;" ></div>
-                      <div style="cursor: pointer; margin-left: 10px;" >
-                        <el-tooltip :content="TCodeStatusEnum[item.status]" placement="top" >
-                          <TCodeStatus :style="{fontSize: '18px'}" :status="item.status" ></TCodeStatus>
-                        </el-tooltip>
-                      </div>
-                      <div @click="toWorkflow(key)" style="margin-left: 15px; cursor: pointer; font-size: 16px;" ><el-icon><ArrowRight /></el-icon></div>
+                      <div style="margin-left: 10px;" ></div>
+                      <el-tooltip :content="TCodeStatusEnum[item.status]" placement="top" >
+                        <TCodeStatus :style="{fontSize: '18px', cursor: 'pointer'}" :status="item.status" ></TCodeStatus>
+                      </el-tooltip>
+                      <el-icon @click="toWorkflow(key)" style="margin-left: 15px; cursor: pointer; font-size: 16px;" ><ArrowRight /></el-icon>
                     </div>
                   </div>
                 </template>
               </template>
               <template v-else >
-                <div>{{ $t('以') }} <span style="background-color: #f3f4f4;" >U</span> {{ $t('开头，自定义实现类似Shell脚本的自动化Workflow') }}</div>
+                <div class="kk-flex" >
+                  <div>{{ $t('以') }}&nbsp;</div>
+                  <div style="background-color: #f3f4f4;" >U</div>
+                  <div>&nbsp;{{ $t('开头，用于自定义工作流') }}</div>
+                </div>
                 <div class="kk-border" ></div>
                 <NoData height="160px" >
                   <template #mySlot>
@@ -141,7 +146,7 @@ import { localStore } from "@/env/Store";
 import { localStoreUtil } from "@/utils/CloudUtil";
 
 export default {
-  name: 'HelpTCode',
+  name: 'TCodeCenter',
   components: {
     ToolTip,
     NoData,
@@ -289,6 +294,12 @@ export default {
 
 .tcode-item:hover {
   background-color: #efefef;
+}
+
+.editor-operator {
+  margin-left: 15px;
+  font-size: 18px;
+  cursor: pointer;
 }
 
 /* 文本不可选中 */
