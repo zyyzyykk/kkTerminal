@@ -31,7 +31,6 @@
   "解压失败": "Decompress Failed",
   "解压成功": "Decompressed",
   "连接断开，文件上传失败": "Disconnected, File Upload Failed",
-  "文件上传失败": "File Upload Failed",
   "文件后台上传中": "File uploading in the backend",
   "文件片上传成功": "File Chunk Upload Success",
   "文件片解密失败": "File Chunk Decrypt Failed",

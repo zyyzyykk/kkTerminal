@@ -34,6 +34,6 @@ build/
 
 
 ### Java ###
-.files/
-data/
+file/
 cloud/
+log/

@@ -55,7 +55,7 @@ public class FileUtil {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LogUtil.logException(FileUtil.class, e);
                 throw new MyException(Result.error(FileBlockStateEnum.CHUNK_MERGE_ERROR.getState(), "文件片合并失败"));
             }
         }

@@ -1,5 +1,6 @@
 package com.kkbpro.terminal.controller;
 
+import com.kkbpro.terminal.annotation.Log;
 import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
 import com.kkbpro.terminal.constants.enums.FileUntarEnum;
 import com.kkbpro.terminal.consumer.WebSocketServer;
@@ -10,6 +11,7 @@ import com.kkbpro.terminal.pojo.vo.FileTransInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.AESUtil;
 import com.kkbpro.terminal.utils.FileUtil;
+import com.kkbpro.terminal.utils.LogUtil;
 import com.kkbpro.terminal.utils.RSAUtil;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
@@ -33,6 +35,7 @@ public class FileController {
     /**
      * 下载远程文件
      */
+    @Log
     @GetMapping("/download/remote/file")
     public void downloadRemoteFile(HttpServletResponse response, String sshKey, String path, String fileName, String type) throws IOException {
         SFTPClient sftpClient = getSftpClient(sshKey);
@@ -47,7 +50,7 @@ public class FileController {
         FileTransInfo fileTransInfo = new FileTransInfo(id, path, fileName, sftp.size(remoteFilePath), 2);
         // 非浏览器下载
         if(!"download".equals(type)) fileTransInfo.setId(null);
-        WebSocketServer.putFileTransportingMap(sshKey, id, fileTransInfo);
+        WebSocketServer.putTransportingFile(sshKey, id, fileTransInfo);
         try (RemoteFile file = sftp.open(remoteFilePath)) {
             try (InputStream is = file.new RemoteFileInputStream()) {
                 byte[] buffer = new byte[8096];
@@ -58,7 +61,7 @@ public class FileController {
                 }
             }
         } finally {
-            WebSocketServer.removeFileTransportingMap(sshKey, id);
+            WebSocketServer.removeTransportingFile(sshKey, id);
             // 释放资源
             sshClose(sshKey);
         }
@@ -68,6 +71,7 @@ public class FileController {
     /**
      * 下载远程文件夹
      */
+    @Log
     @GetMapping("/download/remote/folder")
     public void downloadRemoteFolder(HttpServletResponse response, String sshKey, String path, String folderName) throws IOException {
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
@@ -80,7 +84,7 @@ public class FileController {
         // 进入目录并打包
         String command = "cd " + path + " && tar -czvf - " + folderName + " | less";
         FileTransInfo fileTransInfo = new FileTransInfo(id, path, folderName, -1L, 2);
-        WebSocketServer.putFileTransportingMap(sshKey, id, fileTransInfo);
+        WebSocketServer.putTransportingFile(sshKey, id, fileTransInfo);
         try(Session session = ssh.startSession();
             Session.Command cmd = session.exec(command);
             InputStream tarStream = cmd.getInputStream())
@@ -97,9 +101,9 @@ public class FileController {
             // 等待命令执行完毕
             cmd.join();
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
         } finally {
-            WebSocketServer.removeFileTransportingMap(sshKey, id);
+            WebSocketServer.removeTransportingFile(sshKey, id);
             // 释放资源
             sshClose(sshKey);
         }
@@ -110,6 +114,7 @@ public class FileController {
      * 下载本地文件
      * --方法未使用--
      */
+    @Log
     @GetMapping("/download/local")
     public void downloadLocalFile(HttpServletResponse response, String sshKey, String id, String fileName) throws IOException {
         String folderPath = FileUtil.folderBasePath + "/" + sshKey + "-" + id;
@@ -135,6 +140,7 @@ public class FileController {
     /**
      * 获取文件信息列表 ls
      */
+    @Log
     @GetMapping("/ls")
     public Result ls(String sshKey, String path) throws IOException {
         List<FileInfo> fileInfoList = new ArrayList<>();
@@ -161,7 +167,7 @@ public class FileController {
                     try {
                         fileInfo.setIsDirectory(FileMode.Type.DIRECTORY.equals(sftp.stat(path + "/" + file.getName()).getType()));
                     } catch (SFTPException e) {
-                        e.printStackTrace();
+                        LogUtil.logException(this.getClass(), e);
                         fileInfo.setIsDirectory(false);
                     }
                 }
@@ -170,7 +176,7 @@ public class FileController {
                 fileInfoList.add(fileInfo);
             }
         } catch (SFTPException e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             Response.StatusCode statusCode  = e.getStatusCode();
             if(Response.StatusCode.NO_SUCH_FILE.equals(statusCode)) {
                 return Result.error("目录不存在");
@@ -190,6 +196,7 @@ public class FileController {
     /**
      * 统计文件夹中包含的文件/文件夹数目（文件数@文件夹数）
      */
+    @Log
     @GetMapping("/find")
     public Result find(String sshKey, String path, String item) {
         String errorMsg = "统计数目失败";
@@ -216,7 +223,7 @@ public class FileController {
             nums = num.split("@");
             for (String s : nums) Integer.parseInt(s);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(200, successMsg, nums);
@@ -226,6 +233,7 @@ public class FileController {
     /**
      * 获取文件大小（字节）
      */
+    @Log
     @GetMapping("/du")
     public Result du(String sshKey, String path, String item) {
         String errorMsg = "获取大小失败";
@@ -250,7 +258,7 @@ public class FileController {
             if (exitStatus != 0) return Result.error(errorMsg);
             Integer.parseInt(size);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(200, successMsg, size);
@@ -259,6 +267,7 @@ public class FileController {
     /**
      * 获取家路径 (首次有效)
      */
+    @Log
     @GetMapping("/home")
     public Result home(String sshKey) throws IOException {
         String path = "/";
@@ -275,6 +284,7 @@ public class FileController {
      * 获取当前目录（pwd）
      * --方法未使用--
      */
+    @Log
     @GetMapping("/pwd")
     public Result pwd(String sshKey) {
         String errorMsg = "获取当前目录失败";
@@ -298,7 +308,7 @@ public class FileController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(200, successMsg, path);
@@ -308,6 +318,7 @@ public class FileController {
      * 删除文件/文件夹
      * --方法已弃用--
      */
+    @Log
     @PostMapping("/rm")
     public Result rm(String sshKey, Boolean isDirectory, String path) {
         String errorMsg = "删除失败";
@@ -322,7 +333,7 @@ public class FileController {
             if(isDirectory) rmFloder(sftp,path);
             else sftp.rm(path);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(successMsg);
@@ -341,6 +352,7 @@ public class FileController {
     /**
      * rm -rf 快速批量删除
      */
+    @Log
     @PostMapping("/rm-rf")
     public Result rmRf(String sshKey, String path, String items) {
         String errorMsg = "删除失败";
@@ -359,7 +371,7 @@ public class FileController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(successMsg);
@@ -368,6 +380,7 @@ public class FileController {
     /**
      * cp 批量复制
      */
+    @Log
     @PostMapping("/cp")
     public Result cp(String sshKey, String src, String dst, String items) {
         String errorMsg = "复制失败";
@@ -386,7 +399,7 @@ public class FileController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(successMsg);
@@ -396,6 +409,7 @@ public class FileController {
     /**
      * mv 批量移动
      */
+    @Log
     @PostMapping("/mv")
     public Result mv(String sshKey, String src, String dst, String items) {
         String errorMsg = "移动失败";
@@ -414,7 +428,7 @@ public class FileController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(successMsg);
@@ -424,6 +438,7 @@ public class FileController {
     /**
      * 新建文件
      */
+    @Log
     @PostMapping("/touch")
     public Result touch(String sshKey, String path, String item) {
         String errorMsg = "文件新建失败";
@@ -442,7 +457,7 @@ public class FileController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(successMsg);
@@ -452,6 +467,7 @@ public class FileController {
     /**
      * 新建文件夹
      */
+    @Log
     @PostMapping("/mkdir")
     public Result mkdir(String sshKey, String path, String item) {
         String errorMsg = "文件夹新建失败";
@@ -468,7 +484,7 @@ public class FileController {
                 return Result.error(errorMsg);
             sftp.mkdirs(fullPath);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(successMsg);
@@ -477,6 +493,7 @@ public class FileController {
     /**
      * 文件/文件夹重命名
      */
+    @Log
     @PostMapping("/rename")
     public Result rename(String sshKey, String oldPath, String newPath) {
         String errorMsg = "重命名失败";
@@ -490,7 +507,7 @@ public class FileController {
             SFTPClient sftp = getSftpClient(sshKey);
             sftp.rename(oldPath,newPath);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(successMsg);
@@ -500,6 +517,7 @@ public class FileController {
     /**
      * wget 文件URL上传
      */
+    @Log
     @PostMapping("/wget")
     public Result wget(String sshKey, String path, String item, String url) {
         String errorMsg = "文件URL上传失败";
@@ -519,7 +537,7 @@ public class FileController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(successMsg);
@@ -528,6 +546,7 @@ public class FileController {
     /**
      *  tar 文件压缩包解压
      */
+    @Log
     @PostMapping("/untar")
     public Result untar(String sshKey, String path, String item) {
         String errorMsg = "解压失败";
@@ -549,7 +568,7 @@ public class FileController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(successMsg);
@@ -558,6 +577,7 @@ public class FileController {
     /**
      * chmod 文件权限修改
      */
+    @Log
     @PostMapping("/chmod")
     public Result chmod(String sshKey, String path, String item, String perms, Boolean sub) {
         String errorMsg = "权限修改失败";
@@ -576,7 +596,7 @@ public class FileController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(successMsg);
@@ -586,6 +606,7 @@ public class FileController {
     /**
      * 分片上传文件
      */
+    @Log
     @PostMapping("/upload")
     public Result uploadFile(FileUploadInfo fileUploadInfo) {
 
@@ -617,7 +638,7 @@ public class FileController {
             String aesKey = RSAUtil.decrypt(fileUploadInfo.getAesKey());
             decryptedData = AESUtil.decryptToBytes(new String(file.getBytes()), aesKey);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(FileBlockStateEnum.DECRYPT_ERROR.getState(), "文件片解密失败", map);
         }
 
@@ -639,14 +660,14 @@ public class FileController {
         try {
             Files.write(temporaryFile.toPath(), decryptedData);
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(FileBlockStateEnum.UPLOAD_ERROR.getState(), "文件片上传失败", map);
         }
 
         // 上传完毕
         if(chunk.equals(chunks)) {
             FileTransInfo fileTransInfo = new FileTransInfo(id, path, fileName, totalSize, 1);
-            WebSocketServer.putFileTransportingMap(sshKey, id, fileTransInfo);
+            WebSocketServer.putTransportingFile(sshKey, id, fileTransInfo);
             Thread FileThread = new Thread(() -> {
                 try {
                     // 将文件片合并
@@ -656,12 +677,11 @@ public class FileController {
                     SFTPClient sftpFileClient = getSftpClient(sshKey);
                     sftpFileClient.put(folderPath + "/" + id, path + fileName);
                 } catch (Exception e) {
-                    System.out.println("文件上传失败");
-                    e.printStackTrace();
+                    LogUtil.logException(this.getClass(), e);
                 } finally {
                     // 删除临时文件
                     FileUtil.fileDelete(temporaryFolder);
-                    WebSocketServer.removeFileTransportingMap(sshKey, id);
+                    WebSocketServer.removeTransportingFile(sshKey, id);
                     // 释放资源
                     sshClose(sshKey);
                 }
@@ -704,7 +724,7 @@ public class FileController {
                     WebSocketServer.sshClientMap.get(sshKey).close();
                 WebSocketServer.sshClientMap.remove(sshKey);
             } catch (IOException e) {
-                e.printStackTrace();
+                LogUtil.logException(this.getClass(), e);
             }
         }
     }

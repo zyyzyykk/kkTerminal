@@ -17,11 +17,14 @@
         <java.version>1.8</java.version>
     </properties>
     <dependencies>
+
+        <!--web-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!--test-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -69,6 +72,13 @@
             <version>1.70</version>
         </dependency>
 
+        <!--切面-->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.9.4</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -76,7 +86,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <!--这里写上main方法所在类的路径-->
                 <configuration>
                     <mainClass>com.kkbpro.terminal.TerminalApplication</mainClass>
                 </configuration>

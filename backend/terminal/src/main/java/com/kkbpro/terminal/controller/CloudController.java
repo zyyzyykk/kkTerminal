@@ -1,7 +1,9 @@
 package com.kkbpro.terminal.controller;
 
+import com.kkbpro.terminal.annotation.Log;
 import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
 import com.kkbpro.terminal.result.Result;
+import com.kkbpro.terminal.utils.LogUtil;
 import com.kkbpro.terminal.utils.StringUtil;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +37,7 @@ public class CloudController {
     /**
      * 上传文件
      */
+    @Log
     @PostMapping("/cloud")
     public Result uploadCloud(String user, String type, String name, MultipartFile file) throws IOException {
         String folderPath = cloudBasePath + "/" + user;
@@ -57,6 +60,7 @@ public class CloudController {
     /**
      * 读取文件
      */
+    @Log
     @GetMapping("/load")
     public Result loadCloud(HttpServletResponse response, String user, String fileName) throws IOException {
         String folderPath = cloudBasePath + "/" + user;
@@ -70,7 +74,7 @@ public class CloudController {
                 content.append(line);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
         }
 
         return Result.success("文件内容", content.toString());
@@ -80,7 +84,7 @@ public class CloudController {
      * 清除过期文件
      */
     @Scheduled(cron = "0 0 0 */1 * ?")
-    private void clean() {
+    protected void clean() {
         File cloudBaseFolder = new File(cloudBasePath);
         if(!cloudBaseFolder.exists()) return;
         File[] userFolders = cloudBaseFolder.listFiles();

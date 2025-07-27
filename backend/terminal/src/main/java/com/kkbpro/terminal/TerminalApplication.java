@@ -2,6 +2,7 @@ package com.kkbpro.terminal;
 
 import com.kkbpro.terminal.controller.SystemController;
 import com.kkbpro.terminal.utils.FileUtil;
+import com.kkbpro.terminal.utils.LogUtil;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -24,7 +25,7 @@ public class TerminalApplication {
         try {
             properties.load(inputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtil.logException(TerminalApplication.class, e);
         }
     }
 
@@ -86,7 +87,7 @@ public class TerminalApplication {
                 else System.exit(0); // 结束进程
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(TerminalApplication.class, e);
         }
     }
 
@@ -100,7 +101,7 @@ public class TerminalApplication {
                 Thread.sleep(1000 * 18);
                 if(!SystemController.isEnableMonitor()) System.exit(0); // 结束进程
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LogUtil.logException(TerminalApplication.class, e);
             }
         }).start();
     }

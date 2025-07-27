@@ -238,6 +238,7 @@ export default {
         if(openEncode.value === encode) return;
         if(!loading.value) initText();
         openEncode.value = encode;
+        saveEncode.value = encode;        // 默认同一编码格式保存
         DialogVisible.value = true;
       }
       // 保存编码

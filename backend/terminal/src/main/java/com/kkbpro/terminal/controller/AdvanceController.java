@@ -1,10 +1,12 @@
 package com.kkbpro.terminal.controller;
 
+import com.kkbpro.terminal.annotation.Log;
 import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
 import com.kkbpro.terminal.consumer.WebSocketServer;
 import com.kkbpro.terminal.pojo.dto.CooperateInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.AESUtil;
+import com.kkbpro.terminal.utils.LogUtil;
 import com.kkbpro.terminal.utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
@@ -52,6 +54,7 @@ public class AdvanceController {
     /**
      * 生成协作Key
      */
+    @Log
     @GetMapping("/cooperate/key")
     public Result cooperateKey(String sshKey, Boolean readOnly, Integer maxHeadCount) throws Exception {
         String errorMsg = "协作Key生成失败";
@@ -80,6 +83,7 @@ public class AdvanceController {
     /**
      * 结束协作
      */
+    @Log
     @PostMapping("/cooperate/end")
     public Result cooperateEnd(String sshKey) throws IOException {
         String errorMsg = "结束协作失败";
@@ -124,6 +128,7 @@ public class AdvanceController {
     /**
      * 获取监控状态
      */
+    @Log
     @PostMapping("/monitor")
     public Result monitor(String sshKey) {
         String errorMsg = "获取监控状态失败";
@@ -163,7 +168,7 @@ public class AdvanceController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(200, successMsg, status);
@@ -172,6 +177,7 @@ public class AdvanceController {
     /**
      * 获取Docker版本
      */
+    @Log
     @PostMapping("/docker/version")
     public Result dockerVersion(String sshKey) {
         String errorMsg = "获取Docker版本失败";
@@ -195,7 +201,7 @@ public class AdvanceController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(200, successMsg, version);
@@ -212,6 +218,7 @@ public class AdvanceController {
     /**
      * 获取Docker信息
      */
+    @Log
     @PostMapping("/docker/info")
     public Result dockerInfo(String sshKey, Integer type) {
         String errorMsg = "获取Docker信息失败";
@@ -235,7 +242,7 @@ public class AdvanceController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(200, successMsg, info);
@@ -244,6 +251,7 @@ public class AdvanceController {
     /**
      * Docker删除
      */
+    @Log
     @PostMapping("/docker/delete")
     public Result dockerDelete(String sshKey, Integer type, String items) {
         String errorMsg = "删除失败";
@@ -262,7 +270,7 @@ public class AdvanceController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(200, successMsg, null);
@@ -272,6 +280,7 @@ public class AdvanceController {
     /**
      * Docker容器操作
      */
+    @Log
     @PostMapping("/docker/container")
     public Result dockerContainer(String sshKey, Integer type, String items) {
         String errorMsg = "操作失败";
@@ -295,7 +304,7 @@ public class AdvanceController {
             int exitStatus = cmd.getExitStatus();
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
         return Result.success(200, successMsg, container);

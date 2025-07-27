@@ -14,10 +14,7 @@ import com.kkbpro.terminal.pojo.dto.MessageInfo;
 import com.kkbpro.terminal.pojo.dto.PrivateKey;
 import com.kkbpro.terminal.pojo.vo.FileTransInfo;
 import com.kkbpro.terminal.result.Result;
-import com.kkbpro.terminal.utils.AESUtil;
-import com.kkbpro.terminal.utils.FileUtil;
-import com.kkbpro.terminal.utils.RSAUtil;
-import com.kkbpro.terminal.utils.StringUtil;
+import com.kkbpro.terminal.utils.*;
 import lombok.Getter;
 import lombok.Setter;
 import net.schmizz.sshj.SSHClient;
@@ -56,18 +53,18 @@ public class WebSocketServer {
 
     public static ConcurrentHashMap<String, ConcurrentHashMap<String, FileTransInfo>> fileTransportingMap = new ConcurrentHashMap<>();
 
-    public static void putFileTransportingMap(String sshKey, String key, FileTransInfo fileTransInfo) {
+    public static void putTransportingFile(String sshKey, String key, FileTransInfo fileTransInfo) {
         fileTransportingMap.get(sshKey).put(key, fileTransInfo);
         if(fileTransInfo.getId() == null) return;
         webSocketServerMap.get(sshKey).sendMessage(ResultCodeEnum.FILE_TRANSPORT_UPDATE.getDesc() ,"success", ResultCodeEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
     };
 
-    public static FileTransInfo getFileTransportingMap(String sshKey, String key) {
+    public static FileTransInfo getTransportingFile(String sshKey, String key) {
         return fileTransportingMap.get(sshKey).get(key);
     };
 
-    public static void removeFileTransportingMap(String sshKey, String key) {
-        FileTransInfo fileTransInfo = getFileTransportingMap(sshKey, key);
+    public static void removeTransportingFile(String sshKey, String key) {
+        FileTransInfo fileTransInfo = getTransportingFile(sshKey, key);
         if(fileTransInfo == null || fileTransInfo.getId() == null) return;
         // 修改类型为 已完成
         fileTransInfo.setIndex(3);
@@ -157,7 +154,7 @@ public class WebSocketServer {
                     else msg = "Cooperators Limit Exceeded";
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LogUtil.logException(this.getClass(), e);
             }
             this.sendMessage(msg, "fail", state, null);
             return;
@@ -195,7 +192,7 @@ public class WebSocketServer {
                 sshClient.authPublickey(user_name, keyProvider);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtil.logException(this.getClass(), e);
             this.sendMessage("Fail to connect remote server !","fail", ResultCodeEnum.CONNECT_FAIL.getState(), null);
             return;
         } finally {
@@ -256,7 +253,7 @@ public class WebSocketServer {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LogUtil.logException(this.getClass(), e);
             }
         });
         shellOutThread.start();
@@ -293,7 +290,7 @@ public class WebSocketServer {
                 // 判断是否是本次ssh对应的临时文件夹
                 if (file.isDirectory() && StringUtil.isPrefix(key, file.getName())) {
                     // 忽略正在进行文件上传的文件夹
-                    if(getFileTransportingMap(key, file.getName().substring(key.length() + 1)) == null)
+                    if(getTransportingFile(key, file.getName().substring(key.length() + 1)) == null)
                         FileUtil.fileDelete(file);
                 }
             }
@@ -376,7 +373,7 @@ public class WebSocketServer {
                 else result = Result.error(code,message);
                 this.sessionSocket.getBasicRemote().sendText(JSON.toJSONString(result));
             } catch(Exception e) {
-                e.printStackTrace();
+                LogUtil.logException(this.getClass(), e);
             }
         }
     }

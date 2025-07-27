@@ -210,8 +210,11 @@
         </div>
       </div>
     </div>
-    <!-- terminal主体 -->
-    <div ref="terminal" class="terminal-class" :style="{backgroundColor: env.bg}" ></div>
+    <!-- Terminal主体 -->
+    <div class="kk-flex terminal-class" :style="{backgroundColor: env.bg}" >
+      <div style="margin-left: 5px;" ></div>
+      <div ref="terminal" style="flex: 1;" ></div>
+    </div>
   </div>
 
   <!-- 连接设置 -->
@@ -452,12 +455,12 @@ export default {
     const initTerminal = () => {
       term = new Terminal({
         convertEol: true,                                     // 设置光标为下一行开头
-        scrollback: 0,                                        // 终端回滚量
+        scrollback: Number.MAX_SAFE_INTEGER,                  // 终端回滚量
         disableStdin: false,                                  // 是否禁用输入
         cursorStyle: env.value.cursorStyle,                   // 光标样式(默认block)
-        cursorInactiveStyle: env.value.cursorStyle,           // 光标样式(失去焦点)
+        cursorInactiveStyle: 'outline',                       // 光标样式(失去焦点)
         cursorBlink: env.value.cursorBlink,                   // 光标是否闪烁
-        theme:{
+        theme: {
           foreground: env.value.fg,                           // 终端前景色
           background: env.value.bg,                           // 终端背景色
           cursor: env.value.fg,                               // 光标颜色
@@ -485,8 +488,6 @@ export default {
     // 终端写入
     const termWrite = (content) => {
       term.write(content);
-      // 设置回滚量
-      term.options.scrollback += term._core.buffer.lines.length;
     };
 
     // 协作
@@ -1171,6 +1172,7 @@ export default {
 
 .terminal-class {
   width: 100%;
+  height: 100%;
 }
 
 .setting {

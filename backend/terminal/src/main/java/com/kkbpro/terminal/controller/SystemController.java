@@ -1,10 +1,12 @@
 package com.kkbpro.terminal.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.kkbpro.terminal.annotation.Log;
 import com.kkbpro.terminal.config.AppConfig;
 import com.kkbpro.terminal.pojo.vo.OSInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.AESUtil;
+import com.kkbpro.terminal.utils.LogUtil;
 import com.kkbpro.terminal.utils.RSAUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +38,7 @@ public class SystemController {
     /**
      * 新建窗口初始化
      */
+    @Log
     @PostMapping("/init")
     public Result init(@RequestHeader("User-Agent") String userAgent, Boolean aesKey, Boolean publicKey) {
         String clientOS = getOSFromUA(userAgent);
@@ -87,7 +90,7 @@ public class SystemController {
                             }
                             System.exit(0); // 结束进程
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            LogUtil.logException(this.getClass(), e);
                         }
                     });
                     monitor.start();
@@ -100,6 +103,7 @@ public class SystemController {
     /**
      * 窗口心跳续约
      */
+    @Log
     @PostMapping ("/beat")
     public Result beat(String windowId) {
         if(!"Linux".equals(serverOS) && appConfig.getPcWindowTag() && windowId != null)
