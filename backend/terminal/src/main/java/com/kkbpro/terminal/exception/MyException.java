@@ -14,7 +14,7 @@ public class MyException extends RuntimeException {
 
     private Result result;
 
-    public MyException(Result result){
+    public MyException(Result result) {
         super(result.getInfo());
         this.result = result;
     }

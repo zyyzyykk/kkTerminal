@@ -193,7 +193,7 @@
               <el-icon :style="{ color: '#606266', cursor: 'pointer' }" ><QuestionFilled /></el-icon>
             </template>
             <div v-if="env.tCode" class="no-select" style="font-size: 12px; color: #313131;" >
-              <div style="font-size: 14px; font-weight: bold;" >{{ $t('什么是 TCode (终端代码) ？') }}</div>
+              <div style="font-size: 14px; font-weight: bold;" >{{ $t('什么是 TCode（终端代码）？') }}</div>
               <div style="margin-top: 5px;" >{{ $t('TCode（终端代码）是用于访问和执行特定操作流程的快捷方式') }}</div>
               <div class="kk-flex" style="margin-top: 5px;" >
                 <div>{{ $t('输入') }}&nbsp;</div>
@@ -262,7 +262,14 @@ import StatusMonitor from '@/components/advance/StatusMonitor'
 import DockerBlock from "@/components/advance/DockerBlock";
 import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
 import { QuestionFilled, VideoPlay, VideoPause, ChromeFilled, ArrowRight, UserFilled, FolderOpened, CircleClose } from '@element-plus/icons-vue';
-import { FuncTCode, SysTCode, UserTCodeExecutor, UserTCodeHelper, historyTCode } from "@/components/tcode/TCode";
+import {
+  FuncTCode,
+  SysTCode,
+  UserTCodeExecutor,
+  UserTCodeHelper,
+  TCodeReservedVarsSetter,
+  historyTCode,
+} from "@/components/tcode/TCode";
 
 import i18n from "@/locales/i18n";
 import { cloud, load, syncUpload, syncDownload, localStoreUtil } from "@/utils/CloudUtil";
@@ -432,6 +439,8 @@ export default {
       // lang
       if(!env.value.lang) env.value.lang = 'en';
       i18n.global.locale = env.value.lang;
+      // 预留值
+      TCodeReservedVarsSetter('option', env.value.option);
     };
     loadEnv();
 

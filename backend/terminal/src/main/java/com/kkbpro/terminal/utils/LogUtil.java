@@ -16,7 +16,12 @@ public class LogUtil {
 
     public static void logException(Class<?> clazz, Exception e) {
         Logger logger = getLoggerForClass(clazz);
-        logger.error("Exception occurred {}", e.getMessage(), e);
+        logger.error("Exception occurred \"{}\"", e.getMessage(), e);
+    }
+
+    public static void logException(Class<?> clazz, Throwable e) {
+        Logger logger = getLoggerForClass(clazz);
+        logger.error("Exception occurred \"{}\"", e.getMessage(), e);
     }
 
 }

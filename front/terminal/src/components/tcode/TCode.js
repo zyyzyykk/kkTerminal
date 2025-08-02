@@ -217,6 +217,15 @@ export const UserTCodeHelper = {
     },
 };
 
+const TCodeReservedVarsDict = {
+    'option': 'CONNECT_OPTION',
+    'home': 'HOME_PATH',
+    'dir': 'CURRENT_DIR',
+};
+export const TCodeReservedVarsSetter = (key, val) => {
+    UserTCodeExecutor.var.session(TCodeReservedVarsDict[key], val);
+};
+
 // 处理过滤输出
 const filter = (arr) => {
     const ret = [];

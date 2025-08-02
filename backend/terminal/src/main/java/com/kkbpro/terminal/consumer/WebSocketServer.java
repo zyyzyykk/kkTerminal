@@ -356,8 +356,8 @@ public class WebSocketServer {
     }
 
     @OnError
-    public void onError(Session sessionSocket,Throwable error) {
-        error.printStackTrace();
+    public void onError(Session sessionSocket, Throwable e) {
+        LogUtil.logException(this.getClass(), e);
     }
 
     // 向Client发送信息

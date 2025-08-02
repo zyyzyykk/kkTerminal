@@ -34,7 +34,7 @@ public class LogAspect {
     public void logBefore(JoinPoint joinPoint) {
         String ip = IpUtil.getIpAddress(((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
         Logger logger = LogUtil.getLoggerForClass(joinPoint.getTarget().getClass());
-        logger.info("Method {} starts execution from IP {}", joinPoint.getSignature().getName(), ip);
+        logger.info("Method \"{}\" starts execution from IP {}", joinPoint.getSignature().getName(), ip);
         startTime.set(System.currentTimeMillis());
     }
 
@@ -46,7 +46,7 @@ public class LogAspect {
         Long totalTime = System.currentTimeMillis() - startTime.get();
         startTime.remove();
         Logger logger = LogUtil.getLoggerForClass(joinPoint.getTarget().getClass());
-        logger.info("Method {} costs {}ms totally", joinPoint.getSignature().getName(), totalTime);
+        logger.info("Method \"{}\" costs {}ms totally", joinPoint.getSignature().getName(), totalTime);
     }
 
     /**
@@ -54,8 +54,7 @@ public class LogAspect {
      */
     @AfterThrowing(value = "logPointCut()", throwing = "e")
     public void logThrowing(JoinPoint joinPoint, Exception e) {
-        Logger logger = LogUtil.getLoggerForClass(joinPoint.getTarget().getClass());
-        logger.error("Exception occurred {}", e.getMessage(), e);
+        LogUtil.logException(joinPoint.getTarget().getClass(), e);
     }
 
 }

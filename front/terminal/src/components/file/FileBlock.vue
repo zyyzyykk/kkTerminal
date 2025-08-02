@@ -175,6 +175,7 @@ import { getChmodValue } from '@/components/calc/CalcPriority';
 import { getUrlParams } from "@/utils/UrlUtil";
 import { aesEncryptBuffer, rsaEncrypt } from "@/utils/Encrypt";
 import { encodeStrToArray } from "@/components/preview/EncodeUtil";
+import { TCodeReservedVarsSetter } from "@/components/tcode/TCode";
 
 import ToolTip from '@/components/ToolTip';
 import NoData from '@/components/NoData';
@@ -322,6 +323,8 @@ export default {
             selectedFiles.value = [];
             files.value = [];
             getDirList();
+            // 预留值
+            TCodeReservedVarsSetter('home', dir.value);
           }
           else {
             noDataMsg.value = resp.info;
@@ -912,10 +915,12 @@ export default {
       });
     };
 
-    watch(dir,() => {
+    watch(dir,(newVal) => {
       if(mkFileRef.value) mkFileRef.value.closeDialog();
       if(fileUrlRef.value) fileUrlRef.value.closeDialog();
       if(fileAttrRef.value) fileAttrRef.value.closeDialog();
+      // 预留值
+      TCodeReservedVarsSetter('dir', newVal);
     });
 
     // 滚动到可视区
