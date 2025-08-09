@@ -193,8 +193,8 @@
               <el-icon :style="{ color: '#606266', cursor: 'pointer' }" ><QuestionFilled /></el-icon>
             </template>
             <div v-if="env.tCode" class="no-select" style="font-size: 12px; color: #313131;" >
-              <div style="font-size: 14px; font-weight: bold;" >{{ $t('什么是 TCode（终端代码）？') }}</div>
-              <div style="margin-top: 5px;" >{{ $t('TCode（终端代码）是用于访问和执行特定操作流程的快捷方式') }}</div>
+              <div style="font-size: 16px; font-weight: bold;" >{{ $t('什么是终端代码？') }}</div>
+              <div style="margin-top: 5px;" >{{ $t('终端代码是用于访问和执行特定操作流程的快捷方式') }}</div>
               <div class="kk-flex" style="margin-top: 5px;" >
                 <div>{{ $t('输入') }}&nbsp;</div>
                 <div style="background-color: #f3f4f4; user-select: text;" >STC</div>
@@ -223,9 +223,9 @@
   <PreferenceSetting ref="preferenceSettingRef" :env="env" @callback="saveEnv" :os="osInfo.clientOS" ></PreferenceSetting>
   <!-- 文件管理 -->
   <FileBlock ref="fileBlockRef" :sshKey="sshKey" :os="osInfo.clientOS" @updateTransportLists="updateTransportLists" :uploadingList="uploadingList" ></FileBlock>
-  <!-- TCode工作流 -->
+  <!-- 终端代码工作流 -->
   <TCodeWorkflow ref="tCodeWorkflowRef" @importTCodes="importTCodes" @exportTCodes="exportTCodes" ></TCodeWorkflow>
-  <!-- TCode中心 -->
+  <!-- 终端代码中心 -->
   <TCodeCenter ref="tCodeCenterRef" :userTCodes="tcodes" @handleSaveTCode="handleSaveTCode" @handleDeleteTCode="handleDeleteTCode" ></TCodeCenter>
   <!-- 协作 -->
   <CooperateGen ref="cooperateGenRef" :sshKey="sshKey" :advance="env.advance" @handleCooperate="handleCooperate" ></CooperateGen>
@@ -583,7 +583,7 @@ export default {
           if(urlParams.value.cmd) {
             // bash命令
             if(urlParams.value.cmd.toLowerCase().startsWith('bash:')) sendMessage(urlParams.value.cmd.substring(5) + "\n");
-            // TCode命令
+            // 终端代码命令
             else if(urlParams.value.cmd.toLowerCase().startsWith('tcode:')) {
               setTimeout(() => {
                 tcode.value = urlParams.value.cmd.substring(6);
@@ -858,7 +858,7 @@ export default {
     // 处理终端代码
     const tcode = ref('');
     const handleTCode = async (event) => {
-      // 历史TCode
+      // 历史终端代码
       if(event.key === 'ArrowUp' || event.key === 'ArrowDown') {
         event.preventDefault();
         if(event.key === 'ArrowUp') tcode.value = historyTCode.up(tcode.value);
@@ -870,11 +870,11 @@ export default {
       const transTCode = tcode.value.toUpperCase();
       tcode.value = '';
       historyTCode.add(transTCode);
-      // 功能TCode
-      if(transTCode[0] === '/' && FuncTCode[transTCode]) FuncTCode[transTCode].execFlow(instance);
-      // 系统TCode
+      // 功能终端代码
+      if(transTCode[0] === 'F' && FuncTCode[transTCode]) FuncTCode[transTCode].execFlow(instance);
+      // 系统终端代码
       else if(transTCode[0] === 'S' && SysTCode[transTCode]) SysTCode[transTCode].execFlow(instance);
-      // 用户TCode
+      // 用户终端代码
       else if(transTCode[0] === 'U' && tcodes.value[transTCode]) {
         if(!UserTCodeHelper.writeNoAwait) UserTCodeHelper.writeNoAwait = sendMessage;
         if(!UserTCodeHelper.context) UserTCodeHelper.fileBlockRef = fileBlockRef.value;
@@ -890,7 +890,7 @@ export default {
             } catch (error) {
               setTCodeStatus(transTCode, 'Compile Error');
               ElMessage({
-                message: 'TCode-' + transTCode + ' ' + i18n.global.t('编译错误：') + error,
+                message: i18n.global.t('终端代码') + ' ' + transTCode + ' ' + i18n.global.t('编译错误：') + error,
                 type: 'error',
                 grouping: true,
               });
@@ -902,14 +902,14 @@ export default {
           try {
             await tcodes.value[transTCode].execFlow(UserTCodeExecutor);
             ElMessage({
-              message: 'TCode-' + transTCode + ' ' + i18n.global.t('工作流结束'),
+              message: i18n.global.t('终端代码') + ' ' + transTCode + ' ' + i18n.global.t('工作流结束'),
               type: 'success',
               grouping: true,
             });
             setTCodeStatus(transTCode, 'Execute Success');
           } catch(error) {
             ElMessage({
-              message: 'TCode-' + transTCode + ' ' + i18n.global.t('执行中断：') + error,
+              message: i18n.global.t('终端代码') + ' ' + transTCode + ' ' + i18n.global.t('执行中断：') + error,
               type: 'warning',
               grouping: true,
             });
@@ -920,23 +920,23 @@ export default {
         }
         else {
           ElMessage({
-            message: i18n.global.t('其它TCode正在执行'),
+            message: i18n.global.t('其它终端代码正在执行'),
             type: 'warning',
             grouping: true,
           });
         }
       }
       else {
-        if(transTCode[0] === '/' || transTCode[0] === 'S' || transTCode[0] === 'U') {
+        if(transTCode[0] === 'F' || transTCode[0] === 'S' || transTCode[0] === 'U') {
           ElMessage({
-            message: 'TCode-' + transTCode + i18n.global.t('不存在'),
+            message: i18n.global.t('终端代码') + ' ' + transTCode + ' ' + i18n.global.t('不存在'),
             type: 'warning',
             grouping: true,
           });
         }
         else {
           ElMessage({
-            message: i18n.global.t('TCode必须以 /,S,U 开头'),
+            message: i18n.global.t('终端代码必须以 F,S,U 开头'),
             type: 'warning',
             grouping: true,
           });
@@ -950,7 +950,7 @@ export default {
       localStoreUtil.setItem(localStore['tcodes'], aesEncrypt(JSON.stringify(tCodeData)));
       loadTCodes();
     };
-    // 批量导出TCode
+    // 批量导出终端代码
     const exportTCodes = () => {
       let content = {};
       if(localStoreUtil.getItem(localStore['tcodes'])) content = JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['tcodes'])));
@@ -960,14 +960,14 @@ export default {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'TCode.json';
+      a.download = 'TerminalCode.json';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       // 释放 URL 对象
       URL.revokeObjectURL(url);
     };
-    // TCode中心
+    // 终端代码中心
     const tCodeCenterRef = ref();
     const handleSaveTCode = (name, content) => {
       const data = {};

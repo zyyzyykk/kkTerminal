@@ -31,7 +31,7 @@
             <div id="docker-appstore" v-if="!deployInfo.isShow" style="height: 240px; overflow-y: scroll;" >
               <div class="kk-flex" >
                 <span><img src="@/assets/app_store.svg" alt="appstore" style="height: 32px;" ></span>
-                <div style="margin-left: 12px; font-size: 18px; font-weight: bolder;" >{{ $t('Docker应用商店') }}</div>
+                <div style="margin-left: 15px; font-size: 22px; font-weight: bolder;" >{{ $t('Docker应用商店') }}</div>
                 <div style="flex: 1;" ></div>
                 <div>
                   <el-input v-model="appSearch" class="w-50 m-2" :placeholder="$t('搜索应用')" >
@@ -52,8 +52,7 @@
                 </el-dropdown>
               </div>
               <div class="kk-border" ></div>
-              <div style="margin-top: 20px;" ></div>
-              <div class="card-container" >
+              <div v-if="dockerApps.length > 0" class="card-container" >
                 <div class="card-item" v-for="(app, index) in dockerApps" :key="index" >
                   <el-card>
                     <template #header>
@@ -68,11 +67,20 @@
                       </div>
                     </template>
                     <div class="kk-flex" >
-                      <div><img :src="app.img" :alt="app.name" class="app-img" ></div>
+                      <div>
+                        <div class="app-img-box kk-flex" >
+                          <div style="flex: 1;" ></div>
+                          <img :src="app.img" :alt="app.name" >
+                          <div style="flex: 1;" ></div>
+                        </div>
+                      </div>
                       <div>{{ $t(app.desc) }}</div>
                     </div>
                   </el-card>
                 </div>
+              </div>
+              <div v-else >
+                <NoData height="196px" :msg="i18n.global.k('暂无应用')" ></NoData>
               </div>
             </div>
             <div v-else style="height: 240px; overflow-y: scroll;" >
@@ -112,6 +120,12 @@
                   <div class="form-width" >{{ $t('数据卷挂载') }}</div>
                   <div style="flex: 1;" >
                     <el-input v-model="deployInfo.volumeMounting" class="w-50 m-2" :placeholder="$t('每行一个，主机路径:容器路径')" type="textarea" ></el-input>
+                  </div>
+                </div>
+                <div class="kk-flex deploy-item" >
+                  <div class="form-width" >{{ $t('其它命令选项') }}</div>
+                  <div style="flex: 1;" >
+                    <el-input v-model="deployInfo.paramOptions" class="w-50 m-2" :placeholder="$t('每行一个，-命令选项 值')" type="textarea" ></el-input>
                   </div>
                 </div>
                 <div style="height: 10px;" ></div>
@@ -154,7 +168,7 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-button :disabled="!(selectedItems.length > 0 && containerType != 0)" size="small" type="primary" @click="operateConfirm" style="margin-left: 10px;" >
+            <el-button :disabled="!(selectedItems.length > 0 && containerType !== 0)" size="small" type="primary" @click="operateConfirm" style="margin-left: 10px;" >
               {{ $t('确定') }}
             </el-button>
           </div>
@@ -179,7 +193,7 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-button :disabled="!(selectedItems.length > 0 && deleteType != 0)" size="small" type="primary" @click="deleteConfirm" style="margin-left: 10px;" >
+            <el-button :disabled="!(selectedItems.length > 0 && deleteType !== 0)" size="small" type="primary" @click="deleteConfirm" style="margin-left: 10px;" >
               {{ $t('确定') }}
             </el-button>
           </div>
@@ -204,7 +218,7 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-button :disabled="!(selectedItems.length > 0 && deleteType != 0)" size="small" type="primary" @click="deleteConfirm" style="margin-left: 10px;" >
+            <el-button :disabled="!(selectedItems.length > 0 && deleteType !== 0)" size="small" type="primary" @click="deleteConfirm" style="margin-left: 10px;" >
               {{ $t('确定') }}
             </el-button>
           </div>
@@ -228,7 +242,7 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-button :disabled="!(selectedItems.length > 0 && deleteType != 0)" size="small" type="primary" @click="deleteConfirm" style="margin-left: 10px;" >
+            <el-button :disabled="!(selectedItems.length > 0 && deleteType !== 0)" size="small" type="primary" @click="deleteConfirm" style="margin-left: 10px;" >
               {{ $t('确定') }}
             </el-button>
           </div>
@@ -500,6 +514,7 @@ export default {
       portMapping: '',
       envVar: '',
       volumeMounting: '',
+      paramOptions: '',
     };
     const deployInfo = ref({...initDeployInfo});
     const handleAppGet = (appInfo) => {
@@ -522,6 +537,9 @@ export default {
       }
       if(deployInfo.value.volumeMounting) {
         deployCmd += deployInfo.value.volumeMounting.split("\n").filter(volume => volume).map(volume => ` -v ${volume}`).join("");
+      }
+      if(deployInfo.value.paramOptions) {
+        deployCmd += deployInfo.value.paramOptions.split("\n").filter(option => option).map(option => ` ${option}`).join("");
       }
       deployCmd += " --restart=unless-stopped";
       deployCmd += " " + deployInfo.value.imageName + ":";
@@ -584,6 +602,7 @@ export default {
     };
 
     return {
+      i18n,
       computedDialogVisible,
       DialogVisible,
       reset,
@@ -651,18 +670,15 @@ export default {
   font-size: 16px;
 }
 
-.app-img {
-  margin-right: 12px;
-  display: inline-block;
+.app-img-box {
   width: 48px;
   height: 48px;
+  margin-right: 12px;
   --un-border-opacity: 1;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 0px 6px;
-  border-width: 1px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0 0 6px;
   border-color: rgb(238 238 238 / var(--un-border-opacity));
   border-radius: 100%;
   border-style: solid;
-  padding: 4px;
 }
 
 .card-container {
@@ -671,6 +687,7 @@ export default {
   gap: 20px; /* 卡片之间的间距 */
   padding: 0 5px;
   justify-content: space-between;
+  margin-top: 20px;
 }
 
 .card-item {

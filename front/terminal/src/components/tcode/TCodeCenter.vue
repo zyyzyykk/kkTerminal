@@ -4,7 +4,7 @@
         v-model="DialogVisible"
         destroy-on-close
         :width="480"
-        :title="$t('TCode中心')"
+        :title="$t('终端代码中心')"
         :modal="false"
         modal-class="kk-dialog-class"
         header-class="kk-header-class"
@@ -14,11 +14,11 @@
     >
       <div class="no-select" >
         <el-tabs stretch type="border-card" >
-          <el-tab-pane :label="$t('功能TCode')" >
+          <el-tab-pane :label="$t('功能')" >
             <div class="pane-body" >
               <div class="kk-flex" >
                 <div>{{ $t('以') }}&nbsp;</div>
-                <div style="background-color: #f3f4f4;" >/</div>
+                <div style="background-color: #f3f4f4;" >F</div>
                 <div>&nbsp;{{ $t('开头，用于执行通用功能') }}</div>
               </div>
               <div class="kk-border" ></div>
@@ -33,7 +33,7 @@
               </div>
             </div>
           </el-tab-pane>
-          <el-tab-pane :label="$t('系统TCode')" >
+          <el-tab-pane :label="$t('系统')" >
             <div class="pane-body" >
               <div class="kk-flex" >
                 <div>{{ $t('以') }}&nbsp;</div>
@@ -52,7 +52,7 @@
               </div>
             </div>
           </el-tab-pane>
-          <el-tab-pane :label="$t('用户TCode')" >
+          <el-tab-pane :label="$t('用户')" >
             <div class="pane-body" >
               <template v-if="userTCodes && Object.keys(userTCodes).length > 0" >
                 <template v-if="nowTCode && nowTCode.length >= 2 && nowTCode.length <= 6" >
@@ -168,7 +168,7 @@ export default {
     const userTCodes = ref({});
     const nowTCode = ref('');
     const mode = ref(false);
-    // 查看Workflow
+    // 查看工作流
     const toWorkflow = (tcode) => {
       nowTCode.value = tcode;
       mode.value = false;
@@ -204,7 +204,7 @@ export default {
       initTCodeEditor(true);
     };
 
-    // 修改TCode的Workflow
+    // 修改终端代码工作流
     const doSaveTCode = () => {
       if(modifyTag.value != '*') return;
       context.emit('handleSaveTCode', nowTCode.value, userTCodeEditorRef.value.getValue());
@@ -217,9 +217,9 @@ export default {
       modifyTag.value = '';
     };
 
-    // 删除TCode
+    // 删除终端代码
     const confirmDeleteTCode = () => {
-      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此TCode吗?'), doDeleteTCode);
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此终端代码吗?'), doDeleteTCode);
     };
     const doDeleteTCode = () => {
       context.emit('handleDeleteTCode', nowTCode.value);

@@ -5,7 +5,7 @@
         :before-close="closeDialog"
         destroy-on-close
         :width="550"
-        :title="$t('TCode工作流')"
+        :title="$t('终端代码工作流')"
         :modal="false"
         modal-class="kk-dialog-class"
         header-class="kk-header-class"
@@ -15,9 +15,9 @@
     >
       <div>
         <div class="kk-flex" >
-          <div class="no-select nowrap form-width" >TCode：</div>
+          <div class="no-select nowrap form-width" >{{ $t('名称') }}：</div>
           <div class="no-select nowrap" style="background-color: #f3f4f4; margin-right: 8px;" >U</div>
-          <el-input size="small" :style="{width: '130px'}" v-model="userTCodeInfo.name" class="w-50 m-2" :placeholder="$t('输入TCode')" maxlength="5" minlength="1" >
+          <el-input size="small" :style="{width: '190px'}" v-model="userTCodeInfo.name" class="w-50 m-2" :placeholder="$t('输入终端代码名称')" maxlength="5" minlength="1" >
             <template #prefix>
               <el-icon><CollectionTag /></el-icon>
             </template>
@@ -37,8 +37,8 @@
           </div>
         </div>
         <div class="kk-flex" >
-          <div class="no-select nowrap form-width" style="margin-right: 2px;" >{{ $t('描\u00A0\u00A0\u00A0述') }}：</div>
-          <el-input size="small" :style="{width: '146px'}" v-model="userTCodeInfo.desc" class="w-50 m-2" :placeholder="$t('输入TCode描述')" >
+          <div class="no-select nowrap form-width" style="margin-right: 2px;" >{{ $t('描述') }}：</div>
+          <el-input size="small" :style="{width: '206px'}" v-model="userTCodeInfo.desc" class="w-50 m-2" :placeholder="$t('输入终端代码描述')" >
             <template #prefix>
               <el-icon><EditPen /></el-icon>
             </template>
@@ -144,7 +144,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       userTCodeEditorRef.value.resetHistory();
     };
     const initText = () => {
-      // Workflow仅支持JS语法
+      // 工作流仅支持JS语法
       userTCodeEditorRef.value.setLanguage('kk.js');
       // 加载Draft
       if(localStoreUtil.getItem(localStore['tcode-draft'])) {
@@ -158,7 +158,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       return regex.test(str);
     };
 
-    // 导入导出TCode
+    // 导入导出终端代码
     const importTCodes = (data) => {
       const file = data.file;
       const fileReader = new FileReader();
@@ -180,7 +180,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
             }
             else {
               ElMessage({
-                message: 'TCode-' + key + i18n.global.t('：名称非法'),
+                message: i18n.global.t('终端代码') + ' ' + key + ' ' + i18n.global.t('名称非法'),
                 type: 'error',
                 grouping: true,
               });
@@ -200,7 +200,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
           // 全部失败
           else if(scnt == 0) {
             ElMessage({
-              message: i18n.global.t('导入失败：无合法TCode'),
+              message: i18n.global.t('导入失败：无合法终端代码'),
               type: 'error',
               grouping: true,
             });
@@ -264,11 +264,11 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       }
     };
 
-    // 确定(添加TCode)
+    // 添加终端代码确定
     const confirm = () => {
       if(!(userTCodeInfo.value.name && userTCodeInfo.value.name.length >= 1 && userTCodeInfo.value.name.length <= 5)) {
         ElMessage({
-          message: i18n.global.t('TCode不能为空'),
+          message: i18n.global.t('终端代码名称不能为空'),
           type: 'error',
           grouping: true,
           repeatNum: Number.MIN_SAFE_INTEGER,
@@ -277,7 +277,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       }
       if(!isAlphaNumeric(userTCodeInfo.value.name)) {
         ElMessage({
-          message: i18n.global.t('TCode只能由字母和数字组成'),
+          message: i18n.global.t('终端代码只能由字母和数字组成'),
           type: 'error',
           grouping: true,
           repeatNum: Number.MIN_SAFE_INTEGER,
@@ -361,6 +361,6 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
 }
 
 .form-width {
-  width: 56px;
+  width: 50px;
 }
 </style>

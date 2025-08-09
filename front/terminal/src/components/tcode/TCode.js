@@ -6,34 +6,34 @@ const storageSessionPrefix = sessionStore['tcode-vars'];
 
 import i18n from "@/locales/i18n";
 
-// 功能TCode, 以 / 开头
+// 功能终端代码, 以 F 开头
 export const FuncTCode = {
-    '/S': {
+    'FS': {
         desc: i18n.global.k('重启终端'),
         execFlow(context) {
             context.proxy.doSettings(3);
         }
     },
-    '/L': {
+    'FL': {
         desc: i18n.global.k('刷新页面'),
         execFlow() {
             window.location.reload();
         }
     },
-    '/E': {
+    'FE': {
         desc: i18n.global.k('用户退出登录'),
         execFlow(context) {
             if(context.proxy.socket) context.proxy.socket.close(3131);
         }
     },
-    '/O': {
+    'FO': {
         desc: i18n.global.k('新建终端窗口'),
         execFlow() {
             const _url = window.location.href;
             window.open(_url, '_blank');
         }
     },
-    '/C': {
+    'FC': {
         desc: i18n.global.k('关闭终端窗口'),
         execFlow() {
             window.close();
@@ -41,7 +41,7 @@ export const FuncTCode = {
     },
 };
 
-// 系统TCode, 以 S 开头
+// 系统终端代码, 以 S 开头
 export const SysTCode = {
     'SC': {
         desc: i18n.global.k('连接设置'),
@@ -83,13 +83,13 @@ export const SysTCode = {
         }
     },
     'STC': {
-        desc: i18n.global.k('TCode中心'),
+        desc: i18n.global.k('终端代码中心'),
         execFlow(context) {
             context.proxy.tCodeCenterRef.DialogVisible = true;
         }
     },
     'STW': {
-        desc: i18n.global.k('TCode工作流'),
+        desc: i18n.global.k('终端代码工作流'),
         execFlow(context) {
             setTimeout(() => {
                 context.proxy.tCodeWorkflowRef.initText();
@@ -99,7 +99,7 @@ export const SysTCode = {
     },
 };
 
-// 用户TCode, 以 U 开头
+// 用户终端代码, 以 U 开头
 export const UserTCodeExecutor = {
     // 文件
     file: {
@@ -136,21 +136,21 @@ export const UserTCodeExecutor = {
     },
     // 变量
     var: {
-        session(key,value) {
-            if(value) sessionStorage.setItem(storageSessionPrefix + key,JSON.stringify(value));
+        session(key, value) {
+            if(value) sessionStorage.setItem(storageSessionPrefix + key, JSON.stringify(value));
             else {
                 if(sessionStorage.getItem(storageSessionPrefix + key)) return JSON.parse(sessionStorage.getItem(storageSessionPrefix + key));
                 else return null;
             }
         },
-        local(key,value) {
+        local(key, value) {
             let tCodeLocalVars = {};
             if(localStoreUtil.getItem(storageLocalKey)) {
                 tCodeLocalVars = JSON.parse(aesDecrypt(localStoreUtil.getItem(storageLocalKey)));
             }
             if(value) {
                 tCodeLocalVars[key] = value;
-                localStoreUtil.setItem(storageLocalKey,aesEncrypt(JSON.stringify(tCodeLocalVars)));
+                localStoreUtil.setItem(storageLocalKey, aesEncrypt(JSON.stringify(tCodeLocalVars)));
             }
             else return tCodeLocalVars[key];
         },
@@ -254,7 +254,7 @@ const filterANSI = (str) => {
     return stripAnsi(str).replace(/[\x00-\x1F\x7F]/g, '');
 };
 
-// 用户TCode状态枚举
+// 用户终端代码状态枚举
 // Error-编译失败: Compile Error
 // Interrupted-执行中断: Execute Interrupt
 // Inactive-未被使用: Not Active
@@ -379,14 +379,14 @@ export const userTCodeExecutorCompleter = {
             name: "hide",
             value: "hide()",
             meta: "kkTerminal",
-            description: "hide TCode display",
+            description: "hide Terminal Code display",
             score: 1000,
         },
         {
             name: "show",
             value: "show()",
             meta: "kkTerminal",
-            description: "show TCode display",
+            description: "show Terminal Code display",
             score: 1000,
         }
     ];
@@ -402,7 +402,7 @@ export const userTCodeExecutorCompleter = {
   }
 };
 
-// 历史TCode
+// 历史终端代码
 export const historyTCode = {
     tCodes: [],
     index: 0,
