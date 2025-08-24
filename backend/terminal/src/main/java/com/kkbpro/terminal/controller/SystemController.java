@@ -40,7 +40,7 @@ public class SystemController {
      */
     @Log
     @PostMapping("/init")
-    public Result init(@RequestHeader("User-Agent") String userAgent, Boolean aesKey, Boolean publicKey) {
+    public Result init(@RequestHeader("User-Agent") String userAgent) {
         String clientOS = getOSFromUA(userAgent);
         String windowId = UUID.randomUUID().toString();
         OSInfo osInfo = new OSInfo(serverOS, clientOS, windowId);
@@ -51,8 +51,8 @@ public class SystemController {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("osInfo", osInfo);
-        if(aesKey) map.put("aesKey", AESUtil.SECRET_KEY);
-        if(publicKey) map.put("publicKey", RSAUtil.PUBLIC_KEY);
+        map.put("aesKey", AESUtil.SECRET_KEY);
+        map.put("publicKey", RSAUtil.PUBLIC_KEY);
         return Result.success(JSONObject.toJSONString(map));
     }
 

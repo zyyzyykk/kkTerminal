@@ -277,7 +277,7 @@ import { deleteDialog } from "@/utils/DeleteDialog";
 import { calcType } from "@/components/calc/CalcType";
 import { calcSize } from '@/components/calc/CalcSize';
 import { calcBgColor } from "@/components/calc/CalcColor";
-import { localStore, sessionStore } from "@/env/Store";
+import { localStore } from "@/env/Store";
 import NoData from "@/components/NoData";
 import ToolTip from "@/components/ToolTip";
 import FileIcons from "file-icons-vue";
@@ -305,7 +305,8 @@ export default {
     FolderOpened,
     CircleClose,
   },
-  setup() {
+  props: ['osInfo'],
+  setup(props) {
 
     // 连接状态
     const connect_status = ref({
@@ -384,7 +385,6 @@ export default {
     };
 
     // 加载环境变量
-    const osInfo = ref(JSON.parse(sessionStorage.getItem(sessionStore['os-info'])));
     const options = ref({});
     const loadOps = () => {
       if(localStoreUtil.getItem(localStore['options'])) options.value = JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['options'])));
@@ -496,7 +496,7 @@ export default {
     };
     // 终端写入
     const termWrite = (content) => {
-      term.write(content);
+      if(content) term.write(content);
     };
 
     // 协作
@@ -815,12 +815,12 @@ export default {
             socket.value.send(aesEncrypt(JSON.stringify({type:2,content:"",rows:0,cols:0}), secretKey.value));
           }
           // PC端
-          if(osInfo.value.serverOS !== "Linux") {
+          if(props.osInfo.serverOS !== "Linux") {
             $.ajax({
               url: http_base_url + '/beat',
               type: 'post',
               data: {
-                windowId: osInfo.value.windowId,
+                windowId: props.osInfo.windowId,
               },
               success() {
               }
@@ -1117,7 +1117,6 @@ export default {
       tCodeCenterRef,
       handleSaveTCode,
       handleDeleteTCode,
-      osInfo,
       cooperating,
       onlineNumber,
       maxNumber,

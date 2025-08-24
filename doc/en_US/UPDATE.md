@@ -1,5 +1,18 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.5.6: 
+
+- Support more URL parameters
+- Add editor text & image size percentage
+- Optimize webpage display
+
+##### zyyzyykk/kkterminal:3.5.3: 
+
+- Add URL parameter to customize terminal configuration
+- Fix bug of multi window restart
+- Add operation recording and cloud synchronization functions
+- Refactoring some code logic
+
 ##### zyyzyykk/kkterminal:3.4.9: 
 
 - Add private key login method
@@ -20,7 +33,7 @@
 
 ##### zyyzyykk/kkterminal:3.4.0: 
 
-- Add SSH Option and custom TCode deletion function
+- Add SSH Option and custom Terminal Code deletion function
 - Fixed folder pasting failure bug in File Module
 - Optimized network resources and page display
 
@@ -53,8 +66,8 @@
 
 ##### zyyzyykk/kkterminal:3.2.2:
 
-- TCode supports Get/Set to Session/Local Level variables
-- Text editor adds intelligent prompts for TCode native object `kkTerminal`
+- Terminal Code supports Get/Set to Session/Local Level variables
+- Text editor adds intelligent prompts for Terminal Code native object `kkTerminal`
 - File Management Module shortcut keys adapted for MacOS
 
 ##### zyyzyykk/kkterminal:3.2.0 :
@@ -65,19 +78,19 @@
 
 ##### zyyzyykk/kkterminal:3.1.7 :
 
-- Adapt to default fonts and optimize TCode status display
+- Adapt to default fonts and optimize Terminal Code status display
 - Support local PC deployment, automatically open browser window
 
 ##### zyyzyykk/kkterminal:3.1.5 :
 
 - Fix bug where files cannot be uploaded through the input box
 - Support folder upload and optimize file batch upload logic
-- Add TCode status information and optimize TCode display
+- Add Terminal Code status information and optimize Terminal Code display
 
 ##### zyyzyykk/kkterminal:3.1.2 :
 
 - The file editor supports code highlighting and intelligent prompts for common file types
-- Add [TCode (Terminal Code)](./TCODE.md) to enable quick access to functional modules and execution of specific operational processes
+- Add [Terminal Code](./TCODE.md) to enable quick access to functional modules and execution of specific operational processes
 
 ##### zyyzyykk/kkterminal:3.0.9 :
 

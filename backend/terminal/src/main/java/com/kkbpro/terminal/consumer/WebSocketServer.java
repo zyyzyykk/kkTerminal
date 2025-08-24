@@ -5,8 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.lalyos.jfiglet.FigletFont;
 import com.kkbpro.terminal.config.AppConfig;
 import com.kkbpro.terminal.constants.enums.CharsetEnum;
-import com.kkbpro.terminal.constants.enums.MessageInfoTypeRnum;
-import com.kkbpro.terminal.constants.enums.ResultCodeEnum;
+import com.kkbpro.terminal.constants.enums.SocketMessageEnum;
+import com.kkbpro.terminal.constants.enums.SocketSendEnum;
 import com.kkbpro.terminal.controller.AdvanceController;
 import com.kkbpro.terminal.pojo.dto.CooperateInfo;
 import com.kkbpro.terminal.pojo.dto.EnvInfo;
@@ -56,7 +56,7 @@ public class WebSocketServer {
     public static void putTransportingFile(String sshKey, String key, FileTransInfo fileTransInfo) {
         fileTransportingMap.get(sshKey).put(key, fileTransInfo);
         if(fileTransInfo.getId() == null) return;
-        webSocketServerMap.get(sshKey).sendMessage(ResultCodeEnum.FILE_TRANSPORT_UPDATE.getDesc() ,"success", ResultCodeEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
+        webSocketServerMap.get(sshKey).sendMessage(SocketSendEnum.FILE_TRANSPORT_UPDATE.getDesc() ,"success", SocketSendEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
     };
 
     public static FileTransInfo getTransportingFile(String sshKey, String key) {
@@ -69,7 +69,7 @@ public class WebSocketServer {
         // 修改类型为 已完成
         fileTransInfo.setIndex(3);
         fileTransportingMap.get(sshKey).remove(key);
-        webSocketServerMap.get(sshKey).sendMessage(ResultCodeEnum.FILE_TRANSPORT_UPDATE.getDesc() ,"success", ResultCodeEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
+        webSocketServerMap.get(sshKey).sendMessage(SocketSendEnum.FILE_TRANSPORT_UPDATE.getDesc() ,"success", SocketSendEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
     };
 
     private static AppConfig appConfig;
@@ -122,8 +122,8 @@ public class WebSocketServer {
         // 协作
         String cooperateKey = envInfo.getCooperateKey();
         if(cooperateKey != null && !cooperateKey.isEmpty()) {
-            Integer state = ResultCodeEnum.COOPERATE_KEY_INVALID.getState();
-            String msg = ResultCodeEnum.COOPERATE_KEY_INVALID.getDesc();
+            Integer state = SocketSendEnum.COOPERATE_KEY_INVALID.getState();
+            String msg = SocketSendEnum.COOPERATE_KEY_INVALID.getDesc();
             try {
                 String[] keyInfo = AESUtil.decrypt(StringUtil.changeStrBase64(cooperateKey), AdvanceController.COOPERATE_SECRET_KEY).split("\\^");
                 String cooperateId = keyInfo[0];
@@ -138,7 +138,7 @@ public class WebSocketServer {
                     Boolean readOnly = masterSocket.cooperateInfo.getReadOnly();
                     // 成功加入协作
                     if(maxHeadCount > slaveSockets.size()) {
-                        state = ResultCodeEnum.CONNECT_SUCCESS.getState();
+                        state = SocketSendEnum.CONNECT_SUCCESS.getState();
                         msg = (readOnly ? "ReadOnly" : "Edit") + " Cooperation Success";
                         slaveSockets.add(this);
                         this.sshKey = sshKey;
@@ -148,8 +148,8 @@ public class WebSocketServer {
                             this.shell = masterSocket.shell;
                             this.shellOutputStream = masterSocket.shellOutputStream;
                         }
-                        masterSocket.sendMessage(ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
-                                "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));
+                        masterSocket.sendMessage(SocketSendEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
+                                "success", SocketSendEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));
                     }
                     else msg = "Cooperators Limit Exceeded";
                 }
@@ -193,7 +193,7 @@ public class WebSocketServer {
             }
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
-            this.sendMessage("Fail to connect remote server !","fail", ResultCodeEnum.CONNECT_FAIL.getState(), null);
+            this.sendMessage("Fail to connect remote server !","fail", SocketSendEnum.CONNECT_FAIL.getState(), null);
             return;
         } finally {
             // 删除本地私钥文件
@@ -215,14 +215,14 @@ public class WebSocketServer {
 
         // 连接成功，生成key标识
         sshKey = envInfo.getLang() + "-" + serverCharset.name().replace("-","@") + "-" + UUID.randomUUID();
-        this.sendMessage("SSHKey","success", ResultCodeEnum.CONNECT_SUCCESS.getState(), sshKey);
+        this.sendMessage("SSHKey","success", SocketSendEnum.CONNECT_SUCCESS.getState(), sshKey);
         webSocketServerMap.put(sshKey, this);
         sshClientMap.put(sshKey, sshClient);
         fileTransportingMap.put(sshKey, new ConcurrentHashMap<>());
         // 欢迎语
-        this.sendMessage("Welcome","success", ResultCodeEnum.OUT_TEXT.getState(), appConfig.getWelcome() + "\r\n");
+        this.sendMessage("Welcome","success", SocketSendEnum.OUT_TEXT.getState(), appConfig.getWelcome() + "\r\n");
         // github源地址
-        this.sendMessage("GitHub","success", ResultCodeEnum.OUT_TEXT.getState(), "source: " + appConfig.getSource() + "\r\n");
+        this.sendMessage("GitHub","success", SocketSendEnum.OUT_TEXT.getState(), "source: " + appConfig.getSource() + "\r\n");
         // 生成艺术字
         String title = appConfig.getTitle();
         String titleArt = FigletFont.convertOneLine(title);
@@ -230,7 +230,7 @@ public class WebSocketServer {
         // 分割成多行
         String[] asciiArts = titleArt.split("\n");
         for (String asciiArt : asciiArts) {
-            this.sendMessage("ArtWord","success", ResultCodeEnum.OUT_TEXT.getState(), asciiArt + "\r\n");
+            this.sendMessage("ArtWord","success", SocketSendEnum.OUT_TEXT.getState(), asciiArt + "\r\n");
         }
 
         shell = sshSession.startShell();
@@ -243,12 +243,12 @@ public class WebSocketServer {
                 while ((len = shellInputStream.read(buffer)) != -1) {
                     String shellOut = new String(buffer, 0, len, serverCharset);
                     this.sendMessage("ShellOut",
-                            "success", ResultCodeEnum.OUT_TEXT.getState(), shellOut);
+                            "success", SocketSendEnum.OUT_TEXT.getState(), shellOut);
                     List<WebSocketServer> slaveSockets = cooperateMap.get(sshKey);
                     if(slaveSockets != null) {
                         for (WebSocketServer slaveSocket : slaveSockets) {
                             slaveSocket.sendMessage("ShellOut",
-                                    "success", ResultCodeEnum.OUT_TEXT.getState(), shellOut);
+                                    "success", SocketSendEnum.OUT_TEXT.getState(), shellOut);
                         }
                     }
                 }
@@ -267,8 +267,8 @@ public class WebSocketServer {
                 slaveSockets.remove(this);
                 WebSocketServer masterSocket = webSocketServerMap.get(sshKey);
                 if(masterSocket != null) {
-                    masterSocket.sendMessage(ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
-                            "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));
+                    masterSocket.sendMessage(SocketSendEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
+                            "success", SocketSendEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));
                 }
             }
             return;
@@ -332,24 +332,24 @@ public class WebSocketServer {
         MessageInfo messageInfo = JSONObject.parseObject(message, MessageInfo.class);
 
         // 改变虚拟终端大小
-        if(MessageInfoTypeRnum.SIZE_CHANGE.getState().equals(messageInfo.getType())) {
+        if(SocketMessageEnum.SIZE_CHANGE.getState().equals(messageInfo.getType())) {
             shell.changeWindowDimensions(messageInfo.getCols(),messageInfo.getRows(),0,0);
         }
 
         // 文本命令
-        if(MessageInfoTypeRnum.USER_TEXT.getState().equals(messageInfo.getType())) {
+        if(SocketMessageEnum.USER_TEXT.getState().equals(messageInfo.getType())) {
             shellOutputStream.write(messageInfo.getContent().getBytes(serverCharset));
             shellOutputStream.flush();
         }
         // 心跳续约
-        if(MessageInfoTypeRnum.HEART_BEAT.getState().equals(messageInfo.getType())) {
+        if(SocketMessageEnum.HEART_BEAT.getState().equals(messageInfo.getType())) {
             shellOutputStream.write("".getBytes(StandardCharsets.UTF_8));
             shellOutputStream.flush();
             // 更新协作者数量
             List<WebSocketServer> slaveSockets = cooperateMap.get(sshKey);
             if(slaveSockets != null) {
-                this.sendMessage(ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
-                        "success", ResultCodeEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));
+                this.sendMessage(SocketSendEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
+                        "success", SocketSendEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));
             }
         }
 

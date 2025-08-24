@@ -1,52 +1,77 @@
-### ⌨️ TCode (Terminal Code)
+### ⌨️ Terminal Code
 
-##### TCode Introduction
+> Terminal Code is a shortcut used to access and execute specific operational processes
+>
+> The length of Terminal Code is 2-6 bits, where the first bit represents its type
+>
+> Terminal Code is not case sensitive
 
-TCode (Terminal Code) is a shortcut used to access and execute specific operational processes
+##### Terminal Code Type
 
-TCode is not case sensitive; The length is 2-6 bits, where the first bit represents the TCode type
+> Enter `STC` in the Terminal Code input box and press enter to show more details
 
-##### TCode Type
+- Function Terminal Code: Start with `F` , used to execute common functions
+- System Terminal Code: Start with `S` , used to access system modules
+- User Terminal Code: Start with `U` , used to customize workflows
 
-> Enter `/H` in the TCode input box and press enter to view detailed information of all TCodes
+##### New User Terminal Code
 
-- Function TCode: Starting with `/` , used to quickly execute common functions
-- System TCode: Starting with `S` , used for quick access to system modules
-- User TCode: Starting with `U` , customize the implementation of automated Workflow similar to shell scripts
+1. Enter `STW` in the Terminal Code input box and press enter
+2. Enter the name and description of Terminal Code
+3. Click confirm to add User Terminal Code
 
-##### Customized TCode
+##### User Terminal Code Workflow
 
-###### New TCode
+> [!Warning] 
+>
+> Precautions when writing workflows:
+>
+> - `kkTerminal` is a native object in workflow, and you can **directly use** the methods in this object
+> - Workflow only supports javascript syntax format
+> - Annotation information **cannot** be added in workflow
+> - Double quotation marks `""` **cannot** be used in workflow, **only** single quotation marks `''` can be used
+> - When using some methods of `kkTerminal` , the keyword `await` **must** be added before it
 
-1. Enter `/A` in the TCode input box and press Enter
-2. In the custom TCode dialog box, enter the TCode name and description, then edit the corresponding Workflow (JS syntax)
-3. Click OK to add TCode
+###### kkTerminal Basic Functions
 
-###### Workflow
+| Methods | Description                                                  | Example                                                      |
+| ------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| write   | Write content and wait for output results                    | `await kkTerminal.write('content'[, delay for obtaining results=200ms])` |
+| read    | Obtain all output result arrays since the last write command | `kkTerminal.read()`                                          |
+| readAll | Obtain all output result arrays since the workflow execution | `kkTerminal.readAll()`                                       |
+| hide    | Hide workflow execution process in the terminal              | `kkTerminal.hide()`                                          |
+| show    | Display workflow execution process in the terminal           | `kkTerminal.show()`                                          |
 
-1. Workflow only supports JavaScript (js) syntax format
+###### kkTerminal Get/Set Variables
 
-2. There is a `kkTerminal` object in Workflow, and you can **directly use** the methods in the object
+| Methods     | Description                       | Example                                     |
+| ----------- | --------------------------------- | ------------------------------------------- |
+| var.session | Get/Set session level variables   | `kkTerminal.var.session('key'[, value])`    |
+| var.local   | Get/Set local level variables     | `kkTerminal.var.local('key'[, value])`      |
+| var.clean   | Batch clear local level variables | `kkTerminal.var.clean(['key1','key2',...])` |
 
-3. `kkTerminal` contains the following methods:
+###### kkTerminal Operation File
 
-   | Methods | Description                                                  | Example                                                      |
-   | ------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-   | write   | Write content and wait for output results                    | `await kkTerminal.write('content'[, Delay for obtaining results=200ms])` |
-   | read    | Obtain all output result arrays since the last write command | `kkTerminal.read()`                                          |
-   | readAll | Obtain an array of all output results from the start of Workflow execution | `kkTerminal.readAll()`                                       |
-   | session | Get/Set Session Level variables                              | `kkTerminal.variables.session('key'[, value])`               |
-   | local   | Get/Set Local Level variables                                | `kkTerminal.variables.local('key'[, value])`                 |
-   | clean   | Batch Clear Local Level variables                            | `kkTerminal.variables.clean(['key1','key2',...])`            |
-   | hide    | Hide Workflow execution process in the terminal              | `kkTerminal.hide()`                                          |
-   | show    | Display Workflow execution process in the terminal           | `kkTerminal.show()`                                          |
+| Methods       | Description                                   | Example                                                  |
+| ------------- | --------------------------------------------- | -------------------------------------------------------- |
+| file.cd       | Open file module and enter specified path     | `await kkTerminal.file.cd('path')`                       |
+| file.open     | Open file under specified path in file editor | `await kkTerminal.file.open('path'[, editor config={}])` |
+| file.edit     | Edit content in file editor                   | `kkTerminal.file.edit((editor) => {})`                   |
+| file.save     | Save file with specified encoding format      | `kkTerminal.file.save('encode')`                         |
+| file.close    | Close file editor/file module                 | `kkTerminal.file.close([close file module=false])`       |
+| file.download | Download files/folders under specified path   | `await kkTerminal.file.download('path')`                 |
 
-4. Matters needing attention:
-   - Annotation information **cannot** be added in Workflow
-   - Double quotation marks `""` **cannot** be used in Workflow, **only** single quotation marks `''` can be used
-   - When using the method `kkTerminal.write()` , the keyword `await` **must** be added before it
+###### kkTerminal Reserved Values
 
-###### Workflow example: Using Customized TCode to start and deploy Jar packages
+> The reserved values are system values automatically recorded by `kkTerminal` object, and can be obtained through method `kkTerminal.var.session('reserved value name')`
+
+| Name           | Description                           |
+| -------------- | ------------------------------------- |
+| CONNECT_OPTION | Option name of current ssh connection |
+| HOME_PATH      | Home path of file module              |
+| CURRENT_DIR    | Current directory of file module      |
+
+###### Default workflow template (deployment jar package)
 
 ```js
 const path = '/root/terminal';
@@ -64,12 +89,13 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);
 
 ###### Import/Export
 
-- Import: Importing any number of Customized TCodes will overwrite TCodes with the same name
-- Export: Export all existing Customized TCodes
+> Import: Import any number of User Terminal Code (will overwrite Terminal Code with the same name)
+>
+> Export: Export all existing User Terminal Code
+>
+> Note: The file format for importing and exporting User Terminal Code is json
 
-Note: The file format for importing and exporting Customized TCodes is JSON
-
-Example:
+Example of User Terminal Code file:
 
 ```json
 {

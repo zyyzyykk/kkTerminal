@@ -1,10 +1,12 @@
 package com.kkbpro.terminal.constants.enums;
 
-public enum FileBlockStateEnum {
+public enum FileStateEnum {
 
     FILE_UPLOADING(202,"文件后台上传中"),
 
     CHUNK_UPLOAD_SUCCESS(203,"文件片上传成功"),
+
+    FILE_NOT_EXIST(417,"文件不存在"),
 
     DECRYPT_ERROR(501,"文件片解密失败"),
 
@@ -24,13 +26,13 @@ public enum FileBlockStateEnum {
 
     private String desc;
 
-    FileBlockStateEnum(Integer state, String desc) {
+    FileStateEnum(Integer state, String desc) {
         this.state = state;
         this.desc = desc;
     }
 
-    public static FileBlockStateEnum getByState(Integer state) {
-        for (FileBlockStateEnum item : FileBlockStateEnum.values()) {
+    public static FileStateEnum getByState(Integer state) {
+        for (FileStateEnum item : FileStateEnum.values()) {
             if (item.getState().equals(state)) {
                 return item;
             }

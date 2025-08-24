@@ -3,10 +3,10 @@ import $ from 'jquery';
 import { aesDecrypt } from '@/utils/Encrypt';
 
 $.ajaxSetup({
+    cache: false,                   // 禁用缓存
     processData: true,
-    // 携带cookie
     xhrFields:{
-      withCredentials: true,
+      withCredentials: true,        // 携带cookie
     },
     dataFilter(resp) {
       resp = JSON.parse(resp);
@@ -60,5 +60,5 @@ window.ResizeObserver = class ResizeObserver extends _ResizeObserver{
     }
 };
 
-//用于去掉eazyplayer警告,开发时禁用，打包开启
+// 禁用警告输出
 app.config.warnHandler = () => {};

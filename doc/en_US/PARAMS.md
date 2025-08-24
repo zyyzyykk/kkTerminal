@@ -1,18 +1,19 @@
 ### 🔗 URL Parameters
 
-| Name        | Description            | Values                 | Example                                                      |
-| ----------- | ---------------------- | ---------------------- | ------------------------------------------------------------ |
-| option      | login by option        | option name            | option=kkterminal                                            |
-| bg          | background color       | hexadecimal color code | bg=0C0C0C                                                    |
-| fg          | foreground color       | hexadecimal color code | fg=FFFFFF                                                    |
-| fontFamily  | font                   | font name              | fontFamily=Courier%20New                                     |
-| fontSize    | size                   | 12/14/16/18/20         | fontSize=18                                                  |
-| cursorStyle | cursor style           | block/underline/bar    | cursorStyle=bar                                              |
-| cursorBlink | cursor blink           | true/false             | cursorBlink=false                                            |
-| tCode       | enable TCode           | true/false             | tCode=false                                                  |
-| cloud       | enable cloud sync      | true/false             | cloud=false                                                  |
-| lang        | language               | en/zh                  | lang=zh                                                      |
-| mode        | terminal mode          | headless/pure/-        | mode=pure                                                    |
-| record      | play operation record  | record id              | record=eaf1034c-9500-4c59-b9cb-5e09e7c7d48a                  |
-| cooperate   | start team cooperation | cooperate key          | cooperate=1i0GDMiYX3dP8CM-jah6uziYawS8PT9t-GY9PkRzFz9KMRcVyBvA4vVZj4NPs2QBwe-mo0VPRx-nlWFZ3oYkVksTG86pwdep2GAjV10YpfIaA5794omzljdYg5t4T3li |
-| cmd         | initialized command    | bash command           | cmd=ls                                                       |
+| Name        | Description                      | Values                 | Example/Instructions                                         |
+| ----------- | -------------------------------- | ---------------------- | ------------------------------------------------------------ |
+| option      | login by option                  | option name            | option=kkterminal                                            |
+| bg          | background color                 | hexadecimal color code | bg=0C0C0C                                                    |
+| fg          | foreground color                 | hexadecimal color code | fg=FFFFFF                                                    |
+| fontFamily  | font                             | font name              | fontFamily=Courier%20New                                     |
+| fontSize    | size                             | 12/14/16/18/20         | fontSize=18                                                  |
+| cursorStyle | cursor style                     | block/underline/bar    | cursorStyle=bar                                              |
+| cursorBlink | cursor blink                     | true/false             | cursorBlink=false                                            |
+| tCode       | enable Terminal Code             | true/false             | tCode=false                                                  |
+| cloud       | enable devices sync              | true/false             | cloud=false                                                  |
+| lang        | language                         | en/zh                  | lang=zh                                                      |
+| mode        | terminal mode                    | headless/pure/-        | mode=pure                                                    |
+| record      | play operation record            | -                      | priority over ssh connection and cooperation                 |
+| cooperate   | start team cooperation           | -                      | priority over ssh connection                                 |
+| cmd         | initialized command              | bash/Terminal Code     | cmd=bash:ls<br>cmd=tcode:sf                                  |
+| user        | user information of devices sync | -                      | devices synchronization process:<br/>1. Click on "Devices Sync" tab to generate the sync link carrying user parameter<br/>2. Use another browser/device to access this sync link<br/>3. Click on "Devices Sync" tab to achieve user data synchronization |

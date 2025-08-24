@@ -24,7 +24,7 @@ export const cloud = async (type, name, content) => {
   if(!content) return;
   const userInfo = getUserInfo();
   // 创建Blob对象
-  const blob = new Blob([aesEncrypt(content, userInfo.key)], { type: 'application/octet-stream' });
+  const blob = new Blob([aesEncrypt(content, userInfo.key)], {type: 'application/octet-stream'});
   // 创建File对象
   const file = new File([blob], name);
   const formData = new FormData();
@@ -32,52 +32,63 @@ export const cloud = async (type, name, content) => {
   formData.append('type',type);
   formData.append('name',name);
   formData.append('file',file);
-  await $.ajax({
-    url: http_base_url + '/cloud',
-    type: 'post',
-    data: formData,
-    contentType: false,
-    processData: false,
-    success(resp) {
-      if(resp.status !== 'success') {
-        if(resp.code == 506) {
-          ElMessage({
-            message: i18n.global.t('云端文件过多'),
-            type: resp.status,
-            grouping: true,
-          });
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: http_base_url + '/cloud',
+      type: 'post',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success(resp) {
+        if(resp.status !== 'success') {
+          if(resp.code == 506) {
+            ElMessage({
+              message: i18n.global.t('云端文件过多'),
+              type: resp.status,
+              grouping: true,
+            });
+          }
+          else {
+            ElMessage({
+              message: i18n.global.t('云端同步失败'),
+              type: resp.status,
+              grouping: true,
+            });
+          }
         }
-        else {
-          ElMessage({
-            message: i18n.global.t('云端同步失败'),
-            type: resp.status,
-            grouping: true,
-          });
-        }
-      }
-    }
+        resolve();
+      },
+      error() {
+        reject();
+      },
+    });
   });
 };
 
 // return: object
 export const load = async (fileName) => {
   const userInfo = getUserInfo();
-  let content = null;
-  await $.ajax({
-    url: http_base_url + '/load',
-    method: 'GET',
-    data: {
-      time: new Date().getTime(),
-      user: userInfo.name + '-' + userInfo.time,
-      fileName: fileName,
-    },
-    success(resp) {
-      if(resp.status === 'success') {
-        content = JSON.parse(aesDecrypt(resp.data, userInfo.key));
-      }
-    }
+  return new Promise((resolve, reject) => {
+    let content = null;
+    $.ajax({
+      url: http_base_url + '/load',
+      method: 'GET',
+      data: {
+        time: new Date().getTime(),
+        user: userInfo.name + '-' + userInfo.time,
+        fileName: fileName,
+      },
+      success(resp) {
+        if(resp.status === 'success') {
+          content = JSON.parse(aesDecrypt(resp.data, userInfo.key));
+        }
+        resolve(content);
+      },
+      error() {
+        reject();
+      },
+    });
   });
-  return content;
 };
 
 // 需要同步的内容
@@ -85,20 +96,34 @@ const syncArr = Object.values(cloudStore);
 
 export const syncUpload = async (items) => {
   const syncItems = items || syncArr;
+  const promises = [];
   for(let i = 0; i < syncItems.length; i++) {
     const content = localStorage.getItem(syncItems[i]);
-    if(content) await cloud(syncItems[i],'',aesDecrypt(content));
+    if(content) {
+      const promise = cloud(syncItems[i], '', aesDecrypt(content));
+      promises.push(promise);
+    }
   }
+
+  return Promise.allSettled(promises);
 };
 
 export const syncDownload = async (userInfo) => {
   if(userInfo) localStorage.setItem(localStore['user'], userInfo);
+  const promises = [];
   for(let i = 0; i < syncArr.length; i++) {
-    const content = await load(syncArr[i]);
-    if(content) localStorage.setItem(syncArr[i], aesEncrypt(JSON.stringify(content)));
-    else localStorage.removeItem(syncArr[i]);
+    const promise = load(syncArr[i]);
+    promise.then((content) => {
+      if(content) localStorage.setItem(syncArr[i], aesEncrypt(JSON.stringify(content)));
+      // TODO
+      // else localStorage.removeItem(syncArr[i]);
+    });
+    promises.push(promise);
   }
-  if(userInfo) window.location.reload();
+
+  return Promise.allSettled(promises).then(() => {
+    if(userInfo) window.location.reload();
+  });
 };
 
 export const localStoreUtil = {

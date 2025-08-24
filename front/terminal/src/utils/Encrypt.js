@@ -1,16 +1,26 @@
 import CryptoJS from "crypto-js";
 import JSEncrypt from "jsencrypt";
-import { sessionStore } from "@/env/Store";
+
+let aesKey = null;
+let rsaKey = null;
+export const encryptKeySetter = {
+    aes(key) {
+        aesKey = key;
+    },
+    rsa(key) {
+        rsaKey = key;
+    }
+};
 
 /**
  * AES Encrypt
  */
 export const aesEncrypt = (word, secretKey) => {
-    const secret_key = secretKey || sessionStorage.getItem(sessionStore['aes-key']);
-    if(!secret_key) return null;
+    const secret_key = secretKey || aesKey;
+    if(!secret_key || !word) return null;
     const key = CryptoJS.enc.Utf8.parse(secret_key);
     const srcs = CryptoJS.enc.Utf8.parse(word);
-    const encrypted = CryptoJS.AES.encrypt(srcs, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
+    const encrypted = CryptoJS.AES.encrypt(srcs, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7});
     return encrypted.toString();
 };
 
@@ -18,12 +28,12 @@ export const aesEncrypt = (word, secretKey) => {
  * AES Buffer Encrypt
  */
 export const aesEncryptBuffer = (arrayBuffer, secretKey) => {
-    const secret_key = secretKey || sessionStorage.getItem(sessionStore['aes-key']);
-    if(!secret_key) return null;
+    const secret_key = secretKey || aesKey;
+    if(!secret_key || !arrayBuffer) return null;
     const key = CryptoJS.enc.Utf8.parse(secret_key);
     const uint8Array = new Uint8Array(arrayBuffer);
     const srcs = CryptoJS.lib.WordArray.create(uint8Array);
-    const encrypted = CryptoJS.AES.encrypt(srcs, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
+    const encrypted = CryptoJS.AES.encrypt(srcs, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7});
     return encrypted.toString();
 };
 
@@ -31,10 +41,10 @@ export const aesEncryptBuffer = (arrayBuffer, secretKey) => {
  * AES Decrypt
  */
 export const aesDecrypt = (word, secretKey) => {
-    const secret_key = secretKey || sessionStorage.getItem(sessionStore['aes-key']);
-    if(!secret_key) return null;
+    const secret_key = secretKey || aesKey;
+    if(!secret_key || !word) return null;
     const key = CryptoJS.enc.Utf8.parse(secret_key);
-    const decrypt = CryptoJS.AES.decrypt(word, key, {mode:CryptoJS.mode.ECB,padding: CryptoJS.pad.Pkcs7});
+    const decrypt = CryptoJS.AES.decrypt(word, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7});
     return CryptoJS.enc.Utf8.stringify(decrypt).toString();
 };
 
@@ -42,8 +52,8 @@ export const aesDecrypt = (word, secretKey) => {
  * RSA Encrypt
  */
 export const rsaEncrypt = (word, publicKey) => {
-    const secret_key = publicKey || sessionStorage.getItem(sessionStore['public-key']);
-    if(!secret_key) return null;
+    const secret_key = publicKey || rsaKey;
+    if(!secret_key || !word) return null;
     // 创建对象
     const jsRsa = new JSEncrypt();
     // 设置公钥

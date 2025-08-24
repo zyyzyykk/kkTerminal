@@ -1,6 +1,6 @@
 package com.kkbpro.terminal.constants.enums;
 
-public enum ResultCodeEnum {
+public enum SocketSendEnum {
 
     COOPERATE_KEY_INVALID(-2, "Cooperation Key is Invalid"),
 
@@ -18,13 +18,13 @@ public enum ResultCodeEnum {
 
     private String desc;
 
-    ResultCodeEnum(Integer state, String desc) {
+    SocketSendEnum(Integer state, String desc) {
         this.state = state;
         this.desc = desc;
     }
 
-    public static ResultCodeEnum getByState(Integer state) {
-        for (ResultCodeEnum item : ResultCodeEnum.values()) {
+    public static SocketSendEnum getByState(Integer state) {
+        for (SocketSendEnum item : SocketSendEnum.values()) {
             if (item.getState().equals(state)) {
                 return item;
             }

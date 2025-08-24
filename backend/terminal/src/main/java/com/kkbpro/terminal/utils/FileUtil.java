@@ -1,6 +1,6 @@
 package com.kkbpro.terminal.utils;
 
-import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
+import com.kkbpro.terminal.constants.enums.FileStateEnum;
 import com.kkbpro.terminal.exception.MyException;
 import com.kkbpro.terminal.result.Result;
 
@@ -35,7 +35,7 @@ public class FileUtil {
                 }
                 // 如果服务器上的切片数量和前端给的数量不匹配
                 if (chunks != list.size()) {
-                    throw new MyException(Result.error(FileBlockStateEnum.UPLOAD_CHUNK_LOST.getState(), "文件片缺失"));
+                    throw new MyException(Result.error(FileStateEnum.UPLOAD_CHUNK_LOST.getState(), "文件片缺失"));
                 }
                 // 根据切片文件的下标进行排序
                 List<File> fileListCollect = list.parallelStream().sorted(((file1, file2) -> {
@@ -56,12 +56,12 @@ public class FileUtil {
                 }
             } catch (Exception e) {
                 LogUtil.logException(FileUtil.class, e);
-                throw new MyException(Result.error(FileBlockStateEnum.CHUNK_MERGE_ERROR.getState(), "文件片合并失败"));
+                throw new MyException(Result.error(FileStateEnum.CHUNK_MERGE_ERROR.getState(), "文件片合并失败"));
             }
         }
         // 产生的文件大小和前端一开始上传的文件不一致
         if (finalFile.length() != totalSize) {
-            throw new MyException(Result.error(FileBlockStateEnum.UPLOAD_SIZE_DIFF.getState(), "上传文件大小不一致"));
+            throw new MyException(Result.error(FileStateEnum.UPLOAD_SIZE_DIFF.getState(), "上传文件大小不一致"));
         }
     }
 

@@ -1,7 +1,7 @@
 package com.kkbpro.terminal.controller;
 
 import com.kkbpro.terminal.annotation.Log;
-import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
+import com.kkbpro.terminal.constants.enums.FileStateEnum;
 import com.kkbpro.terminal.consumer.WebSocketServer;
 import com.kkbpro.terminal.pojo.dto.CooperateInfo;
 import com.kkbpro.terminal.result.Result;
@@ -63,7 +63,7 @@ public class AdvanceController {
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
         if(ssh == null || webSocketServer == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         if(webSocketServer.getCooperateInfo() != null)
             return Result.error(errorMsg);
@@ -92,7 +92,7 @@ public class AdvanceController {
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
         if(ssh == null || webSocketServer == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
 
         webSocketServer.setCooperateInfo(null);
@@ -136,7 +136,7 @@ public class AdvanceController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String status = "";
         String command = "echo -n \"$(uptime | awk -F'load average: ' '{print $2}' | awk '{print $1}' | sed 's/,//')@\" && \\\n" +
@@ -185,7 +185,7 @@ public class AdvanceController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String version = "";
         String command = "docker --version";
@@ -226,7 +226,7 @@ public class AdvanceController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String info = "";
         String command = DOCKER_INFO_CMD[type % DOCKER_INFO_CMD.length];
@@ -259,7 +259,7 @@ public class AdvanceController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String command = DOCKER_DELETE_CMD[type % DOCKER_DELETE_CMD.length] + items;
         try(Session session = ssh.startSession();
@@ -288,7 +288,7 @@ public class AdvanceController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String container = "";
         String command = DOCKER_CONTAINER_CMD[type % DOCKER_CONTAINER_CMD.length] + items;

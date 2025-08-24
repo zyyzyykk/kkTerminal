@@ -1,6 +1,6 @@
 # kkTerminal
 
-> kkTerminal, a terminal for Web SSH connection
+> kkTerminal, a powerful terminal for Web SSH connection
 >
 > Author: [zyyzyykk](https://github.com/zyyzyykk/)
 >
@@ -10,10 +10,10 @@
 >
 > Preview: https://ssh.kkbpro.com/
 >
-> Update Time: 2025-03-15
+> Update Time: 2025-08-24
 >
 
-<p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.png" alt="kkTerminal"></a></p>
+<p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.svg" alt="kkTerminal"></a></p>
 
 <p align="center">
   <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/docker/pulls/zyyzyykk/kkterminal?logo=docker" alt="Docker Image"></a>
@@ -30,7 +30,7 @@
 Using the `iframe` tag in HTML web pages to quick integration:
 
 ```html
-<iframe src="https://ssh.kkbpro.com/" height="400px" width="600px" ></iframe>
+<iframe src="https://ssh.kkbpro.com/" height="600px" width="800px" ></iframe>
 ```
 
 ### 🐳 Deploy with Docker
@@ -41,37 +41,36 @@ Using the `iframe` tag in HTML web pages to quick integration:
 docker pull zyyzyykk/kkterminal
 ```
 
-2. Create and run a container for port mapping: `-p port:3000`
+2. Create and run a container:
 
 ```bash
-docker run -d --name kkterminal -p 3000:3000 zyyzyykk/kkterminal
+docker run -d --name kkterminal \
+-p 3000:3000 \
+-e TITLE="kkTerminal" \
+-e AESKEY="P5P1SIqVe6kaOxMX" \
+-v /data/kkterminal/cloud:/cloud \
+zyyzyykk/kkterminal
 ```
 
-3. Custom art word: `-e TITLE="ArtWord"`
+3. Accessing in browser: `http://server-ip:3000/`
 
-```bash
-docker run -d --name kkterminal -p 3000:3000 -e TITLE="kkbpro" zyyzyykk/kkterminal
-```
+### 👀 Preview
 
-4. Accessing in browser: `http://server-ip:3000/`
+Visit this website: https://ssh.kkbpro.com/
 
-### 🛸 Preview
+![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.8/en/Connect.png)
 
-Visit the following website: https://ssh.kkbpro.com/
+![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.8/en/Preference.png)
 
-![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/en/Connect.png)
+![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.8/en/File.png)
 
-![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/en/Preference.png)
-
-![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/en/File.png)
-
-![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.0/en/Editor.png)
+![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.8/en/Editor.png)
 
 [**More Module Previews**](./doc/en_US/MODULE.md)
 
 ### 💡 Function Description
 
-1. kkTerminal is a terminal for Web SSH connection. Click on the terminal icon in the upper-left corner and select the connection settings to establish an SSH connection
+1. kkTerminal is a powerful terminal for Web SSH connection; Click on the terminal icon in the upper-left corner and select the connection settings to establish an SSH connection
 
 2. Support the use of `iframe` tags in web pages for quick integration into third-party websites
 
@@ -83,9 +82,9 @@ Visit the following website: https://ssh.kkbpro.com/
 
 6. Support adaptive window size and Chinese input
 
-7. Support custom preference settings, allowing users to choose the background/foreground color, font size, cursor display style, enable TCode for the terminal, etc
+7. Support preference settings, such as choosing the terminal background/foreground color, font size, cursor display style, etc
 
-8. Support restart: It will automatically restart after modifying SSH connection settings or custom preference settings, or can be manually restarted after SSH connection is disconnected
+8. Support automatically/manually restart
 
 9. Support copy and paste:
 
@@ -94,39 +93,37 @@ Visit the following website: https://ssh.kkbpro.com/
    - Paste: Same as `Cmd` terminal, right-click to paste (requires browser access permission)
 
 
-9. Support file management, open the File Management Module to view, decompress, upload and download files/folders
+10. Support file management, open the File Management Module to view, decompress, upload and download files/folders
 
-10. Support shortcut key operations such as multiple/all file selection, copy and paste, cut, selection switch, open, etc
+11. Support shortcut key operations such as multiple/all file selection, copy and paste, cut, selection switch, open, etc
 
-11. Support file browsing and editing, modify the file and save it to a remote server using `ctrl+s`
+12. Support file browsing and editing, modify your file and save it to the remote server using `ctrl+s`
 
-12. Support [TCode (Terminal Code)](./doc/en_US/TCODE.md)，which can achieve automated Workflow similar to Shell scripts through Customized TCode
+13. Support [Terminal Code](./doc/en_US/TCODE.md)，which can execute customized workflow
 
-13. Support operation recording and cloud synchronization functions
+14. Support operation recording and devices synchronization functions
 
-14. Support Cooperate, Monitor and Docker functions
+15. Support Cooperate, Monitor and Docker functions
 
 ### 👨‍💻 Update Records
 
-##### zyyzyykk/kkterminal:3.6.0: latest
+##### zyyzyykk/kkterminal:3.6.8: latest
+
+- Add file transport list
+- Add docker appStore
+- Add logging function
+- Optimize the overall encryption logic
+- Some dialogs support left and right stretching to adjust width
+- Optimize the encoding format for opening and saving in file editor
+- User Terminal Code adds reserved values and file module API
+- Refactoring some code and optimizing interface display
+
+##### zyyzyykk/kkterminal:3.6.0: 
 
 - Add Advance Cooperate function
 - Add Advance Monitor function
 - Add Advance Docker function
 - Optimize packaging volume & webpage display
-
-##### zyyzyykk/kkterminal:3.5.6: 
-
-- Support more URL parameters
-- Add editor text & image size percentage
-- Optimize webpage display
-
-##### zyyzyykk/kkterminal:3.5.3: 
-
-- Add URL parameter to customize terminal configuration
-- Fix bug of multi window restart
-- Add operation recording and cloud synchronization functions
-- Refactoring some code logic
 
 [**History Update Records**](./doc/en_US/UPDATE.md)
 
@@ -141,21 +138,13 @@ Vue + Xterm              SpringBoot + SSHJ                Linux OS
 
 ### 🏘️ About this project
 
-Dear Users,
+> [!Important]
+>
+> kkTerminal will not actively record any information such as passwords, files, commands, etc which related to remote servers
 
-I regret to announce that due to limited time and energy, I will not be able to maintenance on `kkTerminal` in the future.
+Author: [zyyzyykk](https://github.com/zyyzyykk/)
 
-If you are interested in `kkTerminal` or would like to continue maintaining, please feel free to contact me or raise an issue.
-
-If you discover bugs or wish to develop new features, please also raise an issue.
-
-Finally, thank you for your support of `kkTerminal` and I sincerely hope that `kkTerminal` can really help you.
-
-Best Regards,
-
-[zyyzyykk](https://github.com/zyyzyykk/)
-
-2025.03.15
+Welcome to provide valuable opinions or suggestions on this project, and you can also join us in maintaining and developing this project together
 
 ### 🌟 Stars
 

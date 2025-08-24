@@ -1,7 +1,7 @@
 package com.kkbpro.terminal.controller;
 
 import com.kkbpro.terminal.annotation.Log;
-import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
+import com.kkbpro.terminal.constants.enums.FileStateEnum;
 import com.kkbpro.terminal.constants.enums.FileUntarEnum;
 import com.kkbpro.terminal.consumer.WebSocketServer;
 import com.kkbpro.terminal.exception.MyException;
@@ -146,7 +146,7 @@ public class FileController {
         List<FileInfo> fileInfoList = new ArrayList<>();
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接已断开");
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接已断开");
         }
         try {
             SFTPClient sftp = getSftpClient(sshKey);
@@ -204,7 +204,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String num = "";
         String[] nums;
@@ -241,7 +241,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String size = "";
         String command = "cd " + path + " && du -sb " + item + " | head -n 1 | cut -f1";
@@ -273,7 +273,7 @@ public class FileController {
         String path = "/";
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接已断开");
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接已断开");
         }
         SFTPClient sftp = getSftpClient(sshKey);
         path = sftp.canonicalize(".");
@@ -292,7 +292,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String path = "";
         String command = "pwd";
@@ -326,7 +326,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         try {
             SFTPClient sftp = getSftpClient(sshKey);
@@ -360,7 +360,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String command = "cd " + path + " && rm -rf " + items;
         try(Session session = ssh.startSession();
@@ -388,7 +388,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String command = "cd " + src + " && cp -rn " + items + " " + dst;
         try(Session session = ssh.startSession();
@@ -417,7 +417,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String command = "cd " + src + " && mv -n " + items + " " + dst;
         try(Session session = ssh.startSession();
@@ -446,7 +446,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String command = "cd " + path + " && test ! -e " + item + " && touch " + item;
         try(Session session = ssh.startSession();
@@ -475,7 +475,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         try {
             SFTPClient sftp = getSftpClient(sshKey);
@@ -501,7 +501,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         try {
             SFTPClient sftp = getSftpClient(sshKey);
@@ -525,7 +525,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String ua = "--user-agent=\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36\"";
         String command = "cd " + path + " && wget " + ua + " -b -q -O " + item + " \"" + url + "\"";
@@ -554,7 +554,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         FileUntarEnum fileUntarEnum = FileUntarEnum.getByFileName(item);
         if(fileUntarEnum == null) return Result.error(errorMsg);
@@ -585,7 +585,7 @@ public class FileController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String command = "cd " + path + " && chmod " + (sub ? "-R " : "") + perms + " " + item;
         try(Session session = ssh.startSession();
@@ -614,7 +614,7 @@ public class FileController {
         // 判断连接状态
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if(ssh == null) {
-            return Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件上传失败");
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，文件上传失败");
         }
 
         MultipartFile file = fileUploadInfo.getFile();
@@ -639,7 +639,7 @@ public class FileController {
             decryptedData = AESUtil.decryptToBytes(new String(file.getBytes()), aesKey);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
-            return Result.error(FileBlockStateEnum.DECRYPT_ERROR.getState(), "文件片解密失败", map);
+            return Result.error(FileStateEnum.DECRYPT_ERROR.getState(), "文件片解密失败", map);
         }
 
         String folderPath = FileUtil.folderBasePath + "/" + sshKey + "-" + id;
@@ -661,7 +661,7 @@ public class FileController {
             Files.write(temporaryFile.toPath(), decryptedData);
         } catch (IOException e) {
             LogUtil.logException(this.getClass(), e);
-            return Result.error(FileBlockStateEnum.UPLOAD_ERROR.getState(), "文件片上传失败", map);
+            return Result.error(FileStateEnum.UPLOAD_ERROR.getState(), "文件片上传失败", map);
         }
 
         // 上传完毕
@@ -687,10 +687,10 @@ public class FileController {
                 }
             });
             FileThread.start();
-            return Result.success(FileBlockStateEnum.FILE_UPLOADING.getState(), "文件后台上传中", map);
+            return Result.success(FileStateEnum.FILE_UPLOADING.getState(), "文件后台上传中", map);
         }
         else {
-            return Result.success(FileBlockStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功", map);
+            return Result.success(FileStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功", map);
         }
     }
 
@@ -698,7 +698,7 @@ public class FileController {
     private SFTPClient getSftpClient(String sshKey) throws IOException {
         SSHClient sshClient = WebSocketServer.sshClientMap.get(sshKey);
         if(sshClient == null) {
-            throw new MyException(Result.error(FileBlockStateEnum.SSH_NOT_EXIST.getState(),"连接断开"));
+            throw new MyException(Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开"));
         }
         // 单例-懒汉
         if(WebSocketServer.sftpClientMap.get(sshKey) == null) {

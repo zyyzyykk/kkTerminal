@@ -1,7 +1,7 @@
 package com.kkbpro.terminal.controller;
 
 import com.kkbpro.terminal.annotation.Log;
-import com.kkbpro.terminal.constants.enums.FileBlockStateEnum;
+import com.kkbpro.terminal.constants.enums.FileStateEnum;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.LogUtil;
 import com.kkbpro.terminal.utils.StringUtil;
@@ -47,7 +47,7 @@ public class CloudController {
             folder.mkdirs();
         }
         if(folder.listFiles().length > maxCount && countType.equals(type))
-            return Result.error(FileBlockStateEnum.CLOUD_COUNT_ERROR.getState(),"云端文件过多");
+            return Result.error(FileStateEnum.CLOUD_COUNT_ERROR.getState(),"云端文件过多");
         File aimFile = new File(folderPath + "/" + type + name);
         // 如果文件存在则删除
         if (aimFile.exists()) {
@@ -66,7 +66,7 @@ public class CloudController {
         String folderPath = cloudBasePath + "/" + user;
         File file = new File(folderPath + "/" + fileName);
         // 文件不存在
-        if(!file.exists()) return Result.error(417, "文件不存在");
+        if(!file.exists()) return Result.error(FileStateEnum.FILE_NOT_EXIST.getState(), "文件不存在");
         StringBuilder content = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;

@@ -1,6 +1,6 @@
 package com.kkbpro.terminal.constants.enums;
 
-public enum MessageInfoTypeRnum {
+public enum SocketMessageEnum {
 
     USER_TEXT(0,"User input text"),
 
@@ -12,13 +12,13 @@ public enum MessageInfoTypeRnum {
 
     private String desc;
 
-    MessageInfoTypeRnum(Integer state, String desc) {
+    SocketMessageEnum(Integer state, String desc) {
         this.state = state;
         this.desc = desc;
     }
 
-    public static MessageInfoTypeRnum getByState(Integer state) {
-        for (MessageInfoTypeRnum item : MessageInfoTypeRnum.values()) {
+    public static SocketMessageEnum getByState(Integer state) {
+        for (SocketMessageEnum item : SocketMessageEnum.values()) {
             if (item.getState().equals(state)) {
                 return item;
             }

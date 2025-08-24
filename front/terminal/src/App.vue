@@ -1,14 +1,14 @@
 <template>
-  <FrameWork v-if="isInitialized" ></FrameWork>
+  <FrameWork v-if="isInitialized" :osInfo="osInfo" ></FrameWork>
 </template>
 
 <script>
 import FrameWork from "./views/FrameWork";
 import $ from 'jquery';
 import { http_base_url } from '@/env/BaseUrl';
-import { ref, onBeforeMount } from "vue";
-import { sessionStore } from "@/env/Store";
+import { ref, onMounted } from "vue";
 import { syncDownload } from "@/utils/CloudUtil";
+import { encryptKeySetter } from "@/utils/Encrypt";
 
 export default {
   name: 'App',
@@ -19,31 +19,30 @@ export default {
 
     // 初始化
     const isInitialized = ref(false);
-    const needAesKey = !sessionStorage.getItem(sessionStore['aes-key']);
-    const needPublicKey = !sessionStorage.getItem(sessionStore['public-key']);
+    const osInfo = ref(null);
 
-    onBeforeMount(async () => {
-      await $.ajax({
-        url: http_base_url + '/init',
-        type: 'post',
-        data: {
-          aesKey: needAesKey,
-          publicKey: needPublicKey,
-        },
-        success(resp) {
-          const data = JSON.parse(resp.info);
-          if(needAesKey) sessionStorage.setItem(sessionStore['aes-key'], data.aesKey);
-          if(needPublicKey) sessionStorage.setItem(sessionStore['public-key'], data.publicKey);
-          sessionStorage.setItem(sessionStore['os-info'], JSON.stringify(data.osInfo));
-        },
-      });
-      // 多端同步-下载
-      await syncDownload();
-      isInitialized.value = true;
+    onMounted(() => {
+      setTimeout(() => {
+        $.ajax({
+          url: http_base_url + '/init',
+          type: 'post',
+          success(resp) {
+            const data = JSON.parse(resp.info);
+            encryptKeySetter.aes(data.aesKey);
+            encryptKeySetter.rsa(data.publicKey);
+            osInfo.value = data.osInfo;
+            // 多端同步-下载
+            syncDownload().then(() => {
+              isInitialized.value = true;
+            });
+          },
+        });
+      }, 1);
     });
 
     return {
       isInitialized,
+      osInfo,
     }
   },
 }
