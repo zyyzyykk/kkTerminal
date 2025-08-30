@@ -149,7 +149,7 @@
       :confirm-button-text="$t('确定')" :cancel-button-text="$t('取消')"
       @confirm="confirmPopConfirm" @cancel="cancelPopConfirm"
       :visible="isShowMenu && isShowPop" trigger="click"
-      :popper-style="{zIndex: 3466,fontSize:'13px',color:'black'}" popper-class="confirmPop"
+      :popper-style="{zIndex: 3466, fontSize:'13px', color:'black'}" popper-class="confirmPop"
       placement="right" confirm-button-type="danger" >
       <template #reference>
         <div :class="['kk-menu-item', selectedFiles.length === 0 ? 'disabled':'']" key="7" >
@@ -167,6 +167,7 @@ import { ref, onUnmounted, onMounted, watch } from 'vue';
 import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
 import { ElMessage } from 'element-plus';
+import { deleteDialog } from "@/utils/DeleteDialog";
 import { http_base_url } from '@/env/BaseUrl';
 import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
 import { escapeItem, escapePath, generateRandomString, osFileNaturalSort } from '@/utils/StringUtil';
@@ -981,7 +982,7 @@ export default {
       }
       // ctrl
       if ((props.os === "Windows" && event.ctrlKey) || ((props.os === "Mac" || props.os === "iOS") && event.metaKey)) {
-        switch (String.fromCharCode(event.which).toLowerCase()) {
+        switch (event.key.toLowerCase()) {
           // 全选
           case 'a':
             selectedFiles.value = [];
@@ -1013,6 +1014,12 @@ export default {
               fileClipboard.value.path = dir.value;
               fileClipboard.value.files = [...selectedFiles.value];
               isCtrlx.value = true;
+            }
+            break;
+          // 删除
+          case 'backspace':
+            if(selectedFiles.value.length > 0) {
+              deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此文件吗?'), confirmPopConfirm);
             }
             break;
         }
