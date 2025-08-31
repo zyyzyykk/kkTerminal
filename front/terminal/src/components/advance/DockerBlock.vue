@@ -154,7 +154,8 @@
             <el-table-column show-overflow-tooltip prop="port" :label="$t('端口')" />
           </el-table>
           <div v-else >
-            <NoData height="240px" ></NoData>
+            <NoData v-if="!loading" height="240px" ></NoData>
+            <div v-else style="height: 240px;" ></div>
           </div>
           <div class="kk-flex" v-if="dockerInfo.container.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
@@ -182,7 +183,8 @@
             <el-table-column show-overflow-tooltip prop="createTime" :label="$t('创建时间')" width="140" sortable />
           </el-table>
           <div v-else >
-            <NoData height="240px" ></NoData>
+            <NoData v-if="!loading" height="240px" ></NoData>
+            <div v-else style="height: 240px;" ></div>
           </div>
           <div class="kk-flex" v-if="dockerInfo.image.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
@@ -207,7 +209,8 @@
             <el-table-column show-overflow-tooltip prop="createTime" :label="$t('创建时间')" width="140" sortable />
           </el-table>
           <div v-else >
-            <NoData height="240px" ></NoData>
+            <NoData v-if="!loading" height="240px" ></NoData>
+            <div v-else style="height: 240px;" ></div>
           </div>
           <div class="kk-flex" v-if="dockerInfo.network.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
@@ -231,7 +234,8 @@
             <el-table-column show-overflow-tooltip prop="createTime" :label="$t('创建时间')" width="140" sortable />
           </el-table>
           <div v-else >
-            <NoData height="240px" ></NoData>
+            <NoData v-if="!loading" height="240px" ></NoData>
+            <div v-else style="height: 240px;" ></div>
           </div>
           <div class="kk-flex" v-if="dockerInfo.volume.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
@@ -310,18 +314,17 @@ export default {
           sshKey: sshKey,
         },
         success(resp) {
+          loading.value = false;
           if(resp.status === 'success') {
             noDocker.value = false;
             handleTabClick({index: 0});
           }
-          else {
-            noDocker.value = true;
-            loading.value = false;
-          }
+          else noDocker.value = true;
         }
       });
     };
     const getDockerInfo = (type) => {
+      loading.value = true;
       const currentType = (type || 0) % 4;
       $.ajax({
         url: http_base_url + '/docker/info',
@@ -405,11 +408,10 @@ export default {
       });
     };
     const handleTabClick = (tab) => {
-      loading.value = true;
       selectedItems.value = [];
       containerType.value = 0;
       deleteType.value = 0;
-      getDockerInfo(tab.index);
+      if(tab.index > 0) getDockerInfo(tab.index - 1);
     };
 
     // Docker 容器操作 删除
