@@ -244,6 +244,7 @@ import { ElMessage } from 'element-plus';
 
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
+import { WebLinksAddon } from '@xterm/addon-web-links';
 import "xterm/css/xterm.css";
 
 import $ from 'jquery';
@@ -324,8 +325,9 @@ export default {
     // 拷贝
     const { toClipboard } = useClipboard();
 
-    // 终端自适应
-    const fitAddon = new FitAddon();
+    // 终端插件
+    const fitAddon = new FitAddon();              // 宽高自适应
+    const webLinksAddon = new WebLinksAddon();    // 网页链接跳转
 
     // 操作录像
     const recording = ref(false);
@@ -484,6 +486,7 @@ export default {
         fontSize: env.value.fontSize,                         // 字号(默认16)
       });
       term.loadAddon(fitAddon);
+      term.loadAddon(webLinksAddon);
     };
 
     // 终端视高自适应

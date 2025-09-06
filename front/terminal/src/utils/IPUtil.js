@@ -1,4 +1,6 @@
-// 校验IP地址是否合法
+/**
+ * source: validator.js
+ */
 const IPv4SegmentFormat = '(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])';
 const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
 const IPv4AddressRegExp = new RegExp(`^${IPv4AddressFormat}$`);
@@ -13,23 +15,29 @@ const IPv6AddressRegExp = new RegExp('^(' +
     `(?:${IPv6SegmentFormat}:){2}(?:(:${IPv6SegmentFormat}){0,3}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,5}|:)|` +
     `(?:${IPv6SegmentFormat}:){1}(?:(:${IPv6SegmentFormat}){0,4}:${IPv4AddressFormat}|(:${IPv6SegmentFormat}){1,6}|:)|` +
     `(?::((?::${IPv6SegmentFormat}){0,5}:${IPv4AddressFormat}|(?::${IPv6SegmentFormat}){1,7}|:))` +
-    ')(%[0-9a-zA-Z-.:]{1,})?$');
+    ')(%[0-9a-zA-Z.]{1,})?$');
 
-export function isIP(str, version = '4') {
-    version = String(version);
+// Check validity of IP address
+export function isIP(ipAddress, options = {}) {
+    // accessing 'arguments' for backwards compatibility: isIP(ipAddress [, version])
+    // eslint-disable-next-line prefer-rest-params
+    const version = (typeof options === 'object' ? options.version : arguments[1]) || '';
+
     if (!version) {
-        return isIP(str, 4) || isIP(str, 6);
+        return isIP(ipAddress, { version: 4 }) || isIP(ipAddress, { version: 6 });
     }
-    if (version === '4') {
-        return IPv4AddressRegExp.test(str);
+
+    if (version.toString() === '4') {
+        return IPv4AddressRegExp.test(ipAddress);
     }
-    if (version === '6') {
-        return IPv6AddressRegExp.test(str);
+
+    if (version.toString() === '6') {
+        return IPv6AddressRegExp.test(ipAddress);
     }
+
     return false;
 }
 
-// 校验域名是否合法
 const options = {
     require_tld: true,
     allow_underscores: false,
@@ -39,6 +47,7 @@ const options = {
     ignore_max_length: false,
 };
 
+// Check validity of domain name
 export function isFQDN(str) {
 
     /* Remove the optional trailing dot before checking validity */
