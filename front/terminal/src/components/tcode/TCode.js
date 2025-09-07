@@ -1,10 +1,12 @@
 import { aesEncrypt, aesDecrypt } from '@/utils/Encrypt';
 import { localStore, sessionStore } from "@/env/Store";
 import { localStoreUtil } from "@/utils/CloudUtil";
+import { calcPriority } from '@/components/calc/CalcPriority';
+import { toRaw } from 'vue';
+import i18n from "@/locales/i18n";
+
 const storageLocalKey = localStore['tcode-vars'];
 const storageSessionPrefix = sessionStore['tcode-vars'];
-
-import i18n from "@/locales/i18n";
 
 // 功能终端代码, 以 F 开头
 export const FuncTCode = {
@@ -105,6 +107,22 @@ export const UserTCodeExecutor = {
     file: {
         async cd(dir) {
             await UserTCodeHelper.fileBlockRef.fileBlockView(dir);
+        },
+        async ls(dir) {
+            await this.cd(dir);
+            return toRaw(UserTCodeHelper.fileBlockRef.files).map((file) => {
+                return {
+                    permission: calcPriority(file.attributes.mode.type, file.attributes.permissions),
+                    uID: file.attributes.uID,
+                    gID: file.attributes.gID,
+                    size: file.attributes.size,
+                    mtime: file.attributes.mtime,
+                    name: file.name,
+                }
+            });
+        },
+        pwd() {
+            return toRaw(UserTCodeHelper.fileBlockRef.dir);
         },
         async open(path, config={}) {
             const { dir, name } = UserTCodeHelper.parsePath(path);
@@ -289,6 +307,20 @@ export const userTCodeExecutorCompleter = {
             value: "cd()",
             meta: "kkTerminal",
             description: "change directory",
+            score: 1000,
+        },
+        {
+            name: "ls",
+            value: "ls()",
+            meta: "kkTerminal",
+            description: "list files",
+            score: 1000,
+        },
+        {
+            name: "pwd",
+            value: "pwd()",
+            meta: "kkTerminal",
+            description: "print working directory",
             score: 1000,
         },
         {
