@@ -30,8 +30,8 @@
           <div v-else >
             <div id="docker-appstore" v-if="!deployInfo.isShow" style="height: 240px; overflow-y: scroll;" >
               <div class="kk-flex" >
-                <span><img src="@/assets/app_store.svg" alt="appstore" style="height: 32px;" ></span>
-                <div style="margin-left: 15px; font-size: 22px; font-weight: bolder;" >{{ $t('Docker应用商店') }}</div>
+                <span><img src="@/assets/app_store.svg" alt="appstore" style="height: 30px;" ></span>
+                <div style="margin-left: 15px; font-size: 20px; font-weight: bolder;" >{{ $t('Docker应用商店') }}</div>
                 <div style="flex: 1;" ></div>
                 <div>
                   <el-input v-model="appSearch" class="w-50 m-2" :placeholder="$t('搜索应用')" >
@@ -145,13 +145,21 @@
           </div>
         </el-tab-pane>
         <el-tab-pane :disabled="noDocker" :label="$t('容器')" >
-          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.container.length > 0" :data="dockerInfo.container" @selection-change="tableSelect" border stripe >
-            <el-table-column show-overflow-tooltip type="selection" :selectable="selectable" width="40" />
-            <el-table-column show-overflow-tooltip prop="id" label="ID" width="130" />
+          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%;" v-if="dockerInfo.container.length > 0" :data="dockerInfo.container" @selection-change="tableSelect" border stripe table-layout="fixed" >
+            <el-table-column type="selection" width="40" fixed="left" />
+            <el-table-column show-overflow-tooltip prop="id" label="ID" width="120" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="120" />
             <el-table-column show-overflow-tooltip prop="status" :label="$t('状态')" width="80" />
             <el-table-column show-overflow-tooltip prop="image" :label="$t('镜像')" width="140" />
             <el-table-column show-overflow-tooltip prop="port" :label="$t('端口')" />
+            <el-table-column show-overflow-tooltip width="50" fixed="right" >
+              <template #header>
+                <el-icon style="font-size: 18px; color: #606266;" ><Operation /></el-icon>
+              </template>
+              <template #default="scope">
+                <el-icon @click="openContainerViewer(scope.row)" style="font-size: 18px; color: #606266; cursor: pointer;" ><Document /></el-icon>
+              </template>
+            </el-table-column>
           </el-table>
           <div v-else >
             <NoData v-if="!loading" height="240px" ></NoData>
@@ -159,7 +167,7 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.container.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ $t(containerTypeArr[containerType % containerTypeArr.length]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(containerTypeArr[containerType]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item class="no-select" @click="containerType = 1" >{{ $t(containerTypeArr[1]) }}</el-dropdown-item>
@@ -176,7 +184,7 @@
         </el-tab-pane>
         <el-tab-pane :disabled="noDocker" :label="$t('镜像')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.image.length > 0" :data="dockerInfo.image" @selection-change="tableSelect" border stripe >
-            <el-table-column type="selection" :selectable="selectable" width="40" />
+            <el-table-column type="selection" width="40" fixed="left" />
             <el-table-column show-overflow-tooltip prop="id" label="ID" width="130" />
             <el-table-column show-overflow-tooltip prop="repository" :label="$t('仓库')" />
             <el-table-column show-overflow-tooltip prop="size" :label="$t('大小')" width="100" />
@@ -188,7 +196,7 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.image.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item class="no-select" @click="deleteType = 1" >{{ $t(deleteTypeArr[1]) }}</el-dropdown-item>
@@ -202,7 +210,7 @@
         </el-tab-pane>
         <el-tab-pane :disabled="noDocker" :label="$t('网络')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.network.length > 0" :data="dockerInfo.network" @selection-change="tableSelect" border stripe >
-            <el-table-column type="selection" :selectable="selectable" width="40" />
+            <el-table-column type="selection" width="40" fixed="left" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="140" />
             <el-table-column show-overflow-tooltip prop="ip" label="IP" />
             <el-table-column show-overflow-tooltip prop="gateway" :label="$t('网关')" width="120" />
@@ -214,7 +222,7 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.network.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item class="no-select" @click="deleteType = 2" >{{ $t(deleteTypeArr[2]) }}</el-dropdown-item>
@@ -228,7 +236,7 @@
         </el-tab-pane>
         <el-tab-pane :disabled="noDocker" :label="$t('数据卷')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.volume.length > 0" :data="dockerInfo.volume" @selection-change="tableSelect" border stripe >
-            <el-table-column type="selection" :selectable="selectable" width="40" />
+            <el-table-column type="selection" width="40" fixed="left" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="140" />
             <el-table-column show-overflow-tooltip prop="mount" :label="$t('挂载点')" />
             <el-table-column show-overflow-tooltip prop="createTime" :label="$t('创建时间')" width="140" sortable />
@@ -239,7 +247,7 @@
           </div>
           <div class="kk-flex" v-if="dockerInfo.volume.length > 0" style="height: 35px; margin-top: 5px;" >
             <el-dropdown hide-timeout="300" >
-              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType % deleteTypeArr.length]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
+              <span class="a-link no-select" >{{ $t(deleteTypeArr[deleteType]) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item class="no-select" @click="deleteType = 3" >{{ $t(deleteTypeArr[3]) }}</el-dropdown-item>
@@ -254,15 +262,19 @@
       </el-tabs>
     </div>
   </el-dialog>
+
+  <!-- 容器详细信息 -->
+  <DockerContainerViewer ref="dockerContainerViewerRef" :sshKey="sshKey" ></DockerContainerViewer>
+
 </template>
 
 <script>
-
+import DockerContainerViewer from "./DockerContainerViewer";
 import NoData from "@/components/NoData";
 import { computed, ref } from "vue";
 import $ from "jquery";
 import { http_base_url } from "@/env/BaseUrl";
-import { ArrowDown, ArrowLeft, Search } from '@element-plus/icons-vue';
+import { ArrowDown, ArrowLeft, Search, Document, Operation } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 import { ElMessage } from "element-plus";
 import { deleteDialog } from "@/utils/DeleteDialog";
@@ -273,10 +285,13 @@ import { generateRandomString } from "@/utils/StringUtil";
 export default {
   name: 'DockerBlock',
   components: {
+    DockerContainerViewer,
     NoData,
     ArrowDown,
     ArrowLeft,
     Search,
+    Document,
+    Operation,
   },
   props:['sshKey', 'advance'],
   setup(props, context) {
@@ -325,7 +340,7 @@ export default {
     };
     const getDockerInfo = (type) => {
       loading.value = true;
-      const currentType = (type || 0) % 4;
+      const currentType = type || 0;
       $.ajax({
         url: http_base_url + '/docker/info',
         type: 'post',
@@ -422,13 +437,13 @@ export default {
       i18n.global.k('启动容器'),
       i18n.global.k('停止容器'),
       i18n.global.k('重启容器'),
-      i18n.global.k('删除容器')
+      i18n.global.k('删除容器'),
     ];
     const deleteTypeArr = [
       i18n.global.k('选择批量操作'),
       i18n.global.k('删除镜像'),
       i18n.global.k('删除网络'),
-      i18n.global.k('删除数据卷')
+      i18n.global.k('删除数据卷'),
     ];
     const containerOperate = () => {
       loading.value = true;
@@ -447,9 +462,9 @@ export default {
             type: resp.status,
             grouping: true,
           });
-          handleTabClick({index: 0});
           selectedItems.value = [];
           loading.value = false;
+          handleTabClick({index: 1});
         }
       });
     };
@@ -470,9 +485,9 @@ export default {
             type: resp.status,
             grouping: true,
           });
-          handleTabClick({index: type});
           selectedItems.value = [];
           loading.value = false;
+          handleTabClick({index: type + 1});
         }
       });
     };
@@ -481,6 +496,13 @@ export default {
     };
     const deleteConfirm = () => {
       deleteDialog(i18n.global.t('提示'), i18n.global.t('确定进行此操作吗?'), dockerDelete);
+    };
+
+    // 查看容器详细信息
+    const dockerContainerViewerRef = ref();
+    const openContainerViewer = (row) => {
+      dockerContainerViewerRef.value.initText(row);
+      dockerContainerViewerRef.value.DialogVisible = true;
     };
 
     // 安装Docker
@@ -588,6 +610,7 @@ export default {
 
     // 关闭
     const closeDialog = (done) => {
+      if(dockerContainerViewerRef.value) dockerContainerViewerRef.value.closeDialog();
       setTimeout(() => {
         reset();
       },400);
@@ -596,6 +619,7 @@ export default {
     };
     // 深度关闭
     const deepCloseDialog = (done) => {
+      if(dockerContainerViewerRef.value) dockerContainerViewerRef.value.closeDialog();
       setTimeout(() => {
         reset(true);
       },400);
@@ -625,6 +649,8 @@ export default {
       deleteTypeArr,
       operateConfirm,
       deleteConfirm,
+      dockerContainerViewerRef,
+      openContainerViewer,
       tableDataCopy,
       deployInfo,
       dockerAppTypes,
@@ -639,12 +665,7 @@ export default {
 }
 </script>
 
-<style>
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
-
+<style scoped>
 .kk-flex {
   display: flex;
   align-items: center;

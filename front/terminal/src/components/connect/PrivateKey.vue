@@ -133,11 +133,6 @@ export default {
   margin-top: 10px;
 }
 
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
-
 .errInfo{
   font-size: 12px;
   color: rgb(234, 80, 80);

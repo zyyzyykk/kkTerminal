@@ -28,7 +28,7 @@
                     <div style="background-color: #f3f4f4;" >{{ key }}</div>
                     <div style="flex: 1;" ></div>
                   </div>
-                  <div class="ellipsis" style="margin-left: 10px;" >{{ $t(item.desc) }}</div>
+                  <div class="ellipsis" style="margin-left: 10px; line-height: 18px;" >{{ $t(item.desc) }}</div>
                 </div>
               </div>
             </div>
@@ -47,7 +47,7 @@
                     <div style="background-color: #f3f4f4;" >{{ key }}</div>
                     <div style="flex: 1;" ></div>
                   </div>
-                  <div class="ellipsis" style="margin-left: 10px;" >{{ $t(item.desc) }}</div>
+                  <div class="ellipsis" style="margin-left: 10px; line-height: 18px;" >{{ $t(item.desc) }}</div>
                 </div>
               </div>
             </div>
@@ -96,7 +96,7 @@
                       </div>
                       <ToolTip :content="item.desc" :delay="1000" >
                         <template #content>
-                          <div class="ellipsis" style="margin-left: 10px;" >{{ item.desc }}</div>
+                          <div class="ellipsis" style="margin-left: 10px; line-height: 18px;" >{{ item.desc }}</div>
                         </template>
                       </ToolTip>
                       <div style="flex: 1;" ></div>
@@ -188,7 +188,6 @@ export default {
     const initTCodeEditor = (mode) => {
       userTCodeEditorRef.value.setLanguage('kk.js');
       userTCodeEditorRef.value.setValue(JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['tcodes'])))[nowTCode.value].workflow || '');
-      userTCodeEditorRef.value.resetHistory();
       userTCodeEditorRef.value.setReadOnly(mode);
       modifyTag.value = '';
     };
@@ -300,19 +299,6 @@ export default {
   margin-left: 15px;
   font-size: 18px;
   cursor: pointer;
-}
-
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
-
-/* 文本溢出省略 */
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 18px;
 }
 
 .form-width {

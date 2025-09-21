@@ -125,7 +125,7 @@ public class WebSocketServer {
             Integer state = SocketSendEnum.COOPERATE_KEY_INVALID.getState();
             String msg = SocketSendEnum.COOPERATE_KEY_INVALID.getDesc();
             try {
-                String[] keyInfo = AESUtil.decrypt(StringUtil.changeStrBase64(cooperateKey), AdvanceController.COOPERATE_SECRET_KEY).split("\\^");
+                String[] keyInfo = AESUtil.decrypt(StringUtil.changeStrToBase64(cooperateKey), AdvanceController.COOPERATE_SECRET_KEY).split("\\^");
                 String cooperateId = keyInfo[0];
                 String sshKey = keyInfo[1];
                 WebSocketServer masterSocket = webSocketServerMap.get(sshKey);
@@ -139,7 +139,7 @@ public class WebSocketServer {
                     // 成功加入协作
                     if(maxHeadCount > slaveSockets.size()) {
                         state = SocketSendEnum.CONNECT_SUCCESS.getState();
-                        msg = (readOnly ? "ReadOnly" : "Edit") + " Cooperation Success";
+                        msg = (readOnly ? "Read-Only" : "Edit") + " Cooperation Success";
                         slaveSockets.add(this);
                         this.sshKey = sshKey;
                         this.cooperator = true;
@@ -288,7 +288,7 @@ public class WebSocketServer {
             if(files == null || files.length == 0) return;
             for (File file : files) {
                 // 判断是否是本次ssh对应的临时文件夹
-                if (file.isDirectory() && StringUtil.isPrefix(key, file.getName())) {
+                if (file.isDirectory() && file.getName().startsWith(key)) {
                     // 忽略正在进行文件上传的文件夹
                     if(getTransportingFile(key, file.getName().substring(key.length() + 1)) == null)
                         FileUtil.fileDelete(file);

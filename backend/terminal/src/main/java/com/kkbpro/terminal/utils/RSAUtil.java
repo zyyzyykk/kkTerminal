@@ -55,7 +55,7 @@ public class RSAUtil {
         // 得到私钥字符串
         String privateKeyString = encryptBASE64(privateKey.getEncoded());
 
-        return new String[]{publicKeyString, privateKeyString};
+        return new String[] { publicKeyString, privateKeyString };
     }
 
     /**

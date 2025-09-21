@@ -26,7 +26,7 @@ const resizableDirective = {
             const dialog = el.querySelector('.el-dialog');
             // 最小/最大宽度
             const { minWidthRate, maxWidthRate } = binding.value || {};
-            const minWidth = dialog.offsetWidth / (minWidthRate || 2);
+            const minWidth = dialog.offsetWidth * (minWidthRate || 0.5);
             const maxWidth = Math.min(dialog.offsetWidth * (maxWidthRate || 2), document.documentElement.clientWidth * 0.8);
             // 创建拖拽条
             const leftHandle = document.createElement('div');

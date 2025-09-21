@@ -356,18 +356,6 @@ export default {
   margin-top: 8px;
 }
 
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
-
-/* 文本溢出省略 */
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .nowrap {
   white-space: nowrap;
 }

@@ -65,8 +65,30 @@ export default {
 
     // 赋值内容
     const setValue = (text) => {
-      if(aceEditor.value) aceEditor.value.setValue(text);
-      if(aceEditor.value) aceEditor.value.selection.clearSelection();
+      if(aceEditor.value) {
+        aceEditor.value.setValue(text);
+        aceEditor.value.selection.clearSelection();
+        resetEditorScroll();
+        resetHistory();
+      }
+    };
+    // 重置滚动位置（左上角）
+    const resetEditorScroll = () => {
+      if(aceEditor.value) {
+        // 滚动到最顶部
+        aceEditor.value.scrollToLine(0, true, true, () => {});
+        // 滚动到最左边
+        aceEditor.value.renderer.scrollToX(0);
+      }
+    };
+    // 删除末尾空行
+    const removeEndEmptyLine = () => {
+      if(aceEditor.value) {
+        const aceDocument = aceEditor.value.getSession().getDocument();
+        const lastLineNumber = aceDocument.getLength() - 1;
+        const lastLineContent = aceDocument.getLine(lastLineNumber);
+        if(!lastLineContent) aceDocument.removeFullLines(lastLineNumber, lastLineNumber + 1);
+      }
     };
 
     // 获取内容
@@ -120,7 +142,6 @@ export default {
     // 重置编辑器
     const reset = () => {
       setValue('');
-      resetHistory();
     };
 
     // 实例化编辑器
@@ -171,6 +192,8 @@ export default {
       aceEditorRef,
       aceEditor,
       setValue,
+      resetEditorScroll,
+      removeEndEmptyLine,
       resetHistory,
       reset,
       setLanguage,

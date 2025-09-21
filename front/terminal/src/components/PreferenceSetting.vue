@@ -248,11 +248,6 @@ export default {
   margin-bottom: 13px;
 }
 
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
-
 .form-width {
   width: 60px;
 }

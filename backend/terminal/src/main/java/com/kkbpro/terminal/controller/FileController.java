@@ -9,10 +9,7 @@ import com.kkbpro.terminal.pojo.dto.FileUploadInfo;
 import com.kkbpro.terminal.pojo.vo.FileInfo;
 import com.kkbpro.terminal.pojo.vo.FileTransInfo;
 import com.kkbpro.terminal.result.Result;
-import com.kkbpro.terminal.utils.AESUtil;
-import com.kkbpro.terminal.utils.FileUtil;
-import com.kkbpro.terminal.utils.LogUtil;
-import com.kkbpro.terminal.utils.RSAUtil;
+import com.kkbpro.terminal.utils.*;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.sftp.*;
@@ -22,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 
@@ -41,7 +39,7 @@ public class FileController {
         SFTPClient sftpClient = getSftpClient(sshKey);
         // 构建 HTTP 响应，触发文件下载
         response.setHeader("Content-Type", "application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName,"UTF-8"));
+        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8.name()));
         readRemoteFile(response, sshKey, sftpClient, path, fileName, type);
     }
     private void readRemoteFile(HttpServletResponse response, String sshKey, SFTPClient sftp, String path, String fileName, String type) throws IOException {
@@ -78,7 +76,7 @@ public class FileController {
         if(ssh == null) return;
         // 构建 HTTP 响应，触发文件下载
         response.setHeader("Content-Type", "application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(folderName + ".tar.gz","UTF-8"));
+        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(folderName + ".tar.gz", StandardCharsets.UTF_8.name()));
 
         String id = UUID.randomUUID().toString();
         // 进入目录并打包
@@ -124,7 +122,7 @@ public class FileController {
 
         // 构建 HTTP 响应，触发文件下载
         response.setHeader("Content-Type", "application/octet-stream");
-        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName,"UTF-8"));
+        response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8.name()));
 
         try(InputStream is = Files.newInputStream(file.toPath())) {
             byte[] buffer = new byte[8096];
@@ -206,21 +204,13 @@ public class FileController {
         if(ssh == null) {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
-        String num = "";
+        StringBuilder num = new StringBuilder();
         String[] nums;
-        String command = "cd " + path + " && echo \"$(find " + item + " -type f | wc -l)@$(find " + item + " -type d | wc -l)\"";
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 读取命令执行结果
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
-                num += reader.readLine();
-            }
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        String command = "cd " + path + " && echo -n \"$(find " + item + " -type f | wc -l)@$(find " + item + " -type d | wc -l)\"";
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, num);
             if (exitStatus != 0) return Result.error(errorMsg);
-            nums = num.split("@");
+            nums = num.toString().split("@");
             for (String s : nums) Integer.parseInt(s);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
@@ -243,25 +233,17 @@ public class FileController {
         if(ssh == null) {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
-        String size = "";
-        String command = "cd " + path + " && du -sb " + item + " | head -n 1 | cut -f1";
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 读取命令执行结果
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
-                size += reader.readLine();
-            }
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        StringBuilder size = new StringBuilder();
+        String command = "cd " + path + " && echo -n \"$(du -sb " + item + " | head -n 1 | cut -f1)\"";
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, size);
             if (exitStatus != 0) return Result.error(errorMsg);
-            Integer.parseInt(size);
+            Integer.parseInt(size.toString());
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
-        return Result.success(200, successMsg, size);
+        return Result.success(200, successMsg, size.toString());
     }
 
     /**
@@ -294,24 +276,16 @@ public class FileController {
         if(ssh == null) {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
-        String path = "";
-        String command = "pwd";
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 读取命令执行结果
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
-                path += reader.readLine();
-            }
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        StringBuilder path = new StringBuilder();
+        String command = "echo -n $(pwd)";
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, path);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
-        return Result.success(200, successMsg, path);
+        return Result.success(200, successMsg, path.toString());
     }
 
     /**
@@ -363,12 +337,8 @@ public class FileController {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String command = "cd " + path + " && rm -rf " + items;
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, null);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
@@ -391,12 +361,8 @@ public class FileController {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String command = "cd " + src + " && cp -rn " + items + " " + dst;
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, null);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
@@ -420,12 +386,8 @@ public class FileController {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String command = "cd " + src + " && mv -n " + items + " " + dst;
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, null);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
@@ -449,12 +411,8 @@ public class FileController {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String command = "cd " + path + " && test ! -e " + item + " && touch " + item;
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, null);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
@@ -529,12 +487,8 @@ public class FileController {
         }
         String ua = "--user-agent=\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36\"";
         String command = "cd " + path + " && wget " + ua + " -b -q -O " + item + " \"" + url + "\"";
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, null);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
@@ -560,12 +514,8 @@ public class FileController {
         if(fileUntarEnum == null) return Result.error(errorMsg);
 
         String command = "cd " + path + " && " + fileUntarEnum.getCmdParam() + " " + item;
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, null);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
@@ -588,12 +538,8 @@ public class FileController {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
         String command = "cd " + path + " && chmod " + (sub ? "-R " : "") + perms + " " + item;
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, null);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
@@ -626,11 +572,11 @@ public class FileController {
         Long totalSize = fileUploadInfo.getTotalSize();
 
         Map<String,Object> map = new HashMap<>();
-        map.put("chunk",chunk);
-        map.put("chunks",chunks);
-        map.put("id",id);
-        map.put("fileName",fileName);
-        map.put("totalSize",totalSize);
+        map.put("chunk", chunk);
+        map.put("chunks", chunks);
+        map.put("id", id);
+        map.put("fileName", fileName);
+        map.put("totalSize", totalSize);
 
         // 解密文件片
         byte[] decryptedData;

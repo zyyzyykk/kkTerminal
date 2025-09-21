@@ -141,7 +141,6 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
     };
     const setValue = (text) => {
       userTCodeEditorRef.value.setValue(text);
-      userTCodeEditorRef.value.resetHistory();
     };
     const initText = () => {
       // 工作流仅支持JS语法
@@ -149,7 +148,6 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       // 加载Draft
       if(localStoreUtil.getItem(localStore['tcode-draft'])) {
         userTCodeEditorRef.value.setValue(localStoreUtil.getItem(localStore['tcode-draft']));
-        userTCodeEditorRef.value.resetHistory();
       }
     };
     // 仅有数字字母组成
@@ -349,10 +347,6 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
   margin-bottom: 3px;
   padding-bottom: 5px;
   border-bottom: 1px solid #ececec;
-}
-
-.no-select {
-  user-select: none;
 }
 
 /* 不换行 */

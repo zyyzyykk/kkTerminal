@@ -260,9 +260,18 @@ import TCodeWorkflow from '@/components/tcode/TCodeWorkflow';
 import TCodeCenter from "@/components/tcode/TCodeCenter";
 import CooperateGen from '@/components/advance/CooperateGen';
 import StatusMonitor from '@/components/advance/StatusMonitor'
-import DockerBlock from "@/components/advance/DockerBlock";
+import DockerBlock from "@/components/advance/docker/DockerBlock";
 import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
-import { QuestionFilled, VideoPlay, VideoPause, ChromeFilled, ArrowRight, UserFilled, FolderOpened, CircleClose } from '@element-plus/icons-vue';
+import {
+  QuestionFilled,
+  VideoPlay,
+  VideoPause,
+  ChromeFilled,
+  ArrowRight,
+  UserFilled,
+  FolderOpened,
+  CircleClose,
+} from '@element-plus/icons-vue';
 import {
   FuncTCode,
   SysTCode,
@@ -1062,6 +1071,7 @@ export default {
         listenResize();
         recordInfo.value = await load('record-' + urlParams.value.record);
         if(recordInfo.value) playRecord(0);
+        else termWrite('Record ID is Invalid.\r\n');
         return;
       }
 
@@ -1224,18 +1234,6 @@ export default {
   cursor: pointer;
   border: 2px solid #f2f2f2;
   border-left: 2px solid #efefef;
-}
-
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
-
-/* 文本溢出省略 */
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .disabled {

@@ -15,11 +15,11 @@
     >
       <div>
         <div class="title kk-flex" >
-          <div class="ellipsis" style="flex: 1;" >
+          <div class="ellipsis" style="flex: 1; line-height: 18px;" >
             <div v-if="isShowDirInput" >
               <el-input id="aimDirInput" v-model="dir" :placeholder="$t('输入目录路径')" size="small" @keydown.enter="isShowDirInput = false;" @blur="isShowDirInput = false;" @mousedown.stop @dblclick.stop @change="dirInputCallback" />
             </div>
-            <div class="kk-flex no-select ellipsis" v-else @dblclick="doShowDirInput" >
+            <div class="kk-flex ellipsis no-select" style="line-height: 18px;" v-else @dblclick="doShowDirInput" >
               <div v-for="(item, index) in dirLevels" :key="index" class="kk-flex" >
                 <div>/</div>
                 <div class="dir-level" @click="changeDirByLevel($event,index)" >{{ item }}</div>
@@ -77,7 +77,7 @@
                   </div>
                   <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
                     <template #content>
-                      <div v-if="!(isShowRenameInput && renameFile && item.id === renameFile.id)" class="ellipsis" style="margin: 0 10px;" >
+                      <div v-if="!(isShowRenameInput && renameFile && item.id === renameFile.id)" class="ellipsis" style="margin: 0 10px; line-height: 18px;" >
                         {{ item.name }}
                       </div>
                     </template>
@@ -92,7 +92,7 @@
                   </div>
                   <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
                     <template #content>
-                      <div v-if="!(isShowRenameInput && renameFile && item.id === renameFile.id)" class="ellipsis" style="margin: 0 10px;" >
+                      <div v-if="!(isShowRenameInput && renameFile && item.id === renameFile.id)" class="ellipsis" style="margin: 0 10px; line-height: 18px;" >
                         {{ item.name }}
                       </div>
                     </template>
@@ -1350,7 +1350,7 @@ export default {
   font-size: 13px;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow:ellipsis;
+  text-overflow: ellipsis;
   margin-bottom: 15px;
 }
 
@@ -1393,19 +1393,6 @@ export default {
 {
   background-color: #efefef !important;
   border-bottom: 1px solid #d8d8d8;
-}
-
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
-
-/* 文本溢出省略 */
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 18px;
 }
 
 .kk-menu

@@ -95,8 +95,8 @@ public class CloudController {
                 if(userFiles == null) continue;
                 for(File userFile : userFiles) {
                     if(!userFile.isDirectory()) {
-                        // 删除条件
-                        if(StringUtil.isPrefix(countType, userFile.getName())) {
+                        // 只删除录像文件
+                        if(userFile.getName().startsWith(countType)) {
                             try {
                                 // 获取文件的基本属性
                                 BasicFileAttributes attrs = Files.readAttributes(userFile.toPath(), BasicFileAttributes.class);

@@ -450,9 +450,4 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
 </style>

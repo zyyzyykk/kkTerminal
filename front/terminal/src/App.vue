@@ -102,6 +102,13 @@ img {
   user-select: none;
 }
 
+/* 文本溢出省略 */
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* 隐藏滚动条 */
 .xterm-viewport {
   scrollbar-width: none !important; /* Firefox */

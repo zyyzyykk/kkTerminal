@@ -16,7 +16,7 @@
         <div v-for="(value, key) in sshOptions" :key="key" >
           <div :class="['item-class', (aimOption == key) ? 'item-selected' : '']" @click="aimOption = key" >
             <FileIcons :style="{display: 'flex', alignItems: 'center'}" name="kk.ini" :width="20" :height="20" :isFolder="false" />
-            <div class="ellipsis" style="margin: 0 10px;" >{{ key }}</div>
+            <div class="ellipsis" style="margin: 0 10px; line-height: 18px;" >{{ key }}</div>
             <div style="flex: 1;" ></div>
             <div @click="confirmDeleteOption(key)" ><el-icon><CircleClose /></el-icon></div>
           </div>
@@ -144,24 +144,11 @@ export default {
   margin-top: 10px;
 }
 
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
-
 .kk-border
 {
   height: 30.1vh;
   overflow-y: scroll;
   width: 100%;
   border-bottom: 1px solid #ececec;
-}
-
-/* 文本溢出省略 */
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 18px;
 }
 </style>

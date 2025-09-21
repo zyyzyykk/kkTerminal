@@ -13,7 +13,7 @@
       <template #title>
         <div class="kk-flex-0 nowrap kk-header-class" >
           <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="16" :height="16" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" />
-          <div class="ellipsis" style="margin: 0 5px; font-size: small;" >{{ fileInfo.name }}</div>
+          <div class="ellipsis" style="margin: 0 5px; font-size: small; line-height: 18px;" >{{ fileInfo.name }}</div>
           <div style="font-size: small;" >{{ $t('属性') }}</div>
         </div>
       </template>
@@ -28,7 +28,7 @@
           <div class="form-width" >{{ $t('位置') }}：</div>
           <ToolTip :content="fileDir + fileInfo.name" >
             <template #content>
-              <div class="ellipsis" >
+              <div class="ellipsis" style="line-height: 18px;" >
                 {{ fileDir + fileInfo.name }}
               </div>
             </template>
@@ -39,7 +39,7 @@
         </div>
         <div v-if="fileInfo.isDirectory" class="kk-flex" >
           <div class="form-width" >{{ $t('包含') }}：</div>
-          <div class="ellipsis" >
+          <div class="ellipsis" style="line-height: 18px;" >
             {{ $t(includeInfo) }}
           </div>
           <div v-if="uploading" style="margin-left: 10px;" >
@@ -54,7 +54,7 @@
         </div>
         <div v-else class="kk-flex" >
           <div class="form-width" >{{ $t('大小') }}：</div>
-          <div class="ellipsis" >
+          <div class="ellipsis" style="line-height: 18px;" >
             {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size.toLocaleString() + ' ' + $t('字节') }})
           </div>
           <div v-if="uploading" style="margin-left: 10px;" >
@@ -350,18 +350,6 @@ export default {
 .kk-border {
   padding-bottom: 10px;
   border-bottom: 1px solid #ececec;
-}
-
-.no-select {
-  user-select: none;
-}
-
-/* 文本溢出省略 */
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 18px;
 }
 
 .nowrap {

@@ -138,9 +138,4 @@ export default {
   display: flex;
   align-items: center;
 }
-
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
 </style>

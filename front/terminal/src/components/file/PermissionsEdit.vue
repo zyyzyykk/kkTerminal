@@ -12,7 +12,7 @@
     <template #title>
       <div class="kk-flex-0 nowrap kk-header-class" >
         <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="16" :height="16" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" />
-        <div class="ellipsis" style="margin: 0 5px; font-size: small;" >{{ fileInfo.name }}</div>
+        <div class="ellipsis" style="margin: 0 5px; font-size: small; line-height: 18px;" >{{ fileInfo.name }}</div>
         <div style="font-size: small;" >{{ $t('权限修改') }}</div>
       </div>
     </template>
@@ -146,20 +146,8 @@ export default {
   margin-top: 15px;
 }
 
-/* 文本溢出省略 */
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 18px;
-}
-
 .nowrap {
   white-space: nowrap;
-}
-
-.no-select {
-  user-select: none;
 }
 
 .form-width {

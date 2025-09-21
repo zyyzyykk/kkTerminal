@@ -13,11 +13,11 @@
       <template #title>
         <div class="kk-flex no-select kk-header-class" >
           <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileName" :width="25" :height="25" :isFolder="false" />
-          <div class="ellipsis" style="margin: 0 5px; font-size: larger;" >{{ modifyTag + fileName }}</div>
+          <div class="ellipsis" style="margin: 0 5px; font-size: larger; line-height: 22px;" >{{ modifyTag + fileName }}</div>
         </div>
       </template>
       <div style="margin-top: -28px;" ></div>
-      <div id="editor-bar" v-show="previewInfo.preview === 'editor'" class="kk-flex ellipsis no-select" style="margin-bottom: 5px; overflow-x: auto;" >
+      <div id="editor-bar" v-show="previewInfo.preview === 'editor'" class="kk-flex ellipsis no-select" style="margin-bottom: 5px; overflow-x: auto; line-height: 22px;" >
         <div class="kk-flex" >
           <div>{{ $t('编码') }}：</div>
           <div class="kk-flex" >
@@ -258,7 +258,6 @@ export default {
     };
     const initEditor = (content) => {
       codeEditorRef.value.setValue(content);
-      codeEditorRef.value.resetHistory();
       codeEditorRef.value.setLanguage((mode.value === 'auto') ? fileName.value : ("kk." + mode.value));
     };
 
@@ -392,19 +391,6 @@ export default {
 .kk-flex {
   display: flex;
   align-items: center;
-}
-
-/* 文本溢出省略 */
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 22px;
-}
-
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
 }
 
 .preview {

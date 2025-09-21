@@ -7,17 +7,15 @@ import com.kkbpro.terminal.pojo.dto.CooperateInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.AESUtil;
 import com.kkbpro.terminal.utils.LogUtil;
+import com.kkbpro.terminal.utils.SSHUtil;
 import com.kkbpro.terminal.utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.channel.direct.Session;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,25 +28,26 @@ public class AdvanceController {
 
     public static final String COOPERATE_SECRET_KEY = StringUtil.generateRandomString(16);
 
-    public static final String[] DOCKER_INFO_CMD = new String[]{
+    public static final String[] DOCKER_INFO_CMD = new String[] {
             "echo -n \"$(docker ps -a --format \"{{.ID}}@{{.Names}}@{{.Status}}@{{.Image}}@{{.Ports}}\" | paste -sd '$' -)\"",
             "echo -n \"$(docker images --format \"{{.ID}}@{{.Repository}}@{{.Size}}@{{.CreatedAt}}\" | paste -sd '$' -)\"",
             "echo -n \"$(docker network ls --format \"{{.Name}}\" | xargs -I {} docker network inspect {} --format \"{{.Name}}@{{range .IPAM.Config}}{{.Subnet}}{{end}}@{{range .IPAM.Config}}{{.Gateway}}{{end}}@{{.Created}}\" | paste -sd'$' -)\"",
             "echo -n \"$(docker volume ls --format \"{{.Name}}\" | xargs -I {} docker volume inspect {} --format \"{{.Name}}@{{.Mountpoint}}@{{.CreatedAt}}\" | paste -sd'$' -)\"\n"
     };
 
-    public static final String[] DOCKER_DELETE_CMD = new String[]{
+    public static final String[] DOCKER_DELETE_CMD = new String[] {
             "docker rm -f ",
             "docker rmi -f ",
             "docker network rm ",
             "docker volume rm "
     };
 
-    public static final String[] DOCKER_CONTAINER_CMD = new String[]{
+    public static final String[] DOCKER_CONTAINER_CMD = new String[] {
             "docker start ",
             "docker pause ",
             "docker restart ",
-            "docker rm -f "
+            "docker rm -f ",
+            "docker inspect "
     };
 
     /**
@@ -75,7 +74,7 @@ public class AdvanceController {
         cooperateInfo.setMaxHeadCount(maxHeadCount);
         webSocketServer.setCooperateInfo(cooperateInfo);
 
-        String key = StringUtil.changeBase64Str(AESUtil.encrypt(cooperateId + "^" + sshKey, COOPERATE_SECRET_KEY));
+        String key = StringUtil.changeBase64ToStr(AESUtil.encrypt(cooperateId + "^" + sshKey, COOPERATE_SECRET_KEY));
 
         return Result.success(successMsg, key);
     }
@@ -138,7 +137,7 @@ public class AdvanceController {
         if(ssh == null) {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
-        String status = "";
+        StringBuilder status = new StringBuilder();
         String command = "echo -n \"$(uptime | awk -F'load average: ' '{print $2}' | awk '{print $1}' | sed 's/,//')@\" && \\\n" +
                 "echo -n \"$(top -bn1 | grep \"Cpu(s)\" | sed \"s/.*, *\\([0-9.]*\\)%* id.*/\\1/\" | awk '{print 100 - $1}')@\" && \\\n" +
                 "echo -n \"$(nproc)@\" && \\\n" +
@@ -156,22 +155,14 @@ public class AdvanceController {
                 "echo -n \"$(cat /proc/diskstats | awk '{print $3\"@\"$6\"@\"$10}' | tr -s ' ' '@' | tr '\\n' '$' | sed 's/\\(.*\\)\\$/\\1/')\" && \\\n" +
                 "echo -n \"^\" && \\\n" +
                 "echo -n $(date +%s%3N)";
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 读取命令执行结果
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
-                status += reader.readLine();
-            }
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, status);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
-        return Result.success(200, successMsg, status);
+        return Result.success(200, successMsg, status.toString());
     }
 
     /**
@@ -187,24 +178,16 @@ public class AdvanceController {
         if(ssh == null) {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
-        String version = "";
-        String command = "docker --version";
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 读取命令执行结果
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
-                version += reader.readLine();
-            }
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        StringBuilder version = new StringBuilder();
+        String command = "echo -n $(docker --version)";
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, version);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
-        return Result.success(200, successMsg, version);
+        return Result.success(200, successMsg, version.toString());
     }
 
     // 完整命令
@@ -228,24 +211,16 @@ public class AdvanceController {
         if(ssh == null) {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
-        String info = "";
-        String command = DOCKER_INFO_CMD[type % DOCKER_INFO_CMD.length];
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 读取命令执行结果
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
-                info += reader.readLine();
-            }
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        StringBuilder info = new StringBuilder();
+        String command = DOCKER_INFO_CMD[type];
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, info);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
-        return Result.success(200, successMsg, info);
+        return Result.success(200, successMsg, info.toString());
     }
 
     /**
@@ -261,13 +236,9 @@ public class AdvanceController {
         if(ssh == null) {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
-        String command = DOCKER_DELETE_CMD[type % DOCKER_DELETE_CMD.length] + items;
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        String command = DOCKER_DELETE_CMD[type] + items;
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, null);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
@@ -290,24 +261,16 @@ public class AdvanceController {
         if(ssh == null) {
             return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
         }
-        String container = "";
-        String command = DOCKER_CONTAINER_CMD[type % DOCKER_CONTAINER_CMD.length] + items;
-        try(Session session = ssh.startSession();
-            Session.Command cmd = session.exec(command))
-        {
-            // 读取命令执行结果
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(cmd.getInputStream()))) {
-                container += reader.readLine();
-            }
-            // 等待命令执行完毕
-            cmd.join();
-            int exitStatus = cmd.getExitStatus();
+        StringBuilder container = new StringBuilder();
+        String command = DOCKER_CONTAINER_CMD[type] + items;
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, container);
             if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
-        return Result.success(200, successMsg, container);
+        return Result.success(200, successMsg, container.toString());
     }
 
 }
