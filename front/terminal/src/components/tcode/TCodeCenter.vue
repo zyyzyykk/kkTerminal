@@ -134,10 +134,10 @@
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { FuncTCode, SysTCode, TCodeStatusEnum } from "@/components/tcode/TCode";
-import ToolTip from "@/components/ToolTip";
-import NoData from '@/components/NoData';
+import ToolTip from "@/components/common/ToolTip";
+import NoData from '@/components/common/NoData';
 import { ArrowRight, ArrowLeft, Edit, View, Finished, Delete } from '@element-plus/icons-vue';
-import AceEditor from '../preview/AceEditor';
+import AceEditor from '@/components/common/AceEditor';
 import { aesDecrypt } from '@/utils/Encrypt';
 import TCodeStatus from './TCodeStatus';
 import { deleteDialog } from '@/utils/DeleteDialog';

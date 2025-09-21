@@ -108,7 +108,7 @@
 
 <script>
 import { ref } from 'vue';
-import AceEditor from './AceEditor';
+import AceEditor from '@/components/common/AceEditor';
 import $ from 'jquery';
 import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
@@ -117,10 +117,8 @@ import { changeStr2 } from '@/utils/StringUtil';
 import { getUrlParams } from "@/utils/UrlUtil";
 import { encodeStrToArray, decodeArrayToStr } from "@/components/preview/EncodeUtil";
 import { ArrowDown, DocumentCopy } from '@element-plus/icons-vue';
-import i18n from "@/locales/i18n";
-
-// 引入文件图标组件
 import FileIcons from 'file-icons-vue';
+import i18n from "@/locales/i18n";
 
 export default {
   name: 'TxtPreview',

@@ -87,7 +87,7 @@
 <script>
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
-import AceEditor from '../preview/AceEditor';
+import AceEditor from '@/components/common/AceEditor';
 import { CollectionTag, EditPen, Upload, Download, Refresh, Finished, DocumentDelete } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 import { localStore } from "@/env/Store";

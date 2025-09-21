@@ -110,7 +110,7 @@ import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
 import OptionBlock from './OptionBlock';
 import PrivateKey from './PrivateKey';
-import ToolTip from '@/components/ToolTip';
+import ToolTip from '@/components/common/ToolTip';
 import { getPureUrl } from '@/utils/UrlUtil';
 import { HomeFilled, Paperclip, User, Lock, DocumentCopy, View, Hide, Edit, Finished, Switch, ArrowDown, Key } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";

@@ -254,7 +254,7 @@ import { changeStr, changeBase64Str, changeStrBase64, generateRandomString } fro
 import { http_base_url } from '@/env/BaseUrl';
 
 import ConnectSetting from '@/components/connect/ConnectSetting';
-import PreferenceSetting from '@/components/PreferenceSetting';
+import PreferenceSetting from '@/components/preference/PreferenceSetting';
 import FileBlock from "@/components/file/FileBlock";
 import TCodeWorkflow from '@/components/tcode/TCodeWorkflow';
 import TCodeCenter from "@/components/tcode/TCodeCenter";
@@ -288,8 +288,8 @@ import { calcType } from "@/components/calc/CalcType";
 import { calcSize } from '@/components/calc/CalcSize';
 import { calcBgColor } from "@/components/calc/CalcColor";
 import { localStore } from "@/env/Store";
-import NoData from "@/components/NoData";
-import ToolTip from "@/components/ToolTip";
+import NoData from "@/components/common/NoData";
+import ToolTip from "@/components/common/ToolTip";
 import FileIcons from "file-icons-vue";
 
 export default {

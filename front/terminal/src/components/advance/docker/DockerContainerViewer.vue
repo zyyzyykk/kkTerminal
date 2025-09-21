@@ -29,7 +29,7 @@
 import { ref } from "vue";
 import $ from "jquery";
 import { http_base_url } from "@/env/BaseUrl";
-import AceEditor from '@/components/preview/AceEditor';
+import AceEditor from '@/components/common/AceEditor';
 import { ElMessage } from "element-plus";
 import FileIcons from "file-icons-vue";
 import i18n from "@/locales/i18n";

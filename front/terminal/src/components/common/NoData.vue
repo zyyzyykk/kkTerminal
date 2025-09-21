@@ -4,7 +4,7 @@
     <slot name="mySlot" ></slot>
     <div style="display: flex; align-items: center;" >
       <div>
-        <img src="@/assets/no_data.png" :alt="$t('暂无数据')" style="width: 120px;" >
+        <img src="../../assets/no_data.png" :alt="$t('暂无数据')" style="width: 120px;" >
       </div>
     </div>
     <div class="msg" >{{ $t(msg) }}</div>

@@ -155,7 +155,7 @@ import $ from 'jquery';
 import { ArrowDown, SortUp, SortDown } from '@element-plus/icons-vue';
 import { http_base_url } from "@/env/BaseUrl";
 import { calcNumber, calcStatus } from "@/components/calc/CalcType";
-import NoData from '@/components/NoData';
+import NoData from '@/components/common/NoData';
 import EChart from "@/components/advance/EChart";
 import { ElMessage } from "element-plus";
 import useClipboard from "vue-clipboard3";

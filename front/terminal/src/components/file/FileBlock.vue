@@ -178,8 +178,8 @@ import { aesEncryptBuffer, rsaEncrypt } from "@/utils/Encrypt";
 import { encodeStrToArray } from "@/components/preview/EncodeUtil";
 import { TCodeReservedVarsSetter } from "@/components/tcode/TCode";
 
-import ToolTip from '@/components/ToolTip';
-import NoData from '@/components/NoData';
+import ToolTip from '@/components/common/ToolTip';
+import NoData from '@/components/common/NoData';
 import TxtPreview from '../preview/TxtPreview';
 import MkFile from './MkFile';
 import FileAttr from './FileAttr';

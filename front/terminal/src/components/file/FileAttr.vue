@@ -114,7 +114,7 @@ import useClipboard from "vue-clipboard3";
 import { DocumentCopy, Refresh, Edit } from '@element-plus/icons-vue';
 import { calcSize } from '@/components/calc/CalcSize';
 import { escapeItem, escapePath } from '@/utils/StringUtil';
-import ToolTip from '@/components/ToolTip';
+import ToolTip from '@/components/common/ToolTip';
 import PermissionsEdit from './PermissionsEdit';
 import i18n from "@/locales/i18n";
 

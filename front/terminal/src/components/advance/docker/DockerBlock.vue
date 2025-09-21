@@ -270,7 +270,7 @@
 
 <script>
 import DockerContainerViewer from "./DockerContainerViewer";
-import NoData from "@/components/NoData";
+import NoData from "@/components/common/NoData";
 import { computed, ref } from "vue";
 import $ from "jquery";
 import { http_base_url } from "@/env/BaseUrl";

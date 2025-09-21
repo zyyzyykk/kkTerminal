@@ -46,9 +46,7 @@ import { ref } from 'vue';
 import { CircleClose } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { deleteDialog } from '@/utils/DeleteDialog';
-
-import NoData from '@/components/NoData';
-// 引入文件图标组件
+import NoData from '@/components/common/NoData';
 import FileIcons from 'file-icons-vue';
 import i18n from "@/locales/i18n";
 
