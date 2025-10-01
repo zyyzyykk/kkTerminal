@@ -4,7 +4,6 @@ import com.kkbpro.terminal.annotation.Log;
 import com.kkbpro.terminal.constants.enums.FileStateEnum;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.LogUtil;
-import com.kkbpro.terminal.utils.StringUtil;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,7 +45,7 @@ public class CloudController {
         if (!folder.exists()) {
             folder.mkdirs();
         }
-        if(folder.listFiles().length > maxCount && countType.equals(type))
+        if (folder.listFiles().length > maxCount && countType.equals(type))
             return Result.error(FileStateEnum.CLOUD_COUNT_ERROR.getState(),"云端文件过多");
         File aimFile = new File(folderPath + "/" + type + name);
         // 如果文件存在则删除
@@ -66,7 +65,7 @@ public class CloudController {
         String folderPath = cloudBasePath + "/" + user;
         File file = new File(folderPath + "/" + fileName);
         // 文件不存在
-        if(!file.exists()) return Result.error(FileStateEnum.FILE_NOT_EXIST.getState(), "文件不存在");
+        if (!file.exists()) return Result.error(FileStateEnum.FILE_NOT_EXIST.getState(), "文件不存在");
         StringBuilder content = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
@@ -86,17 +85,17 @@ public class CloudController {
     @Scheduled(cron = "0 0 0 */1 * ?")
     protected void clean() {
         File cloudBaseFolder = new File(cloudBasePath);
-        if(!cloudBaseFolder.exists()) return;
+        if (!cloudBaseFolder.exists()) return;
         File[] userFolders = cloudBaseFolder.listFiles();
-        if(userFolders == null) return;
-        for(File userFolder : userFolders) {
-            if(userFolder.isDirectory()) {
+        if (userFolders == null) return;
+        for (File userFolder : userFolders) {
+            if (userFolder.isDirectory()) {
                 File[] userFiles = userFolder.listFiles();
-                if(userFiles == null) continue;
-                for(File userFile : userFiles) {
-                    if(!userFile.isDirectory()) {
+                if (userFiles == null) continue;
+                for (File userFile : userFiles) {
+                    if (!userFile.isDirectory()) {
                         // 只删除录像文件
-                        if(userFile.getName().startsWith(countType)) {
+                        if (userFile.getName().startsWith(countType)) {
                             try {
                                 // 获取文件的基本属性
                                 BasicFileAttributes attrs = Files.readAttributes(userFile.toPath(), BasicFileAttributes.class);

@@ -11,8 +11,8 @@
     <groupId>com.kkbpro</groupId>
     <artifactId>terminal</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>terminal</name>
-    <description>terminal</description>
+    <name>kkTerminal</name>
+    <description>A terminal for Web SSH connection</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
@@ -42,14 +42,14 @@
         <dependency>
             <groupId>com.hierynomus</groupId>
             <artifactId>sshj</artifactId>
-            <version>0.38.0</version>
+            <version>0.40.0</version>
         </dependency>
 
         <!--fastjson-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.66</version>
+            <version>1.2.83</version>
         </dependency>
 
         <!--生成终端艺术字-->
@@ -79,9 +79,22 @@
             <version>1.9.4</version>
         </dependency>
 
+        <!--扩展编码集-->
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+            <version>75.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j-charset</artifactId>
+            <version>75.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
+        <finalName>kkTerminal</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

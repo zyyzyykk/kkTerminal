@@ -69,7 +69,6 @@ public class RSAUtil {
     public static String encrypt(String str, String publicKey) throws Exception {
         // base64编码的公钥
         byte[] decoded = decryptBASE64(publicKey);
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(decoded));
         // RSA加密
         Cipher cipher = Cipher.getInstance("RSA");
@@ -94,7 +93,6 @@ public class RSAUtil {
         byte[] inputByte = decryptBASE64(str);
         // base64编码的私钥
         byte[] decoded = decryptBASE64(privateKey);
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(decoded));
         // RSA解密
         Cipher cipher = Cipher.getInstance("RSA");

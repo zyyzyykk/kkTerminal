@@ -22,7 +22,7 @@ public class FileUtil {
         File finalFile = new File(folderPath + "/" + fileName);
         // 获取暂存切片文件的文件夹中的所有文件
         File[] files = folder.listFiles();
-        if(files != null)
+        if (files != null)
         {
             try(OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(finalFile, true))) {
 
@@ -46,8 +46,8 @@ public class FileUtil {
                 // 根据排序的顺序依次将文件合并到新的文件中
                 for (File file : fileListCollect) {
                     try(InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
-                        int len = 0;
-                        byte[] bytes = new byte[2 * 1024 * 1024];
+                        int len;
+                        byte[] bytes = new byte[4 * 1024 * 1024];
                         while ((len = inputStream.read(bytes)) != -1) {
                             outputStream.write(bytes, 0, len);
                         }
@@ -86,12 +86,12 @@ public class FileUtil {
      */
     private static Boolean isFileChunk(String chunkFileName, Integer chunks, String originFileName) {
         int index = chunkFileName.lastIndexOf("-");
-        if(index != -1) {
+        if (index != -1) {
             String fileName = chunkFileName.substring(0,index);
-            if(!originFileName.equals(fileName)) return false;
+            if (!originFileName.equals(fileName)) return false;
             try {
                 int chunk = Integer.parseInt(chunkFileName.substring(index + 1));
-                if(chunk < 1 || chunk > chunks) return false;
+                if (chunk < 1 || chunk > chunks) return false;
             } catch (Exception e) {
                 return false;
             }
@@ -107,7 +107,7 @@ public class FileUtil {
      */
     private static Integer getFileChunkIndex(String chunkFileName) {
         int index = chunkFileName.lastIndexOf("-");
-        if(index != -1) {
+        if (index != -1) {
             return Integer.parseInt(chunkFileName.substring(index + 1));
         }
 

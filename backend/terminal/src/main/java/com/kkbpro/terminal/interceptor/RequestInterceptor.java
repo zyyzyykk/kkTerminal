@@ -4,6 +4,7 @@ import com.kkbpro.terminal.annotation.Log;
 import com.kkbpro.terminal.utils.I18nUtil;
 import com.kkbpro.terminal.utils.LogUtil;
 import com.kkbpro.terminal.utils.SSHUtil;
+import com.kkbpro.terminal.utils.StringUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,12 +22,12 @@ public class RequestInterceptor implements HandlerInterceptor {
     @Log
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        // 获取请求的参数 sshKey
+        // 获取请求参数 sshKey
         String sshKey = request.getParameter("sshKey");
         // 获取语言
         String lang = "en";
         try {
-            lang = sshKey.split("-")[0];
+            if (!StringUtil.isEmpty(sshKey)) lang = sshKey.split("-")[0];
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
         } finally {
@@ -35,7 +36,7 @@ public class RequestInterceptor implements HandlerInterceptor {
         // 获取服务器编码集
         String encode = StandardCharsets.UTF_8.name();
         try {
-            encode = sshKey.split("-")[1].replace("@","-");
+            if (!StringUtil.isEmpty(sshKey)) encode = sshKey.split("-")[1].replace("@","-");
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
         } finally {

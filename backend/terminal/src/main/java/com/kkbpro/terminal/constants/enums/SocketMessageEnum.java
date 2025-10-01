@@ -2,15 +2,15 @@ package com.kkbpro.terminal.constants.enums;
 
 public enum SocketMessageEnum {
 
-    USER_TEXT(0,"User input text"),
+    USER_TEXT(0, "User input text"),
 
-    SIZE_CHANGE(1,"Change the size of virtual terminal"),
+    SIZE_CHANGE(1, "Change the size of virtual terminal"),
 
-    HEART_BEAT(2,"Do heartbeat renewal");
+    HEART_BEAT(2, "Do heartbeat renewal");
 
-    private Integer state;
+    private final Integer state;
 
-    private String desc;
+    private final String desc;
 
     SocketMessageEnum(Integer state, String desc) {
         this.state = state;

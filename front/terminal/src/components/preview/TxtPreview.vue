@@ -138,8 +138,8 @@ export default {
     const fileUrl = ref('');
 
     const previewInfo = ref({
-      preview:'editor',
-      type:'text',
+      preview: 'editor',
+      type: 'text',
     });
     const previewUrl = ref('');
 
@@ -166,7 +166,7 @@ export default {
           responseType: 'arraybuffer'
         },
         data: {
-          type: 'open',
+          trigger: 'editor',
         },
         dataFilter(resp) {
           return resp;
@@ -175,7 +175,7 @@ export default {
           if(url === fileUrl.value) {
             // 文件可预览
             if(previewInfo.value.preview !== 'editor') {
-              const blob = new Blob([resp], {type:previewInfo.value.type});
+              const blob = new Blob([resp], {type: previewInfo.value.type});
               if(previewUrl.value) URL.revokeObjectURL(previewUrl.value);
               previewUrl.value = URL.createObjectURL(blob);
               percentage.value = 100;

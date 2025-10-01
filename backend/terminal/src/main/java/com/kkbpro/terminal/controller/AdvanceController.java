@@ -10,12 +10,12 @@ import com.kkbpro.terminal.utils.LogUtil;
 import com.kkbpro.terminal.utils.SSHUtil;
 import com.kkbpro.terminal.utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.common.IOUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,10 +61,10 @@ public class AdvanceController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
-        if(ssh == null || webSocketServer == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        if (ssh == null || webSocketServer == null) {
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
-        if(webSocketServer.getCooperateInfo() != null)
+        if (webSocketServer.getCooperateInfo() != null)
             return Result.error(errorMsg);
 
         String cooperateId = UUID.randomUUID().toString();
@@ -84,22 +84,21 @@ public class AdvanceController {
      */
     @Log
     @PostMapping("/cooperate/end")
-    public Result cooperateEnd(String sshKey) throws IOException {
+    public Result cooperateEnd(String sshKey) {
         String errorMsg = "结束协作失败";
         String successMsg = "结束协作成功";
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
-        if(ssh == null || webSocketServer == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        if (ssh == null || webSocketServer == null) {
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
 
         webSocketServer.setCooperateInfo(null);
-        List<WebSocketServer> slaveSockets = WebSocketServer.cooperateMap.get(sshKey);
-        WebSocketServer.cooperateMap.remove(sshKey);
-        if(slaveSockets != null) {
-            for(WebSocketServer slaveSocket : slaveSockets) {
-                slaveSocket.getSessionSocket().close();
+        List<WebSocketServer> slaveSockets = WebSocketServer.cooperateMap.remove(sshKey);
+        if (slaveSockets != null) {
+            for (WebSocketServer slaveSocket : slaveSockets) {
+                IOUtils.closeQuietly(slaveSocket.getSessionSocket());
             }
         }
 
@@ -119,7 +118,7 @@ public class AdvanceController {
     //    echo -n "$" && \
     //    echo -n "$(cat /proc/net/dev | awk 'NR>2 {print $1"@"$10"@"$2}' | tr -s ' ' '@' | tr '\n' '$' | sed 's/\(.*\)\$/\1/')" && \
     //    echo -n "^" && \
-    //    echo -n "$(cat /proc/diskstats | awk '{if($3 ~ /[^0-9]$/) {read+=$6; write+=$10}} END {print "all@" read"@"write}')" && \
+    //    echo -n "$(cat /proc/diskstats | awk '{if ($3 ~ /[^0-9]$/) {read+=$6; write+=$10}} END {print "all@" read"@"write}')" && \
     //    echo -n "$" && \
     //    echo -n "$(cat /proc/diskstats | awk '{print $3"@"$6"@"$10}' | tr -s ' ' '@' | tr '\n' '$' | sed 's/\(.*\)\$/\1/')" && \
     //    echo -n "^" && \
@@ -134,8 +133,8 @@ public class AdvanceController {
         String successMsg = "获取监控状态成功";
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
-        if(ssh == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        if (ssh == null) {
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         StringBuilder status = new StringBuilder();
         String command = "echo -n \"$(uptime | awk -F'load average: ' '{print $2}' | awk '{print $1}' | sed 's/,//')@\" && \\\n" +
@@ -150,7 +149,7 @@ public class AdvanceController {
                 "echo -n \"$\" && \\\n" +
                 "echo -n \"$(cat /proc/net/dev | awk 'NR>2 {print $1\"@\"$10\"@\"$2}' | tr -s ' ' '@' | tr '\\n' '$' | sed 's/\\(.*\\)\\$/\\1/')\" && \\\n" +
                 "echo -n \"^\" && \\\n" +
-                "echo -n \"$(cat /proc/diskstats | awk '{if($3 ~ /[^0-9]$/) {read+=$6; write+=$10}} END {print \"all@\" read\"@\"write}')\" && \\\n" +
+                "echo -n \"$(cat /proc/diskstats | awk '{if ($3 ~ /[^0-9]$/) {read+=$6; write+=$10}} END {print \"all@\" read\"@\"write}')\" && \\\n" +
                 "echo -n \"$\" && \\\n" +
                 "echo -n \"$(cat /proc/diskstats | awk '{print $3\"@\"$6\"@\"$10}' | tr -s ' ' '@' | tr '\\n' '$' | sed 's/\\(.*\\)\\$/\\1/')\" && \\\n" +
                 "echo -n \"^\" && \\\n" +
@@ -175,8 +174,8 @@ public class AdvanceController {
         String successMsg = "获取Docker版本成功";
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
-        if(ssh == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        if (ssh == null) {
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         StringBuilder version = new StringBuilder();
         String command = "echo -n $(docker --version)";
@@ -208,8 +207,8 @@ public class AdvanceController {
         String successMsg = "获取Docker信息成功";
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
-        if(ssh == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        if (ssh == null) {
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         StringBuilder info = new StringBuilder();
         String command = DOCKER_INFO_CMD[type];
@@ -233,8 +232,8 @@ public class AdvanceController {
         String successMsg = "删除成功";
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
-        if(ssh == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        if (ssh == null) {
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         String command = DOCKER_DELETE_CMD[type] + items;
         try {
@@ -258,8 +257,8 @@ public class AdvanceController {
         String successMsg = "操作成功";
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
-        if(ssh == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(),"连接断开，" + errorMsg);
+        if (ssh == null) {
+            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         StringBuilder container = new StringBuilder();
         String command = DOCKER_CONTAINER_CMD[type] + items;

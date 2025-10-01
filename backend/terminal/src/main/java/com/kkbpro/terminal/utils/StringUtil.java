@@ -19,18 +19,18 @@ public class StringUtil {
      *  将字符串的'@'转为'/'
      */
     public static String changeStr(String str) {
-        return str == null ? null : str.replace("@", "/");
+        return isEmpty(str) ? str : str.replace("@", "/");
     }
 
     /**
      * 将Base64编码转换为合法的URL参数
      */
     public static String changeBase64ToStr(String str) {
-        return str == null ? null : str.replace("+", "-").replace("=", "@");
+        return isEmpty(str) ? str : str.replace("+", "-").replace("=", "@");
     }
 
     public static String changeStrToBase64(String str) {
-        return str == null ? null : str.replace("-", "+").replace("@", "=");
+        return isEmpty(str) ? str : str.replace("-", "+").replace("@", "=");
     }
 
     /**

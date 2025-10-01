@@ -591,7 +591,9 @@ export default {
           setTimeout(() => {
             termFit();
           },1);
+          // 协作成功
           if(urlParams.value.cooperate) {
+            term.focus();
             termWrite(result.info + ".\n");
             return;
           }
@@ -1039,7 +1041,7 @@ export default {
     };
     // type: 0增/改 1删 2查
     const updateTransportLists = (index, type, id, item) => {
-      const operateList = transportLists[index % 4];
+      const operateList = transportLists[index];
       // 查询
       if(type === 2) return operateList.value[id];
       // 删除
@@ -1070,6 +1072,7 @@ export default {
       if(urlParams.value.record) {
         listenResize();
         recordInfo.value = await load('record-' + urlParams.value.record);
+        term.focus();
         if(recordInfo.value) playRecord(0);
         else termWrite('Record ID is Invalid.\r\n');
         return;
@@ -1123,17 +1126,17 @@ export default {
       saveOp,
       deleteOp,
       tcode,
-      handleTCode,
-      closeBlock,
-      resetTerminal,
       tcodes,
       tCodeWorkflowRef,
-      sendMessage,
+      handleTCode,
       importTCodes,
       exportTCodes,
       tCodeCenterRef,
       handleSaveTCode,
       handleDeleteTCode,
+      closeBlock,
+      resetTerminal,
+      sendMessage,
       cooperating,
       onlineNumber,
       maxNumber,

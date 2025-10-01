@@ -45,7 +45,7 @@ public class I18nUtil {
         return getMessage(key, locale.get());
     }
 
-    public static String getMessage(String key, String lang) {
+    private static String getMessage(String key, String lang) {
         return messagesCache.get(lang) == null ? key : messagesCache.get(lang).getOrDefault(key, key);
     }
 

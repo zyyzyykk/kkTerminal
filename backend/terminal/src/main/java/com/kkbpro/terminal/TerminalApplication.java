@@ -33,13 +33,13 @@ public class TerminalApplication {
     public void cleanData() {
         // 清除文件数据残留
         File data = new File(FileUtil.folderBasePath);
-        if(data.exists()) FileUtil.fileDelete(data);
+        if (data.exists()) FileUtil.fileDelete(data);
     }
 
     public static void main(String[] args) {
         // 清除文件数据残留
         File data = new File(FileUtil.folderBasePath);
-        if(data.exists()) FileUtil.fileDelete(data);
+        if (data.exists()) FileUtil.fileDelete(data);
         data.mkdirs();
         // 设置服务器OS
         setServerOS();
@@ -51,7 +51,7 @@ public class TerminalApplication {
             enableOnceMonitor = false;
         }
         // 打开Web浏览器
-        if(Boolean.parseBoolean(properties.getProperty("kk.pc.window")))
+        if (Boolean.parseBoolean(properties.getProperty("kk.pc.window")))
             openWebPage(enableOnceMonitor);
     }
 
@@ -77,13 +77,13 @@ public class TerminalApplication {
             // e.g. mac os x
             if ("Mac".equals(SystemController.serverOS)) {
                 runtime.exec("open " + getUrl());
-                if(enableOnceMonitor) startOnceMonitor();
+                if (enableOnceMonitor) startOnceMonitor();
                 else System.exit(0); // 结束进程
             }
             // e.g. windows 10
             else if ("Windows".equals(SystemController.serverOS)) {
                 runtime.exec("rundll32 url.dll,FileProtocolHandler " + getUrl());
-                if(enableOnceMonitor) startOnceMonitor();
+                if (enableOnceMonitor) startOnceMonitor();
                 else System.exit(0); // 结束进程
             }
         } catch (Exception e) {
@@ -99,7 +99,7 @@ public class TerminalApplication {
         new Thread(() -> {
             try {
                 Thread.sleep(1000 * 18);
-                if(!SystemController.isEnableMonitor()) System.exit(0); // 结束进程
+                if (!SystemController.isEnableMonitor()) System.exit(0); // 结束进程
             } catch (InterruptedException e) {
                 LogUtil.logException(TerminalApplication.class, e);
             }

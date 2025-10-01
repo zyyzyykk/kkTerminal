@@ -53,7 +53,7 @@ public class Result {
         result.setCode(code);
         result.setInfo(info);
         try {
-            if(null == data || "null".equals(data)) result.setData(null);
+            if (null == data || "null".equals(data)) result.setData(null);
             else result.setData(AESUtil.encrypt(data));
         } catch (Exception e) {
             LogUtil.logException(Result.class, e);
@@ -81,7 +81,7 @@ public class Result {
         result.setCode(code);
         result.setInfo(info);
         try {
-            if(null == data) result.setData(null);
+            if (null == data) result.setData(null);
             else result.setData(AESUtil.encrypt(JSON.toJSONString(data)));
         } catch (Exception e) {
             LogUtil.logException(Result.class, e);

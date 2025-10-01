@@ -45,7 +45,7 @@ public class SystemController {
         String windowId = UUID.randomUUID().toString();
         OSInfo osInfo = new OSInfo(serverOS, clientOS, windowId);
         // PC端，Windows和Mac
-        if(!"Linux".equals(serverOS) && appConfig.getPcWindowTag()) {
+        if (!"Linux".equals(serverOS) && appConfig.getPcWindowTag()) {
             windowActiveMap.put(windowId, new Date().getTime());
             startMonitor();
         }
@@ -78,9 +78,9 @@ public class SystemController {
      * 开启监视线程
      */
     private void startMonitor() {
-        if(monitor == null) {
+        if (monitor == null) {
             synchronized (this) {
-                if(monitor == null) {
+                if (monitor == null) {
                     monitor = new Thread(() -> {
                         try {
                             while (!windowActiveMap.isEmpty()) {
@@ -106,7 +106,7 @@ public class SystemController {
     @Log
     @PostMapping ("/beat")
     public Result beat(String windowId) {
-        if(!"Linux".equals(serverOS) && appConfig.getPcWindowTag() && windowId != null)
+        if (!"Linux".equals(serverOS) && appConfig.getPcWindowTag() && windowId != null)
             windowActiveMap.replace(windowId, new Date().getTime());
         return Result.success("窗口心跳续约成功");
     }

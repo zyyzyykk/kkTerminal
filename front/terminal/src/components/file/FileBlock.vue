@@ -420,7 +420,7 @@ export default {
 
     // 获取远程文件url
     const getRemoteFileUrl = (name, path) => {
-      return http_base_url + '/download/remote/file' + '?time=' + new Date().getTime() + '&fileName=' + encodeURIComponent(name) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(path ? path : dir.value) + '&type=download';
+      return http_base_url + '/download/remote/file' + '?time=' + new Date().getTime() + '&fileName=' + encodeURIComponent(name) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(path ? path : dir.value) + '&trigger=browser';
     };
     // 获取远程文件夹url
     const getRemoteFolderUrl = (name, path) => {
@@ -503,6 +503,7 @@ export default {
         const fileId = file.uid;
         const chunkIndex = 1;
         const path = data.pathVal ? data.pathVal : dir.value;
+        const key = props.sshKey;
 
         // 添加到传输列表（等待中）
         const fileTransInfo = {
@@ -534,15 +535,15 @@ export default {
           const chunkFile = new File([new Blob([encryptedBuffer])], fileName);
           // 上传文件片
           const formData = new FormData();
-          formData.append('aesKey',rsaEncrypt(aesKey));
-          formData.append('file',chunkFile);
-          formData.append('fileName',fileName);
-          formData.append('chunks',chunks);
-          formData.append('chunk',chunk);
-          formData.append('totalSize',fileSize);
-          formData.append('id',fileId);
-          formData.append('sshKey',props.sshKey);
-          formData.append('path',path);
+          formData.append('aesKey', rsaEncrypt(aesKey));
+          formData.append('file', chunkFile);
+          formData.append('fileName', fileName);
+          formData.append('chunks', chunks);
+          formData.append('chunk', chunk);
+          formData.append('totalSize', fileSize);
+          formData.append('id', fileId);
+          formData.append('path', path);
+          formData.append('sshKey', key);
           await $.ajax({
             url: http_base_url + '/upload',
             type: 'post',
@@ -575,7 +576,7 @@ export default {
                   message: resp.info,
                   type: resp.status,
                   grouping: true,
-                })
+                });
                 chunk = chunks + 10;
                 // 更新传输列表（等待中）状态
                 fileTransInfo.status = 1;
