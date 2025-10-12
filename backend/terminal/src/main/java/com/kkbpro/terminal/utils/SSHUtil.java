@@ -1,7 +1,7 @@
 package com.kkbpro.terminal.utils;
 
-import com.kkbpro.terminal.constants.enums.FileStateEnum;
 import com.kkbpro.terminal.consumer.WebSocketServer;
+import com.kkbpro.terminal.enums.ResultCodeEnum;
 import com.kkbpro.terminal.exception.MyException;
 import com.kkbpro.terminal.result.Result;
 import net.schmizz.sshj.SSHClient;
@@ -35,6 +35,7 @@ public class SSHUtil {
             }
             // 等待命令执行完毕
             cmd.join();
+
             return cmd.getExitStatus();
         }
     }
@@ -45,7 +46,7 @@ public class SSHUtil {
     public static SFTPClient getSftpClient(String sshKey) throws IOException {
         SSHClient sshClient = WebSocketServer.sshClientMap.get(sshKey);
         if (sshClient == null) {
-            throw new MyException(Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接已断开"));
+            throw new MyException(Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接已断开"));
         }
         // 单例-懒汉
         if (WebSocketServer.sftpClientMap.get(sshKey) == null) {
@@ -56,6 +57,7 @@ public class SSHUtil {
                 }
             }
         }
+
         return WebSocketServer.sftpClientMap.get(sshKey);
     }
 

@@ -1,7 +1,5 @@
 package com.kkbpro.terminal.utils;
 
-import com.kkbpro.terminal.TerminalApplication;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import javax.crypto.Cipher;
@@ -13,7 +11,7 @@ public class AESUtil {
     /**
      * 加密密钥
      */
-    public static final String SECRET_KEY = TerminalApplication.properties.getProperty("kk.aes.key");
+    public static final ThreadLocal<String> key = new ThreadLocal<>();
 
     /**
      * 加密算法
@@ -22,10 +20,10 @@ public class AESUtil {
 
     /**
      * aes解密
-     * @param encrypt 内容
+     * @param encryptStr 内容
      */
-    public static String decrypt(String encrypt) throws Exception {
-        return decrypt(encrypt, SECRET_KEY);
+    public static String decrypt(String encryptStr) throws Exception {
+        return decrypt(encryptStr, key.get());
     }
 
     /**
@@ -33,21 +31,21 @@ public class AESUtil {
      * @param content 内容
      */
     public static String encrypt(String content) throws Exception {
-        return encrypt(content, SECRET_KEY);
+        return encrypt(content, key.get());
     }
 
     /**
-     * base 64 encode
+     * base64 encode
      * @param bytes 待编码的byte[]
-     * @return 编码后的base 64 code
+     * @return 编码后的base64 code
      */
-    public static String base64Encode(byte[] bytes){
+    public static String base64Encode(byte[] bytes) {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
     /**
-     * base 64 decode
-     * @param base64Code 待解码的base 64 code
+     * base64 decode
+     * @param base64Code 待解码的base64 code
      * @return 解码后的byte[]
      */
     public static byte[] base64Decode(String base64Code) {
@@ -72,13 +70,13 @@ public class AESUtil {
 
 
     /**
-     * AES加密为base 64 code
+     * AES加密为base64 code
      * @param content 待加密的内容
      * @param encryptKey 加密密钥
-     * @return 加密后的base 64 code
+     * @return 加密后的base64 code
      */
     public static String encrypt(String content, String encryptKey) throws Exception {
-        return base64Encode(encryptToBytes(content, encryptKey));
+        return StringUtil.isEmpty(content) ? null : base64Encode(encryptToBytes(content, encryptKey));
     }
 
     /**
@@ -92,6 +90,7 @@ public class AESUtil {
         kgen.init(128);
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(decryptKey.getBytes(), "AES"));
+
         return cipher.doFinal(encryptBytes);
     }
 
@@ -100,8 +99,8 @@ public class AESUtil {
     }
 
     /**
-     * 将base 64 code AES解密
-     * @param encryptStr 待解密的base 64 code
+     * 将base64 code AES解密
+     * @param encryptStr 待解密的base64 code
      * @param decryptKey 解密密钥
      * @return 解密后的string
      */

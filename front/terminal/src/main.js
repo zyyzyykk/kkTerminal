@@ -1,6 +1,11 @@
+// 浏览器窗口广播
+import { initChannel } from "@/utils/ChannelUtil";
+initChannel();
+
 // jQuery配置Ajax全局响应拦截，进行数据解密
 import $ from 'jquery';
-import { aesDecrypt } from '@/utils/Encrypt';
+import { secretKeyGetter, aesDecrypt } from '@/utils/Encrypt';
+import { ElMessage } from 'element-plus';
 
 $.ajaxSetup({
     cache: false,                   // 禁用缓存
@@ -8,9 +13,23 @@ $.ajaxSetup({
     xhrFields:{
       withCredentials: true,        // 携带cookie
     },
+    statusCode: {                   // 响应码
+        401() {
+            ElMessage({
+                message: i18n.global.t('会话已过期'),
+                type: "warning",
+                grouping: true,
+                repeatNum: Number.MIN_SAFE_INTEGER,
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+            return false;
+        },
+    },
     dataFilter(resp) {
       resp = JSON.parse(resp);
-      if(resp.data) resp.data = JSON.parse(aesDecrypt(resp.data));
+      if(resp.data) resp.data = JSON.parse(aesDecrypt(resp.data, secretKeyGetter.response()));
       return JSON.stringify(resp);
     },
 });
@@ -19,6 +38,10 @@ import { createApp } from 'vue';
 import App from './App.vue';
 
 const app = createApp(App);
+
+// Vue Router
+import router from '@/router';
+app.use(router);
 
 // 自定义指令
 import resizableDirective from '@/directives/Resizable';
@@ -37,7 +60,7 @@ app.use(i18n);
 app.mount('#app');
 
 // 引入全局样式
-import './assets/base.css';
+import '@/assets/base.css';
 
 // 解决 ElTable 自动宽度高度导致的「ResizeObserver loop limit exceeded」问题
 const debounce = (fn, delay) => {

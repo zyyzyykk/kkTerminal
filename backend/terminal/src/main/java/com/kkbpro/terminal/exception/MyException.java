@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 自定义异常，解决参数校验问题
+ * 自定义异常
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

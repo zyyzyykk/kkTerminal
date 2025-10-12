@@ -174,7 +174,7 @@ export default {
       mode.value = false;
       setTimeout(() => {
         initTCodeEditor(true);
-      },1);
+      }, 1);
     };
     // 返回
     const toOverview = () => {
@@ -205,7 +205,7 @@ export default {
 
     // 修改终端代码工作流
     const doSaveTCode = () => {
-      if(modifyTag.value != '*') return;
+      if(modifyTag.value !== '*') return;
       context.emit('handleSaveTCode', nowTCode.value, userTCodeEditorRef.value.getValue());
       doOnlyRead();
       ElMessage({
@@ -247,7 +247,7 @@ export default {
     const closeDialog = (done) => {
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };

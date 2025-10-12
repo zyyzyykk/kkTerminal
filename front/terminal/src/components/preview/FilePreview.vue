@@ -84,7 +84,7 @@
           </el-button>
         </div>
       </div>
-      <div element-loading-text="Loading..." v-loading="loading" style="width: 100%; height: 60vh; position: relative; margin-bottom: 10px" >
+      <div :element-loading-text="$t('加载中...')" v-loading="loading" style="width: 100%; height: 60vh; position: relative; margin-bottom: 10px" >
         <AceEditor class="preview" v-show="!loading && previewInfo.preview === 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
         <iframe id="imgPreview" class="preview" v-if="!loading && previewInfo.preview === 'iframe' && previewUrl" :src="previewUrl" ></iframe>
         <audio controls class="preview" v-if="!loading && previewInfo.preview === 'audio' && previewUrl" >
@@ -121,7 +121,7 @@ import FileIcons from 'file-icons-vue';
 import i18n from "@/locales/i18n";
 
 export default {
-  name: 'TxtPreview',
+  name: 'FilePreview',
   components: {
     AceEditor,
     FileIcons,
@@ -344,7 +344,7 @@ export default {
     const closeDialog = (done) => {
       setTimeout(() => {
         reset(true);
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };

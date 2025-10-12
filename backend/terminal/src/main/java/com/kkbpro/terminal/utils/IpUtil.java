@@ -8,7 +8,7 @@ public class IpUtil {
      * 获取客户端IP地址
      */
     public static String getIpAddress(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
+        String ip = request.getHeader("X-Forwarded-For");
         if (StringUtil.isEmpty(ip) || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
@@ -42,6 +42,7 @@ public class IpUtil {
         if (ip == null) {
             return "127.0.0.1";
         }
+
         return ip;
     }
 }

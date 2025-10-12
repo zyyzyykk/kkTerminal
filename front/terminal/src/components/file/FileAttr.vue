@@ -18,7 +18,7 @@
         </div>
       </template>
       <div style="margin-top: -32px;" ></div>
-      <div class="no-select" element-loading-text="Loading..." v-loading="loading" >
+      <div class="no-select" :element-loading-text="$t('加载中...')" v-loading="loading" >
         <div class="kk-flex" >
           <div style="margin-right: 10px;" ><FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="32" :height="32" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" /></div>
           <div><el-input @keydown.enter="confirm" v-model="rename" placeholder="" /></div>
@@ -155,7 +155,6 @@ export default {
         url: http_base_url + '/du',
         type: 'get',
         data: {
-          time: new Date().getTime(),
           sshKey: props.sshKey,
           path: escapePath(fileDir.value),
           item: escapeItem(fileInfo.value.name),
@@ -179,7 +178,6 @@ export default {
         url: http_base_url + '/find',
         type: 'get',
         data: {
-          time: new Date().getTime(),
           sshKey: props.sshKey,
           path: escapePath(fileDir.value),
           item: escapeItem(fileInfo.value.name),
@@ -304,7 +302,7 @@ export default {
       if(permissionsEditRef.value) permissionsEditRef.value.closeDialog();
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };

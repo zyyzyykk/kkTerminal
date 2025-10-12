@@ -5,6 +5,7 @@ export const localStore = {
     'user': 'user',
     'options': 'options',
     'env': 'env',
+    'lang': 'lang',
 };
 
 export const sessionStore = {

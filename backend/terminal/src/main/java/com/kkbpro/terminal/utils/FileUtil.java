@@ -1,6 +1,6 @@
 package com.kkbpro.terminal.utils;
 
-import com.kkbpro.terminal.constants.enums.FileStateEnum;
+import com.kkbpro.terminal.enums.FileStateEnum;
 import com.kkbpro.terminal.exception.MyException;
 import com.kkbpro.terminal.result.Result;
 

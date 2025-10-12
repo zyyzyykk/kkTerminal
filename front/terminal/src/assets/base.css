@@ -1,13 +1,11 @@
 :root {
   --link: #007fff;
-  --pink: #FF6699;
-  --text2: #61666d;
-  --icon: #9499a0;
+  --error: #ff0000;
 }
 
 body {
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
   font-size: 14px;
   color: #636d7e;
 }
@@ -20,23 +18,22 @@ body {
   vertical-align: middle;
 }
 
-.a-link {
-  text-decoration: none;
-  color: var(--link);
-  cursor: pointer;
+/* 禁止图片拖拽 */
+img {
+  -webkit-user-drag: none; /* Safari */
+  -khtml-user-drag: none; /* Konqueror HTML */
+  -moz-user-drag: none; /* Firefox */
+  -o-user-drag: none; /* Opera */
 }
 
-.el-form-item {
-  align-items: center;
+/* 文本不可选中 */
+.no-select {
+  user-select: none;
 }
 
-.container-body {
-  margin: 0px auto;
-  padding-top: 5px;
-}
-
-.el-button {
-  .iconfont::before {
-    margin-right: 5px;
-  }
+/* 文本溢出省略 */
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

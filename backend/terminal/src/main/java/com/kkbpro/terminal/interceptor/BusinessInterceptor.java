@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 
 @Component
-public class RequestInterceptor implements HandlerInterceptor {
+public class BusinessInterceptor implements HandlerInterceptor {
 
     /**
      * 在请求到达Controller之前进行拦截

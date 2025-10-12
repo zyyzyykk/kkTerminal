@@ -15,7 +15,7 @@
         <el-radio :label="false" size="large" >{{ $t('文件') }}</el-radio>
         <el-radio :label="true" size="large" >{{ $t('文件夹') }}</el-radio>
       </el-radio-group>
-      <div class="errInfo no-select" > {{ $t(err_msg) }} </div>
+      <div class="error-text no-select" > {{ $t(err_msg) }} </div>
       <div class="kk-flex" >
         <div>
           <FileIcons :style="{display: 'flex', alignItems: 'center'}" :width="24" :height="24" v-if="isDirectory" name="kk.txt" :isFolder="true" />
@@ -83,7 +83,7 @@ export default {
     const closeDialog = (done) => {
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };
@@ -108,11 +108,5 @@ export default {
   display: flex;
   align-items: center;
   margin-top: 10px;
-}
-
-.errInfo{
-  font-size: 12px;
-  color: rgb(234, 80, 80);
-  margin-top: 8px;
 }
 </style>

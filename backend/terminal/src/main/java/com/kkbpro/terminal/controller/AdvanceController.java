@@ -1,8 +1,8 @@
 package com.kkbpro.terminal.controller;
 
 import com.kkbpro.terminal.annotation.Log;
-import com.kkbpro.terminal.constants.enums.FileStateEnum;
 import com.kkbpro.terminal.consumer.WebSocketServer;
+import com.kkbpro.terminal.enums.ResultCodeEnum;
 import com.kkbpro.terminal.pojo.dto.CooperateInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.AESUtil;
@@ -62,7 +62,7 @@ public class AdvanceController {
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
         if (ssh == null || webSocketServer == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         if (webSocketServer.getCooperateInfo() != null)
             return Result.error(errorMsg);
@@ -91,7 +91,7 @@ public class AdvanceController {
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
         if (ssh == null || webSocketServer == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
 
         webSocketServer.setCooperateInfo(null);
@@ -134,7 +134,7 @@ public class AdvanceController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if (ssh == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         StringBuilder status = new StringBuilder();
         String command = "echo -n \"$(uptime | awk -F'load average: ' '{print $2}' | awk '{print $1}' | sed 's/,//')@\" && \\\n" +
@@ -161,6 +161,7 @@ public class AdvanceController {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
+
         return Result.success(200, successMsg, status.toString());
     }
 
@@ -175,7 +176,7 @@ public class AdvanceController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if (ssh == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         StringBuilder version = new StringBuilder();
         String command = "echo -n $(docker --version)";
@@ -186,6 +187,7 @@ public class AdvanceController {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
+
         return Result.success(200, successMsg, version.toString());
     }
 
@@ -208,7 +210,7 @@ public class AdvanceController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if (ssh == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         StringBuilder info = new StringBuilder();
         String command = DOCKER_INFO_CMD[type];
@@ -219,6 +221,7 @@ public class AdvanceController {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
+
         return Result.success(200, successMsg, info.toString());
     }
 
@@ -233,7 +236,7 @@ public class AdvanceController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if (ssh == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         String command = DOCKER_DELETE_CMD[type] + items;
         try {
@@ -243,6 +246,7 @@ public class AdvanceController {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
+
         return Result.success(200, successMsg, null);
     }
 
@@ -258,7 +262,7 @@ public class AdvanceController {
 
         SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
         if (ssh == null) {
-            return Result.error(FileStateEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         StringBuilder container = new StringBuilder();
         String command = DOCKER_CONTAINER_CMD[type] + items;
@@ -269,6 +273,7 @@ public class AdvanceController {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
+
         return Result.success(200, successMsg, container.toString());
     }
 

@@ -1,5 +1,8 @@
-package com.kkbpro.terminal.constants.enums;
+package com.kkbpro.terminal.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum SocketSendEnum {
 
     COOPERATE_KEY_INVALID(-2, "Cooperation Key is Invalid"),
@@ -21,23 +24,6 @@ public enum SocketSendEnum {
     SocketSendEnum(Integer state, String desc) {
         this.state = state;
         this.desc = desc;
-    }
-
-    public static SocketSendEnum getByState(Integer state) {
-        for (SocketSendEnum item : SocketSendEnum.values()) {
-            if (item.getState().equals(state)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public Integer getState() {
-        return state;
-    }
-
-    public String getDesc() {
-        return desc;
     }
 
 }

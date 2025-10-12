@@ -1,5 +1,8 @@
-package com.kkbpro.terminal.constants.enums;
+package com.kkbpro.terminal.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum FileStateEnum {
 
     FILE_UPLOADING(202, "文件后台上传中"),
@@ -16,11 +19,7 @@ public enum FileStateEnum {
 
     UPLOAD_SIZE_DIFF(504, "上传文件大小不一致"),
 
-    CHUNK_MERGE_ERROR(505, "文件片合并失败"),
-
-    CLOUD_COUNT_ERROR(506, "云端文件过多"),
-
-    SSH_NOT_EXIST(602, "ssh连接断开");
+    CHUNK_MERGE_ERROR(505, "文件片合并失败");
 
     private final Integer state;
 
@@ -29,23 +28,6 @@ public enum FileStateEnum {
     FileStateEnum(Integer state, String desc) {
         this.state = state;
         this.desc = desc;
-    }
-
-    public static FileStateEnum getByState(Integer state) {
-        for (FileStateEnum item : FileStateEnum.values()) {
-            if (item.getState().equals(state)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public Integer getState() {
-        return state;
-    }
-
-    public String getDesc() {
-        return desc;
     }
 
 }

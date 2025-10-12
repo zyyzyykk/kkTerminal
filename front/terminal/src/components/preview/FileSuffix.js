@@ -1,4 +1,4 @@
-const zipSuffixs = {
+const zipSuffixes = {
     "tar": "tar",
     "tbz2": "tbz2",
     "gz": "gz",
@@ -11,11 +11,11 @@ export const isZipFile = (item) => {
     const index = item.lastIndexOf('.');
     if(index === -1) return false;
     const fileSuffix = item.substring(index + 1).toLowerCase();
-    if(zipSuffixs[fileSuffix]) return true;
+    if(zipSuffixes[fileSuffix]) return true;
     return false;
 };
 
-const iframeSuffixs = {
+const iframeSuffixes = {
     "pdf": "application/pdf",
     "html": "text/html",
     "jpg": "image/jpeg",
@@ -28,7 +28,7 @@ const iframeSuffixs = {
     "ico": "image/vnd.microsoft.icon",
 };
 
-const audioSuffixs = {
+const audioSuffixes = {
     "mp3": "audio/mpeg",
     "wav": "audio/wav",
     "ogg": "audio/ogg",
@@ -36,7 +36,7 @@ const audioSuffixs = {
     "m4a": "audio/mp4"
 };
 
-const videoSuffixs = {
+const videoSuffixes = {
     "mp4": "video/mp4",
     "webm": "video/webm",
     "ogv": "video/ogg",
@@ -52,17 +52,17 @@ export const previewFileInfo = (item) => {
     const index = item.lastIndexOf('.');
     if(index === -1) return previewInfo;
     const fileSuffix = item.substring(index + 1).toLowerCase();
-    if(iframeSuffixs[fileSuffix]) {
+    if(iframeSuffixes[fileSuffix]) {
         previewInfo.preview = "iframe";
-        previewInfo.type = iframeSuffixs[fileSuffix];
+        previewInfo.type = iframeSuffixes[fileSuffix];
     }
-    else if(audioSuffixs[fileSuffix]) {
+    else if(audioSuffixes[fileSuffix]) {
         previewInfo.preview = "audio";
-        previewInfo.type = audioSuffixs[fileSuffix];
+        previewInfo.type = audioSuffixes[fileSuffix];
     }
-    else if(videoSuffixs[fileSuffix]) {
+    else if(videoSuffixes[fileSuffix]) {
         previewInfo.preview = "video";
-        previewInfo.type = videoSuffixs[fileSuffix];
+        previewInfo.type = videoSuffixes[fileSuffix];
     }
     return previewInfo;
 };

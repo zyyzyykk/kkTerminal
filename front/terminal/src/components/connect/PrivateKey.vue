@@ -22,14 +22,14 @@
           <el-button size="small" type="primary" ><el-icon class="el-icon--left" ><Lock /></el-icon>{{ $t('选择') }}</el-button>
         </el-upload>
       </div>
-      <div v-if="err_msg && err_msg.length > 0" class="errInfo no-select" > {{ err_msg }} </div>
+      <div v-if="err_msg && err_msg.length > 0" class="error-text no-select" > {{ err_msg }} </div>
       <div v-else style="height: 7px;" ></div>
       <div class="kk-flex" >
         <div class="form-width" >{{ $t('密码') }}：</div>
         <div style="flex: 1;" >
           <el-input size="small" v-model="passphrase" @keydown.enter="confirm" class="w-50 m-2" :placeholder="$t('请输入私钥密码')" >
             <template #prefix>
-              <el-icon><Key /></el-icon>
+              <el-icon class="el-input__icon" ><Key /></el-icon>
             </template>
           </el-input>
         </div>
@@ -70,7 +70,7 @@ export default {
     const readPrivateKeyContent = (file) => {
       const reader = new FileReader();
       reader.onload = () => {
-        if(reader.result.length > 1024*1024) {
+        if(reader.result.length > 1024 * 1024) {
           ElMessage({
             message: i18n.global.t('内容过长'),
             type: 'warning',
@@ -107,7 +107,7 @@ export default {
     const closeDialog = (done) => {
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };
@@ -131,12 +131,6 @@ export default {
   display: flex;
   align-items: center;
   margin-top: 10px;
-}
-
-.errInfo{
-  font-size: 12px;
-  color: rgb(234, 80, 80);
-  margin-top: 8px;
 }
 
 .form-width {

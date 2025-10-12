@@ -16,19 +16,19 @@
         <div style="flex: 1;" >
           <el-input size="small" v-model="url" class="w-50 m-2" :placeholder="$t('请输入文件URL')" >
             <template #prefix>
-              <el-icon><Connection /></el-icon>
+              <el-icon class="el-input__icon" ><Connection /></el-icon>
             </template>
           </el-input>
         </div>
       </div>
-      <div v-if="err_msg && err_msg.length > 0" class="errInfo no-select" > {{ $t(err_msg) }} </div>
+      <div v-if="err_msg && err_msg.length > 0" class="error-text no-select" > {{ $t(err_msg) }} </div>
       <div v-else style="height: 7px;" ></div>
       <div class="kk-flex" >
         <div class="form-width" >{{ $t('文件名') }}：</div>
         <div style="flex: 1;" >
           <el-input size="small" v-model="name" @keydown.enter="confirm" class="w-50 m-2" :placeholder="$t('请输入文件名')" >
             <template #prefix>
-              <el-icon><Document /></el-icon>
+              <el-icon class="el-input__icon" ><Document /></el-icon>
             </template>
           </el-input>
         </div>
@@ -91,7 +91,7 @@ export default {
     const closeDialog = (done) => {
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };
@@ -114,12 +114,6 @@ export default {
   display: flex;
   align-items: center;
   margin-top: 10px;
-}
-
-.errInfo{
-  font-size: 12px;
-  color: rgb(234, 80, 80);
-  margin-top: 8px;
 }
 
 .form-width {

@@ -13,73 +13,76 @@
         align-center
         draggable
     >
-      <div>
-        <div class="kk-flex" >
-          <div class="no-select nowrap form-width" >{{ $t('名称') }}：</div>
-          <div class="no-select nowrap" style="background-color: #f3f4f4; margin-right: 8px;" >U</div>
-          <el-input size="small" :style="{width: '190px'}" v-model="userTCodeInfo.name" class="w-50 m-2" :placeholder="$t('输入终端代码名称')" maxlength="5" minlength="1" >
-            <template #prefix>
-              <el-icon><CollectionTag /></el-icon>
-            </template>
-          </el-input>
-          <div style="flex: 1;" ></div>
-          <div>
-            <el-upload
-                :show-file-list="false"
-                :with-credentials="false"
-                :http-request="importTCodes"
-                :multiple="false"
-            >
-              <el-button size="small" type="primary" >
-                <el-icon class="el-icon--left" ><Upload /></el-icon> {{ $t('导入') }}
+      <div :element-loading-text="$t('加载中...')" v-loading="loading" >
+        <div>
+          <div class="kk-flex" >
+            <div class="no-select nowrap form-width" >{{ $t('名称') }}：</div>
+            <div class="no-select nowrap" style="background-color: #f3f4f4; margin-right: 8px;" >U</div>
+            <el-input size="small" :style="{width: '190px'}" v-model="userTCodeInfo.name" class="w-50 m-2" :placeholder="$t('输入终端代码名称')" maxlength="5" minlength="1" >
+              <template #prefix>
+                <el-icon class="el-input__icon" ><CollectionTag /></el-icon>
+              </template>
+            </el-input>
+            <div style="flex: 1;" ></div>
+            <div>
+              <el-upload
+                  :show-file-list="false"
+                  :with-credentials="false"
+                  :http-request="importTCodes"
+                  :multiple="false"
+              >
+                <el-button size="small" type="primary" >
+                  <el-icon class="el-icon--left" ><Upload /></el-icon> {{ $t('导入') }}
+                </el-button>
+              </el-upload>
+            </div>
+          </div>
+          <div class="kk-flex" >
+            <div class="no-select nowrap form-width" style="margin-right: 2px;" >{{ $t('描述') }}：</div>
+            <el-input size="small" :style="{width: '206px'}" v-model="userTCodeInfo.desc" class="w-50 m-2" :placeholder="$t('输入终端代码描述')" >
+              <template #prefix>
+                <el-icon class="el-input__icon" ><EditPen /></el-icon>
+              </template>
+            </el-input>
+            <div style="flex: 1;" ></div>
+            <div>
+              <el-button size="small" type="primary" @click="exportTCodes" >
+                <el-icon class="el-icon--left" ><Download /></el-icon> {{ $t('导出') }}
               </el-button>
-            </el-upload>
+            </div>
+          </div>
+          <div class="kk-border" ></div>
+          <div class="kk-flex" style="margin: 7px 0;" >
+            <div class="no-select nowrap" >Workflow</div>
+            <div style="flex: 1;" ></div>
+            <div @click="workflowTab(1)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
+              <el-tooltip :content="$t('默认模板')" placement="top" >
+                <el-icon><Refresh /></el-icon>
+              </el-tooltip>
+            </div>
+            <div @click="workflowTab(2)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
+              <el-tooltip :content="$t('清空')" placement="top" >
+                <el-icon><DocumentDelete /></el-icon>
+              </el-tooltip>
+            </div>
+            <div @click="workflowTab(3)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
+              <el-tooltip :content="$t('保存')" placement="top" >
+                <el-icon><Finished /></el-icon>
+              </el-tooltip>
+            </div>
+          </div>
+          <div style="width: 100%; height: 30vh;" >
+            <AceEditor ref="userTCodeEditorRef" @handleSave="handleSave" ></AceEditor>
           </div>
         </div>
-        <div class="kk-flex" >
-          <div class="no-select nowrap form-width" style="margin-right: 2px;" >{{ $t('描述') }}：</div>
-          <el-input size="small" :style="{width: '206px'}" v-model="userTCodeInfo.desc" class="w-50 m-2" :placeholder="$t('输入终端代码描述')" >
-            <template #prefix>
-              <el-icon><EditPen /></el-icon>
-            </template>
-          </el-input>
+        <div style="display: flex;" >
           <div style="flex: 1;" ></div>
-          <div>
-            <el-button size="small" type="primary" @click="exportTCodes" >
-              <el-icon class="el-icon--left" ><Download /></el-icon> {{ $t('导出') }}
-            </el-button>
-          </div>
-        </div>
-        <div class="kk-border" ></div>
-        <div class="kk-flex" style="margin: 7px 0;" >
-          <div class="no-select nowrap" >Workflow</div>
-          <div style="flex: 1;" ></div>
-          <div @click="workflowTab(1)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
-            <el-tooltip :content="$t('默认模板')" placement="top" >
-              <el-icon><Refresh /></el-icon>
-            </el-tooltip>
-          </div>
-          <div @click="workflowTab(2)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
-            <el-tooltip :content="$t('清空')" placement="top" >
-              <el-icon><DocumentDelete /></el-icon>
-            </el-tooltip>
-          </div>
-          <div @click="workflowTab(3)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
-            <el-tooltip :content="$t('保存')" placement="top" >
-              <el-icon><Finished /></el-icon>
-            </el-tooltip>
-          </div>
-        </div>
-        <div element-loading-text="Loading..." v-loading="loading" style="width: 100%; height: 30vh;" >
-          <AceEditor ref="userTCodeEditorRef" @handleSave="handleSave" ></AceEditor>
+          <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;" >
+            {{ $t('确定') }}
+          </el-button>
         </div>
       </div>
-      <div style="display: flex;" >
-        <div style="flex: 1;" ></div>
-        <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;" >
-          {{ $t('确定') }}
-        </el-button>
-      </div>
+
     </el-dialog>
   </div>
 </template>
@@ -186,7 +189,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
             }
           }
           // 全部成功
-          if(fcnt == 0) {
+          if(fcnt === 0) {
             context.emit('importTCodes', data);
             ElMessage({
               message: i18n.global.t('导入成功'),
@@ -196,7 +199,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
             closeDialog();
           }
           // 全部失败
-          else if(scnt == 0) {
+          else if(scnt === 0) {
             ElMessage({
               message: i18n.global.t('导入失败：无合法终端代码'),
               type: 'error',
@@ -311,7 +314,7 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
     const closeDialog = (done) => {
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };

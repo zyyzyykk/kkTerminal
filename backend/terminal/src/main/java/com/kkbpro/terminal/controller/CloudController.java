@@ -1,7 +1,8 @@
 package com.kkbpro.terminal.controller;
 
 import com.kkbpro.terminal.annotation.Log;
-import com.kkbpro.terminal.constants.enums.FileStateEnum;
+import com.kkbpro.terminal.enums.FileStateEnum;
+import com.kkbpro.terminal.enums.ResultCodeEnum;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.LogUtil;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -46,13 +47,14 @@ public class CloudController {
             folder.mkdirs();
         }
         if (folder.listFiles().length > maxCount && countType.equals(type))
-            return Result.error(FileStateEnum.CLOUD_COUNT_ERROR.getState(),"云端文件过多");
+            return Result.error(ResultCodeEnum.CLOUD_COUNT_ERROR.getState(),"云端文件过多");
         File aimFile = new File(folderPath + "/" + type + name);
         // 如果文件存在则删除
         if (aimFile.exists()) {
             aimFile.delete();
         }
         file.transferTo(aimFile);
+
         return Result.success("云端上传成功");
     }
 

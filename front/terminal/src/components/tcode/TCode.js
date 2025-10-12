@@ -95,7 +95,7 @@ export const SysTCode = {
         execFlow(context) {
             setTimeout(() => {
                 context.proxy.tCodeWorkflowRef.initText();
-            },1);
+            }, 1);
             context.proxy.tCodeWorkflowRef.DialogVisible = true;
         }
     },
@@ -131,16 +131,16 @@ export const UserTCodeExecutor = {
             else throw new Error(i18n.global.t('无法打开文件：') + name);
         },
         edit(editFlow) {
-            if(editFlow && editFlow instanceof Function) editFlow(UserTCodeHelper.fileBlockRef.txtPreviewRef.codeEditorRef.aceEditor);
+            if(editFlow && editFlow instanceof Function) editFlow(UserTCodeHelper.fileBlockRef.filePreviewRef.codeEditorRef.aceEditor);
         },
         save(encode) {
-            const txtPreviewInstance = UserTCodeHelper.fileBlockRef.txtPreviewRef;
-            if(encode) txtPreviewInstance.saveEncode = encode;
-            txtPreviewInstance.handleSave(txtPreviewInstance.codeEditorRef.getValue());
+            const filePreviewInstance = UserTCodeHelper.fileBlockRef.filePreviewRef;
+            if(encode) filePreviewInstance.saveEncode = encode;
+            filePreviewInstance.handleSave(filePreviewInstance.codeEditorRef.getValue());
         },
         close(block=false) {
             if(block) UserTCodeHelper.fileBlockRef.closeDialog();
-            else UserTCodeHelper.fileBlockRef.txtPreviewRef.closeDialog();
+            else UserTCodeHelper.fileBlockRef.filePreviewRef.closeDialog();
         },
         async download(path) {
             const { dir, name } = UserTCodeHelper.parsePath(path);

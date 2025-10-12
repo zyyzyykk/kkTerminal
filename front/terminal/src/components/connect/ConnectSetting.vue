@@ -31,22 +31,22 @@
         <div>
           <el-input :disabled="isForbidInput" v-model="setInfo.server_ip" class="w-50 m-2" :placeholder="$t('输入主机IP')" >
             <template #prefix>
-              <el-icon><HomeFilled /></el-icon>
+              <el-icon class="el-input__icon" ><HomeFilled /></el-icon>
             </template>
           </el-input>
         </div>
-        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_ip)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
+        <div class="operator-class" @click="doCopy(setInfo.server_ip)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;" >
         <div class="no-select form-width" >{{ $t('端口号') }}：</div>
         <div>
           <el-input :disabled="isForbidInput" v-model="setInfo.server_port" class="w-50 m-2" :placeholder="$t('输入端口号')" >
             <template #prefix>
-              <el-icon><Paperclip /></el-icon>
+              <el-icon class="el-input__icon" ><Paperclip /></el-icon>
             </template>
           </el-input>
         </div>
-        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_port)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
+        <div class="operator-class" @click="doCopy(setInfo.server_port)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;" >
         <div class="no-select form-width" >{{ $t('用户名') }}：</div>
@@ -57,7 +57,7 @@
             </template>
           </el-input>
         </div>
-        <div style="cursor: pointer; margin-left: 10px;" @click="doCopy(setInfo.server_user)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
+        <div class="operator-class" @click="doCopy(setInfo.server_user)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
       </div>
       <div class="item-class" style="margin-bottom: 5px;" >
         <el-dropdown :disabled="isForbidInput" class="no-select form-width" hide-timeout="300" >
@@ -77,8 +77,8 @@
               </template>
             </el-input>
           </div>
-          <div v-if="isShowPassword" style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = false" ><el-icon size="15" ><View /></el-icon></div>
-          <div v-else style="cursor: pointer; margin-left: 10px;" @click="isShowPassword = true" ><el-icon size="15" ><Hide /></el-icon></div>
+          <div v-if="isShowPassword" class="operator-class" @click="isShowPassword = false" ><el-icon size="15" ><View /></el-icon></div>
+          <div v-else class="operator-class" @click="isShowPassword = true" ><el-icon size="15" ><Hide /></el-icon></div>
         </div>
         <div v-else >
           <el-button :disabled="isForbidInput" type="primary" @click="openPrivateKeyBlock" >
@@ -87,7 +87,7 @@
         </div>
       </div>
     </div>
-    <div class="errInfo no-select" > {{ $t(err_msg) }} </div>
+    <div class="error-text no-select" > {{ $t(err_msg) }} </div>
     <div style="margin-bottom: 5px;" ></div>
     <div style="display: flex; border-top: 1px solid #f1f2f4;" >
       <el-checkbox v-if="setInfo.option && setInfo.option.length > 0" v-model="isNewWindow" :label="$t('新窗口打开')" size="small" style="margin-top: 10px;" />
@@ -311,7 +311,7 @@ export default {
       if(privateKeyRef.value && privateKeyRef.value.DialogVisible) privateKeyRef.value.closeDialog();
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };
@@ -350,12 +350,6 @@ export default {
   align-items: center;
 }
 
-.errInfo{
-  font-size: 12px;
-  color: rgb(234, 80, 80);
-  margin-top: 8px;
-}
-
 .nowrap {
   white-space: nowrap;
 }
@@ -370,5 +364,10 @@ export default {
 
 .form-width {
   width: 56px;
+}
+
+.operator-class {
+  margin-left: 10px;
+  cursor: pointer;
 }
 </style>

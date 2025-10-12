@@ -73,6 +73,7 @@ public class RSAUtil {
         // RSA加密
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+
         return encryptBASE64(cipher.doFinal(str.getBytes(StandardCharsets.UTF_8)));
     }
 
@@ -97,6 +98,7 @@ public class RSAUtil {
         // RSA解密
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.DECRYPT_MODE, priKey);
+
         return new String(cipher.doFinal(inputByte));
     }
 

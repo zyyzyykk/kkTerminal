@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.lalyos.jfiglet.FigletFont;
 import com.kkbpro.terminal.config.AppConfig;
-import com.kkbpro.terminal.constants.enums.SocketMessageEnum;
-import com.kkbpro.terminal.constants.enums.SocketSendEnum;
+import com.kkbpro.terminal.enums.SocketMessageEnum;
+import com.kkbpro.terminal.enums.SocketSendEnum;
 import com.kkbpro.terminal.controller.AdvanceController;
 import com.kkbpro.terminal.pojo.dto.CooperateInfo;
 import com.kkbpro.terminal.pojo.dto.EnvInfo;
@@ -41,6 +41,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ServerEndpoint("/socket/ssh/{ws}")  // 注意不要以'/'结尾
 public class WebSocketServer {
+
+    public static final String SOCKET_SECRET_KEY = StringUtil.generateRandomString(16);
 
     public static final ConcurrentHashMap<String, WebSocketServer> webSocketServerMap = new ConcurrentHashMap<>();
 
@@ -105,7 +107,7 @@ public class WebSocketServer {
     public void onOpen(Session sessionSocket, @PathParam("ws") String wsInfoStr) throws Exception {
 
         // 获取加密密钥
-        wsInfoStr = AESUtil.decrypt(StringUtil.changeStr(wsInfoStr));
+        wsInfoStr = AESUtil.decrypt(StringUtil.changeStr(wsInfoStr), SOCKET_SECRET_KEY);
         JSONObject jsonObject = JSONObject.parseObject(wsInfoStr);
         this.secretKey = RSAUtil.decrypt(jsonObject.getString("secretKey"));
         // 获取连接信息
@@ -171,7 +173,7 @@ public class WebSocketServer {
         try {
             sshClient.setConnectTimeout(appConfig.getSshMaxTimeout());
             sshClient.addHostKeyVerifier(new PromiscuousVerifier());            // 不验证主机密钥
-            sshClient.connect(host,port);
+            sshClient.connect(host, port);
             if (authType != 1) sshClient.authPassword(user_name, password);      // 使用用户名和密码进行身份验证
             else {
                 // 创建本地私钥文件
@@ -361,12 +363,15 @@ public class WebSocketServer {
 
         synchronized (this.sessionSocket) {
             try {
-                // 加密数据
-                if (data != null) data = AESUtil.encrypt(data, this.secretKey);
                 Result result;
-                if ("success".equals(type)) result = Result.successStr(code,message,data);
-                else if ("fail".equals(type)) result = Result.fail(code,message);
-                else result = Result.error(code,message);
+                if ("success".equals(type)) result = Result.success(code, message, null);
+                else if ("fail".equals(type)) result = Result.fail(code, message);
+                else result = Result.error(code, message);
+                // 重写数据加密逻辑
+                if (data != null) {
+                    String encryptedData = AESUtil.encrypt(data, this.secretKey);
+                    result.setData(encryptedData);
+                }
                 this.sessionSocket.getBasicRemote().sendText(JSON.toJSONString(result));
             } catch(Exception e) {
                 LogUtil.logException(this.getClass(), e);

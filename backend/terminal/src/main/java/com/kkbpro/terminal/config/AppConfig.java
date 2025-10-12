@@ -1,5 +1,6 @@
 package com.kkbpro.terminal.config;
 
+import com.kkbpro.terminal.utils.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,18 +35,34 @@ public class AppConfig {
      * ssh连接最大超时时间 ms
      */
     @Value("${kk.ssh-max-timeout:}")
-    private Integer SshMaxTimeout;
+    private Integer sshMaxTimeout;
 
     /**
      * websocket最大空闲超时 ms
      */
     @Value("${kk.max-idle-timeout:}")
-    private Integer MaxIdleTimeout;
+    private Integer maxIdleTimeout;
 
     /**
      * PC端启用窗口
      */
-    @Value("${kk.pc.window}")
-    private Boolean PcWindowTag = false;
+    @Value("${kk.pc.window:}")
+    private Boolean pcWindowTag;
+
+    /**
+     * 存储密钥
+     */
+    @Value("${kk.aes.storage:}")
+    private String storageKey;
+
+    /**
+     * 登录密码
+     */
+    @Value("${kk.login.password:}")
+    private String password;
+
+    public String getPassword() {
+        return StringUtil.isEmpty(password) ? null : password.substring(0, Math.min(password.length(), 16));
+    };
 
 }

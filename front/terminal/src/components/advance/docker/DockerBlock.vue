@@ -12,7 +12,7 @@
       draggable
   >
     <div class="no-select" >
-      <el-tabs stretch element-loading-text="Loading..." v-loading="loading" @tab-click="handleTabClick" type="border-card" >
+      <el-tabs stretch :element-loading-text="$t('加载中...')" v-loading="loading" @tab-click="handleTabClick" type="border-card" >
         <el-tab-pane :label="$t('部署')" >
           <div v-if="noDocker" class="kk-flex-column" style="height: 240px" >
             <div style="flex: 1" ></div>
@@ -613,7 +613,7 @@ export default {
       if(dockerContainerViewerRef.value) dockerContainerViewerRef.value.closeDialog();
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };
@@ -622,7 +622,7 @@ export default {
       if(dockerContainerViewerRef.value) dockerContainerViewerRef.value.closeDialog();
       setTimeout(() => {
         reset(true);
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };

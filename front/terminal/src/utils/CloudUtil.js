@@ -74,7 +74,6 @@ export const load = async (fileName) => {
       url: http_base_url + '/load',
       method: 'GET',
       data: {
-        time: new Date().getTime(),
         user: userInfo.name + '-' + userInfo.time,
         fileName: fileName,
       },

@@ -17,7 +17,7 @@
         </div>
       </template>
       <div style="margin-top: -28px;" ></div>
-      <div element-loading-text="Loading..." v-loading="loading" style="width: 100%; height: 80vh; position: relative; margin-bottom: 10px;" >
+      <div :element-loading-text="$t('加载中...')" v-loading="loading" style="width: 100%; height: 80vh; position: relative; margin-bottom: 10px;" >
         <AceEditor class="preview" v-show="!loading" ref="containerViewerRef" ></AceEditor>
       </div>
       <div style="margin-top: -13px;" ></div>
@@ -93,7 +93,7 @@ export default {
     const closeDialog = (done) => {
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };

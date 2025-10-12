@@ -1,24 +1,34 @@
 <template>
-  <FrameWork v-if="isInitialized" :osInfo="osInfo" ></FrameWork>
+  <div class="app-class" :element-loading-text="$t('加载中...')" v-loading="loading" >
+    <template v-if="isInitialized" >
+      <RouterView v-slot="{ Component }" >
+        <component :is="Component" :osInfo="osInfo" />
+      </RouterView>
+    </template>
+  </div>
 </template>
 
 <script>
-import FrameWork from "./views/FrameWork";
+import { ref, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+
 import $ from 'jquery';
 import { http_base_url } from '@/env/BaseUrl';
-import { ref, onMounted } from "vue";
 import { syncDownload } from "@/utils/CloudUtil";
-import { encryptKeySetter } from "@/utils/Encrypt";
+import { secretKeySetter } from "@/utils/Encrypt";
 
 export default {
   name: 'App',
   components: {
-    FrameWork,
   },
   setup() {
 
+    const router = useRouter();
+    const route = useRoute();
+
     // 初始化
     const isInitialized = ref(false);
+    const loading = ref(true);
     const osInfo = ref(null);
 
     onMounted(() => {
@@ -28,13 +38,36 @@ export default {
           type: 'post',
           success(resp) {
             const data = JSON.parse(resp.info);
-            encryptKeySetter.aes(data.aesKey);
-            encryptKeySetter.rsa(data.publicKey);
             osInfo.value = data.osInfo;
-            // 多端同步-下载
-            syncDownload().then(() => {
-              isInitialized.value = true;
-            });
+            secretKeySetter.storage(data.storageKey);
+            secretKeySetter.socket(data.socketKey);
+            secretKeySetter.public(data.publicKey);
+            if(data.responseKey) {
+              secretKeySetter.response(data.responseKey);
+              // 多端同步-下载
+              syncDownload().then(() => {
+                router.push({
+                  name: 'terminal',
+                  query: {
+                    ...route.query,
+                  },
+                });
+                isInitialized.value = true;
+                loading.value = false;
+              });
+            }
+            else {
+              router.push({
+                name: 'login',
+                query: {
+                  ...route.query,
+                },
+              });
+              setTimeout(() => {
+                isInitialized.value = true;
+              }, 1);
+              loading.value = false;
+            }
           },
         });
       }, 1);
@@ -42,6 +75,7 @@ export default {
 
     return {
       isInitialized,
+      loading,
       osInfo,
     }
   },
@@ -49,12 +83,21 @@ export default {
 </script>
 
 <style>
-/* 禁止图片拖拽 */
-img {
-  -webkit-user-drag: none; /* Safari */
-  -khtml-user-drag: none; /* Konqueror HTML */
-  -moz-user-drag: none; /* Firefox */
-  -o-user-drag: none; /* Opera */
+.app-class {
+  height: 100vh;
+  width: 100vw;
+}
+
+.a-link {
+  text-decoration: none;
+  color: var(--link);
+  cursor: pointer;
+}
+
+.error-text {
+  font-size: 12px;
+  color: var(--error);
+  margin-top: 8px;
 }
 
 .kk-dialog-class {
@@ -95,18 +138,6 @@ img {
 .el-popconfirm__main {
   user-select: none;
   margin-top: 2px;
-}
-
-/* 文本不可选中 */
-.no-select {
-  user-select: none;
-}
-
-/* 文本溢出省略 */
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* 隐藏滚动条 */

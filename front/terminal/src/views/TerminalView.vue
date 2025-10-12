@@ -1,5 +1,5 @@
 <template>
-  <div class="global" >
+  <div class="root-view" >
     <!-- 设置栏 -->
     <div class="setting" v-show="isShowSetting && (urlParams.mode !== 'headless' && urlParams.mode !== 'pure')" >
       <div class="setting-menu no-select" @click="doSettings(1)" ><div>{{ $t('连接设置') }}</div></div>
@@ -239,7 +239,7 @@
 <script>
 import useClipboard from "vue-clipboard3";
 import { ref, onMounted, onUnmounted, getCurrentInstance } from 'vue';
-import { aesEncrypt, aesDecrypt, rsaEncrypt } from '@/utils/Encrypt';
+import { secretKeyGetter, aesEncrypt, aesDecrypt, rsaEncrypt } from '@/utils/Encrypt';
 import { ElMessage } from 'element-plus';
 
 import { Terminal } from 'xterm';
@@ -261,7 +261,7 @@ import TCodeCenter from "@/components/tcode/TCodeCenter";
 import CooperateGen from '@/components/advance/CooperateGen';
 import StatusMonitor from '@/components/advance/StatusMonitor'
 import DockerBlock from "@/components/advance/docker/DockerBlock";
-import { getUrlParams, getPureUrl } from '@/utils/UrlUtil';
+import { getUrlParams, getPureUrl, doUrlDownload } from '@/utils/UrlUtil';
 import {
   QuestionFilled,
   VideoPlay,
@@ -285,15 +285,16 @@ import i18n from "@/locales/i18n";
 import { cloud, load, syncUpload, syncDownload, localStoreUtil } from "@/utils/CloudUtil";
 import { deleteDialog } from "@/utils/DeleteDialog";
 import { calcType } from "@/components/calc/CalcType";
-import { calcSize } from '@/components/calc/CalcSize';
+import { calcSize } from "@/components/calc/CalcSize";
 import { calcBgColor } from "@/components/calc/CalcColor";
+import { getChannel, messageDict } from "@/utils/ChannelUtil";
 import { localStore } from "@/env/Store";
 import NoData from "@/components/common/NoData";
 import ToolTip from "@/components/common/ToolTip";
 import FileIcons from "file-icons-vue";
 
 export default {
-  name: "FrameWork",
+  name: "TerminalView",
   components: {
     FileIcons,
     NoData,
@@ -318,13 +319,20 @@ export default {
   props: ['osInfo'],
   setup(props) {
 
+    // 浏览器窗口广播
+    const channel = getChannel();
+    channel.postMessage(JSON.stringify({
+      message: messageDict['RESPONSE_KEY_UPDATE'],
+      data: secretKeyGetter.response(),
+    }));
+
     // 连接状态
     const connect_status = ref({
-      'Fail':'Fail to connect remote server !\r\n',
-      'Success':'Connecting success !\r\n',
-      'Connecting':'Connecting to remote server ...\r\n',
-      'Disconnected':'Disconnect to remote server.\r\n',
-      'End':'This Cooperation is Ended.\r\n',
+      'Fail': 'Fail to connect remote server !\r\n',
+      'Success': 'Connecting success !\r\n',
+      'Connecting': 'Connecting to remote server ...\r\n',
+      'Disconnected': 'Disconnect to remote server.\r\n',
+      'End': 'This Cooperation is Ended.\r\n',
     });
     const now_connect_status = ref(connect_status.value['Connecting']);
 
@@ -410,13 +418,15 @@ export default {
       }
       setTimeout(() => {
         tCodeCenterRef.value.userTCodes = {...tcodes.value};
-      },1);
+      }, 1);
     };
     loadTCodes();
     const env = ref(default_env);
     const urlParams = ref(getUrlParams());
     const loadEnv = () => {
       if(localStoreUtil.getItem(localStore['env'])) env.value = {...env.value, ...JSON.parse(aesDecrypt(localStoreUtil.getItem(localStore['env'])))};
+      // login lang
+      localStoreUtil.setItem(localStore['lang'], env.value.lang);
       // # bg fg
       if(urlParams.value.bg && urlParams.value.bg[0] !== '#') urlParams.value.bg = '#' + urlParams.value.bg;
       if(urlParams.value.fg && urlParams.value.fg[0] !== '#') urlParams.value.fg = '#' + urlParams.value.fg;
@@ -503,10 +513,10 @@ export default {
       terminal.value.style.height = (window.innerHeight - (urlParams.value.mode !== 'headless' ? 25 : 0)) + 'px';
       fitAddon.fit();
       // 修改虚拟终端行列大小
-      if(socket.value && socket.value.readyState == WebSocket.OPEN && term) {
+      if(socket.value && socket.value.readyState === WebSocket.OPEN && term) {
         const new_rows = fitAddon.proposeDimensions().rows;
         const new_cols = fitAddon.proposeDimensions().cols;
-        socket.value.send(aesEncrypt(JSON.stringify({type:1,content:"",rows:new_rows,cols:new_cols}), secretKey.value));
+        socket.value.send(aesEncrypt(JSON.stringify({type: 1, content: "", rows: new_rows, cols: new_cols}), secretKey.value));
         term.resize(new_cols,new_rows);
       }
     };
@@ -538,6 +548,7 @@ export default {
           ElMessage({
             message: resp.info,
             type: resp.status,
+            grouping: true,
           });
         }
       });
@@ -561,7 +572,7 @@ export default {
         cooperateKey: urlParams.value.cooperate
       }), secretKey.value);
       // ws连接
-      socket.value = new WebSocket(ws_base_url + changeStr(aesEncrypt(JSON.stringify(wsInfo))));
+      socket.value = new WebSocket(ws_base_url + changeStr(aesEncrypt(JSON.stringify(wsInfo), secretKeyGetter.socket())));
       // 连接建立
       socket.value.onopen = () => {
         termFit();
@@ -570,34 +581,34 @@ export default {
       socket.value.onmessage = resp => {
         const result = JSON.parse(resp.data);
         // 协作失败
-        if(result.code == -2) {
+        if(result.code === -2) {
           term.clear();
           now_connect_status.value = connect_status.value['Fail'];
           termWrite(result.info + ".\n");
         }
         // 连接失败
-        else if(result.code == -1) {
+        else if(result.code === -1) {
           term.clear();
           now_connect_status.value = connect_status.value['Fail'];
           termWrite(now_connect_status.value);
           setTimeout(() => {
             doSettings(1);
-          },400);
+          }, 400);
         }
         // 连接成功
-        else if(result.code == 0) {
+        else if(result.code === 0) {
           term.clear();
           now_connect_status.value = connect_status.value['Success'];
           setTimeout(() => {
             termFit();
-          },1);
+          }, 1);
           // 协作成功
           if(urlParams.value.cooperate) {
             term.focus();
             termWrite(result.info + ".\n");
             return;
           }
-          sshKey.value = aesDecrypt(aesDecrypt(result.data), secretKey.value);
+          sshKey.value = aesDecrypt(result.data, secretKey.value);
           if(urlParams.value.cmd) {
             // bash命令
             if(urlParams.value.cmd.toLowerCase().startsWith('bash:')) sendMessage(urlParams.value.cmd.substring(5) + "\n");
@@ -613,8 +624,8 @@ export default {
           if(env.value.advance && dockerBlockRef.value) dockerBlockRef.value.getDockerVersion(sshKey.value);
         }
         // 输出
-        else if(result.code == 1) {
-          const output = aesDecrypt(aesDecrypt(result.data), secretKey.value);
+        else if(result.code === 1) {
+          const output = aesDecrypt(result.data, secretKey.value);
           if(UserTCodeHelper.active) UserTCodeHelper.outArray.push(output);
           if(recording.value) {
             recordInfo.value.push({
@@ -625,12 +636,12 @@ export default {
           if(!(UserTCodeHelper.active && !UserTCodeHelper.display)) termWrite(output);
         }
         // 更新协作者数量
-        else if(result.code == 2) {
-          onlineNumber.value = Number(aesDecrypt(aesDecrypt(result.data), secretKey.value));
+        else if(result.code === 2) {
+          onlineNumber.value = Number(aesDecrypt(result.data, secretKey.value));
         }
         // 更新文件传输列表
-        else if(result.code == 3) {
-          const fileTransInfo = JSON.parse(aesDecrypt(aesDecrypt(result.data), secretKey.value));
+        else if(result.code === 3) {
+          const fileTransInfo = JSON.parse(aesDecrypt(result.data, secretKey.value));
           const index = parseInt(fileTransInfo.index);
           const id = fileTransInfo.id;
           // 已完成
@@ -648,7 +659,7 @@ export default {
       };
       // 断开连接
       socket.value.onclose = (e) => {
-        if(now_connect_status.value === connect_status.value['Success'] && e.code != 3333) {
+        if(now_connect_status.value === connect_status.value['Success'] && e.code !== 3333) {
           sshKey.value = '';
           if(urlParams.value.cooperate) {
             now_connect_status.value = connect_status.value['End'];
@@ -706,7 +717,9 @@ export default {
           termFit();
           isFirst.value = false;
         }
-        if(UserTCodeHelper.active === active) socket.value.send(aesEncrypt(JSON.stringify({type:0,content:text,rows:0,cols:0}), secretKey.value));
+        if(UserTCodeHelper.active === active) {
+          socket.value.send(aesEncrypt(JSON.stringify({type: 0, content: text, rows: 0, cols: 0}), secretKey.value));
+        }
       }
     };
 
@@ -829,10 +842,10 @@ export default {
     const doHeartBeat = () => {
       if(timer == null) {
         timer = setInterval(() => {
-          if(socket.value && socket.value.readyState == WebSocket.OPEN) {
-            socket.value.send(aesEncrypt(JSON.stringify({type:2,content:"",rows:0,cols:0}), secretKey.value));
+          if(socket.value && socket.value.readyState === WebSocket.OPEN) {
+            socket.value.send(aesEncrypt(JSON.stringify({type: 2, content: "", rows: 0, cols: 0}), secretKey.value));
           }
-          // PC端
+          // 本地PC端
           if(props.osInfo.serverOS !== "Linux") {
             $.ajax({
               url: http_base_url + '/beat',
@@ -844,7 +857,7 @@ export default {
               }
             });
           }
-        },25000);
+        }, 25000);
       }
     };
 
@@ -870,7 +883,7 @@ export default {
       localStoreUtil.setItem(localStore['tcodes'], aesEncrypt(JSON.stringify(tcodes.value)));
       setTimeout(() => {
         tCodeCenterRef.value.userTCodes = {...tcodes.value};
-      },1);
+      }, 1);
     };
 
     // 处理终端代码
@@ -976,12 +989,7 @@ export default {
       const blob = new Blob([JSON.stringify(content, null, 4)], { type: 'text/plain' });
       // 创建指向 Blob 的 URL
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'TerminalCode.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      doUrlDownload(url, 'TerminalCode.json');
       // 释放 URL 对象
       URL.revokeObjectURL(url);
     };
@@ -1163,7 +1171,7 @@ export default {
 
 
 <style scoped>
-.global {
+.root-view {
   position: relative;
   width: 100%;
   display: flex;

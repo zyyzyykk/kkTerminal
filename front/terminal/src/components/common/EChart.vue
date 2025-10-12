@@ -1,5 +1,5 @@
 <template>
-  <div element-loading-text="Loading..." v-loading="loading" ref="eChartRef" ></div>
+  <div :element-loading-text="$t('加载中...')" v-loading="loading" ref="eChartRef" ></div>
 </template>
 
 <script>

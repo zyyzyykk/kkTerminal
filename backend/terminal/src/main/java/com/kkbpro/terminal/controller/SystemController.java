@@ -3,11 +3,11 @@ package com.kkbpro.terminal.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.kkbpro.terminal.annotation.Log;
 import com.kkbpro.terminal.config.AppConfig;
+import com.kkbpro.terminal.constant.Constant;
+import com.kkbpro.terminal.consumer.WebSocketServer;
 import com.kkbpro.terminal.pojo.vo.OSInfo;
 import com.kkbpro.terminal.result.Result;
-import com.kkbpro.terminal.utils.AESUtil;
-import com.kkbpro.terminal.utils.LogUtil;
-import com.kkbpro.terminal.utils.RSAUtil;
+import com.kkbpro.terminal.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,8 +51,17 @@ public class SystemController {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("osInfo", osInfo);
-        map.put("aesKey", AESUtil.SECRET_KEY);
+        map.put("storageKey", appConfig.getStorageKey());
+        map.put("socketKey", WebSocketServer.SOCKET_SECRET_KEY);
         map.put("publicKey", RSAUtil.PUBLIC_KEY);
+
+        String responseKey = (String) SessionUtil.getAttribute(Constant.LOGIN_SESSION);
+        if (StringUtil.isEmpty(responseKey) && StringUtil.isEmpty(appConfig.getPassword())) {
+            responseKey = StringUtil.generateRandomString(16);
+            SessionUtil.setAttribute(Constant.LOGIN_SESSION, responseKey);
+        }
+        map.put("responseKey", responseKey);
+
         return Result.success(JSONObject.toJSONString(map));
     }
 

@@ -40,7 +40,7 @@ export default {
           isShowTooltip.value = toolTipContentRef.value.firstElementChild.scrollWidth > toolTipContentRef.value.firstElementChild.offsetWidth;
         }
         else isShowTooltip.value = false;
-      },1);
+      }, 1);
     };
 
     // 使用ResizeObserver监听尺寸变化

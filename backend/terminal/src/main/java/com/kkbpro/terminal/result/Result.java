@@ -35,8 +35,7 @@ public class Result {
     }
 
     // 失败返回
-    public static Result fail(Integer code, String info)
-    {
+    public static Result fail(Integer code, String info) {
         Result result = new Result();
         result.setStatus("warning");
         result.setCode(code);
@@ -47,7 +46,7 @@ public class Result {
     }
 
     // 成功返回
-    public static Result successStr(Integer code, String info, String data) {
+    private static Result successStr(Integer code, String info, String data) {
         Result result = new Result();
         result.setStatus("success");
         result.setCode(code);

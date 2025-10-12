@@ -74,7 +74,6 @@ export default {
         url: http_base_url + '/cooperate/key',
         type: 'get',
         data: {
-          time: new Date().getTime(),
           sshKey: props.sshKey,
           readOnly: isReadonly.value,
           maxHeadCount: maxHC,
@@ -115,7 +114,7 @@ export default {
     const closeDialog = (done) => {
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };

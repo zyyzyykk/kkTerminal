@@ -12,7 +12,7 @@
     draggable
   >
     <div class="no-select" >
-      <div v-if="Object.keys(sshOptions).length > 0" class="kk-border" >
+      <div v-if="Object.keys(sshOptions).length > 0" class="container" >
         <div v-for="(value, key) in sshOptions" :key="key" >
           <div :class="['item-class', (aimOption == key) ? 'item-selected' : '']" @click="aimOption = key" >
             <FileIcons :style="{display: 'flex', alignItems: 'center'}" name="kk.ini" :width="20" :height="20" :isFolder="false" />
@@ -22,7 +22,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="kk-border" >
+      <div v-else class="container" >
         <NoData :msg="i18n.global.k('暂无配置')" ></NoData>
       </div>
       <div class="kk-flex" >
@@ -99,7 +99,7 @@ export default {
     const closeDialog = (done) => {
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };
@@ -142,9 +142,9 @@ export default {
   margin-top: 10px;
 }
 
-.kk-border
+.container
 {
-  height: 30.1vh;
+  height: 30vh;
   overflow-y: scroll;
   width: 100%;
   border-bottom: 1px solid #ececec;

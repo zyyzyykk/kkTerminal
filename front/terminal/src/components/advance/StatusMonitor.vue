@@ -300,14 +300,14 @@ export default {
       const totalDown = networkInfo ? networkInfo.map(item => {return item.totalDown}) : [];
       return [
         {
-            name:i18n.global.t('上行'),
-            type:'line',
-            data:totalUp.slice(1).map((value, index) => {return calcNumber(Math.max(0, (value - totalUp[index])) * 1000 / ((time[index + 1] - time[index]) * 1024), 3)}),
+            name: i18n.global.t('上行'),
+            type: 'line',
+            data: totalUp.slice(1).map((value, index) => {return calcNumber(Math.max(0, (value - totalUp[index])) * 1000 / ((time[index + 1] - time[index]) * 1024), 3)}),
         },
         {
-          name:i18n.global.t('下行'),
-          type:'line',
-          data:totalDown.slice(1).map((value, index) => {return calcNumber(Math.max(0, (value - totalDown[index])) * 1000 / ((time[index + 1] - time[index]) * 1024), 3)}),
+          name: i18n.global.t('下行'),
+          type: 'line',
+          data: totalDown.slice(1).map((value, index) => {return calcNumber(Math.max(0, (value - totalDown[index])) * 1000 / ((time[index + 1] - time[index]) * 1024), 3)}),
         },
       ];
     });
@@ -326,14 +326,14 @@ export default {
       const totalWrite = diskInfo ? diskInfo.map(item => {return item.totalWrite}) : [];
       return [
         {
-          name:i18n.global.t('读'),
-          type:'line',
-          data:totalRead.slice(1).map((value, index) => {return calcNumber(Math.max(0, (value - totalRead[index])) * 1000 / ((time[index + 1] - time[index]) * 2), 3)}),
+          name: i18n.global.t('读'),
+          type: 'line',
+          data: totalRead.slice(1).map((value, index) => {return calcNumber(Math.max(0, (value - totalRead[index])) * 1000 / ((time[index + 1] - time[index]) * 2), 3)}),
         },
         {
-          name:i18n.global.t('写'),
-          type:'line',
-          data:totalWrite.slice(1).map((value, index) => {return calcNumber(Math.max(0, (value - totalWrite[index])) * 1000 / ((time[index + 1] - time[index]) * 2), 3)}),
+          name: i18n.global.t('写'),
+          type: 'line',
+          data: totalWrite.slice(1).map((value, index) => {return calcNumber(Math.max(0, (value - totalWrite[index])) * 1000 / ((time[index + 1] - time[index]) * 2), 3)}),
         },
       ];
     });
@@ -357,7 +357,7 @@ export default {
         }, 1);
         timer.value = setInterval(() => {
           getStatusInfo();
-        },interval);
+        }, interval);
       }
     };
 
@@ -399,7 +399,7 @@ export default {
     const closeDialog = (done) => {
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };
@@ -407,7 +407,7 @@ export default {
     const deepCloseDialog = (done) => {
       setTimeout(() => {
         reset(true);
-      },400);
+      }, 400);
       stopMonitor();
       DialogVisible.value = false;
       if(done) done();

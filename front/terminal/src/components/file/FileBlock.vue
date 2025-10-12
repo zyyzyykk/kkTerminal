@@ -63,7 +63,7 @@
             <div v-else class="disabled-function operate-icon" ><el-icon><Upload /></el-icon></div>
           </div>
         </div>
-        <div id="fileArea" ref="fileAreaRef" element-loading-text="Loading..." v-loading="loading" class="list-class no-select"
+        <div id="fileArea" ref="fileAreaRef" :element-loading-text="$t('加载中...')" v-loading="loading" class="list-class no-select"
              @contextmenu="handleContextMenu" @scroll="handleScroll"
              @dragover="preventDefault" @drop="handleFileDrag"
              tabindex="0" @keydown="handleShortcutKeys" >
@@ -71,7 +71,7 @@
             <div v-for="item in files" :key="item.id" >
               <template v-if="item.isDirectory" >
                 <div :class="[isSelected(item.id) !== -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="changeDir(dir + item.name + '/')" @contextmenu="addSelectFile($event,item,false)" >
-                  <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] === '.' || (isClipboard(item.id) !== -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
+                  <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] === '.' || (isClipboard(item.id) !== -1 && isCtrlX)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
                   <div style="margin: 0 10px;" v-if="isShowRenameInput && renameFile && item.id === renameFile.id" >
                     <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                   </div>
@@ -86,7 +86,7 @@
               </template>
               <template v-else>
                 <div :class="[isSelected(item.id) !== -1 ? 'item-selected' : '', 'item-class']" @click="addSelectFile($event,item)" @dblclick="preViewFile(item.name)" @contextmenu="addSelectFile($event,item,false)" >
-                  <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] === '.' || (isClipboard(item.id) !== -1 && isCtrlx)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
+                  <FileIcons :style="{display: 'flex', alignItems: 'center'}" :iconStyle="{opacity: (item.name[0] === '.' || (isClipboard(item.id) !== -1 && isCtrlX)) ? 0.5 : 1}" :name="item.name" :width="20" :height="20" :isFolder="item.isDirectory" :isLink="item.isSymlink" />
                   <div style="margin: 0 10px;" v-if="isShowRenameInput && renameFile && item.id === renameFile.id" >
                     <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                   </div>
@@ -130,7 +130,7 @@
   />
   <!-- 文件URL上传 -->
   <FileUrl ref="fileUrlRef" @callback="fileUrlUpload" ></FileUrl>
-  <TxtPreview ref="txtPreviewRef" @doSave="doSave" ></TxtPreview>
+  <FilePreview ref="filePreviewRef" @doSave="doSave" ></FilePreview>
   <MkFile ref="mkFileRef" @callback="handleMkFile" ></MkFile>
 
   <!-- 文件属性 -->
@@ -173,14 +173,14 @@ import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@
 import { escapeItem, escapePath, generateRandomString, osFileNaturalSort } from '@/utils/StringUtil';
 import { isZipFile } from '@/components/preview/FileSuffix';
 import { getChmodValue } from '@/components/calc/CalcPriority';
-import { getUrlParams } from "@/utils/UrlUtil";
+import { getUrlParams, doUrlDownload } from "@/utils/UrlUtil";
 import { aesEncryptBuffer, rsaEncrypt } from "@/utils/Encrypt";
 import { encodeStrToArray } from "@/components/preview/EncodeUtil";
 import { TCodeReservedVarsSetter } from "@/components/tcode/TCode";
 
 import ToolTip from '@/components/common/ToolTip';
 import NoData from '@/components/common/NoData';
-import TxtPreview from '../preview/TxtPreview';
+import FilePreview from '@/components/preview/FilePreview';
 import MkFile from './MkFile';
 import FileAttr from './FileAttr';
 import FileUrl from './FileUrl';
@@ -196,7 +196,7 @@ export default {
     ToolTip,
     NoData,
     FileIcons,
-    TxtPreview,
+    FilePreview,
     MkFile,
     FileAttr,
     FileUrl,
@@ -312,7 +312,6 @@ export default {
         url: http_base_url + '/home',
         type: 'get',
         data: {
-          time: new Date().getTime(),
           sshKey: props.sshKey,
         },
         success(resp) {
@@ -350,7 +349,6 @@ export default {
         url: http_base_url + '/ls',
         type: 'get',
         data: {
-          time: new Date().getTime(),
           sshKey: props.sshKey,
           path: now_dir,
         },
@@ -430,21 +428,13 @@ export default {
     // 下载远程文件
     const downloadRemoteFile = (name) => {
       if(isShowDirInput.value) return;
-      const a = document.createElement('a');
-      a.href = getRemoteFileUrl(name);
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      doUrlDownload(getRemoteFileUrl(name));
     };
 
     // 下载文件夹
     const downloadDir = (name) => {
       if(isShowDirInput.value) return;
-      const a = document.createElement('a');
-      a.href = getRemoteFolderUrl(name);
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      doUrlDownload(getRemoteFolderUrl(name));
     };
 
     // 更新目录路径
@@ -516,7 +506,7 @@ export default {
         context.emit('updateTransportLists', 0, 0, fileId, fileTransInfo);
 
         // 大文件开始上传提示
-        if(fileSize > 20*1024*1024 && !data.noStartUpLoad) {
+        if(fileSize > 20 * 1024 * 1024 && !data.noStartUpLoad) {
           ElMessage({
             message: data.startUpLoad ? data.startUpLoad : i18n.global.t('开始上传'),
             type: 'success',
@@ -529,13 +519,13 @@ export default {
           const start = (chunk-1) * chunkSize;
           const end = start + chunkSize >= fileSize ? fileSize : start + chunkSize;
           // 加密文件片
-          const aesKey = generateRandomString(16);
+          const secretKey = generateRandomString(16);
           const chunkBuffer = await file.slice(start, end).arrayBuffer();
-          const encryptedBuffer = encodeStrToArray(aesEncryptBuffer(chunkBuffer, aesKey), "UTF-8");
+          const encryptedBuffer = encodeStrToArray(aesEncryptBuffer(chunkBuffer, secretKey), "UTF-8");
           const chunkFile = new File([new Blob([encryptedBuffer])], fileName);
           // 上传文件片
           const formData = new FormData();
-          formData.append('aesKey', rsaEncrypt(aesKey));
+          formData.append('secretKey', rsaEncrypt(secretKey));
           formData.append('file', chunkFile);
           formData.append('fileName', fileName);
           formData.append('chunks', chunks);
@@ -601,20 +591,20 @@ export default {
       isShowDirInput.value = true;
       setTimeout(() => {
         document.querySelector('#aimDirInput').focus();
-      },1);
+      }, 1);
     };
 
     // 控制Dialog显示
     const DialogVisible = ref(false);
 
     // 文本文件编辑
-    const txtPreviewRef = ref();
+    const filePreviewRef = ref();
     const preViewFile = async (name, config={}) => {
-      txtPreviewRef.value.fileName = name;
-      txtPreviewRef.value.fileUrl = getRemoteFileUrl(name);
-      txtPreviewRef.value.loading = true;
-      txtPreviewRef.value.DialogVisible = true;
-      await txtPreviewRef.value.initText(config);
+      filePreviewRef.value.fileName = name;
+      filePreviewRef.value.fileUrl = getRemoteFileUrl(name);
+      filePreviewRef.value.loading = true;
+      filePreviewRef.value.DialogVisible = true;
+      await filePreviewRef.value.initText(config);
     };
     // 保存文本，写回服务器
     const doSave = (name, url, arrayBuffer) => {
@@ -624,7 +614,7 @@ export default {
       const blob = new Blob([arrayBuffer], { type: 'application/octet-stream' });
       // 创建File对象
       const file = new File([blob], name);
-      doUpload({file:file}, {pathVal: urlParams.path, startUpLoad:i18n.global.t("修改保存中"),alert:i18n.global.t('文件后台保存中')});
+      doUpload({file: file}, {pathVal: urlParams.path, startUpLoad: i18n.global.t("修改保存中"), alert: i18n.global.t('文件后台保存中')});
     };
 
     // 文件/文件夹拖拽
@@ -770,7 +760,7 @@ export default {
             isShowRenameInput.value = true;
             setTimeout(() => {
               document.querySelector('#rename').focus();
-            },1);
+            }, 1);
           }
           break;
         // 删除
@@ -944,7 +934,7 @@ export default {
       path:'/',
       files:[],
     });
-    const isCtrlx = ref(false);
+    const isCtrlX = ref(false);
     const handleShortcutKeys = (event) => {
       const renameDom = document.querySelector('#rename');
       if(renameDom && renameDom.contains(event.target)) return;
@@ -994,15 +984,15 @@ export default {
             if(selectedFiles.value.length > 0) {
               fileClipboard.value.path = dir.value;
               fileClipboard.value.files = [...selectedFiles.value];
-              isCtrlx.value = false;
+              isCtrlX.value = false;
             }
             break;
           // 粘贴
           case 'v':
             if(fileClipboard.value.files.length === 0) return;
-            fileCopyMove(isCtrlx.value ? 'mv' : 'cp');
-            if(isCtrlx.value) {
-              isCtrlx.value = false;
+            fileCopyMove(isCtrlX.value ? 'mv' : 'cp');
+            if(isCtrlX.value) {
+              isCtrlX.value = false;
               fileClipboard.value = {
                 path:'/',
                 files:[],
@@ -1014,7 +1004,7 @@ export default {
             if(selectedFiles.value.length > 0) {
               fileClipboard.value.path = dir.value;
               fileClipboard.value.files = [...selectedFiles.value];
-              isCtrlx.value = true;
+              isCtrlX.value = true;
             }
             break;
           // 删除
@@ -1217,7 +1207,7 @@ export default {
           path:'/',
           files:[],
         };
-        isCtrlx.value = false;
+        isCtrlX.value = false;
       }
       selectedFiles.value = [];
       lastSelectedIndex = -1;
@@ -1230,26 +1220,26 @@ export default {
 
     // 关闭
     const closeDialog = (done) => {
-      if(txtPreviewRef.value && txtPreviewRef.value.DialogVisible) txtPreviewRef.value.closeDialog();
+      if(filePreviewRef.value && filePreviewRef.value.DialogVisible) filePreviewRef.value.closeDialog();
       if(mkFileRef.value && mkFileRef.value.DialogVisible) mkFileRef.value.closeDialog();
       if(fileAttrRef.value && fileAttrRef.value.DialogVisible) fileAttrRef.value.closeDialog();
       if(fileUrlRef.value && fileUrlRef.value.DialogVisible) fileUrlRef.value.closeDialog();
       setTimeout(() => {
         reset();
-      },400);
+      }, 400);
       DialogVisible.value = false;
       if(done) done();
     };
 
     // 深度关闭
     const deepCloseDialog = () => {
-      if(txtPreviewRef.value) txtPreviewRef.value.closeDialog();
+      if(filePreviewRef.value) filePreviewRef.value.closeDialog();
       if(mkFileRef.value) mkFileRef.value.closeDialog();
       if(fileAttrRef.value) fileAttrRef.value.closeDialog();
       if(fileUrlRef.value) fileUrlRef.value.closeDialog();
       setTimeout(() => {
         reset(true);
-      },400);
+      }, 400);
       DialogVisible.value = false;
     };
 
@@ -1296,7 +1286,7 @@ export default {
       doUpload,
       selectedFiles,
       loading,
-      txtPreviewRef,
+      filePreviewRef,
       preViewFile,
       doSave,
       fileAreaRef,
@@ -1325,7 +1315,7 @@ export default {
       addSelectFile,
       isSelected,
       isClipboard,
-      isCtrlx,
+      isCtrlX,
       fileCopyMove,
       fileUploadTypeChoose,
       folderInputUploadPrehandle,
