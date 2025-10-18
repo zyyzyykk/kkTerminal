@@ -128,7 +128,7 @@ export default {
     ArrowDown,
     DocumentCopy,
   },
-  setup(props,context) {
+  setup(props, context) {
 
     const DialogVisible = ref(false);
     const loading = ref(false);
@@ -212,7 +212,7 @@ export default {
 
     const handleSave = (content) => {
       if(modifyTag.value !== '*') return;
-      context.emit('doSave',fileName.value, fileUrl.value, encodeStrToArray(content, (saveEncode.value || "UTF-8")));
+      context.emit('doSave', fileName.value, fileUrl.value, encodeStrToArray(content, (saveEncode.value || "UTF-8")));
       modifyTag.value = '';
     };
 
@@ -319,8 +319,8 @@ export default {
       if(codeEditorRef.value) codeEditorRef.value.reset();
       modifyTag.value = '';
       previewInfo.value = {
-        preview:'editor',
-        type:'text',
+        preview: 'editor',
+        type: 'text',
       };
       if(previewUrl.value) {
         URL.revokeObjectURL(previewUrl.value);

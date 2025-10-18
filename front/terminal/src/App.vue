@@ -131,6 +131,10 @@ export default {
   margin-right: 4px;
 }
 
+.el-loading-text {
+  user-select: none;
+}
+
 .el-dialog {
   pointer-events: auto;
 }
@@ -143,7 +147,7 @@ export default {
 /* 隐藏滚动条 */
 .xterm-viewport {
   scrollbar-width: none !important; /* Firefox */
-  -ms-overflow-style: none !important; /* Internet Explorer 和 Edge */
+  -ms-overflow-style: none !important; /* IE 和 Edge */
 }
 
 .xterm-viewport::-webkit-scrollbar {

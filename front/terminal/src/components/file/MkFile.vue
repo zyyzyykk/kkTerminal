@@ -45,7 +45,7 @@ export default {
   components: {
     FileIcons,
   },
-  setup(props,context) {
+  setup(props, context) {
     // 控制Dialog显示
     const DialogVisible = ref(false);
     const err_msg = ref('');

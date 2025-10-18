@@ -58,7 +58,7 @@ export default {
       chart = echarts.init(eChartRef.value);
       chart.setOption(option);
       chart.resize();
-      chart.on('finished', function() {
+      chart.on('finished', () => {
         isFinished.value = true;
         loading.value = false;
       });

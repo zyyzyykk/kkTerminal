@@ -149,7 +149,7 @@
       :confirm-button-text="$t('确定')" :cancel-button-text="$t('取消')"
       @confirm="confirmPopConfirm" @cancel="cancelPopConfirm"
       :visible="isShowMenu && isShowPop" trigger="click"
-      :popper-style="{zIndex: 3466, fontSize:'13px', color:'black'}" popper-class="confirmPop"
+      :popper-style="{zIndex: 3466, fontSize: '13px', color: 'black'}" popper-class="confirmPop"
       placement="right" confirm-button-type="danger" >
       <template #reference>
         <div :class="['kk-menu-item', selectedFiles.length === 0 ? 'disabled':'']" key="7" >
@@ -167,7 +167,7 @@ import { ref, onUnmounted, onMounted, watch } from 'vue';
 import useClipboard from "vue-clipboard3";
 import $ from 'jquery';
 import { ElMessage } from 'element-plus';
-import { deleteDialog } from "@/utils/DeleteDialog";
+import { deleteDialog } from "@/components/common/DeleteDialog";
 import { http_base_url } from '@/env/BaseUrl';
 import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
 import { escapeItem, escapePath, generateRandomString, osFileNaturalSort } from '@/utils/StringUtil';
@@ -191,7 +191,7 @@ import i18n from "@/locales/i18n";
 import FileIcons from 'file-icons-vue';
 
 export default {
-  name:'FileBlock',
+  name: 'FileBlock',
   components: {
     ToolTip,
     NoData,
@@ -208,7 +208,7 @@ export default {
     FolderAdd,
     Link,
   },
-  props:['sshKey','os','uploadingList'],
+  props: ['sshKey', 'os', 'uploadingList'],
   setup(props, context) {
 
     // 加载
@@ -543,7 +543,7 @@ export default {
             success(resp) {
               if(resp.status === 'success') {
                 // 文件后台上传中
-                if(resp.code == 202) {
+                if(resp.code === 202) {
                   ElMessage({
                     message: data.alert ? data.alert : resp.info,
                     type: resp.status,
@@ -931,8 +931,8 @@ export default {
 
     // 文件快捷键操作
     const fileClipboard = ref({
-      path:'/',
-      files:[],
+      path: '/',
+      files: [],
     });
     const isCtrlX = ref(false);
     const handleShortcutKeys = (event) => {
@@ -994,8 +994,8 @@ export default {
             if(isCtrlX.value) {
               isCtrlX.value = false;
               fileClipboard.value = {
-                path:'/',
-                files:[],
+                path: '/',
+                files: [],
               };
             }
             break;
@@ -1039,8 +1039,8 @@ export default {
               grouping: true,
             });
             fileClipboard.value = {
-              path:'/',
-              files:[],
+              path: '/',
+              files: [],
             };
           }
         }
@@ -1204,7 +1204,7 @@ export default {
         noDataMsg.value = i18n.global.k('暂无文件');
         dirStatus.value = 0;
         fileClipboard.value = {
-          path:'/',
+          path: '/',
           files:[],
         };
         isCtrlX.value = false;

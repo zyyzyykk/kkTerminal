@@ -6,24 +6,24 @@ const GB = BYTES_PER_KILOBYTE * MB;
 
 export const calcSize = (size) => {
     if(!size) return "";
-    if(size < 0) size = 0;
+    const _size = Math.max(0, parseInt(size));
 
     let value;
     let unit;
-    if (size < KB) {                                                         // B
-        value = size / B;
+    if (_size < KB) {                                                       // B
+        value = _size / B;
         unit = "B";
     }
-    else if (size < MB) {                                                   // KB
-        value = size / KB;
+    else if (_size < MB) {                                                  // KB
+        value = _size / KB;
         unit = "KB";
     }
-    else if (size < GB) {                                                   // MB
-        value = size / MB;
+    else if (_size < GB) {                                                  // MB
+        value = _size / MB;
         unit = "MB";
     }
     else {                                                                  // GB
-        value = size / GB;
+        value = _size / GB;
         unit = "GB";
     }
 

@@ -1,7 +1,7 @@
 <template>
-  <el-icon v-if="statusType == -2" :style="statusStyle" ><CircleCloseFilled /></el-icon>
-  <el-icon v-else-if="statusType == -1" :style="statusStyle" ><WarningFilled /></el-icon>
-  <el-icon v-else-if="statusType == 1" :style="statusStyle" ><SuccessFilled /></el-icon>
+  <el-icon v-if="statusType === -2" :style="statusStyle" ><CircleCloseFilled /></el-icon>
+  <el-icon v-else-if="statusType === -1" :style="statusStyle" ><WarningFilled /></el-icon>
+  <el-icon v-else-if="statusType === 1" :style="statusStyle" ><SuccessFilled /></el-icon>
   <el-icon v-else :style="statusStyle" ><InfoFilled /></el-icon>
 </template>
 

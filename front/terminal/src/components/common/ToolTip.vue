@@ -13,19 +13,19 @@ export default {
   name: 'ToolTip',
   props: {
     content: {
-      type:String,
-      required:true,
-      default:'',
+      type: String,
+      required: true,
+      default: '',
     },
     delay: {
-      type:Number,
-      required:false,
-      default:200,
+      type: Number,
+      required: false,
+      default: 200,
     },
     isShow: {
-      type:Boolean,
-      required:false,
-      default:true,
+      type: Boolean,
+      required: false,
+      default: true,
     }
   },
   setup() {

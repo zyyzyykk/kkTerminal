@@ -20,10 +20,7 @@ body {
 
 /* 禁止图片拖拽 */
 img {
-  -webkit-user-drag: none; /* Safari */
-  -khtml-user-drag: none; /* Konqueror HTML */
-  -moz-user-drag: none; /* Firefox */
-  -o-user-drag: none; /* Opera */
+  -webkit-user-drag: none !important;
 }
 
 /* 文本不可选中 */

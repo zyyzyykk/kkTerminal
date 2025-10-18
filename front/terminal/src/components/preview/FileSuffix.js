@@ -46,8 +46,8 @@ const videoSuffixes = {
 
 export const previewFileInfo = (item) => {
     const previewInfo = {
-        preview:'editor',
-        type:'text',
+        preview: 'editor',
+        type: 'text',
     };
     const index = item.lastIndexOf('.');
     if(index === -1) return previewInfo;

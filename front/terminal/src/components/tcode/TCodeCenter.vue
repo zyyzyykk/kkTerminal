@@ -140,7 +140,7 @@ import { ArrowRight, ArrowLeft, Edit, View, Finished, Delete } from '@element-pl
 import AceEditor from '@/components/common/AceEditor';
 import { aesDecrypt } from '@/utils/Encrypt';
 import TCodeStatus from './TCodeStatus';
-import { deleteDialog } from '@/utils/DeleteDialog';
+import { deleteDialog } from '@/components/common/DeleteDialog';
 import i18n from "@/locales/i18n";
 import { localStore } from "@/env/Store";
 import { localStoreUtil } from "@/utils/CloudUtil";

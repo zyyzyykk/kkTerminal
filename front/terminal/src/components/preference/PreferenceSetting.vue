@@ -143,12 +143,12 @@ import { ArrowDown } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 
 export default {
-  name:'PreferenceSetting',
+  name: 'PreferenceSetting',
   components: {
     ArrowDown,
   },
-  props:['env','os'],
-  setup(props,context) {
+  props: ['env', 'os'],
+  setup(props, context) {
 
     // 控制Dialog显示
     const DialogVisible = ref(false);

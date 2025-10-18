@@ -40,7 +40,7 @@ export default {
     FileIcons,
     AceEditor,
   },
-  props:['sshKey'],
+  props: ['sshKey'],
   setup(props) {
 
     const DialogVisible = ref(false);

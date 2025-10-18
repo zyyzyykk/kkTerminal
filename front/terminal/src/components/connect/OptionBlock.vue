@@ -14,7 +14,7 @@
     <div class="no-select" >
       <div v-if="Object.keys(sshOptions).length > 0" class="container" >
         <div v-for="(value, key) in sshOptions" :key="key" >
-          <div :class="['item-class', (aimOption == key) ? 'item-selected' : '']" @click="aimOption = key" >
+          <div :class="['item-class', (aimOption === key) ? 'item-selected' : '']" @click="aimOption = key" >
             <FileIcons :style="{display: 'flex', alignItems: 'center'}" name="kk.ini" :width="20" :height="20" :isFolder="false" />
             <div class="ellipsis" style="margin: 0 10px; line-height: 18px;" >{{ key }}</div>
             <div style="flex: 1;" ></div>
@@ -28,7 +28,7 @@
       <div class="kk-flex" >
         <div>{{ $t('配置名') }}：</div>
         <div style="flex: 1;" >
-          <el-input size="small" v-model="aimOption" :disabled="opType == 0" @keydown.enter="confirm" class="w-50 m-2" placeholder="" >
+          <el-input size="small" v-model="aimOption" :disabled="opType === 0" @keydown.enter="confirm" class="w-50 m-2" placeholder="" >
           </el-input>
         </div>
         <div style="margin-left: 10px;" >
@@ -45,7 +45,7 @@
 import { ref } from 'vue';
 import { CircleClose } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
-import { deleteDialog } from '@/utils/DeleteDialog';
+import { deleteDialog } from '@/components/common/DeleteDialog';
 import NoData from '@/components/common/NoData';
 import FileIcons from 'file-icons-vue';
 import i18n from "@/locales/i18n";
@@ -57,8 +57,8 @@ export default {
     NoData,
     CircleClose,
   },
-  props:['opType','sshOptions'],
-  setup(props,context) {
+  props: ['opType', 'sshOptions'],
+  setup(props, context) {
     // 控制Dialog显示
     const DialogVisible = ref(false);
 
@@ -67,7 +67,7 @@ export default {
 
     // 确定
     const confirm = () => {
-      if(aimOption.value == '' || aimOption.value.trim() == '') return;
+      if(!aimOption.value.trim()) return;
       context.emit('callback',aimOption.value.trim());
       closeDialog();
     };
@@ -85,7 +85,7 @@ export default {
         type: 'success',
         grouping: true,
       });
-      if(aimOption.value == deleteOption.value) aimOption.value = '';
+      if(aimOption.value === deleteOption.value) aimOption.value = '';
     };
 
     // 重置

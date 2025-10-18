@@ -108,7 +108,7 @@ export default {
     Finished,
     DocumentDelete,
   },
-  setup(props,context)
+  setup(props, context)
   {
     // 控制Dialog显示
     const DialogVisible = ref(false);
@@ -128,8 +128,8 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
 
     const userTCodeEditorRef = ref();
     const userTCodeInfo = ref({
-      name:'',
-      desc:'',
+      name: '',
+      desc: '',
     });
 
     // 保存

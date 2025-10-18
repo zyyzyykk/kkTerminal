@@ -62,7 +62,7 @@ app.mount('#app');
 // 引入全局样式
 import '@/assets/base.css';
 
-// 解决 ElTable 自动宽度高度导致的「ResizeObserver loop limit exceeded」问题
+// 防抖: 解决 ElTable 自动宽度高度导致的「ResizeObserver loop limit exceeded」问题
 const debounce = (fn, delay) => {
     let timer = null;
     return function () {
@@ -74,9 +74,8 @@ const debounce = (fn, delay) => {
         }, delay);
     }
 }
-
 const _ResizeObserver = window.ResizeObserver;
-window.ResizeObserver = class ResizeObserver extends _ResizeObserver{
+window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
     constructor(callback) {
         callback = debounce(callback, 16);
         super(callback);

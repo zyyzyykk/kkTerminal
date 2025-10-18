@@ -13,24 +13,24 @@
     <div class="no-select" >
       <div class="kk-flex" >
         <div>{{ $t('编辑权限') }}：</div>
-        <div style="flex: 1" ></div>
+        <div style="flex: 1;" ></div>
         <el-radio-group v-model="isReadonly" class="ml-4" >
           <el-radio :label="false" size="large" >{{ $t('是') }}</el-radio>
           <el-radio :label="true" size="large" >{{ $t('否') }}</el-radio>
         </el-radio-group>
-        <div style="flex: 1" ></div>
+        <div style="flex: 1;" ></div>
       </div>
-      <div style="margin-top: 10px" ></div>
+      <div style="margin-top: 10px;" ></div>
       <div class="kk-flex" >
         <div>{{ $t('人数上限') }}：</div>
-        <div style="flex: 1" ></div>
+        <div style="flex: 1;" ></div>
         <div>
           <el-input-number :style="{width: '80px'}" size="small" v-model="maxHeadCount" :min="1" :max="6" step="1" :step-strictly="true" >
           </el-input-number>
         </div>
-        <div style="flex: 1" ></div>
+        <div style="flex: 1;" ></div>
       </div>
-      <div style="margin-top: 10px" ></div>
+      <div style="margin-top: 10px;" ></div>
       <div style="display: flex; border-top: 1px solid #f1f2f4;" >
         <div style="flex: 1;" ></div>
         <el-button size="small" type="primary" @click="confirm" style="margin-top: 10px;" >
@@ -52,7 +52,7 @@ import { getPureUrl } from "@/utils/UrlUtil";
 
 export default {
   name: 'CooperateGen',
-  props:['sshKey', 'advance'],
+  props: ['sshKey', 'advance'],
   setup(props, context) {
 
     // 控制Dialog显示

@@ -67,7 +67,7 @@
                   </template>
                   <div v-if="Object.keys(waitingList).length > 0" class="trans-items" >
                     <div v-for="item in waitingList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
-                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size == -1" />
+                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
                         <ToolTip :content="item.path + item.name" :delay="1000" >
@@ -94,7 +94,7 @@
                   </template>
                   <div v-if="Object.keys(uploadingList).length > 0" class="trans-items" >
                     <div v-for="item in uploadingList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
-                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size == -1" />
+                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
                         <ToolTip :content="item.path + item.name" :delay="1000" >
@@ -123,7 +123,7 @@
                   </template>
                   <div v-if="Object.keys(downloadingList).length > 0" class="trans-items" >
                     <div v-for="item in downloadingList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
-                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size == -1" />
+                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
                         <ToolTip :content="item.path + item.name" :delay="1000" >
@@ -152,7 +152,7 @@
                   </template>
                   <div v-if="Object.keys(finishedList).length > 0" class="trans-items" >
                     <div v-for="item in finishedList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
-                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size == -1" />
+                      <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
                         <ToolTip :content="item.path + item.name" :delay="1000" >
@@ -283,7 +283,7 @@ import {
 
 import i18n from "@/locales/i18n";
 import { cloud, load, syncUpload, syncDownload, localStoreUtil } from "@/utils/CloudUtil";
-import { deleteDialog } from "@/utils/DeleteDialog";
+import { deleteDialog } from "@/components/common/DeleteDialog";
 import { calcType } from "@/components/calc/CalcType";
 import { calcSize } from "@/components/calc/CalcSize";
 import { calcBgColor } from "@/components/calc/CalcColor";
@@ -294,7 +294,7 @@ import ToolTip from "@/components/common/ToolTip";
 import FileIcons from "file-icons-vue";
 
 export default {
-  name: "TerminalView",
+  name: 'TerminalView',
   components: {
     FileIcons,
     NoData,
@@ -364,13 +364,15 @@ export default {
       recordInfo.value.push({
         time: new Date().getTime(),
         content: '\r\nRecord ' + recordId.value + ' Over.',
-      })
-      await cloud('record-', recordId.value, JSON.stringify(recordInfo.value));
-      await toClipboard(getPureUrl() + '?record=' + recordId.value);
-      ElMessage({
-        message: i18n.global.t('录像链接已复制'),
-        type: 'success',
-        grouping: true,
+      });
+      cloud('record-', recordId.value, JSON.stringify(recordInfo.value)).then(() => {
+        toClipboard(getPureUrl() + '?record=' + recordId.value).then(() => {
+          ElMessage({
+            message: i18n.global.t('录像链接已复制'),
+            type: 'success',
+            grouping: true,
+          });
+        });
       });
     };
     const playRecord = (index) => {
@@ -470,16 +472,16 @@ export default {
     loadEnv();
 
     // 保存更改的配置
-    const saveOp = (name,item) => {
-      if(name) options.value = {...options.value,[name]:item};
+    const saveOp = (name, item) => {
+      if(name) options.value = {...options.value, [name]: item};
       localStoreUtil.setItem(localStore['options'], aesEncrypt(JSON.stringify(options.value)));
       loadOps();
     };
     // 删除配置
     const deleteOp = (name) => {
       delete options.value[name];
-      saveOp(null,null);
-      if(env.value.option && env.value.option === name) saveEnv({option:''},false);
+      saveOp(null, null);
+      if(env.value.option && env.value.option === name) saveEnv({option: ''}, false);
     };
 
     // 初始化终端
@@ -522,7 +524,10 @@ export default {
     };
     // 终端写入
     const termWrite = (content) => {
-      if(content) term.write(content);
+      if(content) {
+        term.focus();
+        term.write(content);
+      }
     };
 
     // 协作
@@ -604,7 +609,6 @@ export default {
           }, 1);
           // 协作成功
           if(urlParams.value.cooperate) {
-            term.focus();
             termWrite(result.info + ".\n");
             return;
           }
@@ -717,8 +721,17 @@ export default {
           termFit();
           isFirst.value = false;
         }
+        // 禁止在执行终端代码工作流的过程中进行人为输入
         if(UserTCodeHelper.active === active) {
           socket.value.send(aesEncrypt(JSON.stringify({type: 0, content: text, rows: 0, cols: 0}), secretKey.value));
+        }
+        else {
+          ElMessage({
+            message: i18n.global.t('终端代码') + ' ' + UserTCodeHelper.name + ' ' + i18n.global.t('正在执行'),
+            type: 'warning',
+            grouping: true,
+            repeatNum: Number.MIN_SAFE_INTEGER,
+          });
         }
       }
     };
@@ -840,7 +853,7 @@ export default {
     // websocket心跳续约 (25秒)
     let timer = null;
     const doHeartBeat = () => {
-      if(timer == null) {
+      if(!timer) {
         timer = setInterval(() => {
           if(socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(aesEncrypt(JSON.stringify({type: 2, content: "", rows: 0, cols: 0}), secretKey.value));
@@ -901,6 +914,7 @@ export default {
       const transTCode = tcode.value.toUpperCase();
       tcode.value = '';
       historyTCode.add(transTCode);
+      // 执行终端代码工作流
       // 功能终端代码
       if(transTCode[0] === 'F' && FuncTCode[transTCode]) FuncTCode[transTCode].execFlow(instance);
       // 系统终端代码
@@ -908,12 +922,13 @@ export default {
       // 用户终端代码
       else if(transTCode[0] === 'U' && tcodes.value[transTCode]) {
         if(!UserTCodeHelper.writeNoAwait) UserTCodeHelper.writeNoAwait = sendMessage;
-        if(!UserTCodeHelper.context) UserTCodeHelper.fileBlockRef = fileBlockRef.value;
-        // 未激活
+        if(!UserTCodeHelper.fileBlockRef) UserTCodeHelper.fileBlockRef = fileBlockRef.value;
+        // 当前未执行任何终端代码工作流
         if(!UserTCodeHelper.active) {
           UserTCodeHelper.reset();
+          UserTCodeHelper.name = transTCode;
           UserTCodeHelper.active = true;
-          // 执行流未被定义
+          // 编译: 工作流 => 执行流
           if(!tcodes.value[transTCode].execFlow || !(tcodes.value[transTCode].execFlow instanceof Function)) {
             const textFlow = tcodes.value[transTCode].workflow.toString();
             try {
@@ -929,8 +944,13 @@ export default {
               return;
             }
           }
-          // 执行Workflow
+          // 执行终端代码工作流
           try {
+            ElMessage({
+              message: i18n.global.t('终端代码') + ' ' + transTCode + ' ' + i18n.global.t('工作流开始'),
+              type: 'success',
+              grouping: true,
+            });
             await tcodes.value[transTCode].execFlow(UserTCodeExecutor);
             ElMessage({
               message: i18n.global.t('终端代码') + ' ' + transTCode + ' ' + i18n.global.t('工作流结束'),
@@ -951,12 +971,14 @@ export default {
         }
         else {
           ElMessage({
-            message: i18n.global.t('其它终端代码正在执行'),
+            message: i18n.global.t('终端代码') + ' ' + UserTCodeHelper.name + ' ' + i18n.global.t('正在执行'),
             type: 'warning',
             grouping: true,
+            repeatNum: Number.MIN_SAFE_INTEGER,
           });
         }
       }
+      // 错误终端代码
       else {
         if(transTCode[0] === 'F' || transTCode[0] === 'S' || transTCode[0] === 'U') {
           ElMessage({
@@ -1080,7 +1102,6 @@ export default {
       if(urlParams.value.record) {
         listenResize();
         recordInfo.value = await load('record-' + urlParams.value.record);
-        term.focus();
         if(recordInfo.value) playRecord(0);
         else termWrite('Record ID is Invalid.\r\n');
         return;

@@ -14,54 +14,54 @@
     <div class="no-select" >
       <el-tabs stretch type="border-card" @tab-click="handleTabClick" >
         <el-tab-pane :label="$t('概览')" >
-          <div class="kk-flex" style="height: 200px" >
-            <div style="margin-left: 5px" ></div>
+          <div class="kk-flex" style="height: 200px;" >
+            <div style="margin-left: 5px;" ></div>
             <div class="kk-flex-column" >
-              <div style="flex: 1" ></div>
+              <div style="flex: 1;" ></div>
               <div>{{ $t('负载') }}</div>
-              <div style="margin-top: 10px" ></div>
+              <div style="margin-top: 10px;" ></div>
               <el-progress :color="calcStatus(statusInfo.overview.load)" type="circle" :percentage="statusInfo.overview.load" />
-              <div style="margin-top: 10px" ></div>
+              <div style="margin-top: 10px;" ></div>
               <div v-if="statusInfo.overview.load < 33.4" >{{ $t('运行流畅') }}</div>
               <div v-else-if="statusInfo.overview.load < 66.7" >{{ $t('运行缓慢') }}</div>
               <div v-else >{{ $t('运行堵塞') }}</div>
-              <div style="flex: 1" ></div>
+              <div style="flex: 1;" ></div>
             </div>
-            <div style="flex: 1" ></div>
+            <div style="flex: 1;" ></div>
             <div class="kk-flex-column" >
-              <div style="flex: 1" ></div>
+              <div style="flex: 1;" ></div>
               <div>{{ $t('CPU使用率') }}</div>
-              <div style="margin-top: 10px" ></div>
+              <div style="margin-top: 10px;" ></div>
               <el-progress :color="calcStatus(statusInfo.overview.cpu)" type="circle" :percentage="statusInfo.overview.cpu" />
-              <div style="margin-top: 10px" ></div>
+              <div style="margin-top: 10px;" ></div>
               <div>{{ statusInfo.overview.core }} {{ $t('核心') }}</div>
-              <div style="flex: 1" ></div>
+              <div style="flex: 1;" ></div>
             </div>
-            <div style="flex: 1" ></div>
+            <div style="flex: 1;" ></div>
             <div class="kk-flex-column" >
-              <div style="flex: 1" ></div>
+              <div style="flex: 1;" ></div>
               <div>{{ $t('内存使用率') }}</div>
-              <div style="margin-top: 10px" ></div>
+              <div style="margin-top: 10px;" ></div>
               <el-progress :color="calcStatus(statusInfo.overview.usedMemory * 100 / statusInfo.overview.totalMemory)" type="circle" :percentage="calcNumber(statusInfo.overview.usedMemory * 100 / statusInfo.overview.totalMemory)" />
-              <div style="margin-top: 10px" ></div>
+              <div style="margin-top: 10px;" ></div>
               <div>{{ statusInfo.overview.usedMemory }} / {{ statusInfo.overview.totalMemory }} (MB)</div>
-              <div style="flex: 1" ></div>
+              <div style="flex: 1;" ></div>
             </div>
-            <div style="flex: 1" ></div>
+            <div style="flex: 1;" ></div>
             <div class="kk-flex-column" >
-              <div style="flex: 1" ></div>
+              <div style="flex: 1;" ></div>
               <div>/</div>
-              <div style="margin-top: 10px" ></div>
+              <div style="margin-top: 10px;" ></div>
               <el-progress :color="calcStatus(statusInfo.overview.usedRoot * 100 / statusInfo.overview.totalRoot)" type="circle" :percentage="calcNumber(statusInfo.overview.usedRoot * 100 / statusInfo.overview.totalRoot)" />
-              <div style="margin-top: 10px" ></div>
+              <div style="margin-top: 10px;" ></div>
               <div>{{ calcNumber(statusInfo.overview.usedRoot / 1024, 2) }}G / {{ calcNumber(statusInfo.overview.totalRoot / 1024, 2) }}G</div>
-              <div style="flex: 1" ></div>
+              <div style="flex: 1;" ></div>
             </div>
-            <div style="margin-left: 5px" ></div>
+            <div style="margin-left: 5px;" ></div>
           </div>
         </el-tab-pane>
         <el-tab-pane :label="$t('Top进程')" >
-          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="statusInfo.processes.length > 0" :data="statusInfo.processes" border stripe >
+          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%;" v-if="statusInfo.processes.length > 0" :data="statusInfo.processes" border stripe >
             <el-table-column prop="pid" label="PID" width="80" />
             <el-table-column prop="user" label="User" width="100" />
             <el-table-column prop="cpu" label="%CPU" width="100" />
@@ -73,12 +73,12 @@
           </div>
         </el-tab-pane>
         <el-tab-pane :label="$t('网络')" >
-          <div style="position: relative" >
+          <div style="position: relative;" >
             <EChart v-show="statusInfo.time.length > 1"
               style="width: 650px; height: 200px;" ref="networkEChartRef"
               :legend="[$t('上行'),$t('下行')]" yName="KB/s" >
             </EChart>
-            <div v-show="statusInfo.time.length > 1" style="position: absolute; top: 0; right: 0" >
+            <div v-show="statusInfo.time.length > 1" style="position: absolute; top: 0; right: 0;" >
               <el-dropdown size="small" style="margin-top: 2px; margin-right: 25px;" hide-timeout="300" >
                 <span class="a-link no-select" >{{ selectedNetwork }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
                 <template #dropdown>
@@ -90,14 +90,14 @@
                 </template>
               </el-dropdown>
             </div>
-            <div v-show="statusInfo.time.length > 1" style="position: absolute; top: 0; left: 0" >
+            <div v-show="statusInfo.time.length > 1" style="position: absolute; top: 0; left: 0;" >
               <div class="kk-flex" >
-                <div class="kk-flex" style="color: #5a6fc0" >
+                <div class="kk-flex" style="color: #5a6fc0;" >
                   <el-icon><SortUp /></el-icon>
                   <div>{{ (networkSeries[0].data[networkSeries[0].data.length - 1] || 0) + 'K' }}</div>
                 </div>
-                <div style="margin-left: 10px" ></div>
-                <div class="kk-flex" style="color: #9eca7f" >
+                <div style="margin-left: 10px;" ></div>
+                <div class="kk-flex" style="color: #9eca7f;" >
                   <el-icon><SortDown /></el-icon>
                   <div>{{ (networkSeries[1].data[networkSeries[1].data.length - 1] || 0) + 'K' }}</div>
                 </div>
@@ -109,12 +109,12 @@
           </div>
         </el-tab-pane>
         <el-tab-pane :label="$t('磁盘')" >
-          <div style="position: relative" >
+          <div style="position: relative;" >
             <EChart v-show="statusInfo.time.length > 1"
                     style="width: 650px; height: 200px;" ref="diskEChartRef"
                     :legend="[$t('读'),$t('写')]" yName="KB/s" >
             </EChart>
-            <div v-show="statusInfo.time.length > 1" style="position: absolute; top: 0; right: 0" >
+            <div v-show="statusInfo.time.length > 1" style="position: absolute; top: 0; right: 0;" >
               <el-dropdown size="small" style="margin-top: 2px; margin-right: 25px;" hide-timeout="300" >
                 <span class="a-link no-select" >{{ selectedDisk }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
                 <template #dropdown>
@@ -126,14 +126,14 @@
                 </template>
               </el-dropdown>
             </div>
-            <div v-show="statusInfo.time.length > 1" style="position: absolute; top: 0; left: 0" >
+            <div v-show="statusInfo.time.length > 1" style="position: absolute; top: 0; left: 0;" >
               <div class="kk-flex" >
-                <div class="kk-flex" style="color: #5a6fc0" >
+                <div class="kk-flex" style="color: #5a6fc0;" >
                   <el-icon><SortUp /></el-icon>
                   <div>{{ (diskSeries[0].data[diskSeries[0].data.length - 1] || 0) + 'K' }}</div>
                 </div>
-                <div style="margin-left: 10px" ></div>
-                <div class="kk-flex" style="color: #9eca7f" >
+                <div style="margin-left: 10px;" ></div>
+                <div class="kk-flex" style="color: #9eca7f;" >
                   <el-icon><SortDown /></el-icon>
                   <div>{{ (diskSeries[1].data[diskSeries[1].data.length - 1] || 0) + 'K' }}</div>
                 </div>
@@ -163,8 +163,8 @@ import { calcTime } from "@/components/calc/CalcDate";
 import i18n from "@/locales/i18n";
 
 export default {
-  name:'StatusMonitor',
-  methods: {calcNumber, calcStatus, calcTime },
+  name: 'StatusMonitor',
+  methods: { calcNumber, calcStatus, calcTime },
   components: {
     EChart,
     NoData,
@@ -172,7 +172,7 @@ export default {
     SortUp,
     SortDown,
   },
-  props:['sshKey', 'advance'],
+  props: ['sshKey', 'advance'],
   setup(props) {
     // 拷贝
     const { toClipboard } = useClipboard();
@@ -369,8 +369,9 @@ export default {
     };
 
     const handleTabClick = (tab) => {
-      if(tab.index == 2 && !networkEChartRef.value.isFinished) networkEChartRef.value.loading = true;
-      if(tab.index == 3 && !diskEChartRef.value.isFinished) diskEChartRef.value.loading = true;
+      const index = parseInt(tab.index);
+      if(index === 2 && !networkEChartRef.value.isFinished) networkEChartRef.value.loading = true;
+      if(index === 3 && !diskEChartRef.value.isFinished) diskEChartRef.value.loading = true;
     };
 
     // 复制表格数据

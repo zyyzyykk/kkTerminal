@@ -189,6 +189,7 @@ export const UserTCodeExecutor = {
     },
     // 写入后等待
     async write(content, time = 200) {
+        content = content.toString();
         if(!content) content = '\n';
         else if(!content.endsWith('\n') && !content.endsWith('\r')) content += '\n';
         UserTCodeHelper.cnt = UserTCodeHelper.outArray.length;
@@ -214,6 +215,7 @@ export const UserTCodeExecutor = {
     },
 };
 export const UserTCodeHelper = {
+    name: '',
     active: false,
     display: true,
     outArray: [],
@@ -228,6 +230,7 @@ export const UserTCodeHelper = {
         return { dir, name };
     },
     reset() {
+        this.name = '';
         this.active = false;
         this.display = true;
         this.outArray = [];
@@ -279,7 +282,7 @@ const filterANSI = (str) => {
 // Success-执行成功: Execute Success
 export const TCodeStatusEnum = {
     'Compile Error': 'Error',
-    'Execute Interrupt':'Interrupted',
+    'Execute Interrupt': 'Interrupted',
     'Not Active': 'Inactive',
     'Execute Success': 'Success',
 };

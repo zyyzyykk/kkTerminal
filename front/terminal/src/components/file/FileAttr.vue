@@ -131,8 +131,8 @@ export default {
     Edit,
     PermissionsEdit,
   },
-  props:['sshKey','uploadingList'],
-  setup(props,context) {
+  props: ['sshKey', 'uploadingList'],
+  setup(props, context) {
     // 拷贝
     const { toClipboard } = useClipboard();
 
@@ -223,13 +223,13 @@ export default {
       }
       const oldPath = fileDir.value + fileInfo.value.name;
       const newPath = fileDir.value + rename.value;
-      context.emit('callback',oldPath,newPath);
+      context.emit('callback', oldPath, newPath);
       closeDialog();
     };
 
     // 复制
     const doCopy = async (content) => {
-      content += '';
+      content = content.toString();
       if(!(content && content.length > 0)) {
         ElMessage({
           message: i18n.global.t('内容为空'),
@@ -255,11 +255,11 @@ export default {
     // 重置
     const reset = () => {
       fileInfo.value = {
-        attributes:{
-          mode:{
-            type:'',
+        attributes: {
+          mode: {
+            type: '',
           },
-          permissions:'',
+          permissions: '',
           size: 0,
         },
       };

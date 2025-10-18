@@ -12,7 +12,7 @@
       <div class="container-body" >
         <div class="kk-flex" >
           <div style="flex: 1;" >
-            <el-input v-model="password" type="password" @keydown.enter="verify" class="w-50 m-2 body-item" minlength="1" maxlength="16" :placeholder="$t('输入密码以获取访问权限')" >
+            <el-input v-model="password" type="password" @keydown.enter="verify" class="w-50 m-2 body-item" maxlength="16" :placeholder="$t('输入密码以获取访问权限')" >
               <template #prefix>
                 <el-icon class="el-input__icon" ><Lock /></el-icon>
               </template>

@@ -66,11 +66,11 @@ export default {
     // 文件信息
     const fileDir = ref('');
     const fileInfo = ref({
-      attributes:{
-        mode:{
-          type:'',
+      attributes: {
+        mode: {
+          type: '',
         },
-        permissions:'',
+        permissions: '',
       },
     });
 
@@ -95,11 +95,11 @@ export default {
     const reset = () => {
       fileDir.value = '';
       fileInfo.value = {
-        attributes:{
-          mode:{
-            type:'',
+        attributes: {
+          mode: {
+            type: '',
           },
-          permissions:'',
+          permissions: '',
         },
       };
       permissionsInfo.value = {

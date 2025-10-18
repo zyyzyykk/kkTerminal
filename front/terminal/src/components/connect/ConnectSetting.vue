@@ -61,7 +61,7 @@
       </div>
       <div class="item-class" style="margin-bottom: 5px;" >
         <el-dropdown :disabled="isForbidInput" class="no-select form-width" hide-timeout="300" >
-          <span>{{ setInfo.authType == 0 ? $t('密码') : $t('私钥') }}<el-icon class="el-icon--right" ><arrow-down style="cursor: pointer;" /></el-icon></span>
+          <span>{{ setInfo.authType === 0 ? $t('密码') : $t('私钥') }}<el-icon class="el-icon--right" ><arrow-down style="cursor: pointer;" /></el-icon></span>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item class="no-select" @click="switchAuthType(0)" >{{ $t('密码') }}</el-dropdown-item>
@@ -69,7 +69,7 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-        <div v-if="setInfo.authType == 0" class="item-class" >
+        <div v-if="setInfo.authType === 0" class="item-class" >
           <div>
             <el-input :disabled="isForbidInput" v-model="setInfo.server_password" :type="isShowPassword ? 'text': 'password'" class="w-50 m-2" :placeholder="$t('输入密码')" >
               <template #prefix>
@@ -117,7 +117,7 @@ import i18n from "@/locales/i18n";
 import { isIP, isFQDN } from '@/utils/IPUtil';
 
 export default {
-  name:'ConnectSetting',
+  name: 'ConnectSetting',
   components: {
     ToolTip,
     OptionBlock,
@@ -135,8 +135,8 @@ export default {
     ArrowDown,
     Key,
   },
-  props:['env','sshOptions'],
-  setup(props,context) {
+  props: ['env', 'sshOptions'],
+  setup(props, context) {
 
     // 控制Dialog显示
     const DialogVisible = ref(false);
@@ -173,12 +173,12 @@ export default {
         return false;
       }
       // 校验密码
-      if (setInfo.value.authType == 0 && !setInfo.value.server_password) {
+      if (setInfo.value.authType === 0 && !setInfo.value.server_password) {
         err_msg.value = i18n.global.k("密码不能为空");
         return false;
       }
       // 校验私钥
-      if(setInfo.value.authType == 1 && !(setInfo.value.server_key && setInfo.value.server_key.content)) {
+      if(setInfo.value.authType === 1 && !(setInfo.value.server_key && setInfo.value.server_key.content)) {
         err_msg.value = i18n.global.k("私钥不能为空");
         return false;
       }
@@ -191,7 +191,7 @@ export default {
     const optionBlockType = ref(0);
 
     const showOption = (type) => {
-      if(type == 1 && !verifyParams()) return;
+      if(type === 1 && !verifyParams()) return;
       optionBlockType.value = type;
       optionBlockRef.value.aimOption = '';
       optionBlockRef.value.DialogVisible = true;
@@ -201,7 +201,7 @@ export default {
     if(setInfo.value.option) isForbidInput.value = true;
     const doOption = (option) => {
       // 切换
-      if(optionBlockType.value == 0)
+      if(optionBlockType.value === 0)
       {
         if(!props.sshOptions[option].authType) setInfo.value.authType = 0;
         setInfo.value = {...setInfo.value, ...props.sshOptions[option]};
@@ -209,7 +209,7 @@ export default {
         err_msg.value = '';
       }
       // 保存
-      else if(optionBlockType.value == 1)
+      else if(optionBlockType.value === 1)
       {
         setInfo.value.option = option;
         context.emit('saveOp', option, setInfo.value);
@@ -225,7 +225,7 @@ export default {
     // 删除配置
     const handleDeleteOption = (name) => {
       context.emit('deleteOp', name);
-      if(setInfo.value.option && setInfo.value.option == name) {
+      if(setInfo.value.option && setInfo.value.option === name) {
         setInfo.value.option = '';
         isForbidInput.value = false;
       }
@@ -247,7 +247,7 @@ export default {
     const switchAuthType = (type) => {
       setInfo.value.authType = type;
       // 选择密码登录
-      if(type == 0) privateKeyRef.value.closeDialog();
+      if(type === 0) privateKeyRef.value.closeDialog();
     };
 
     const confirm = () => {
@@ -265,7 +265,7 @@ export default {
 
     // 复制
     const doCopy = async (content) => {
-      content += '';
+      content = content.toString();
       if(!(content && content.length > 0)) {
         ElMessage({
           message: i18n.global.t('内容为空'),

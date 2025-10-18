@@ -14,9 +14,9 @@
     <div class="no-select" >
       <el-tabs stretch :element-loading-text="$t('加载中...')" v-loading="loading" @tab-click="handleTabClick" type="border-card" >
         <el-tab-pane :label="$t('部署')" >
-          <div v-if="noDocker" class="kk-flex-column" style="height: 240px" >
-            <div style="flex: 1" ></div>
-            <div><img style="height: 160px" src="@/assets/no_docker.png" alt="docker" ></div>
+          <div v-if="noDocker" class="kk-flex-column" style="height: 240px;" >
+            <div style="flex: 1;" ></div>
+            <div><img style="height: 160px;" src="@/assets/no_docker.png" alt="docker" ></div>
             <div class="kk-flex" style="margin-top: 25px;" >
               <div style="font-size: large;" >{{ $t('Docker未安装?') }}</div>
               <div>
@@ -25,7 +25,7 @@
                 </el-button>
               </div>
             </div>
-            <div style="flex: 1" ></div>
+            <div style="flex: 1;" ></div>
           </div>
           <div v-else >
             <div id="docker-appstore" v-if="!deployInfo.isShow" style="height: 240px; overflow-y: scroll;" >
@@ -94,7 +94,7 @@
                   <div class="form-width" >{{ $t('镜像') }}</div>
                   <div class="kk-flex" style="flex: 1;" >
                     <el-input style="flex: 1;" v-model="deployInfo.imageName" class="w-50 m-2" :placeholder="$t('镜像名称')" ></el-input>
-                    <div style="margin: 0 5px" >:</div>
+                    <div style="margin: 0 5px;" >:</div>
                     <el-input v-model="deployInfo.imageVersion" style="width: 80px;" class="w-50 m-2" :placeholder="$t('版本号')" ></el-input>
                   </div>
                 </div>
@@ -183,7 +183,7 @@
           </div>
         </el-tab-pane>
         <el-tab-pane :disabled="noDocker" :label="$t('镜像')" >
-          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.image.length > 0" :data="dockerInfo.image" @selection-change="tableSelect" border stripe >
+          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%;" v-if="dockerInfo.image.length > 0" :data="dockerInfo.image" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" width="40" fixed="left" />
             <el-table-column show-overflow-tooltip prop="id" label="ID" width="130" />
             <el-table-column show-overflow-tooltip prop="repository" :label="$t('仓库')" />
@@ -209,7 +209,7 @@
           </div>
         </el-tab-pane>
         <el-tab-pane :disabled="noDocker" :label="$t('网络')" >
-          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.network.length > 0" :data="dockerInfo.network" @selection-change="tableSelect" border stripe >
+          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%;" v-if="dockerInfo.network.length > 0" :data="dockerInfo.network" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" width="40" fixed="left" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="140" />
             <el-table-column show-overflow-tooltip prop="ip" label="IP" />
@@ -235,7 +235,7 @@
           </div>
         </el-tab-pane>
         <el-tab-pane :disabled="noDocker" :label="$t('数据卷')" >
-          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%" v-if="dockerInfo.volume.length > 0" :data="dockerInfo.volume" @selection-change="tableSelect" border stripe >
+          <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%;" v-if="dockerInfo.volume.length > 0" :data="dockerInfo.volume" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" width="40" fixed="left" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="140" />
             <el-table-column show-overflow-tooltip prop="mount" :label="$t('挂载点')" />
@@ -277,7 +277,7 @@ import { http_base_url } from "@/env/BaseUrl";
 import { ArrowDown, ArrowLeft, Search, Document, Operation } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
 import { ElMessage } from "element-plus";
-import { deleteDialog } from "@/utils/DeleteDialog";
+import { deleteDialog } from "@/components/common/DeleteDialog";
 import useClipboard from "vue-clipboard3";
 import { dockerAppTypes, dockerAppStore } from "./DockerAppStore";
 import { generateRandomString } from "@/utils/StringUtil";
@@ -293,7 +293,7 @@ export default {
     Document,
     Operation,
   },
-  props:['sshKey', 'advance'],
+  props: ['sshKey', 'advance'],
   setup(props, context) {
     // 拷贝
     const { toClipboard } = useClipboard();
@@ -356,8 +356,8 @@ export default {
             let network = dockerInfo.value.network;
             let volume = dockerInfo.value.volume;
             // 容器
-            if(currentType == 0) {
-              const containerArr = (resp.data && resp.data != 'null') ? resp.data.split('$') : [];
+            if(currentType === 0) {
+              const containerArr = (resp.data && resp.data !== 'null') ? resp.data.split('$') : [];
               container = [];
               for(let i = 0; i < containerArr.length; i++) {
                 const containerInfo = containerArr[i].split('@');
@@ -371,8 +371,8 @@ export default {
               }
             }
             // 镜像
-            else if(currentType == 1) {
-              const imageArr = (resp.data && resp.data != 'null') ? resp.data.split('$') : [];
+            else if(currentType === 1) {
+              const imageArr = (resp.data && resp.data !== 'null') ? resp.data.split('$') : [];
               image = [];
               for(let i = 0; i < imageArr.length; i++) {
                 const imageInfo = imageArr[i].split('@');
@@ -385,8 +385,8 @@ export default {
               }
             }
             // 网络
-            else if(currentType == 2) {
-              const networkArr = (resp.data && resp.data != 'null') ? resp.data.split('$') : [];
+            else if(currentType === 2) {
+              const networkArr = (resp.data && resp.data !== 'null') ? resp.data.split('$') : [];
               network = [];
               for(let i = 0; i < networkArr.length; i++) {
                 const networkInfo = networkArr[i].split('@');
@@ -399,8 +399,8 @@ export default {
               }
             }
             // 数据卷
-            else if(currentType == 3) {
-              const volumeArr = (resp.data && resp.data != 'null') ? resp.data.split('$') : [];
+            else if(currentType === 3) {
+              const volumeArr = (resp.data && resp.data !== 'null') ? resp.data.split('$') : [];
               volume = [];
               for(let i = 0; i < volumeArr.length; i++) {
                 const volumeInfo = volumeArr[i].split('@');
@@ -426,7 +426,8 @@ export default {
       selectedItems.value = [];
       containerType.value = 0;
       deleteType.value = 0;
-      if(tab.index > 0) getDockerInfo(tab.index - 1);
+      const index = parseInt(tab.index);
+      if(index > 0) getDockerInfo(index - 1);
     };
 
     // Docker 容器操作 删除
@@ -707,7 +708,7 @@ export default {
 .card-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px; /* 卡片之间的间距 */
+  gap: 20px; /* 卡片间距 */
   padding: 0 5px;
   justify-content: space-between;
   margin-top: 20px;
@@ -728,7 +729,7 @@ export default {
 /* 隐藏滚动条 */
 #docker-appstore {
   scrollbar-width: none !important; /* Firefox */
-  -ms-overflow-style: none !important; /* Internet Explorer 和 Edge */
+  -ms-overflow-style: none !important; /* IE 和 Edge */
 }
 
 #docker-appstore::-webkit-scrollbar {

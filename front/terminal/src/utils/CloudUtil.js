@@ -28,10 +28,10 @@ export const cloud = async (type, name, content) => {
   // 创建File对象
   const file = new File([blob], name);
   const formData = new FormData();
-  formData.append('user',userInfo.name + '-' + userInfo.time);
-  formData.append('type',type);
-  formData.append('name',name);
-  formData.append('file',file);
+  formData.append('user', userInfo.name + '-' + userInfo.time);
+  formData.append('type', type);
+  formData.append('name', name);
+  formData.append('file', file);
   return new Promise((resolve, reject) => {
     $.ajax({
       url: http_base_url + '/cloud',
@@ -41,7 +41,7 @@ export const cloud = async (type, name, content) => {
       processData: false,
       success(resp) {
         if(resp.status !== 'success') {
-          if(resp.code == 506) {
+          if(resp.code === 506) {
             ElMessage({
               message: i18n.global.t('云端文件过多'),
               type: resp.status,
@@ -55,6 +55,7 @@ export const cloud = async (type, name, content) => {
               grouping: true,
             });
           }
+          reject();
         }
         resolve();
       },
