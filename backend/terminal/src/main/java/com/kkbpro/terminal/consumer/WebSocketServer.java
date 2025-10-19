@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.lalyos.jfiglet.FigletFont;
 import com.kkbpro.terminal.config.AppConfig;
+import com.kkbpro.terminal.constant.Constant;
 import com.kkbpro.terminal.enums.SocketMessageEnum;
 import com.kkbpro.terminal.enums.SocketSendEnum;
 import com.kkbpro.terminal.controller.AdvanceController;
@@ -39,7 +40,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@ServerEndpoint("/socket/ssh/{ws}")  // 注意不要以'/'结尾
+@ServerEndpoint(Constant.API_PREFIX + "/socket/ssh/{ws}")  // 注意不要以'/'结尾
 public class WebSocketServer {
 
     public static final String SOCKET_SECRET_KEY = StringUtil.generateRandomString(16);

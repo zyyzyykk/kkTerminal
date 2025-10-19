@@ -21,14 +21,14 @@ import java.util.Map;
  * 访问权限类
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping(Constant.API_PREFIX + "/access")
 public class AccessController {
 
     @Autowired
     private AppConfig appConfig;
 
     @Log
-    @PostMapping("/access/login")
+    @PostMapping("/login")
     public Result login(String password) throws Exception {
         // 解密密码
         password = RSAUtil.decrypt(password);

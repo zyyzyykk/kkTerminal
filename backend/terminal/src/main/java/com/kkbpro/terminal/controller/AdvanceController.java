@@ -1,6 +1,7 @@
 package com.kkbpro.terminal.controller;
 
 import com.kkbpro.terminal.annotation.Log;
+import com.kkbpro.terminal.constant.Constant;
 import com.kkbpro.terminal.consumer.WebSocketServer;
 import com.kkbpro.terminal.enums.ResultCodeEnum;
 import com.kkbpro.terminal.pojo.dto.CooperateInfo;
@@ -23,7 +24,7 @@ import java.util.UUID;
  * 高级功能接口类
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping(Constant.API_PREFIX + "/advance")
 public class AdvanceController {
 
     public static final String COOPERATE_SECRET_KEY = StringUtil.generateRandomString(16);

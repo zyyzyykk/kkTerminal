@@ -1,7 +1,7 @@
 import { aesDecrypt, aesEncrypt } from '@/utils/Encrypt';
 import { generateRandomString } from '@/utils/StringUtil';
 
-import $ from 'jquery';
+import request from "@/utils/RequestUtil";
 import { http_base_url } from '@/env/BaseUrl';
 import { ElMessage } from 'element-plus';
 import i18n from "@/locales/i18n";
@@ -20,7 +20,7 @@ const getUserInfo = () => {
 };
 
 // content: string
-export const cloud = async (type, name, content) => {
+export const cloudUpload = async (type, name, content) => {
   if(!content) return;
   const userInfo = getUserInfo();
   // 创建Blob对象
@@ -33,8 +33,8 @@ export const cloud = async (type, name, content) => {
   formData.append('name', name);
   formData.append('file', file);
   return new Promise((resolve, reject) => {
-    $.ajax({
-      url: http_base_url + '/cloud',
+    request({
+      url: http_base_url + '/cloud/upload',
       type: 'post',
       data: formData,
       contentType: false,
@@ -67,12 +67,12 @@ export const cloud = async (type, name, content) => {
 };
 
 // return: object
-export const load = async (fileName) => {
+export const cloudDownload = async (fileName) => {
   const userInfo = getUserInfo();
   return new Promise((resolve, reject) => {
     let content = null;
-    $.ajax({
-      url: http_base_url + '/load',
+    request({
+      url: http_base_url + '/cloud/download',
       method: 'GET',
       data: {
         user: userInfo.name + '-' + userInfo.time,
@@ -100,7 +100,7 @@ export const syncUpload = async (items) => {
   for(let i = 0; i < syncItems.length; i++) {
     const content = localStorage.getItem(syncItems[i]);
     if(content) {
-      const promise = cloud(syncItems[i], '', aesDecrypt(content));
+      const promise = cloudUpload(syncItems[i], '', aesDecrypt(content));
       promises.push(promise);
     }
   }
@@ -112,7 +112,7 @@ export const syncDownload = async (userInfo) => {
   if(userInfo) localStorage.setItem(localStore['user'], userInfo);
   const promises = [];
   for(let i = 0; i < syncArr.length; i++) {
-    const promise = load(syncArr[i]);
+    const promise = cloudDownload(syncArr[i]);
     promise.then((content) => {
       if(content) localStorage.setItem(syncArr[i], aesEncrypt(JSON.stringify(content)));
       // TODO

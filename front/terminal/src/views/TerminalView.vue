@@ -247,7 +247,7 @@ import { FitAddon } from 'xterm-addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import "xterm/css/xterm.css";
 
-import $ from 'jquery';
+import request from "@/utils/RequestUtil";
 import { default_env } from '@/env/Env';
 import { ws_base_url } from '@/env/BaseUrl';
 import { changeStr, changeBase64Str, changeStrBase64, generateRandomString } from '@/utils/StringUtil';
@@ -282,7 +282,7 @@ import {
 } from "@/components/tcode/TCode";
 
 import i18n from "@/locales/i18n";
-import { cloud, load, syncUpload, syncDownload, localStoreUtil } from "@/utils/CloudUtil";
+import { cloudUpload, cloudDownload, syncUpload, syncDownload, localStoreUtil } from "@/utils/CloudUtil";
 import { deleteDialog } from "@/components/common/DeleteDialog";
 import { calcType } from "@/components/calc/CalcType";
 import { calcSize } from "@/components/calc/CalcSize";
@@ -365,7 +365,7 @@ export default {
         time: new Date().getTime(),
         content: '\r\nRecord ' + recordId.value + ' Over.',
       });
-      cloud('record-', recordId.value, JSON.stringify(recordInfo.value)).then(() => {
+      cloudUpload('record-', recordId.value, JSON.stringify(recordInfo.value)).then(() => {
         toClipboard(getPureUrl() + '?record=' + recordId.value).then(() => {
           ElMessage({
             message: i18n.global.t('录像链接已复制'),
@@ -539,8 +539,8 @@ export default {
       cooperating.value = true;
     };
     const endCooperate = () => {
-      $.ajax({
-        url: http_base_url + '/cooperate/end',
+      request({
+        url: http_base_url + '/advance/cooperate/end',
         type: 'post',
         data: {
           sshKey: sshKey.value,
@@ -862,8 +862,8 @@ export default {
           }
           // 本地PC端
           if(props.osInfo.serverOS !== "Linux") {
-            $.ajax({
-              url: http_base_url + '/beat',
+            request({
+              url: http_base_url + '/system/beat',
               type: 'post',
               data: {
                 windowId: props.osInfo.windowId,
@@ -1104,7 +1104,7 @@ export default {
       // 录像
       if(urlParams.value.record) {
         listenResize();
-        recordInfo.value = await load('record-' + urlParams.value.record);
+        recordInfo.value = await cloudDownload('record-' + urlParams.value.record);
         if(recordInfo.value) playRecord(0);
         else termWrite('Record ID is Invalid.\r\n');
         return;

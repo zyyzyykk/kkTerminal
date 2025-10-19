@@ -12,7 +12,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
-import $ from 'jquery';
+import request from "@/utils/RequestUtil";
 import { http_base_url } from '@/env/BaseUrl';
 import { syncDownload } from "@/utils/CloudUtil";
 import { secretKeySetter } from "@/utils/Encrypt";
@@ -33,8 +33,8 @@ export default {
 
     onMounted(() => {
       setTimeout(() => {
-        $.ajax({
-          url: http_base_url + '/init',
+        request({
+          url: http_base_url + '/system/init',
           type: 'post',
           success(resp) {
             const data = JSON.parse(resp.info);

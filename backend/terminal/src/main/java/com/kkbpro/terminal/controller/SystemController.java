@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping(Constant.API_PREFIX + "/system")
 public class SystemController {
 
     public static String serverOS = "Linux";

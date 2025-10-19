@@ -151,7 +151,7 @@
 
 <script>
 import { ref, computed } from 'vue';
-import $ from 'jquery';
+import request from "@/utils/RequestUtil";
 import { ArrowDown, SortUp, SortDown } from '@element-plus/icons-vue';
 import { http_base_url } from "@/env/BaseUrl";
 import { calcNumber, calcStatus } from "@/components/calc/CalcType";
@@ -203,8 +203,8 @@ export default {
     const selectedNetwork = ref('all');
     const selectedDisk = ref('all');
     const getStatusInfo = () => {
-      $.ajax({
-        url: http_base_url + '/monitor',
+      request({
+        url: http_base_url + '/advance/monitor',
         type: 'post',
         data: {
           sshKey: props.sshKey,

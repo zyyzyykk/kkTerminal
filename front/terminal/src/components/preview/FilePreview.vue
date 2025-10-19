@@ -109,7 +109,7 @@
 <script>
 import { ref } from 'vue';
 import AceEditor from '@/components/common/AceEditor';
-import $ from 'jquery';
+import request from "@/utils/RequestUtil";
 import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
 import { previewFileInfo } from '@/components/preview/FileSuffix';
@@ -159,7 +159,7 @@ export default {
         if(config.indent) indent.value = config.indent;
         if(config.size) fontSize.value = config.size;
       }
-      jqXHR.value = $.ajax({
+      jqXHR.value = request({
         url: url,
         method: 'GET',
         xhrFields: {

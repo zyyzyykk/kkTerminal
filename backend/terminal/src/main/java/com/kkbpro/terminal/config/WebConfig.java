@@ -1,5 +1,6 @@
 package com.kkbpro.terminal.config;
 
+import com.kkbpro.terminal.constant.Constant;
 import com.kkbpro.terminal.interceptor.AccessInterceptor;
 import com.kkbpro.terminal.interceptor.BusinessInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,11 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册请求前拦截器
         registry.addInterceptor(accessInterceptor)
-                .addPathPatterns("/api/**")
-                .excludePathPatterns("/api/init")
-                .excludePathPatterns("/api/access/**");
-        registry.addInterceptor(businessInterceptor).addPathPatterns("/**");
+                .addPathPatterns(Constant.API_PREFIX + "/**")
+                .excludePathPatterns(Constant.API_PREFIX + "/system/**")
+                .excludePathPatterns(Constant.API_PREFIX + "/access/**");
+        registry.addInterceptor(businessInterceptor)
+                .addPathPatterns(Constant.API_PREFIX + "/**");
     }
 
 }

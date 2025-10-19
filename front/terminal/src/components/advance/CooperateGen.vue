@@ -44,10 +44,10 @@
 <script>
 import { ref,computed } from 'vue';
 import useClipboard from "vue-clipboard3";
-import $ from 'jquery';
 import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/env/BaseUrl';
 import i18n from "@/locales/i18n";
+import request from "@/utils/RequestUtil";
 import { getPureUrl } from "@/utils/UrlUtil";
 
 export default {
@@ -70,8 +70,8 @@ export default {
     // 确定
     const confirm = async () => {
       const maxHC = maxHeadCount.value;
-      $.ajax({
-        url: http_base_url + '/cooperate/key',
+      request({
+        url: http_base_url + '/advance/cooperate/key',
         type: 'get',
         data: {
           sshKey: props.sshKey,

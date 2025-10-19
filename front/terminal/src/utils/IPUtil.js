@@ -19,9 +19,8 @@ const IPv6AddressRegExp = new RegExp('^(' +
 
 // Check validity of IP address
 export const isIP = (ipAddress, options = {}) => {
-    // accessing 'arguments' for backwards compatibility: isIP(ipAddress [, version])
     // eslint-disable-next-line prefer-rest-params
-    const version = (typeof options === 'object' ? options.version : arguments[1]) || '';
+    const version = (typeof options === 'object' ? options.version : '');
 
     if (!version) {
         return isIP(ipAddress, { version: 4 }) || isIP(ipAddress, { version: 6 });

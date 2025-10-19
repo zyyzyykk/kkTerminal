@@ -11,8 +11,6 @@
   "获取大小失败": "Size Failed",
   "获取大小成功": "Sized",
   "家路径": "Home Path",
-  "获取当前目录失败": "Current Dir Failed",
-  "获取当前目录成功": "Current Dir Success",
   "删除失败": "Delete Failed",
   "删除成功": "Deleted",
   "复制失败": "Copy Failed",

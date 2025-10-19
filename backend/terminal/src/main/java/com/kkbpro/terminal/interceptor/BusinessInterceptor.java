@@ -22,12 +22,15 @@ public class BusinessInterceptor implements HandlerInterceptor {
     @Log
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        // 获取请求头 X-Accept-Language
+        String acceptLang = request.getHeader("X-Accept-Language");
         // 获取请求参数 sshKey
         String sshKey = request.getParameter("sshKey");
         // 获取语言
         String lang = "en";
         try {
-            if (!StringUtil.isEmpty(sshKey)) lang = sshKey.split("-")[0];
+            if (!StringUtil.isEmpty(acceptLang)) lang = acceptLang;
+            else if (!StringUtil.isEmpty(sshKey)) lang = sshKey.split("-")[0];
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
         } finally {

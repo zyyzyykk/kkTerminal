@@ -1,6 +1,7 @@
 package com.kkbpro.terminal.controller;
 
 import com.kkbpro.terminal.annotation.Log;
+import com.kkbpro.terminal.constant.Constant;
 import com.kkbpro.terminal.enums.FileStateEnum;
 import com.kkbpro.terminal.enums.ResultCodeEnum;
 import com.kkbpro.terminal.result.Result;
@@ -23,7 +24,7 @@ import java.time.temporal.ChronoUnit;
  * 云端同步
  **/
 @RestController
-@RequestMapping("/api")
+@RequestMapping(Constant.API_PREFIX + "/cloud")
 public class CloudController {
 
     private static final String cloudBasePath = System.getProperty("user.dir") + "/" + "cloud";
@@ -38,7 +39,7 @@ public class CloudController {
      * 上传文件
      */
     @Log
-    @PostMapping("/cloud")
+    @PostMapping("/upload")
     public Result uploadCloud(String user, String type, String name, MultipartFile file) throws IOException {
         String folderPath = cloudBasePath + "/" + user;
         File folder = new File(folderPath);
@@ -62,8 +63,8 @@ public class CloudController {
      * 读取文件
      */
     @Log
-    @GetMapping("/load")
-    public Result loadCloud(HttpServletResponse response, String user, String fileName) throws IOException {
+    @GetMapping("/download")
+    public Result downloadCloud(HttpServletResponse response, String user, String fileName) throws IOException {
         String folderPath = cloudBasePath + "/" + user;
         File file = new File(folderPath + "/" + fileName);
         // 文件不存在

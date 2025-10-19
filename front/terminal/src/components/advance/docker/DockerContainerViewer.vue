@@ -27,7 +27,7 @@
 
 <script>
 import { ref } from "vue";
-import $ from "jquery";
+import request from "@/utils/RequestUtil";
 import { http_base_url } from "@/env/BaseUrl";
 import AceEditor from '@/components/common/AceEditor';
 import { ElMessage } from "element-plus";
@@ -51,8 +51,8 @@ export default {
     const initText = async (item) => {
       loading.value = true;
       containerName.value = item.name;
-      await $.ajax({
-        url: http_base_url + '/docker/container',
+      await request({
+        url: http_base_url + '/advance/docker/container',
         type: 'post',
         data: {
           sshKey: props.sshKey,

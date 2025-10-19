@@ -1,6 +1,7 @@
 package com.kkbpro.terminal.controller;
 
 import com.kkbpro.terminal.annotation.Log;
+import com.kkbpro.terminal.constant.Constant;
 import com.kkbpro.terminal.enums.FileStateEnum;
 import com.kkbpro.terminal.enums.FileUntarEnum;
 import com.kkbpro.terminal.consumer.WebSocketServer;
@@ -27,7 +28,7 @@ import java.util.*;
  * 文件管理接口类
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping(Constant.API_PREFIX + "/file")
 public class FileController {
 
     /**
@@ -262,33 +263,6 @@ public class FileController {
         path = sftp.canonicalize(".");
 
         return Result.success(200, "家路径", path);
-    }
-
-    /**
-     * 获取当前目录（pwd）
-     * --方法未使用--
-     */
-    @Log
-    @GetMapping("/pwd")
-    public Result pwd(String sshKey) {
-        String errorMsg = "获取当前目录失败";
-        String successMsg = "获取当前目录成功";
-
-        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
-        if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
-        }
-        StringBuilder path = new StringBuilder();
-        String command = "echo -n $(pwd)";
-        try {
-            int exitStatus = SSHUtil.executeCommand(ssh, command, path);
-            if (exitStatus != 0) return Result.error(errorMsg);
-        } catch (Exception e) {
-            LogUtil.logException(this.getClass(), e);
-            return Result.error(errorMsg);
-        }
-
-        return Result.success(200, successMsg, path.toString());
     }
 
     /**

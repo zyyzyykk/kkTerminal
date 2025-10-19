@@ -105,7 +105,7 @@
 
 <script>
 import { ref, computed, watch } from 'vue';
-import $ from 'jquery';
+import request from "@/utils/RequestUtil";
 import { http_base_url } from '@/env/BaseUrl';
 import { calcDate } from '@/components/calc/CalcDate';
 import { calcPriority } from '@/components/calc/CalcPriority';
@@ -151,8 +151,8 @@ export default {
 
     // 获取文件大小
     const getFileSize = () => {
-      $.ajax({
-        url: http_base_url + '/du',
+      request({
+        url: http_base_url + '/file/du',
         type: 'get',
         data: {
           sshKey: props.sshKey,
@@ -174,8 +174,8 @@ export default {
 
     // 获取文件夹包含信息
     const getFolderInclude = () => {
-      $.ajax({
-        url: http_base_url + '/find',
+      request({
+        url: http_base_url + '/file/find',
         type: 'get',
         data: {
           sshKey: props.sshKey,

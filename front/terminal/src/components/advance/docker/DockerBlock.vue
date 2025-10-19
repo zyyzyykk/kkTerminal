@@ -272,7 +272,7 @@
 import DockerContainerViewer from "./DockerContainerViewer";
 import NoData from "@/components/common/NoData";
 import { computed, ref } from "vue";
-import $ from "jquery";
+import request from "@/utils/RequestUtil";
 import { http_base_url } from "@/env/BaseUrl";
 import { ArrowDown, ArrowLeft, Search, Document, Operation } from '@element-plus/icons-vue';
 import i18n from "@/locales/i18n";
@@ -322,8 +322,8 @@ export default {
     const dockerInfo = ref({...initDockerInfo});
     const getDockerVersion = (sshKey) => {
       loading.value = true;
-      $.ajax({
-        url: http_base_url + '/docker/version',
+      request({
+        url: http_base_url + '/advance/docker/version',
         type: 'post',
         data: {
           sshKey: sshKey,
@@ -341,8 +341,8 @@ export default {
     const getDockerInfo = (type) => {
       loading.value = true;
       const currentType = type || 0;
-      $.ajax({
-        url: http_base_url + '/docker/info',
+      request({
+        url: http_base_url + '/advance/docker/info',
         type: 'post',
         data: {
           sshKey: props.sshKey,
@@ -449,8 +449,8 @@ export default {
     const containerOperate = () => {
       loading.value = true;
       const type = containerType.value - 1;
-      $.ajax({
-        url: http_base_url + '/docker/container',
+      request({
+        url: http_base_url + '/advance/docker/container',
         type: 'post',
         data: {
           sshKey: props.sshKey,
@@ -472,8 +472,8 @@ export default {
     const dockerDelete = () => {
       loading.value = true;
       const type = deleteType.value;
-      $.ajax({
-        url: http_base_url + '/docker/delete',
+      request({
+        url: http_base_url + '/advance/docker/delete',
         type: 'post',
         data: {
           sshKey: props.sshKey,

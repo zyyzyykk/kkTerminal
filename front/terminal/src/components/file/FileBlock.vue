@@ -167,7 +167,7 @@
 <script>
 import { ref, onUnmounted, onMounted, watch } from 'vue';
 import useClipboard from "vue-clipboard3";
-import $ from 'jquery';
+import request from "@/utils/RequestUtil";
 import { ElMessage } from 'element-plus';
 import { deleteDialog } from "@/components/common/DeleteDialog";
 import { http_base_url } from '@/env/BaseUrl';
@@ -311,8 +311,8 @@ export default {
     const isShowDirInput = ref(false);
     const getInitDir = () => {
       if(dir.value) return;
-      $.ajax({
-        url: http_base_url + '/home',
+      request({
+        url: http_base_url + '/file/home',
         type: 'get',
         data: {
           sshKey: props.sshKey,
@@ -348,8 +348,8 @@ export default {
         return;
       }
       const now_dir = dir.value;
-      await $.ajax({
-        url: http_base_url + '/ls',
+      await request({
+        url: http_base_url + '/file/ls',
         type: 'get',
         data: {
           sshKey: props.sshKey,
@@ -421,11 +421,11 @@ export default {
 
     // 获取远程文件url
     const getRemoteFileUrl = (name, path) => {
-      return http_base_url + '/download/remote/file' + '?time=' + new Date().getTime() + '&fileName=' + encodeURIComponent(name) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(path ? path : dir.value) + '&trigger=browser';
+      return http_base_url + '/file/download/remote/file' + '?time=' + new Date().getTime() + '&fileName=' + encodeURIComponent(name) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(path ? path : dir.value) + '&trigger=browser';
     };
     // 获取远程文件夹url
     const getRemoteFolderUrl = (name, path) => {
-      return http_base_url + '/download/remote/folder' + '?time=' + new Date().getTime() + '&folderName=' + encodeURIComponent(escapeItem(name)) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(escapePath(path ? path : dir.value));
+      return http_base_url + '/file/download/remote/folder' + '?time=' + new Date().getTime() + '&folderName=' + encodeURIComponent(escapeItem(name)) + '&sshKey=' + props.sshKey + '&path=' + encodeURIComponent(escapePath(path ? path : dir.value));
     };
 
     // 下载远程文件
@@ -537,12 +537,12 @@ export default {
           formData.append('id', fileId);
           formData.append('path', path);
           formData.append('sshKey', key);
-          await $.ajax({
-            url: http_base_url + '/upload',
+          await request({
+            url: http_base_url + '/file/upload',
             type: 'post',
             data: formData,
-            contentType : false,
-            processData : false,
+            contentType: false,
+            processData: false,
             success(resp) {
               if(resp.status === 'success') {
                 // 文件后台上传中
@@ -643,8 +643,8 @@ export default {
         // 文件夹类型
         else if(!item.isFile && item.isDirectory) {
           const nowPath = basePath + item.name;
-          $.ajax({
-            url: http_base_url + '/mkdir',
+          request({
+            url: http_base_url + '/file/mkdir',
             type: 'post',
             data: {
               sshKey: props.sshKey,
@@ -683,8 +683,8 @@ export default {
           // 文件夹类型
           else if(!item.isFile && item.isDirectory) {
             const nowPath = basePath + item.name;
-            $.ajax({
-              url: http_base_url + '/mkdir',
+            request({
+              url: http_base_url + '/file/mkdir',
               type: 'post',
               data: {
                 sshKey: props.sshKey,
@@ -850,8 +850,8 @@ export default {
       doRename(oldPath,newPath);
     };
     const doRename = (oldPath,newPath) => {
-      $.ajax({
-        url: http_base_url + '/rename',
+      request({
+        url: http_base_url + '/file/rename',
         type: 'post',
         data: {
           sshKey: props.sshKey,
@@ -873,8 +873,8 @@ export default {
       isShowMenu.value = false;
       isShowPop.value = false;
       if(selectedFiles.value.length === 0) return;
-      $.ajax({
-        url: http_base_url + '/rm-rf',
+      request({
+        url: http_base_url + '/file/rm-rf',
         type: 'post',
         data: {
           sshKey: props.sshKey,
@@ -897,8 +897,8 @@ export default {
     // 新建文件/文件夹
     const mkFileRef = ref();
     const handleMkFile = (isFolder, name, nowDir) => {
-      $.ajax({
-        url: http_base_url + (isFolder ? '/mkdir' : '/touch'),
+      request({
+        url: http_base_url + (isFolder ? '/file/mkdir' : '/file/touch'),
         type: 'post',
         data: {
           sshKey: props.sshKey,
@@ -1029,8 +1029,8 @@ export default {
     // 文件复制/剪切
     const fileCopyMove = (mode) => {
       if(fileClipboard.value.path === dir.value) return;
-      $.ajax({
-        url: http_base_url + '/' + mode,
+      request({
+        url: http_base_url + '/file/' + mode,
         type: 'post',
         data: {
           sshKey: props.sshKey,
@@ -1102,8 +1102,8 @@ export default {
     const folderInputUpload = (basePath,filesArr,now) => {
       // 父目录创建
       const fileObj = filesArr[now];
-      $.ajax({
-        url: http_base_url + '/mkdir',
+      request({
+        url: http_base_url + '/file/mkdir',
         type: 'post',
         data: {
           sshKey: props.sshKey,
@@ -1135,8 +1135,8 @@ export default {
     // 文件URL上传
     const fileUrlRef = ref();
     const fileUrlUpload = (url,fileName) => {
-      $.ajax({
-        url: http_base_url + '/wget',
+      request({
+        url: http_base_url + '/file/wget',
         type: 'post',
         data: {
           sshKey: props.sshKey,
@@ -1157,8 +1157,8 @@ export default {
 
     // 解压文件
     const untar = () => {
-      $.ajax({
-        url: http_base_url + '/untar',
+      request({
+        url: http_base_url + '/file/untar',
         type: 'post',
         data: {
           sshKey: props.sshKey,
@@ -1178,8 +1178,8 @@ export default {
 
     // 修改权限
     const editPermissions = (path,item, permissionsInfo) => {
-      $.ajax({
-        url: http_base_url + '/chmod',
+      request({
+        url: http_base_url + '/file/chmod',
         type: 'post',
         data: {
           sshKey: props.sshKey,
