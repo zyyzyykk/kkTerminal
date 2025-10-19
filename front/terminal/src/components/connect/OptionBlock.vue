@@ -18,7 +18,7 @@
             <FileIcons :style="{display: 'flex', alignItems: 'center'}" name="kk.ini" :width="20" :height="20" :isFolder="false" />
             <div class="ellipsis" style="margin: 0 10px; line-height: 18px;" >{{ key }}</div>
             <div style="flex: 1;" ></div>
-            <div @click="confirmDeleteOption(key)" ><el-icon><CircleClose /></el-icon></div>
+            <el-icon @click="confirmDeleteOption(key)" ><CircleClose /></el-icon>
           </div>
         </div>
       </div>

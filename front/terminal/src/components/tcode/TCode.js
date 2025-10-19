@@ -289,7 +289,7 @@ export const TCodeStatusEnum = {
 
 // 编辑器添加kkTerminal智能提示
 export const userTCodeExecutorCompleter = {
-  getCompletions: function(editor, session, pos, prefix, callback) {
+  getCompletions(editor, session, pos, prefix, callback) {
     const userTCodeExecutorCompletions = [
         {
             name: "kkTerminal",

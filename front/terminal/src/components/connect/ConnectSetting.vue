@@ -22,9 +22,24 @@
           </template>
         </ToolTip>
         <div style="flex: 1;" ></div>
-        <div><el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" ><el-icon class="el-icon--left" ><Switch /></el-icon>{{ $t('切换') }}</el-button></div>
-        <div v-if="!isForbidInput" ><el-button size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" ><el-icon class="el-icon--left" ><Finished /></el-icon>{{ $t('保存') }}</el-button></div>
-        <div v-else ><el-button size="small" type="primary" @click="newOp" style="margin-left: 10px;" ><el-icon class="el-icon--left" ><Edit /></el-icon>{{ $t('新建') }}</el-button></div>
+        <div>
+          <el-button size="small" type="primary" @click="showOption(0)" style="margin-left: 10px;" >
+            <el-icon class="el-icon--left" ><Switch /></el-icon>
+            {{ $t('切换') }}
+          </el-button>
+        </div>
+        <div v-if="!isForbidInput" >
+          <el-button size="small" type="primary" @click="showOption(1)" style="margin-left: 10px;" >
+            <el-icon class="el-icon--left" ><Finished /></el-icon>
+            {{ $t('保存') }}
+          </el-button>
+        </div>
+        <div v-else >
+          <el-button size="small" type="primary" @click="newOp" style="margin-left: 10px;" >
+            <el-icon class="el-icon--left" ><Edit /></el-icon>
+            {{ $t('新建') }}
+          </el-button>
+        </div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;" >
         <div class="no-select form-width" >{{ $t('主机IP') }}：</div>
@@ -35,7 +50,7 @@
             </template>
           </el-input>
         </div>
-        <div class="operator-class" @click="doCopy(setInfo.server_ip)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
+        <el-icon class="operator-class" @click="doCopy(setInfo.server_ip)" size="15" ><DocumentCopy /></el-icon>
       </div>
       <div class="item-class" style="margin-bottom: 15px;" >
         <div class="no-select form-width" >{{ $t('端口号') }}：</div>
@@ -46,7 +61,7 @@
             </template>
           </el-input>
         </div>
-        <div class="operator-class" @click="doCopy(setInfo.server_port)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
+        <el-icon class="operator-class" @click="doCopy(setInfo.server_port)" size="15" ><DocumentCopy /></el-icon>
       </div>
       <div class="item-class" style="margin-bottom: 15px;" >
         <div class="no-select form-width" >{{ $t('用户名') }}：</div>
@@ -57,11 +72,14 @@
             </template>
           </el-input>
         </div>
-        <div class="operator-class" @click="doCopy(setInfo.server_user)" ><el-icon size="15" ><DocumentCopy /></el-icon></div>
+        <el-icon class="operator-class" @click="doCopy(setInfo.server_user)" size="15" ><DocumentCopy /></el-icon>
       </div>
       <div class="item-class" style="margin-bottom: 5px;" >
         <el-dropdown :disabled="isForbidInput" class="no-select form-width" hide-timeout="300" >
-          <span>{{ setInfo.authType === 0 ? $t('密码') : $t('私钥') }}<el-icon class="el-icon--right" ><arrow-down style="cursor: pointer;" /></el-icon></span>
+          <span>
+            {{ setInfo.authType === 0 ? $t('密码') : $t('私钥') }}
+            <el-icon class="el-icon--right" ><arrow-down style="cursor: pointer;" /></el-icon>
+          </span>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item class="no-select" @click="switchAuthType(0)" >{{ $t('密码') }}</el-dropdown-item>
@@ -77,8 +95,8 @@
               </template>
             </el-input>
           </div>
-          <div v-if="isShowPassword" class="operator-class" @click="isShowPassword = false" ><el-icon size="15" ><View /></el-icon></div>
-          <div v-else class="operator-class" @click="isShowPassword = true" ><el-icon size="15" ><Hide /></el-icon></div>
+          <el-icon v-if="isShowPassword" class="operator-class" @click="isShowPassword = false" size="15" ><View /></el-icon>
+          <el-icon v-else class="operator-class" @click="isShowPassword = true" size="15" ><Hide /></el-icon>
         </div>
         <div v-else >
           <el-button :disabled="isForbidInput" type="primary" @click="openPrivateKeyBlock" >

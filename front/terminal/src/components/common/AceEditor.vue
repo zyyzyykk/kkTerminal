@@ -133,6 +133,7 @@ export default {
         switch (String.fromCharCode(event.which).toLowerCase()) {
           case 's':
             event.preventDefault();
+            event.stopPropagation();
             context.emit('handleSave', aceEditor.value.getValue());
             break;
         }

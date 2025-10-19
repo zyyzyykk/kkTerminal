@@ -739,13 +739,15 @@ export default {
     // 中文
     const putChinese = (event) => {
       event.preventDefault();
+      event.stopPropagation();
       sendMessage(event.target.value);
       event.target.value = '';
     };
 
     // 右键事件函数
-    const doPaste = async function(event) {
+    const doPaste = async (event) => {
       event.preventDefault();   // 阻止默认的上下文菜单弹出
+      event.stopPropagation();
       const pasteText = await navigator.clipboard.readText();
       sendMessage(pasteText);
     };
@@ -905,6 +907,7 @@ export default {
       // 历史终端代码
       if(event.key === 'ArrowUp' || event.key === 'ArrowDown') {
         event.preventDefault();
+        event.stopPropagation();
         if(event.key === 'ArrowUp') tcode.value = historyTCode.up(tcode.value);
         else tcode.value = historyTCode.down(tcode.value);
         return;
@@ -932,7 +935,7 @@ export default {
           if(!tcodes.value[transTCode].execFlow || !(tcodes.value[transTCode].execFlow instanceof Function)) {
             const textFlow = tcodes.value[transTCode].workflow.toString();
             try {
-              tcodes.value[transTCode].execFlow = new Function('kkTerminal', `return (async function() { ${textFlow} })()`);
+              tcodes.value[transTCode].execFlow = new Function('kkTerminal', `return (async () => { ${textFlow} })()`);
             } catch (error) {
               setTCodeStatus(transTCode, 'Compile Error');
               ElMessage({

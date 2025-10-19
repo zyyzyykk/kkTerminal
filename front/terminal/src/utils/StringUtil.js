@@ -44,7 +44,7 @@ export const generateRandomString = (length) => {
 // 转义字符串(路径)
 const pathChars = /[ !"#$&'()*,:;<=>?@[\\\]^`{}~]/g;
 export const escapePath = (str) => {
-  return str.replace(pathChars, function(match) {
+  return str.replace(pathChars, (match) => {
     return '\\' + match;
   });
 };

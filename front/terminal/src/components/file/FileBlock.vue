@@ -14,58 +14,60 @@
         style="position: relative;"
     >
       <div>
-        <div class="title kk-flex" >
+        <div class="title kk-flex ellipsis" >
           <div class="ellipsis" style="flex: 1; line-height: 18px;" >
             <div v-if="isShowDirInput" >
               <el-input id="aimDirInput" v-model="dir" :placeholder="$t('输入目录路径')" size="small" @keydown.enter="isShowDirInput = false;" @blur="isShowDirInput = false;" @mousedown.stop @dblclick.stop @change="dirInputCallback" />
             </div>
-            <div class="kk-flex ellipsis no-select" style="line-height: 18px;" v-else @dblclick="doShowDirInput" >
-              <div v-for="(item, index) in dirLevels" :key="index" class="kk-flex" >
-                <div>/</div>
-                <div class="dir-level" @click="changeDirByLevel($event,index)" >{{ item }}</div>
+            <div class="kk-flex ellipsis no-select" style="line-height: 18px;" v-else @click="doShowDirInput" >
+              <div class="kk-flex" >
+                <el-icon style="font-size: 16px;" ><Monitor /></el-icon>
+                <el-icon class="dir-level" @click="changeDirByLevel($event,-1)" ><ArrowRight /></el-icon>
               </div>
-              <div>/</div>
+              <div v-for="(item, index) in dirLevels" :key="index" class="kk-flex" >
+                <div>{{ item }}</div>
+                <el-icon class="dir-level" @click="changeDirByLevel($event,index)" ><ArrowRight /></el-icon>
+              </div>
             </div>
           </div>
           <div class="kk-flex" >
-            <div class="hover-class operate-icon" @click="doRefresh" ><el-icon><Refresh /></el-icon></div>
-            <div v-if="dir && dir !== '/'" class="hover-class operate-icon" @click="doReturn" ><el-icon><Fold /></el-icon></div>
-            <div v-else class="disabled-function operate-icon" ><el-icon><Fold /></el-icon></div>
-            <div v-if="selectedFiles.length === 1" class="hover-class operate-icon" @click="doDownload" ><el-icon><Download /></el-icon></div>
-            <div v-else class="disabled-function operate-icon" ><el-icon><Download /></el-icon></div>
-            <div v-if="dirStatus === 0" class="hover-class operate-icon" >
-              <el-dropdown v-show="DialogVisible" style="line-height: unset;" placement="bottom-end" size="small" trigger="click" >
-                <div class="hover-class" style="font-size: 18px; cursor: pointer;" ><el-icon><Upload /></el-icon></div>
-                <template #dropdown>
-                  <el-dropdown-menu v-show="DialogVisible" class="no-select" style="text-align: center;" >
-                    <el-dropdown-item @click="fileUploadTypeChoose(0)" >
-                      <div class="kk-flex" >
-                        <div><el-icon><DocumentAdd /></el-icon></div>
-                        <div>{{ $t('文件') }}</div>
-                      </div>
-                    </el-dropdown-item>
-                    <el-dropdown-item @click="fileUploadTypeChoose(1)" >
-                      <div class="kk-flex" >
-                        <div><el-icon><FolderAdd /></el-icon></div>
-                        <div>{{ $t('文件夹') }}</div>
-                      </div>
-                    </el-dropdown-item>
-                    <el-dropdown-item @click="fileUploadTypeChoose(2)" >
-                      <div class="kk-flex" >
-                        <div><el-icon><Link /></el-icon></div>
-                        <div>URL</div>
-                      </div>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-            </div>
-            <div v-else class="disabled-function operate-icon" ><el-icon><Upload /></el-icon></div>
+            <el-icon class="hover-class operate-icon" @click="doRefresh" ><Refresh /></el-icon>
+            <el-icon v-if="dir && dir !== '/'" class="hover-class operate-icon" @click="doReturn" ><Fold /></el-icon>
+            <el-icon v-else class="disabled-function operate-icon" ><Fold /></el-icon>
+            <el-icon v-if="selectedFiles.length === 1" class="hover-class operate-icon" @click="doDownload" ><Download /></el-icon>
+            <el-icon v-else class="disabled-function operate-icon" ><Download /></el-icon>
+            <el-dropdown v-if="dirStatus === 0" class="hover-class operate-icon"
+                         v-show="DialogVisible" style="line-height: unset;" placement="bottom-end" size="small" trigger="click" >
+              <el-icon class="hover-class" style="font-size: 18px; cursor: pointer;" ><Upload /></el-icon>
+              <template #dropdown>
+                <el-dropdown-menu v-show="DialogVisible" class="no-select" style="text-align: center;" >
+                  <el-dropdown-item @click="fileUploadTypeChoose(0)" >
+                    <div class="kk-flex" >
+                      <el-icon><DocumentAdd /></el-icon>
+                      <div>{{ $t('文件') }}</div>
+                    </div>
+                  </el-dropdown-item>
+                  <el-dropdown-item @click="fileUploadTypeChoose(1)" >
+                    <div class="kk-flex" >
+                      <el-icon><FolderAdd /></el-icon>
+                      <div>{{ $t('文件夹') }}</div>
+                    </div>
+                  </el-dropdown-item>
+                  <el-dropdown-item @click="fileUploadTypeChoose(2)" >
+                    <div class="kk-flex" >
+                      <el-icon><Link /></el-icon>
+                      <div>URL</div>
+                    </div>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <el-icon v-else class="disabled-function operate-icon" ><Upload /></el-icon>
           </div>
         </div>
         <div id="fileArea" ref="fileAreaRef" :element-loading-text="$t('加载中...')" v-loading="loading" class="list-class no-select"
-             @contextmenu="handleContextMenu" @scroll="handleScroll"
-             @dragover="preventDefault" @drop="handleFileDrag"
+             @contextmenu="handleContextMenu" @click="handleClick"
+             @scroll="handleScroll" @dragover="stopEvent" @drop="handleFileDrag"
              tabindex="0" @keydown="handleShortcutKeys" >
           <div v-if="files.length > 0" >
             <div v-for="item in files" :key="item.id" >
@@ -137,7 +139,7 @@
   <FileAttr :sshKey="sshKey" ref="fileAttrRef" @callback="doRename" @editPermissions="editPermissions" :uploadingList="uploadingList" ></FileAttr>
 
   <!-- 菜单项 -->
-  <div ref="menuBlockRef" @contextmenu="preventDefault" v-show="isShowMenu" class="kk-menu no-select" >
+  <div ref="menuBlockRef" @contextmenu="stopEvent" v-show="isShowMenu" class="kk-menu no-select" >
     <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(1)" key="1" >{{ $t('刷新') }}</div>
     <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >{{ $t('打开') }}</div>
     <div style="border-bottom: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length > 1 ? 'disabled':'']" @click="handleMenuSelect(3)" key="3" >{{ $t('复制路径') }}</div>
@@ -169,7 +171,7 @@ import $ from 'jquery';
 import { ElMessage } from 'element-plus';
 import { deleteDialog } from "@/components/common/DeleteDialog";
 import { http_base_url } from '@/env/BaseUrl';
-import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link } from '@element-plus/icons-vue';
+import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link, ArrowRight, Monitor } from '@element-plus/icons-vue';
 import { escapeItem, escapePath, generateRandomString, osFileNaturalSort } from '@/utils/StringUtil';
 import { isZipFile } from '@/components/preview/FileSuffix';
 import { getChmodValue } from '@/components/calc/CalcPriority';
@@ -207,6 +209,8 @@ export default {
     DocumentAdd,
     FolderAdd,
     Link,
+    ArrowRight,
+    Monitor,
   },
   props: ['sshKey', 'os', 'uploadingList'],
   setup(props, context) {
@@ -290,17 +294,16 @@ export default {
     };
     const calcDirLevel = (fullPath) => {
       if(fullPath === '/') dirLevels.value = [];
-      else dirLevels.value = fullPath.substring(1,fullPath.length - 1).split('/');
+      else dirLevels.value = fullPath.substring(1, fullPath.length - 1).split('/');
     };
-    const changeDirByLevel = (event,index) => {
-      // not ctrl
-      if(!((props.os === "Windows" && event.ctrlKey) || ((props.os === "Mac" || props.os === "iOS") && event.metaKey))) return;
-      event.preventDefault();
-      let aimDir = '/';
+    const changeDirByLevel = (event, index) => {
+      stopEvent(event);
+      let aimDir = '';
       for(let i=0;i<=index;i++) {
-        aimDir += dirLevels.value[i];
         aimDir += '/';
+        aimDir += dirLevels.value[i];
       }
+      aimDir += '/';
       changeDir(aimDir);
     };
 
@@ -352,7 +355,7 @@ export default {
           sshKey: props.sshKey,
           path: now_dir,
         },
-        beforeSend: function() { // 发送请求前执行的方法
+        beforeSend() {      // 发送请求前执行的方法
           loading.value = true;
           files.value = [];
         },
@@ -394,7 +397,7 @@ export default {
             }
           }
         },
-        complete: function() { // 发送请求完成后执行的方法
+        complete() {        // 发送请求完成后执行的方法
           if(now_dir === dir.value) loading.value = false;
         }
       });
@@ -586,8 +589,7 @@ export default {
     };
 
     const doShowDirInput = (event) => {
-      // ctrl
-      if((props.os === "Windows" && event.ctrlKey) || ((props.os === "Mac" || props.os === "iOS") && event.metaKey)) return;
+      stopEvent(event);
       isShowDirInput.value = true;
       setTimeout(() => {
         document.querySelector('#aimDirInput').focus();
@@ -619,11 +621,13 @@ export default {
 
     // 文件/文件夹拖拽
     const fileAreaRef = ref();
-    const preventDefault = (event) => {
+    // 阻止默认行为和事件冒泡
+    const stopEvent = (event) => {
       event.preventDefault();
+      event.stopPropagation();
     };
     const handleFileDrag = (event) => {
-      event.preventDefault();
+      stopEvent(event);
       // 文件/文件夹项
       const items = event.dataTransfer.items;
       if(!(items && items.length > 0)) return;
@@ -800,13 +804,18 @@ export default {
     const menuBlockRef = ref();
     // 右键显示
     const handleContextMenu = (event) => {
-      // 点击空白处
+      // 右键点击空白处
       if(event.target.id === 'fileArea') selectedFiles.value = [];
       menuBlockRef.value.style.top = event.clientY - 135 + 'px';
       menuBlockRef.value.style.left = event.clientX + 1 + 'px';
       isShowMenu.value = true;
       isShowPop.value = false;
-      event.preventDefault();
+      stopEvent(event);
+    };
+    // 左键点击空白处
+    const handleClick = () => {
+      if(event.target.id === 'fileArea') selectedFiles.value = [];
+      stopEvent(event);
     };
     // 重命名文件
     const handleRename = (item) => {
@@ -938,7 +947,7 @@ export default {
     const handleShortcutKeys = (event) => {
       const renameDom = document.querySelector('#rename');
       if(renameDom && renameDom.contains(event.target)) return;
-      event.preventDefault();
+      stopEvent(event);
       // 上下箭头
       if(event.key === 'ArrowUp' || event.key === 'ArrowDown') {
         // 上箭头
@@ -1259,7 +1268,7 @@ export default {
 
     onUnmounted(() => {
       if(fileAreaRef.value) {
-        fileAreaRef.value.removeEventListener('dragover', preventDefault);
+        fileAreaRef.value.removeEventListener('dragover', stopEvent);
         fileAreaRef.value.removeEventListener('drop', handleFileDrag);
         fileAreaRef.value.removeEventListener('scroll', handleScroll);
         fileAreaRef.value.removeEventListener('keydown', handleShortcutKeys);
@@ -1292,10 +1301,11 @@ export default {
       fileAreaRef,
       handleMenuSelect,
       isShowMenu,
-      preventDefault,
+      stopEvent,
       handleFileDrag,
       handleScroll,
       handleContextMenu,
+      handleClick,
       isShowRenameInput,
       handleRename,
       renameFile,
@@ -1336,13 +1346,11 @@ export default {
 
 <style scoped>
 .title {
-  background-color: #efefef;
-  padding: 4px 10px;
+  height: 32px;
   font-size: 13px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding: 4px 10px;
   margin-bottom: 15px;
+  background-color: #efefef;
 }
 
 .kk-flex {
@@ -1429,9 +1437,15 @@ export default {
   user-select: none;
 }
 
+.dir-level {
+  margin: 0 5px;
+  border: 1px solid #efefef;
+  height: 20px;
+}
+
 .dir-level:hover {
   text-decoration: none;
-  color: var(--link);
+  border: 1px solid var(--link);
   cursor: pointer;
 }
 </style>

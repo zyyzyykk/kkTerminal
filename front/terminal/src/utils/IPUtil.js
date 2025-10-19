@@ -18,7 +18,7 @@ const IPv6AddressRegExp = new RegExp('^(' +
     ')(%[0-9a-zA-Z.]{1,})?$');
 
 // Check validity of IP address
-export function isIP(ipAddress, options = {}) {
+export const isIP = (ipAddress, options = {}) => {
     // accessing 'arguments' for backwards compatibility: isIP(ipAddress [, version])
     // eslint-disable-next-line prefer-rest-params
     const version = (typeof options === 'object' ? options.version : arguments[1]) || '';
@@ -48,7 +48,7 @@ const options = {
 };
 
 // Check validity of domain name
-export function isFQDN(str) {
+export const isFQDN = (str) => {
 
     /* Remove the optional trailing dot before checking validity */
     if (options.allow_trailing_dot && str[str.length - 1] === '.') {

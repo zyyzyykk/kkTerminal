@@ -159,14 +159,14 @@ export default {
           path: escapePath(fileDir.value),
           item: escapeItem(fileInfo.value.name),
         },
-        beforeSend: function() { // 发送请求前执行的方法
+        beforeSend() {        // 发送请求前执行的方法
           loading.value = true;
         },
         success(resp) {
           if(resp.status === 'success') fileInfo.value.attributes.size = parseInt(resp.data, 10);
           else unreliable.value = true;
         },
-        complete: function() { // 发送请求完成后执行的方法
+        complete() {        // 发送请求完成后执行的方法
           loading.value = false;
         }
       });
@@ -182,7 +182,7 @@ export default {
           path: escapePath(fileDir.value),
           item: escapeItem(fileInfo.value.name),
         },
-        beforeSend: function() { // 发送请求前执行的方法
+        beforeSend() {        // 发送请求前执行的方法
           loading.value = true;
         },
         success(resp) {
@@ -191,7 +191,7 @@ export default {
           }
           else unreliable.value = true;
         },
-        complete: function() { // 发送请求完成后执行的方法
+        complete() {        // 发送请求完成后执行的方法
           loading.value = false;
         }
       });
