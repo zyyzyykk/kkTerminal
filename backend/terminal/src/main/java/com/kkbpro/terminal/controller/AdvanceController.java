@@ -180,10 +180,11 @@ public class AdvanceController {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
         StringBuilder version = new StringBuilder();
-        String command = "echo -n $(docker --version)";
+        String command = "docker version --format \"{{.Server.Version}}\"";
         try {
             int exitStatus = SSHUtil.executeCommand(ssh, command, version);
-            if (exitStatus != 0) return Result.error(errorMsg);
+            // 1权限不足/127未安装
+            if (exitStatus != 0) return Result.error(500, errorMsg, exitStatus);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);

@@ -14,7 +14,7 @@
     </div>
     <div @mousemove="showAdvance(true)" @mouseleave="showAdvance(false)" :class="['advance', (sshKey && env.advance) ? '':'disabled']" v-show="isShowSetting && isShowAdvance && (urlParams.mode !== 'headless' && urlParams.mode !== 'pure')" >
       <div class="setting-menu no-select" @click="doSettings(6)" ><div>{{ $t('协作') }}</div></div>
-      <div :class="['setting-menu', 'no-select', (env.server_user === 'root') ? '':'disabled']" @click="doSettings(7)" ><div>{{ $t('监控') }}</div></div>
+      <div class="setting-menu no-select" @click="doSettings(7)" ><div>{{ $t('监控') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(8)" ><div>Docker</div></div>
     </div>
     <div v-if="urlParams.mode !== 'headless'" class="kk-flex bar" >
@@ -52,7 +52,7 @@
             </div>
           </el-tag>
         </div>
-        <el-dropdown v-if="env.transport" @visible-change="changeDropdownShowStatus" class="bar-tag" hide-timeout="300" trigger="click" >
+        <el-dropdown v-if="env.transport" @visible-change="changeDropdownShowStatus" class="bar-tag no-select" hide-timeout="300" trigger="click" >
           <el-badge :hidden="isShowDropdown || !isShowDot" :is-dot="true" :offset="[0, 4]" >
             <span @click="isShowDot = false;" ><img src="@/assets/transport.svg" alt="transport" style="height: 20px;" ></span>
           </el-badge>
@@ -232,7 +232,7 @@
   <!-- 监控 -->
   <StatusMonitor ref="statusMonitorRef" :sshKey="sshKey" :advance="env.advance" ></StatusMonitor>
   <!-- Docker -->
-  <DockerBlock ref="dockerBlockRef" :sshKey="sshKey" :advance="env.advance" @install="installDocker" @deploy="runContainer" ></DockerBlock>
+  <DockerBlock ref="dockerBlockRef" :sshKey="sshKey" :advance="env.advance" @enable="enableDocker" @deploy="runContainer" ></DockerBlock>
 
 </template>
 
@@ -388,7 +388,7 @@ export default {
 
     // 多端同步提示
     const cloudSync = async () => {
-      if(urlParams.value.user) deleteDialog(i18n.global.t('提示'), i18n.global.t('确定从云端覆盖本地数据吗?'), doSyncDownload);
+      if(urlParams.value.user) deleteDialog(i18n.global.t('提示'), i18n.global.t('确定从云端覆盖本地数据吗？'), doSyncDownload);
       else {
         await syncUpload();
         const link = getPureUrl() + '?user=' + changeBase64Str(localStoreUtil.getItem(localStore['user']));
@@ -559,7 +559,7 @@ export default {
       });
     };
     const endCooperateConfirm = () => {
-      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定结束此次协作吗?'), endCooperate);
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定结束此次协作吗？'), endCooperate);
     };
 
     // websocket连接
@@ -624,7 +624,7 @@ export default {
               }, 400);
             }
           }
-          if(env.value.advance && env.value.server_user === 'root' && statusMonitorRef.value) statusMonitorRef.value.doMonitor();
+          if(env.value.advance && statusMonitorRef.value) statusMonitorRef.value.doMonitor();
           if(env.value.advance && dockerBlockRef.value) dockerBlockRef.value.getDockerVersion(sshKey.value);
         }
         // 输出
@@ -833,11 +833,13 @@ export default {
       }
       // 协作
       else if(type === 6) {
+        if(!(sshKey.value && env.value.advance)) return;
         showSettings(false);
         cooperateGenRef.value.DialogVisible = true;
       }
       // 监控
       else if(type === 7) {
+        if(!(sshKey.value && env.value.advance)) return;
         showSettings(false);
         setTimeout(() => {
           statusMonitorRef.value.updateNetworkData();
@@ -847,7 +849,9 @@ export default {
       }
       // Docker
       else if(type === 8) {
+        if(!(sshKey.value && env.value.advance)) return;
         showSettings(false);
+        dockerBlockRef.value.getDockerVersion(sshKey.value);
         dockerBlockRef.value.DialogVisible = true;
       }
     };
@@ -1045,8 +1049,8 @@ export default {
       });
     };
 
-    // 安装Docker
-    const installDocker = (cmd) => {
+    // 安装/授权Docker
+    const enableDocker = (cmd) => {
       sendMessage(cmd);
     };
     // 部署容器
@@ -1176,7 +1180,7 @@ export default {
       endCooperateConfirm,
       calcType,
       calcSize,
-      installDocker,
+      enableDocker,
       runContainer,
       waitingList,
       uploadingList,

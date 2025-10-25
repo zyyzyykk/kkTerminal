@@ -14,14 +14,14 @@
     <div class="no-select" >
       <el-tabs stretch :element-loading-text="$t('加载中...')" v-loading="loading" @tab-click="handleTabClick" type="border-card" >
         <el-tab-pane :label="$t('部署')" >
-          <div v-if="noDocker" class="kk-flex-column" style="height: 240px;" >
+          <div v-if="!(hasDocker && hasPermission)" class="kk-flex-column" style="height: 240px;" >
             <div style="flex: 1;" ></div>
             <div><img style="height: 160px;" src="@/assets/no_docker.png" alt="docker" ></div>
             <div class="kk-flex" style="margin-top: 25px;" >
-              <div style="font-size: large;" >{{ $t('Docker未安装?') }}</div>
+              <div style="font-size: large;" >{{ hasDocker ? $t('Docker权限不足？') : $t('Docker未安装？') }}</div>
               <div>
-                <el-button type="primary" @click="installDocker" style="margin-left: 15px;" >
-                  {{ $t('安装') }}
+                <el-button type="primary" @click="enableDocker" style="margin-left: 15px;" >
+                  {{ hasDocker ? $t('授权') : $t('安装') }}
                 </el-button>
               </div>
             </div>
@@ -144,7 +144,7 @@
             </div>
           </div>
         </el-tab-pane>
-        <el-tab-pane :disabled="noDocker" :label="$t('容器')" >
+        <el-tab-pane :disabled="!(hasDocker && hasPermission)" :label="$t('容器')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%;" v-if="dockerInfo.container.length > 0" :data="dockerInfo.container" @selection-change="tableSelect" border stripe table-layout="fixed" >
             <el-table-column type="selection" width="40" fixed="left" />
             <el-table-column show-overflow-tooltip prop="id" label="ID" width="120" />
@@ -182,7 +182,7 @@
             </el-button>
           </div>
         </el-tab-pane>
-        <el-tab-pane :disabled="noDocker" :label="$t('镜像')" >
+        <el-tab-pane :disabled="!(hasDocker && hasPermission)" :label="$t('镜像')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%;" v-if="dockerInfo.image.length > 0" :data="dockerInfo.image" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" width="40" fixed="left" />
             <el-table-column show-overflow-tooltip prop="id" label="ID" width="130" />
@@ -208,7 +208,7 @@
             </el-button>
           </div>
         </el-tab-pane>
-        <el-tab-pane :disabled="noDocker" :label="$t('网络')" >
+        <el-tab-pane :disabled="!(hasDocker && hasPermission)" :label="$t('网络')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%;" v-if="dockerInfo.network.length > 0" :data="dockerInfo.network" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" width="40" fixed="left" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="140" />
@@ -234,7 +234,7 @@
             </el-button>
           </div>
         </el-tab-pane>
-        <el-tab-pane :disabled="noDocker" :label="$t('数据卷')" >
+        <el-tab-pane :disabled="!(hasDocker && hasPermission)" :label="$t('数据卷')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%;" v-if="dockerInfo.volume.length > 0" :data="dockerInfo.volume" @selection-change="tableSelect" border stripe >
             <el-table-column type="selection" width="40" fixed="left" />
             <el-table-column show-overflow-tooltip prop="name" :label="$t('名称')" width="140" />
@@ -312,7 +312,8 @@ export default {
     };
 
     // Docker信息
-    const noDocker = ref(true);
+    const hasDocker = ref(false);
+    const hasPermission = ref(false);
     const initDockerInfo = {
       container: [],
       image: [],
@@ -331,10 +332,17 @@ export default {
         success(resp) {
           loading.value = false;
           if(resp.status === 'success') {
-            noDocker.value = false;
+            hasDocker.value = true;
+            hasPermission.value = true;
             handleTabClick({index: 0});
           }
-          else noDocker.value = true;
+          else {
+            hasDocker.value = false;
+            hasPermission.value = false;
+            const exitCode = parseInt(JSON.parse(resp.data));
+            // 权限不足
+            if(exitCode === 1) hasDocker.value = true;
+          }
         }
       });
     };
@@ -350,7 +358,8 @@ export default {
         },
         success(resp) {
           if(resp.status === 'success') {
-            noDocker.value = false;
+            hasDocker.value = true;
+            hasPermission.value = true;
             let container = dockerInfo.value.container;
             let image = dockerInfo.value.image;
             let network = dockerInfo.value.network;
@@ -493,10 +502,10 @@ export default {
       });
     };
     const operateConfirm = () => {
-      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定进行此操作吗?'), containerOperate);
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定进行此操作吗？'), containerOperate);
     };
     const deleteConfirm = () => {
-      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定进行此操作吗?'), dockerDelete);
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定进行此操作吗？'), dockerDelete);
     };
 
     // 查看容器详细信息
@@ -506,15 +515,19 @@ export default {
       dockerContainerViewerRef.value.DialogVisible = true;
     };
 
-    // 安装Docker
-    const installDocker = () => {
-      ElMessage({
-        message: i18n.global.t('开始安装'),
-        type: 'success',
-        grouping: true,
-        repeatNum: Number.MIN_SAFE_INTEGER,
-      });
-      context.emit('install', "curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh\n");
+    // 安装/授权Docker
+    const enableDocker = () => {
+      if(hasDocker.value && hasPermission.value) return;
+      const command = hasDocker.value ? "sudo usermod -aG docker $(whoami)\n" : "curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh\n";
+      if(!hasDocker.value) {
+        ElMessage({
+          message: i18n.global.t('开始安装'),
+          type: 'success',
+          grouping: true,
+          repeatNum: Number.MIN_SAFE_INTEGER,
+        });
+      }
+      context.emit('enable', command);
       deepCloseDialog();
     };
 
@@ -596,7 +609,8 @@ export default {
     // 重置
     const reset = (deep=false) => {
       if(deep) {
-        noDocker.value = true;
+        hasDocker.value = false;
+        hasPermission.value = false;
         dockerInfo.value = {...initDockerInfo};
         deployInfo.value = {...initDeployInfo};
       }
@@ -635,13 +649,14 @@ export default {
       reset,
       closeDialog,
       deepCloseDialog,
-      noDocker,
+      hasDocker,
+      hasPermission,
       getDockerVersion,
       dockerInfo,
       getDockerInfo,
       handleTabClick,
       loading,
-      installDocker,
+      enableDocker,
       tableSelect,
       containerType,
       deleteType,

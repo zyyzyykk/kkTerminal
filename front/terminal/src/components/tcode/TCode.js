@@ -66,21 +66,18 @@ export const SysTCode = {
     'SAC': {
         desc: i18n.global.k('高级-协作'),
         execFlow(context) {
-            if(!(context.proxy.sshKey && context.proxy.env.advance)) return;
             context.proxy.doSettings(6);
         }
     },
     'SAM': {
         desc: i18n.global.k('高级-监控'),
         execFlow(context) {
-            if(!(context.proxy.sshKey && context.proxy.env.advance && context.proxy.env.server_user === 'root')) return;
             context.proxy.doSettings(7);
         }
     },
     'SAD': {
         desc: i18n.global.k('高级-Docker'),
         execFlow(context) {
-            if(!(context.proxy.sshKey && context.proxy.env.advance)) return;
             context.proxy.doSettings(8);
         }
     },

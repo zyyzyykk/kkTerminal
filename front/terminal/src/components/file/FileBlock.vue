@@ -147,7 +147,7 @@
     <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >{{ $t('下载') }}</div>
     <div :class="['kk-menu-item', dirStatus === 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >{{ $t('新建') }}</div>
     <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >{{ $t('重命名') }}</div>
-    <el-popconfirm :title="$t('确定删除此文件吗?')"
+    <el-popconfirm :title="$t('确定删除此文件吗？')"
       :confirm-button-text="$t('确定')" :cancel-button-text="$t('取消')"
       @confirm="confirmPopConfirm" @cancel="cancelPopConfirm"
       :visible="isShowMenu && isShowPop" trigger="click"
@@ -1019,7 +1019,7 @@ export default {
           // 删除
           case 'backspace':
             if(selectedFiles.value.length > 0) {
-              deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此文件吗?'), confirmPopConfirm);
+              deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此文件吗？'), confirmPopConfirm);
             }
             break;
         }

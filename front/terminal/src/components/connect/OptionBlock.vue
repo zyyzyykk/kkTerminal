@@ -76,7 +76,7 @@ export default {
     const deleteOption = ref('');
     const confirmDeleteOption = (name) => {
       deleteOption.value = name;
-      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此配置吗?'), doDeleteOption);
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此配置吗？'), doDeleteOption);
     };
     const doDeleteOption = () => {
       context.emit('handleDeleteOption', deleteOption.value);

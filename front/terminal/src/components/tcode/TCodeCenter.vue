@@ -218,7 +218,7 @@ export default {
 
     // 删除终端代码
     const confirmDeleteTCode = () => {
-      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此终端代码吗?'), doDeleteTCode);
+      deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此终端代码吗？'), doDeleteTCode);
     };
     const doDeleteTCode = () => {
       context.emit('handleDeleteTCode', nowTCode.value);
