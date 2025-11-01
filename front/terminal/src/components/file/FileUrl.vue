@@ -12,7 +12,7 @@
   >
     <div class="no-select" >
       <div class="kk-flex" >
-        <div class="form-width" >URL：</div>
+        <div class="form-width" >URL{{ $t('：') }}</div>
         <div style="flex: 1;" >
           <el-input size="small" v-model="url" class="w-50 m-2" :placeholder="$t('请输入文件URL')" >
             <template #prefix>
@@ -24,7 +24,7 @@
       <div v-if="err_msg && err_msg.length > 0" class="error-text no-select" > {{ $t(err_msg) }} </div>
       <div v-else style="height: 7px;" ></div>
       <div class="kk-flex" >
-        <div class="form-width" >{{ $t('文件名') }}：</div>
+        <div class="form-width" >{{ $t('文件名') }}{{ $t('：') }}</div>
         <div style="flex: 1;" >
           <el-input size="small" v-model="name" @keydown.enter="confirm" class="w-50 m-2" :placeholder="$t('请输入文件名')" >
             <template #prefix>
@@ -72,7 +72,7 @@ export default {
       }
       const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(name.value)) {
-        err_msg.value = i18n.global.k("文件名不能含有") + " |,/";
+        err_msg.value = i18n.global.k("文件名不能含有") + " |" + i18n.global.t('，') + "/";
         return;
       }
       context.emit('callback',url.value, name.value);

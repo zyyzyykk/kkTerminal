@@ -12,7 +12,7 @@
   >
     <div class="no-select" >
       <div class="kk-flex" >
-        <div class="form-width" >{{ $t('私钥') }}：</div>
+        <div class="form-width" >{{ $t('私钥') }}{{ $t('：') }}</div>
         <el-upload
           :show-file-list="false"
           :with-credentials="true"
@@ -25,7 +25,7 @@
       <div v-if="err_msg && err_msg.length > 0" class="error-text no-select" > {{ err_msg }} </div>
       <div v-else style="height: 7px;" ></div>
       <div class="kk-flex" >
-        <div class="form-width" >{{ $t('密码') }}：</div>
+        <div class="form-width" >{{ $t('密码') }}{{ $t('：') }}</div>
         <div style="flex: 1;" >
           <el-input size="small" v-model="passphrase" @keydown.enter="confirm" class="w-50 m-2" :placeholder="$t('请输入私钥密码')" >
             <template #prefix>

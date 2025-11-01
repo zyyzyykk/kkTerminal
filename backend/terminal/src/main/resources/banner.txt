@@ -1,5 +1,5 @@
-author by zyyzyykk
-https://github.com/zyyzyykk
+${kk.app.welcome}
+${kk.app.source}
  _     _     _____                         _                _
 | | __| | __|_   _|  ___  _ __  _ __ ___  (_) _ __    __ _ | |
 | |/ /| |/ /  | |   / _ \| '__|| '_ ` _ \ | || '_ \  / _` || |

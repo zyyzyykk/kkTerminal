@@ -26,7 +26,7 @@
         <NoData :msg="i18n.global.k('暂无配置')" ></NoData>
       </div>
       <div class="kk-flex" >
-        <div>{{ $t('配置名') }}：</div>
+        <div style="min-width: 48px; max-width: 56px;" >{{ $t('配置名') }}{{ $t('：') }}</div>
         <div style="flex: 1;" >
           <el-input size="small" v-model="aimOption" :disabled="opType === 0" @keydown.enter="confirm" class="w-50 m-2" placeholder="" >
           </el-input>
@@ -142,8 +142,7 @@ export default {
   margin-top: 10px;
 }
 
-.container
-{
+.container {
   height: 30vh;
   overflow-y: scroll;
   width: 100%;

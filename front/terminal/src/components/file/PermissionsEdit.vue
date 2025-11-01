@@ -18,19 +18,19 @@
     </template>
     <div style="margin-top: -25px;" ></div>
     <div class="kk-flex" >
-      <div class="form-width no-select" >{{ $t('所有者') }}：</div>
+      <div class="form-width no-select" >{{ $t('所有者') }}{{ $t('：') }}</div>
       <el-checkbox v-model="permissionsInfo.owner[0]" :label="$t('读取')" size="large" />
       <el-checkbox v-model="permissionsInfo.owner[1]" :label="$t('写入')" size="large" />
       <el-checkbox v-model="permissionsInfo.owner[2]" :label="$t('执行')" size="large" />
     </div>
     <div class="kk-flex" >
-      <div class="form-width no-select" >{{ $t('所属组') }}：</div>
+      <div class="form-width no-select" >{{ $t('所属组') }}{{ $t('：') }}</div>
       <el-checkbox v-model="permissionsInfo.group[0]" :label="$t('读取')" size="large" />
       <el-checkbox v-model="permissionsInfo.group[1]" :label="$t('写入')" size="large" />
       <el-checkbox v-model="permissionsInfo.group[2]" :label="$t('执行')" size="large" />
     </div>
     <div class="kk-flex" >
-      <div class="form-width no-select" >{{ $t('其他用户') }}：</div>
+      <div class="form-width no-select" >{{ $t('其他用户') }}{{ $t('：') }}</div>
       <el-checkbox v-model="permissionsInfo.others[0]" :label="$t('读取')" size="large" />
       <el-checkbox v-model="permissionsInfo.others[1]" :label="$t('写入')" size="large" />
       <el-checkbox v-model="permissionsInfo.others[2]" :label="$t('执行')" size="large" />

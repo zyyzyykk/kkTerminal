@@ -19,7 +19,8 @@
       <div style="margin-top: -28px;" ></div>
       <div id="editor-bar" v-show="previewInfo.preview === 'editor'" class="kk-flex ellipsis no-select" style="margin-bottom: 5px; overflow-x: auto; line-height: 22px;" >
         <div class="kk-flex" >
-          <div>{{ $t('编码') }}：</div>
+          <div>{{ $t('编码') }}</div>
+          <div style="width: 15px;" >{{ $t('：') }}</div>
           <div class="kk-flex" >
             <el-tag size="small" type="info" style="margin-right: 5px;" >{{ $t('打开') }}</el-tag>
             <el-dropdown size="small" hide-timeout="300" >
@@ -49,7 +50,8 @@
         </div>
         <div style="margin-right: 20px;" ></div>
         <div class="kk-flex" >
-          <div>{{ $t('模式') }}：</div>
+          <div>{{ $t('模式') }}</div>
+          <div style="width: 15px;" >{{ $t('：') }}</div>
           <el-dropdown size="small" hide-timeout="300" >
             <span class="a-link" >{{ mode }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
             <template #dropdown>
@@ -63,12 +65,14 @@
         </div>
         <div style="margin-right: 20px;" ></div>
         <div class="kk-flex" >
-          <div>{{ $t('缩进') }}：</div>
+          <div>{{ $t('缩进') }}</div>
+          <div style="width: 15px;" >{{ $t('：') }}</div>
           <div><el-input-number :style="{width: '80px'}" size="small" v-model="indent" :min="2" :max="4" step="2" :step-strictly="true" @change="setIndent" /></div>
         </div>
         <div style="margin-right: 20px;" ></div>
         <div class="kk-flex" >
-          <div>{{ $t('字号') }}：</div>
+          <div>{{ $t('字号') }}</div>
+          <div style="width: 15px;" >{{ $t('：') }}</div>
           <div>
             <el-input-number :style="{width: '100px'}" size="small" v-model="fontSize" :min="12" :max="20" step="2" :step-strictly="true" @change="setFontSize" >
               <template #suffix>
@@ -84,7 +88,7 @@
           </el-button>
         </div>
       </div>
-      <div :element-loading-text="$t('加载中...')" v-loading="loading" style="width: 100%; height: 60vh; position: relative; margin-bottom: 10px" >
+      <div :element-loading-text="$t('加载中...')" v-loading="loading" style="width: 100%; height: 60vh; position: relative; margin-bottom: 10px;" >
         <AceEditor class="preview" v-show="!loading && previewInfo.preview === 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
         <iframe id="imgPreview" class="preview" v-if="!loading && previewInfo.preview === 'iframe' && previewUrl" :src="previewUrl" ></iframe>
         <audio controls class="preview" v-if="!loading && previewInfo.preview === 'audio' && previewUrl" >
@@ -93,7 +97,7 @@
         <video controls class="preview" v-if="!loading && previewInfo.preview === 'video' && previewUrl" >
           <source :src="previewUrl" :type="previewInfo.type" >
         </video>
-        <div style="position: absolute; top: 0; right: 30px" v-if="!loading && previewInfo.preview === 'iframe' && previewInfo.type !== 'application/pdf' && previewInfo.type !== 'text/html' && previewUrl" >
+        <div style="position: absolute; top: 0; right: 30px;" v-if="!loading && previewInfo.preview === 'iframe' && previewInfo.type !== 'application/pdf' && previewInfo.type !== 'text/html' && previewUrl" >
           <el-input-number :style="{width: '105px'}" size="small" v-model="percentage" :min="20" :max="200" step="10" :step-strictly="true" @change="setPercentage" >
             <template #suffix>
               <span>%</span>

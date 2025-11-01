@@ -13,7 +13,7 @@
   >
     <div class="no-select" >
       <div class="kk-flex item-class" >
-        <div class="form-width" >{{ $t('颜色') }}：</div>
+        <div class="form-width" >{{ $t('颜色') }}{{ $t('：') }}</div>
         <div class="kk-flex" >
           <div>{{ $t('背景色') }}</div>
           <div style="margin: 0 20px;" >
@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="kk-flex item-class" >
-        <div class="form-width" >{{ $t('文本') }}：</div>
+        <div class="form-width" >{{ $t('文本') }}{{ $t('：') }}</div>
         <div class="kk-flex" >
           <div>{{ $t('字体') }}</div>
           <el-dropdown style="margin: 0 20px;" hide-timeout="300" >
@@ -58,7 +58,7 @@
         </div>
       </div>
       <div class="kk-flex item-class" >
-        <div class="form-width" >{{ $t('光标') }}：</div>
+        <div class="form-width" >{{ $t('光标') }}{{ $t('：') }}</div>
         <div class="kk-flex" >
           <div>{{ $t('样式') }}</div>
           <el-dropdown style="margin: 0 20px;" hide-timeout="300" >
@@ -81,7 +81,7 @@
         </div>
       </div>
       <div class="kk-flex item-class" >
-        <div class="form-width" >{{ $t('标签') }}：</div>
+        <div class="form-width" >{{ $t('标签') }}{{ $t('：') }}</div>
         <div class="kk-flex" >
           <div class="form-width-item1" >{{ $t('终端代码') }}</div>
           <div class="func-switch" >
@@ -111,7 +111,7 @@
         </div>
       </div>
       <div class="kk-flex item-class" >
-        <div class="form-width" >{{ $t('其它') }}：</div>
+        <div class="form-width" >{{ $t('其它') }}{{ $t('：') }}</div>
         <div class="kk-flex" >
           <div>{{ $t('语言') }}</div>
           <el-dropdown style="margin: 0 20px;" hide-timeout="300" >

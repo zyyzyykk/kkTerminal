@@ -16,49 +16,49 @@ public class AppConfig {
     /**
      * 欢迎语
      */
-    @Value("${kk.welcome:}")
+    @Value("${kk.app.welcome:}")
     private String welcome;
 
     /**
      * github源地址
      */
-    @Value("${kk.source:}")
+    @Value("${kk.app.source:}")
     private String source;
 
     /**
      * 艺术字标题
      */
-    @Value("${kk.title:}")
-    private String title;
+    @Value("${kk.app.banner:}")
+    private String banner;
 
     /**
      * ssh连接最大超时时间 ms
      */
-    @Value("${kk.ssh-max-timeout:}")
-    private Integer sshMaxTimeout;
+    @Value("${kk.ssh.timeout:}")
+    private Integer sshTimeout;
 
     /**
      * websocket最大空闲超时 ms
      */
-    @Value("${kk.max-idle-timeout:}")
-    private Integer maxIdleTimeout;
+    @Value("${kk.ws.timeout:}")
+    private Integer wsTimeout;
 
     /**
      * PC端启用窗口
      */
     @Value("${kk.pc.window:}")
-    private Boolean pcWindowTag;
+    private Boolean pcWindow;
 
     /**
      * 存储密钥
      */
-    @Value("${kk.aes.storage:}")
+    @Value("${kk.key.storage:}")
     private String storageKey;
 
     /**
      * 登录密码
      */
-    @Value("${kk.login.password:}")
+    @Value("${kk.key.password:}")
     private String password;
 
     public String getPassword() {

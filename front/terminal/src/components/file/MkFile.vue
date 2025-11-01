@@ -63,7 +63,7 @@ export default {
       }
       const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(name.value)) {
-        err_msg.value = i18n.global.k("文件名不能含有") + " |,/";
+        err_msg.value = i18n.global.k("文件名不能含有") + " |" + i18n.global.t('，') + "/";
         return;
       }
       context.emit('callback', isDirectory.value, name.value, nowDir.value);

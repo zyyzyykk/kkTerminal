@@ -16,7 +16,7 @@
       <div :element-loading-text="$t('加载中...')" v-loading="loading" >
         <div>
           <div class="kk-flex" >
-            <div class="no-select nowrap form-width" >{{ $t('名称') }}：</div>
+            <div class="no-select nowrap form-width" >{{ $t('名称') }}{{ $t('：') }}</div>
             <div class="no-select nowrap" style="background-color: #f3f4f4; margin-right: 8px;" >U</div>
             <el-input size="small" :style="{width: '190px'}" v-model="userTCodeInfo.name" class="w-50 m-2" :placeholder="$t('输入终端代码名称')" maxlength="5" minlength="1" >
               <template #prefix>
@@ -38,7 +38,7 @@
             </div>
           </div>
           <div class="kk-flex" >
-            <div class="no-select nowrap form-width" style="margin-right: 2px;" >{{ $t('描述') }}：</div>
+            <div class="no-select nowrap form-width" style="margin-right: 2px;" >{{ $t('描述') }}{{ $t('：') }}</div>
             <el-input size="small" :style="{width: '206px'}" v-model="userTCodeInfo.desc" class="w-50 m-2" :placeholder="$t('输入终端代码描述')" >
               <template #prefix>
                 <el-icon class="el-input__icon" ><EditPen /></el-icon>

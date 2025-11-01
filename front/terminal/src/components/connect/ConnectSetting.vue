@@ -15,7 +15,7 @@
   >
     <div>
       <div class="item-class" style="margin-bottom: 15px;" >
-        <div class="no-select form-width nowrap" >{{ $t('配\u00A0\u00A0\u00A0置') }}：</div>
+        <div class="no-select form-width nowrap" >{{ $t('配\u00A0\u00A0\u00A0置') }}{{ $t('：') }}</div>
         <ToolTip :content="!(setInfo.option && setInfo.option.length > 0) ? $t('新建配置') : setInfo.option" >
           <template #content>
             <div class="ellipsis" style="user-select: none;" :class="!(setInfo.option && setInfo.option.length > 0) ? 'new-option': 'old-option'" >{{ !(setInfo.option && setInfo.option.length > 0) ? $t('新建配置') : setInfo.option }}</div>
@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="item-class" style="margin-bottom: 15px;" >
-        <div class="no-select form-width" >{{ $t('主机IP') }}：</div>
+        <div class="no-select form-width" >{{ $t('主机IP') }}{{ $t('：') }}</div>
         <div>
           <el-input :disabled="isForbidInput" v-model="setInfo.server_ip" class="w-50 m-2" :placeholder="$t('输入主机IP')" >
             <template #prefix>
@@ -53,7 +53,7 @@
         <el-icon class="operator-class" @click="doCopy(setInfo.server_ip)" size="15" ><DocumentCopy /></el-icon>
       </div>
       <div class="item-class" style="margin-bottom: 15px;" >
-        <div class="no-select form-width" >{{ $t('端口号') }}：</div>
+        <div class="no-select form-width" >{{ $t('端口号') }}{{ $t('：') }}</div>
         <div>
           <el-input :disabled="isForbidInput" v-model="setInfo.server_port" class="w-50 m-2" :placeholder="$t('输入端口号')" >
             <template #prefix>
@@ -64,7 +64,7 @@
         <el-icon class="operator-class" @click="doCopy(setInfo.server_port)" size="15" ><DocumentCopy /></el-icon>
       </div>
       <div class="item-class" style="margin-bottom: 15px;" >
-        <div class="no-select form-width" >{{ $t('用户名') }}：</div>
+        <div class="no-select form-width" >{{ $t('用户名') }}{{ $t('：') }}</div>
         <div>
           <el-input :disabled="isForbidInput" v-model="setInfo.server_user" class="w-50 m-2" :placeholder="$t('输入用户名')" >
             <template #prefix>

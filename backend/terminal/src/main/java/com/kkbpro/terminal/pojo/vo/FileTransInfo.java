@@ -27,4 +27,7 @@ public class FileTransInfo {
     // 类型: 0等待中/1上传中/2下载中/3已完成
     private Integer index = 0;
 
+    // 状态: 0成功/-1上传失败/-2下载失败
+    private Integer status = 0;
+
 }

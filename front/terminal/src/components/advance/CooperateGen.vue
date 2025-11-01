@@ -12,7 +12,7 @@
   >
     <div class="no-select" >
       <div class="kk-flex" >
-        <div>{{ $t('编辑权限') }}：</div>
+        <div>{{ $t('编辑权限') }}{{ $t('：') }}</div>
         <div style="flex: 1;" ></div>
         <el-radio-group v-model="isReadonly" class="ml-4" >
           <el-radio :label="false" size="large" >{{ $t('是') }}</el-radio>
@@ -22,7 +22,7 @@
       </div>
       <div style="margin-top: 10px;" ></div>
       <div class="kk-flex" >
-        <div>{{ $t('人数上限') }}：</div>
+        <div>{{ $t('人数上限') }}{{ $t('：') }}</div>
         <div style="flex: 1;" ></div>
         <div>
           <el-input-number :style="{width: '80px'}" size="small" v-model="maxHeadCount" :min="1" :max="6" step="1" :step-strictly="true" >

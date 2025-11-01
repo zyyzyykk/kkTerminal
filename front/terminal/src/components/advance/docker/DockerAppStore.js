@@ -39,7 +39,7 @@ export const dockerAppStore = [
             imageVersion: 'latest',
             containerName: 'kkTerminal',
             portMapping: '3000:3000',
-            envVar: 'TITLE=kkTerminal\nAESKEY=' + generateRandomString(16),
+            envVar: 'PASSWORD=' + generateRandomString(16),
             volumeMounting: '/data/kkterminal/cloud:/cloud',
             paramOptions: '',
         },

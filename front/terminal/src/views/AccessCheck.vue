@@ -115,7 +115,7 @@ export default {
 .root-view {
   height: 100vh;
   width: 100%;
-  background: #eef2f6 url('@/assets/bg_access_check.png') repeat-x 0 bottom;
+  background: #eef2f6 url('@/assets/bg_cloud.png') repeat-x 0 bottom;
   display: flex;
   align-items: center;
   justify-content: center;

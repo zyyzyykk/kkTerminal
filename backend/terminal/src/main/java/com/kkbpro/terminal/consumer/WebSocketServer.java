@@ -115,16 +115,16 @@ public class WebSocketServer {
         String envInfoStr = AESUtil.decrypt(jsonObject.getString("envInfo"), this.secretKey);
         EnvInfo envInfo = JSONObject.parseObject(envInfoStr, EnvInfo.class);
 
-        // 建立 web-socket 连接
+        // 建立Web Socket连接
         this.sessionSocket = sessionSocket;
         // 设置最大空闲超时
-        sessionSocket.setMaxIdleTimeout(appConfig.getMaxIdleTimeout());
+        sessionSocket.setMaxIdleTimeout(appConfig.getWsTimeout());
 
         // 协作
         String cooperateKey = envInfo.getCooperateKey();
         if (!StringUtil.isEmpty(cooperateKey)) {
             Integer state = SocketSendEnum.COOPERATE_KEY_INVALID.getState();
-            String msg = SocketSendEnum.COOPERATE_KEY_INVALID.getDesc();
+            String cooperateTip = SocketSendEnum.COOPERATE_KEY_INVALID.getDesc();
             try {
                 String[] keyInfo = AESUtil.decrypt(StringUtil.changeStrToBase64(cooperateKey), AdvanceController.COOPERATE_SECRET_KEY).split("\\^");
                 String cooperateId = keyInfo[0];
@@ -140,7 +140,7 @@ public class WebSocketServer {
                     // 成功加入协作
                     if (maxHeadCount > slaveSockets.size()) {
                         state = SocketSendEnum.CONNECT_SUCCESS.getState();
-                        msg = (readOnly ? "Read-Only" : "Edit") + " Cooperation Success";
+                        cooperateTip = (readOnly ? "Read-Only" : "Edit") + " Cooperation Success";
                         slaveSockets.add(this);
                         this.sshKey = sshKey;
                         this.cooperator = true;
@@ -152,12 +152,12 @@ public class WebSocketServer {
                         masterSocket.sendMessage(SocketSendEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
                                 "success", SocketSendEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));
                     }
-                    else msg = "Cooperators Limit Exceeded";
+                    else cooperateTip = "Cooperators Limit Exceeded";
                 }
             } catch (Exception e) {
                 LogUtil.logException(this.getClass(), e);
             }
-            this.sendMessage(msg, "fail", state, null);
+            this.sendMessage(cooperateTip, "fail", state, null);
             return;
         }
 
@@ -172,10 +172,10 @@ public class WebSocketServer {
 
         SSHClient sshClient = new SSHClient();
         try {
-            sshClient.setConnectTimeout(appConfig.getSshMaxTimeout());
-            sshClient.addHostKeyVerifier(new PromiscuousVerifier());            // 不验证主机密钥
+            sshClient.setConnectTimeout(appConfig.getSshTimeout());
+            sshClient.addHostKeyVerifier(new PromiscuousVerifier());                // 不验证主机密钥
             sshClient.connect(host, port);
-            if (authType != 1) sshClient.authPassword(user_name, password);      // 使用用户名和密码进行身份验证
+            if (authType != 1) sshClient.authPassword(user_name, password);         // 使用用户名和密码进行身份验证
             else {
                 // 创建本地私钥文件
                 String keyPath = FileUtil.folderBasePath + "/keyProviders/" + UUID.randomUUID();
@@ -222,15 +222,16 @@ public class WebSocketServer {
         // 欢迎语
         this.sendMessage("Welcome","success", SocketSendEnum.OUT_TEXT.getState(), appConfig.getWelcome() + "\r\n");
         // github源地址
-        this.sendMessage("GitHub","success", SocketSendEnum.OUT_TEXT.getState(), "source: " + appConfig.getSource() + "\r\n");
-        // 生成艺术字
-        String title = appConfig.getTitle();
-        String titleArt = FigletFont.convertOneLine(title);
+        this.sendMessage("GitHub","success", SocketSendEnum.OUT_TEXT.getState(), appConfig.getSource() + "\r\n");
+        // 生成横幅艺术字
+        String banner = appConfig.getBanner();
+        String bannerArt = FigletFont.convertOneLine(banner);
 
         // 分割成多行
-        String[] asciiArts = titleArt.split("\n");
+        String[] asciiArts = bannerArt.split("\n");
         for (String asciiArt : asciiArts) {
-            this.sendMessage("ArtWord","success", SocketSendEnum.OUT_TEXT.getState(), asciiArt + "\r\n");
+            this.sendMessage("BannerArtLine",
+                    "success", SocketSendEnum.OUT_TEXT.getState(), asciiArt + "\r\n");
         }
 
         shell = sshSession.startShell();

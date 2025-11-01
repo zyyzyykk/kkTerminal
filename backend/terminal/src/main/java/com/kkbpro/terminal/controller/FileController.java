@@ -46,18 +46,20 @@ public class FileController {
     private void readRemoteFile(HttpServletResponse response, String sshKey, SFTPClient sftp, String path, String fileName, String trigger) throws IOException {
         String id = UUID.randomUUID().toString();
         String remoteFilePath = path + fileName;
-        FileTransInfo fileTransInfo = new FileTransInfo(id, path, fileName, sftp.size(remoteFilePath), 2);
+        FileTransInfo fileTransInfo = new FileTransInfo(id, path, fileName, sftp.size(remoteFilePath), 2, 0);
         // 浏览器下载（非文件编辑器中打开）
         if ("browser".equals(trigger)) WebSocketServer.putTransportingFile(sshKey, id, fileTransInfo);
-        try (RemoteFile file = sftp.open(remoteFilePath)) {
-            try (InputStream is = file.new RemoteFileInputStream()) {
-                byte[] buffer = new byte[8096];
-                int len;
-                while ((len = is.read(buffer)) != -1) {
-                    // 逐块传输至前端
-                    response.getOutputStream().write(buffer, 0, len);
-                }
+        try (RemoteFile file = sftp.open(remoteFilePath);
+             InputStream is = file.new RemoteFileInputStream())
+        {
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                response.getOutputStream().write(buffer, 0, len);   // 流式传输
             }
+        } catch (Exception e) {
+            fileTransInfo.setStatus(-2);
+            LogUtil.logException(this.getClass(), e);
         } finally {
             WebSocketServer.removeTransportingFile(sshKey, id);
             // 释放资源
@@ -81,24 +83,26 @@ public class FileController {
         String id = UUID.randomUUID().toString();
         // 进入目录并打包
         String command = "cd " + path + " && tar -czvf - " + folderName + " | less";
-        FileTransInfo fileTransInfo = new FileTransInfo(id, path, folderName, -1L, 2);
+        FileTransInfo fileTransInfo = new FileTransInfo(id, path, folderName, -1L, 2, 0);
         WebSocketServer.putTransportingFile(sshKey, id, fileTransInfo);
         try(Session session = ssh.startSession();
             Session.Command cmd = session.exec(command);
-            InputStream tarStream = cmd.getInputStream())
+            InputStream is = cmd.getInputStream())
         {
             byte[] buffer = new byte[8192];
             int len;
-            while ((len = tarStream.read(buffer)) != -1) {
-                try {
-                    if (response != null) response.getOutputStream().write(buffer, 0, len);
-                } catch (Exception e) {
-                    response = null;
+            try {
+                while ((len = is.read(buffer)) != -1) {
+                    response.getOutputStream().write(buffer, 0, len);   // 流式传输
                 }
+            } catch (Exception e) {
+                cmd.close();
+                throw e;
             }
             // 等待命令执行完毕
             cmd.join();
         } catch (Exception e) {
+            fileTransInfo.setStatus(-2);
             LogUtil.logException(this.getClass(), e);
         } finally {
             WebSocketServer.removeTransportingFile(sshKey, id);
@@ -125,7 +129,7 @@ public class FileController {
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8.name()));
 
         try(InputStream is = Files.newInputStream(file.toPath())) {
-            byte[] buffer = new byte[8096];
+            byte[] buffer = new byte[8192];
             int len;
             while ((len = is.read(buffer)) != -1) {
                 // 逐块传输至前端
@@ -598,7 +602,7 @@ public class FileController {
 
         // 上传完毕
         if (chunk.equals(chunks)) {
-            FileTransInfo fileTransInfo = new FileTransInfo(id, path, fileName, totalSize, 1);
+            FileTransInfo fileTransInfo = new FileTransInfo(id, path, fileName, totalSize, 1, 0);
             WebSocketServer.putTransportingFile(sshKey, id, fileTransInfo);
             new Thread(() -> {
                 try {
@@ -609,11 +613,12 @@ public class FileController {
                     SFTPClient sftpFileClient = SSHUtil.getSftpClient(sshKey);
                     sftpFileClient.put(folderPath + "/" + id, path + fileName);
                 } catch (Exception e) {
+                    fileTransInfo.setStatus(-1);
                     LogUtil.logException(this.getClass(), e);
                 } finally {
+                    WebSocketServer.removeTransportingFile(sshKey, id);
                     // 删除临时文件
                     FileUtil.fileDelete(temporaryFolder);
-                    WebSocketServer.removeTransportingFile(sshKey, id);
                     // 释放资源
                     SSHUtil.sftpClose(sshKey);
                 }

@@ -7,7 +7,7 @@
       <div class="setting-menu no-select" @click="doSettings(4)" ><div>{{ $t('文件管理') }}</div></div>
       <div @mousemove="showAdvance(true)" @mouseleave="showAdvance(false)" :class="['setting-menu', 'no-select', (sshKey && env.advance) ? '':'disabled']" @click="doSettings(5)" >
         <div>{{ $t('高级') }}</div>
-        <div style="flex: 1" ></div>
+        <div style="flex: 1;" ></div>
         <el-icon><ArrowRight /></el-icon>
       </div>
       <div class="setting-menu no-select" @click="doSettings(3)" ><div>{{ $t('重启') }}</div></div>
@@ -66,7 +66,7 @@
                     </el-badge>
                   </template>
                   <div v-if="Object.keys(waitingList).length > 0" class="trans-items" >
-                    <div v-for="item in waitingList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
+                    <div v-for="item in waitingList" :key="item.id" class="kk-flex trans-item" >
                       <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
@@ -93,7 +93,7 @@
                     </el-badge>
                   </template>
                   <div v-if="Object.keys(uploadingList).length > 0" class="trans-items" >
-                    <div v-for="item in uploadingList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
+                    <div v-for="item in uploadingList" :key="item.id" class="kk-flex trans-item" >
                       <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
@@ -122,7 +122,7 @@
                     </el-badge>
                   </template>
                   <div v-if="Object.keys(downloadingList).length > 0" class="trans-items" >
-                    <div v-for="item in downloadingList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
+                    <div v-for="item in downloadingList" :key="item.id" class="kk-flex trans-item" >
                       <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
@@ -151,7 +151,7 @@
                     </el-badge>
                   </template>
                   <div v-if="Object.keys(finishedList).length > 0" class="trans-items" >
-                    <div v-for="item in finishedList" :key="item.id" class="kk-flex trans-item" style="height: 64px; width: 512px;" >
+                    <div v-for="item in finishedList" :key="item.id" class="kk-flex trans-item" >
                       <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
@@ -163,7 +163,13 @@
                         <div class="trans-item-size" >{{ calcSize(item.size) }}</div>
                       </div>
                       <div style="flex: 1;" ></div>
-                      <el-icon @click="fileBlockView(item.path, item.name)" class="el-icon--left folder-hover" ><FolderOpened /></el-icon>
+                      <el-icon v-if="item.status === -1" class="el-icon--left" >
+                        <img class="custom-svg" src="@/assets/error_upload.svg" alt="error_upload" >
+                      </el-icon>
+                      <el-icon v-else-if="item.status === -2" class="el-icon--left" >
+                        <img class="custom-svg" src="@/assets/error_download.svg" alt="error_download" >
+                      </el-icon>
+                      <el-icon v-else @click="fileBlockView(item.path, item.name)" class="el-icon--left folder-hover" ><FolderOpened /></el-icon>
                       <div style="margin-left: 10px;" ></div>
                       <el-icon @click="updateTransportLists(3, 1, item.id, null)" class="el-icon--left close-hover" ><CircleClose /></el-icon>
                       <div style="flex: 1;" ></div>
@@ -996,7 +1002,7 @@ export default {
         }
         else {
           ElMessage({
-            message: i18n.global.t('终端代码必须以 F,S,U 开头'),
+            message: i18n.global.t('终端代码必须以F，S，U开头'),
             type: 'warning',
             grouping: true,
           });
@@ -1062,7 +1068,7 @@ export default {
     const waitingList = ref({});
     const uploadingList = ref({});
     const downloadingList = ref({});
-    const finishedList = ref({});       // status: 0成功 1失败
+    const finishedList = ref({});
     const transportLists = {
       0: waitingList,
       1: uploadingList,
@@ -1276,16 +1282,16 @@ export default {
 }
 
 .disabled {
-  background-color: #f5f7fa;
-  color: #a8abb2;
   pointer-events: none;
+  color: #a8abb2;
+  background-color: #f5f7fa;
 }
 
 .trans-items {
   height: 256px;
   overflow-y: scroll;
   scrollbar-width: none !important; /* Firefox */
-  -ms-overflow-style: none !important; /* Internet Explorer 和 Edge */
+  -ms-overflow-style: none !important; /* IE 和 Edge */
 }
 
 /* 隐藏滚动条 */
@@ -1294,9 +1300,10 @@ export default {
 }
 
 .trans-item {
+  height: 64px;
+  width: 512px;
   padding: 10px 15px;
   border-bottom: 1px solid #efefef;
-  width: 100%;
 }
 
 .trans-item:hover {
@@ -1332,6 +1339,11 @@ export default {
 .trans-item-size {
   color: #474747;
   font-size: 12px;
+}
+
+.custom-svg {
+  height: 20px !important;
+  width: 20px !important;
 }
 </style>
 

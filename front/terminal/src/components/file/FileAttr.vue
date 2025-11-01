@@ -25,7 +25,7 @@
         </div>
         <div class="kk-border" ></div>
         <div class="kk-flex nowrap" >
-          <div class="form-width" >{{ $t('位置') }}：</div>
+          <div class="form-width" >{{ $t('位置') }}{{ $t('：') }}</div>
           <ToolTip :content="fileDir + fileInfo.name" >
             <template #content>
               <div class="ellipsis" style="line-height: 18px;" >
@@ -38,7 +38,7 @@
           </div>
         </div>
         <div v-if="fileInfo.isDirectory" class="kk-flex" >
-          <div class="form-width" >{{ $t('包含') }}：</div>
+          <div class="form-width" >{{ $t('包含') }}{{ $t('：') }}</div>
           <div class="ellipsis" style="line-height: 18px;" >
             {{ $t(includeInfo) }}
           </div>
@@ -53,7 +53,7 @@
           </div>
         </div>
         <div v-else class="kk-flex" >
-          <div class="form-width" >{{ $t('大小') }}：</div>
+          <div class="form-width" >{{ $t('大小') }}{{ $t('：') }}</div>
           <div class="ellipsis" style="line-height: 18px;" >
             {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size.toLocaleString() + ' ' + $t('字节') }})
           </div>
@@ -69,20 +69,20 @@
         </div>
         <div class="kk-border" ></div>
         <div class="kk-flex" >
-          <div class="form-width" >{{ $t('修改时间') }}：</div>
+          <div class="form-width" >{{ $t('修改时间') }}{{ $t('：') }}</div>
           <div>
             {{ calcDate(fileInfo.attributes.mtime) }}
           </div>
         </div>
         <div class="kk-flex" >
-          <div class="form-width" >{{ $t('访问时间') }}：</div>
+          <div class="form-width" >{{ $t('访问时间') }}{{ $t('：') }}</div>
           <div>
             {{ calcDate(fileInfo.attributes.atime) }}
           </div>
         </div>
         <div class="kk-border" ></div>
         <div class="kk-flex" >
-          <div class="form-width" >{{ $t('权限') }}：</div>
+          <div class="form-width" >{{ $t('权限') }}{{ $t('：') }}</div>
           <div>
             {{ calcPriority(fileInfo.attributes.mode.type,fileInfo.attributes.permissions) }}
           </div>
@@ -215,7 +215,7 @@ export default {
       const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(rename.value)) {
         ElMessage({
-          message: i18n.global.t("文件名不能含有") + " |,/",
+          message: i18n.global.t("文件名不能含有") + " |" + i18n.global.t('，') + "/",
           type: "warning",
           grouping: true,
         })

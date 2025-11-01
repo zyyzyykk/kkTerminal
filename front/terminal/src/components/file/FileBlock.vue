@@ -340,7 +340,7 @@ export default {
 
     // 获取当前路径下的文件列表
     const noDataMsg = ref(i18n.global.k('暂无文件'));
-    // 目录状态：0 正常 / 1 目录不存在、无权限等
+    // 目录状态: 0 正常 / 1 目录不存在、无权限等
     const dirStatus = ref(0);
     const getDirList = async () => {
       if(!dir.value) {
@@ -504,6 +504,7 @@ export default {
           path: path,
           name: fileName,
           size: fileSize,
+          status: 0,
           progress: 0,
         };
         context.emit('updateTransportLists', 0, 0, fileId, fileTransInfo);
@@ -572,7 +573,7 @@ export default {
                 });
                 chunk = chunks + 10;
                 // 更新传输列表（等待中）状态
-                fileTransInfo.status = 1;
+                fileTransInfo.status = -1;
                 context.emit('updateTransportLists', 0, 1, fileId, null);
                 context.emit('updateTransportLists', 3, 0, fileId, fileTransInfo);
               }
@@ -837,7 +838,7 @@ export default {
       const invalidNameRe = /[/|]/;
       if(invalidNameRe.test(renameFile.value.name)) {
         ElMessage({
-          message: i18n.global.t("文件名不能含有") + " |,/",
+          message: i18n.global.t("文件名不能含有") + " |" + i18n.global.t('，') + "/",
           type: "warning",
           grouping: true,
         });
@@ -1388,14 +1389,12 @@ export default {
   color: #409eff;
 }
 
-.item-selected
-{
+.item-selected {
   background-color: #efefef !important;
   border-bottom: 1px solid #d8d8d8;
 }
 
-.kk-menu
-{
+.kk-menu {
   position: absolute;
   z-index: 3466;
   text-align: left;
@@ -1416,15 +1415,14 @@ export default {
   cursor: pointer;
 }
 
-.kk-menu-item:hover
-{
+.kk-menu-item:hover {
   background-color: #efefef;
 }
 
 .disabled {
-  background-color: #f5f7fa;
-  color: #a8abb2;
   pointer-events: none;
+  color: #a8abb2;
+  background-color: #f5f7fa;
 }
 
 .disabled-function {
