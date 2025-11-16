@@ -26,25 +26,13 @@ public class AppConfig {
     private String source;
 
     /**
-     * 艺术字标题
+     * 艺术字横幅
      */
     @Value("${kk.app.banner:}")
     private String banner;
 
     /**
-     * ssh连接最大超时时间 ms
-     */
-    @Value("${kk.ssh.timeout:}")
-    private Integer sshTimeout;
-
-    /**
-     * websocket最大空闲超时 ms
-     */
-    @Value("${kk.ws.timeout:}")
-    private Integer wsTimeout;
-
-    /**
-     * PC端启用窗口
+     * 本地PC端窗口
      */
     @Value("${kk.pc.window:}")
     private Boolean pcWindow;

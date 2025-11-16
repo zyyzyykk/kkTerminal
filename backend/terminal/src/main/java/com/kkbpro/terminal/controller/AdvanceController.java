@@ -60,13 +60,16 @@ public class AdvanceController {
         String errorMsg = "协作Key生成失败";
         String successMsg = "协作Key生成成功";
 
-        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
-        WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
-        if (ssh == null || webSocketServer == null) {
+        SSHClient ssh = SSHUtil.getSSHClient(sshKey);
+        if (ssh == null) {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
-        if (webSocketServer.getCooperateInfo() != null)
+
+        WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
+        // 已开启协作
+        if (webSocketServer.getCooperateInfo() != null) {
             return Result.error(errorMsg);
+        }
 
         String cooperateId = UUID.randomUUID().toString();
         CooperateInfo cooperateInfo = new CooperateInfo();
@@ -89,7 +92,7 @@ public class AdvanceController {
         String errorMsg = "结束协作失败";
         String successMsg = "结束协作成功";
 
-        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
         if (ssh == null || webSocketServer == null) {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
@@ -133,7 +136,7 @@ public class AdvanceController {
         String errorMsg = "获取监控状态失败";
         String successMsg = "获取监控状态成功";
 
-        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
@@ -175,7 +178,7 @@ public class AdvanceController {
         String errorMsg = "获取Docker版本失败";
         String successMsg = "获取Docker版本成功";
 
-        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
@@ -210,7 +213,7 @@ public class AdvanceController {
         String errorMsg = "获取Docker信息失败";
         String successMsg = "获取Docker信息成功";
 
-        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
@@ -236,7 +239,7 @@ public class AdvanceController {
         String errorMsg = "删除失败";
         String successMsg = "删除成功";
 
-        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }
@@ -262,7 +265,7 @@ public class AdvanceController {
         String errorMsg = "操作失败";
         String successMsg = "操作成功";
 
-        SSHClient ssh = WebSocketServer.sshClientMap.get(sshKey);
+        SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
         }

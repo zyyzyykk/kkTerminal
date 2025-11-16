@@ -1088,14 +1088,20 @@ export default {
       // 查询
       if(type === 2) return operateList.value[id];
       // 删除
-      delete operateList.value[id];
+      if(type === 1) {
+        delete operateList.value[id];
+        isShowDot.value = true;
+      }
       // 新增/修改
       if(type === 0) {
-        const delta = {};
-        delta[id] = item;
-        operateList.value = {...delta, ...operateList.value};
+        // 新增
+        if(!operateList.value[id]) {
+          operateList.value = {...{[id]: item}, ...operateList.value};
+          isShowDot.value = true;
+        }
+        // 修改
+        else operateList.value[id] = {...item};
       }
-      isShowDot.value = true;
     };
     const isShowDot = ref(false);
     const isShowDropdown = ref(false);
@@ -1301,8 +1307,8 @@ export default {
 
 .trans-item {
   height: 64px;
-  width: 512px;
-  padding: 10px 15px;
+  width: 100%;
+  padding: 10px 0 10px 15px;
   border-bottom: 1px solid #efefef;
 }
 

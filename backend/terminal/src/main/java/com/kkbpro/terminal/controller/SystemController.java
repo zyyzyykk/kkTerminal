@@ -110,14 +110,14 @@ public class SystemController {
 
 
     /**
-     * 窗口心跳续约
+     * Window心跳续约
      */
     @Log
     @PostMapping ("/beat")
     public Result beat(String windowId) {
         if (!"Linux".equals(serverOS) && appConfig.getPcWindow() && windowId != null)
             windowActiveMap.replace(windowId, new Date().getTime());
-        return Result.success("窗口心跳续约成功");
+        return Result.success("窗口续约成功");
     }
 
     /**

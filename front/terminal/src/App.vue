@@ -135,6 +135,10 @@ export default {
   user-select: none;
 }
 
+.el-message__content {
+  user-select: none;
+}
+
 .el-dialog {
   pointer-events: auto;
 }

@@ -1,5 +1,5 @@
 {
-  "窗口心跳续约成功": "Window heartbeat renewal",
+  "窗口续约成功": "Window Renewal Success",
   "连接已断开": "Disconnected",
   "连接断开，": "Disconnected, ",
   "目录不存在": "No Such Dir",
@@ -10,7 +10,7 @@
   "统计数目成功": "Counted",
   "获取大小失败": "Size Failed",
   "获取大小成功": "Sized",
-  "家路径": "Home Path",
+  "家目录": "Home Directory",
   "删除失败": "Delete Failed",
   "删除成功": "Deleted",
   "复制失败": "Copy Failed",

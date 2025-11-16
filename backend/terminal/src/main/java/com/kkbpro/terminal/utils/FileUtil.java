@@ -5,6 +5,7 @@ import com.kkbpro.terminal.exception.MyException;
 import com.kkbpro.terminal.result.Result;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,10 +23,8 @@ public class FileUtil {
         File finalFile = new File(folderPath + "/" + fileName);
         // 获取暂存切片文件的文件夹中的所有文件
         File[] files = folder.listFiles();
-        if (files != null)
-        {
-            try(OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(finalFile, true))) {
-
+        if (files != null) {
+            try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(finalFile, true))) {
                 List<File> list = new ArrayList<>();
                 for (File file : files) {
                     // 判断是否是文件对应的文件片
@@ -45,7 +44,7 @@ public class FileUtil {
                 })).collect(Collectors.toList());
                 // 根据排序的顺序依次将文件合并到新的文件中
                 for (File file : fileListCollect) {
-                    try(InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
+                    try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
                         int len;
                         byte[] bytes = new byte[4 * 1024 * 1024];
                         while ((len = inputStream.read(bytes)) != -1) {

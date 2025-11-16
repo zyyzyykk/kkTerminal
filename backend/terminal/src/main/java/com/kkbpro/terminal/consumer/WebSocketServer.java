@@ -11,7 +11,6 @@ import com.kkbpro.terminal.controller.AdvanceController;
 import com.kkbpro.terminal.pojo.dto.CooperateInfo;
 import com.kkbpro.terminal.pojo.dto.EnvInfo;
 import com.kkbpro.terminal.pojo.dto.MessageInfo;
-import com.kkbpro.terminal.pojo.dto.PrivateKey;
 import com.kkbpro.terminal.pojo.vo.FileTransInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.*;
@@ -20,8 +19,6 @@ import lombok.Setter;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.IOUtils;
 import net.schmizz.sshj.sftp.SFTPClient;
-import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
-import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,9 +28,6 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,18 +41,21 @@ public class WebSocketServer {
 
     public static final ConcurrentHashMap<String, WebSocketServer> webSocketServerMap = new ConcurrentHashMap<>();
 
+    public static final ConcurrentHashMap<String, List<WebSocketServer>> cooperateMap = new ConcurrentHashMap<>();
+
     public static final ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
 
     public static final ConcurrentHashMap<String, SFTPClient> sftpClientMap = new ConcurrentHashMap<>();
-
-    public static final ConcurrentHashMap<String, List<WebSocketServer>> cooperateMap = new ConcurrentHashMap<>();
 
     private static final ConcurrentHashMap<String, ConcurrentHashMap<String, FileTransInfo>> fileTransportingMap = new ConcurrentHashMap<>();
 
     public static void putTransportingFile(String sshKey, String key, FileTransInfo fileTransInfo) {
         if (fileTransportingMap.get(sshKey) == null) return;
         fileTransportingMap.get(sshKey).put(key, fileTransInfo);
-        webSocketServerMap.get(sshKey).sendMessage(SocketSendEnum.FILE_TRANSPORT_UPDATE.getDesc() ,"success", SocketSendEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
+        WebSocketServer webSocketServer = webSocketServerMap.get(sshKey);
+        if (webSocketServer == null) return;
+        webSocketServer.sendMessage(SocketSendEnum.FILE_TRANSPORT_UPDATE.getDesc() ,
+                "success", SocketSendEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
     };
 
     public static FileTransInfo getTransportingFile(String sshKey, String key) {
@@ -72,7 +69,10 @@ public class WebSocketServer {
         // 修改类型为 已完成
         fileTransInfo.setIndex(3);
         fileTransportingMap.get(sshKey).remove(key);
-        webSocketServerMap.get(sshKey).sendMessage(SocketSendEnum.FILE_TRANSPORT_UPDATE.getDesc() ,"success", SocketSendEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
+        WebSocketServer webSocketServer = webSocketServerMap.get(sshKey);
+        if (webSocketServer == null) return;
+        webSocketServer.sendMessage(SocketSendEnum.FILE_TRANSPORT_UPDATE.getDesc() ,
+                "success", SocketSendEnum.FILE_TRANSPORT_UPDATE.getState(), JSON.toJSONString(fileTransInfo));
     };
 
     private static AppConfig appConfig;
@@ -90,6 +90,12 @@ public class WebSocketServer {
     private String sshKey;
 
     private Charset serverCharset;
+
+    @Getter
+    private SSHClient sshClient;
+
+    @Getter
+    private SFTPClient sftpClient;
 
     private net.schmizz.sshj.connection.channel.direct.Session.Shell shell;
 
@@ -115,10 +121,8 @@ public class WebSocketServer {
         String envInfoStr = AESUtil.decrypt(jsonObject.getString("envInfo"), this.secretKey);
         EnvInfo envInfo = JSONObject.parseObject(envInfoStr, EnvInfo.class);
 
-        // 建立Web Socket连接
+        // 建立WebSocket连接
         this.sessionSocket = sessionSocket;
-        // 设置最大空闲超时
-        sessionSocket.setMaxIdleTimeout(appConfig.getWsTimeout());
 
         // 协作
         String cooperateKey = envInfo.getCooperateKey();
@@ -161,64 +165,34 @@ public class WebSocketServer {
             return;
         }
 
-        // 与服务器建立连接
-        String host = envInfo.getServer_ip();
-        int port = envInfo.getServer_port();
-        String user_name = envInfo.getServer_user();
-        String password = envInfo.getServer_password();
-        PrivateKey privateKey = envInfo.getServer_key();
-        Integer authType = envInfo.getAuthType();
-        File keyFile = null;
-
-        SSHClient sshClient = new SSHClient();
+        // 建立交互SSH连接
         try {
-            sshClient.setConnectTimeout(appConfig.getSshTimeout());
-            sshClient.addHostKeyVerifier(new PromiscuousVerifier());                // 不验证主机密钥
-            sshClient.connect(host, port);
-            if (authType != 1) sshClient.authPassword(user_name, password);         // 使用用户名和密码进行身份验证
-            else {
-                // 创建本地私钥文件
-                String keyPath = FileUtil.folderBasePath + "/keyProviders/" + UUID.randomUUID();
-                keyFile = new File(keyPath);
-                // 确保父目录存在
-                if (!keyFile.getParentFile().exists()) {
-                    keyFile.getParentFile().mkdirs();
-                }
-                // 写入私钥内容
-                Files.write(Paths.get(keyFile.getAbsolutePath()), privateKey.getContent().getBytes());
-                // 加载私钥
-                KeyProvider keyProvider = sshClient.loadKeys(keyPath, privateKey.getPassphrase());
-                // 使用私钥进行身份验证
-                sshClient.authPublickey(user_name, keyProvider);
-            }
+            this.sshClient = SSHUtil.connectHost(envInfo);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
             this.sendMessage("Fail to connect remote server !","fail", SocketSendEnum.CONNECT_FAIL.getState(), null);
             return;
-        } finally {
-            // 删除本地私钥文件
-            if (keyFile != null) FileUtil.fileDelete(keyFile);
-        }
+        };
 
         // 获取服务器编码格式
-        try(net.schmizz.sshj.connection.channel.direct.Session sshSession = sshClient.startSession();
+        try(net.schmizz.sshj.connection.channel.direct.Session sshSession = this.sshClient.startSession();
             net.schmizz.sshj.connection.channel.direct.Session.Command command = sshSession.exec("echo -n $(locale charmap)")) {
             String charsetName = IOUtils.readFully(command.getInputStream()).toString();
             command.join();
-            serverCharset = Charset.forName(charsetName);
-            sshClient.setRemoteCharset(serverCharset);
+            this.serverCharset = Charset.forName(charsetName);
+            this.sshClient.setRemoteCharset(this.serverCharset);
         }
 
-        // 开启交互终端
-        net.schmizz.sshj.connection.channel.direct.Session sshSession = sshClient.startSession();
+        // 开启交互终端和SFTP
+        net.schmizz.sshj.connection.channel.direct.Session sshSession = this.sshClient.startSession();
         sshSession.allocateDefaultPTY();
+        this.sftpClient = this.sshClient.newSFTPClient();
 
-        // 连接成功，生成key标识
-        sshKey = envInfo.getLang() + "-" + serverCharset.name().replace("-","@") + "-" + UUID.randomUUID();
-        this.sendMessage("SSHKey","success", SocketSendEnum.CONNECT_SUCCESS.getState(), sshKey);
-        webSocketServerMap.put(sshKey, this);
-        sshClientMap.put(sshKey, sshClient);
-        fileTransportingMap.put(sshKey, new ConcurrentHashMap<>());
+        // 生成唯一标识
+        this.sshKey = envInfo.getLang() + "-" + this.serverCharset.name().replace("-","@") + "-" + UUID.randomUUID();
+        this.sendMessage("SSHKey","success", SocketSendEnum.CONNECT_SUCCESS.getState(), this.sshKey);
+        webSocketServerMap.put(this.sshKey, this);
+        fileTransportingMap.put(this.sshKey, new ConcurrentHashMap<>());
         // 欢迎语
         this.sendMessage("Welcome","success", SocketSendEnum.OUT_TEXT.getState(), appConfig.getWelcome() + "\r\n");
         // github源地址
@@ -234,18 +208,18 @@ public class WebSocketServer {
                     "success", SocketSendEnum.OUT_TEXT.getState(), asciiArt + "\r\n");
         }
 
-        shell = sshSession.startShell();
-        shellInputStream = shell.getInputStream();
-        shellOutputStream = shell.getOutputStream();
-        shellOutThread = new Thread(() -> {
-            byte[] buffer = new byte[8192];
+        this.shell = sshSession.startShell();
+        this.shellInputStream = this.shell.getInputStream();
+        this.shellOutputStream = this.shell.getOutputStream();
+        this.shellOutThread = new Thread(() -> {
+            byte[] buffer = new byte[Constant.BUFFER_SIZE];
             int len;
             try {
-                while ((len = shellInputStream.read(buffer)) != -1) {
-                    String shellOut = new String(buffer, 0, len, serverCharset);
+                while ((len = this.shellInputStream.read(buffer)) != -1) {
+                    String shellOut = new String(buffer, 0, len, this.serverCharset);
                     this.sendMessage("ShellOut",
                             "success", SocketSendEnum.OUT_TEXT.getState(), shellOut);
-                    List<WebSocketServer> slaveSockets = cooperateMap.get(sshKey);
+                    List<WebSocketServer> slaveSockets = cooperateMap.get(this.sshKey);
                     if (slaveSockets != null) {
                         for (WebSocketServer slaveSocket : slaveSockets) {
                             slaveSocket.sendMessage("ShellOut",
@@ -257,17 +231,28 @@ public class WebSocketServer {
                 LogUtil.logException(this.getClass(), e);
             }
         });
-        shellOutThread.start();
+        this.shellOutThread.start();
+        // 建立传输SSH连接（异步）
+        new Thread(() -> {
+            try {
+                SSHClient ssh = SSHUtil.connectHost(envInfo);
+                SFTPClient sftp = ssh.newSFTPClient();
+                sshClientMap.put(this.sshKey, ssh);
+                sftpClientMap.put(sshKey, sftp);
+            } catch (Exception e) {
+                LogUtil.logException(this.getClass(), e);
+            };
+        }).start();
     }
 
     @OnClose
     public void onClose() {
         // 释放协作资源
-        if (cooperator) {
-            List<WebSocketServer> slaveSockets = cooperateMap.get(sshKey);
+        if (this.cooperator) {
+            List<WebSocketServer> slaveSockets = cooperateMap.get(this.sshKey);
             if (slaveSockets != null) {
                 slaveSockets.remove(this);
-                WebSocketServer masterSocket = webSocketServerMap.get(sshKey);
+                WebSocketServer masterSocket = webSocketServerMap.get(this.sshKey);
                 if (masterSocket != null) {
                     masterSocket.sendMessage(SocketSendEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
                             "success", SocketSendEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));
@@ -275,78 +260,80 @@ public class WebSocketServer {
             }
             return;
         }
-        List<WebSocketServer> slaveSockets = cooperateMap.remove(sshKey);
+        List<WebSocketServer> slaveSockets = cooperateMap.remove(this.sshKey);
         if (slaveSockets != null) {
             for (WebSocketServer slaveSocket : slaveSockets) {
                 IOUtils.closeQuietly(slaveSocket.getSessionSocket());
             }
         }
         // 释放ssh资源
-        String key = sshKey;
-        if (shellOutThread != null && !shellOutThread.isInterrupted()) {
-            shellOutThread.interrupt();
+        if (this.shellOutThread != null && !shellOutThread.isInterrupted()) {
+            this.shellOutThread.interrupt();
         }
-        IOUtils.closeQuietly(shellOutputStream, shellInputStream, shell, sessionSocket);
-        webSocketServerMap.remove(key);
-        sftpClose(key);
+        IOUtils.closeQuietly(this.shellOutputStream, this.shellInputStream, this.shell,
+                this.sftpClient, this.sshClient, this.sessionSocket);
+        webSocketServerMap.remove(this.sshKey);
+        closeTransClient(this.sshKey);
         // 删除临时文件
         new Thread(() -> {
-            // 延时2s执行，确保文件上传已经结束
+            // 延时5s执行
             try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                Thread.sleep(5000);
+            } catch (Exception e) {
+                LogUtil.logException(this.getClass(), e);
             }
             File fileBaseFolder = new File(FileUtil.folderBasePath);
             File[] files = fileBaseFolder.listFiles();
             if (files == null) return;
             for (File file : files) {
                 // 判断是否是本次ssh对应的临时文件夹
-                if (file.isDirectory() && file.getName().startsWith(key)) {
-                    FileTransInfo fileTransInfo = getTransportingFile(key, file.getName().substring(key.length() + 1));
+                if (file.isDirectory() && file.getName().startsWith(this.sshKey)) {
+                    FileTransInfo fileTransInfo = getTransportingFile(this.sshKey, file.getName().substring(this.sshKey.length() + 1));
                     // 忽略上传中/下载中的文件
                     if (fileTransInfo != null && fileTransInfo.getIndex() != null
-                            && (fileTransInfo.getIndex().equals(2) || fileTransInfo.getIndex().equals(3)))
+                            && (fileTransInfo.getIndex().equals(1) || fileTransInfo.getIndex().equals(2)))
                         continue;
                     FileUtil.fileDelete(file);
                 }
             }
         }).start();
     }
-    // 关闭sftp相关资源
-    public static void sftpClose(String sshKey) {
+    // 关闭传输资源
+    public static void closeTransClient(String sshKey) {
+        // 当前没有仍在传输的文件
         if (fileTransportingMap.get(sshKey) == null || fileTransportingMap.get(sshKey).isEmpty()) {
             fileTransportingMap.remove(sshKey);
-            SFTPClient sftpClient = sftpClientMap.remove(sshKey);
-            SSHClient sshClient = sshClientMap.remove(sshKey);
-            IOUtils.closeQuietly(sftpClient, sshClient);
+            SFTPClient sftp = sftpClientMap.remove(sshKey);
+            SSHClient ssh = sshClientMap.remove(sshKey);
+            IOUtils.closeQuietly(sftp, ssh);
         }
     }
 
     // 从Client接收消息
     @OnMessage
     public void onMessage(String message) throws Exception {
-        if (shell == null || shellOutputStream == null) return;
+        if (this.shell == null || this.shellOutputStream == null) return;
 
         message = AESUtil.decrypt(message, this.secretKey);
         MessageInfo messageInfo = JSONObject.parseObject(message, MessageInfo.class);
 
-        // 改变虚拟终端大小
+        // 修改虚拟终端窗口大小
         if (SocketMessageEnum.SIZE_CHANGE.getState().equals(messageInfo.getType())) {
-            shell.changeWindowDimensions(messageInfo.getCols(),messageInfo.getRows(),0,0);
+            this.shell.changeWindowDimensions(messageInfo.getCols(),messageInfo.getRows(),0,0);
         }
 
         // 文本命令
         if (SocketMessageEnum.USER_TEXT.getState().equals(messageInfo.getType())) {
-            shellOutputStream.write(messageInfo.getContent().getBytes(serverCharset));
-            shellOutputStream.flush();
+            this.shellOutputStream.write(messageInfo.getContent().getBytes(this.serverCharset));
+            this.shellOutputStream.flush();
         }
-        // 心跳续约
+        // WebSocket心跳续约
         if (SocketMessageEnum.HEART_BEAT.getState().equals(messageInfo.getType())) {
-            shellOutputStream.write("".getBytes(StandardCharsets.UTF_8));
-            shellOutputStream.flush();
+            // SSH心跳续约
+            SSHUtil.doHeartBeat(this.sshClient);
+            SSHUtil.doHeartBeat(SSHUtil.getTransSSHClient(this.sshKey));
             // 更新协作者数量
-            List<WebSocketServer> slaveSockets = cooperateMap.get(sshKey);
+            List<WebSocketServer> slaveSockets = cooperateMap.get(this.sshKey);
             if (slaveSockets != null) {
                 this.sendMessage(SocketSendEnum.COOPERATE_NUMBER_UPDATE.getDesc(),
                         "success", SocketSendEnum.COOPERATE_NUMBER_UPDATE.getState(), Integer.toString(slaveSockets.size()));

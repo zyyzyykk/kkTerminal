@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@babel/plugin-transform-private-methods": "^7.27.1",
     "@element-plus/icons-vue": "^2.3.1",
     "@xterm/addon-web-links": "^0.11.0",
     "ace-builds": "^1.32.5",
@@ -19,6 +20,7 @@
     "iconv-lite": "^0.6.3",
     "jquery": "^3.7.1",
     "jsencrypt": "^3.3.2",
+    "p-queue": "^9.0.0",
     "strip-ansi": "^7.1.0",
     "vue": "^3.2.13",
     "vue-clipboard3": "^2.0.0",

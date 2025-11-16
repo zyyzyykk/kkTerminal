@@ -172,12 +172,10 @@ import { ElMessage } from 'element-plus';
 import { deleteDialog } from "@/components/common/DeleteDialog";
 import { http_base_url } from '@/env/BaseUrl';
 import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link, ArrowRight, Monitor } from '@element-plus/icons-vue';
-import { escapeItem, escapePath, generateRandomString, osFileNaturalSort } from '@/utils/StringUtil';
+import { escapeItem, escapePath, osFileNaturalSort } from '@/utils/StringUtil';
 import { isZipFile } from '@/components/preview/FileSuffix';
 import { getChmodValue } from '@/components/calc/CalcPriority';
 import { getUrlParams, doUrlDownload } from "@/utils/UrlUtil";
-import { aesEncryptBuffer, rsaEncrypt } from "@/utils/Encrypt";
-import { encodeStrToArray } from "@/components/preview/EncodeUtil";
 import { TCodeReservedVarsSetter } from "@/components/tcode/TCode";
 
 import ToolTip from '@/components/common/ToolTip';
@@ -188,9 +186,8 @@ import FileAttr from './FileAttr';
 import FileUrl from './FileUrl';
 
 import i18n from "@/locales/i18n";
-
-// 引入文件图标组件
 import FileIcons from 'file-icons-vue';
+import PQueue from "p-queue";
 
 export default {
   name: 'FileBlock',
@@ -480,8 +477,19 @@ export default {
       if(selectedFiles.value.length === 1 && selectedFiles.value[0].name && !selectedFiles.value[0].isDirectory) downloadRemoteFile(selectedFiles.value[0].name);
     };
     // 上传文件
-    const chunkSize = 1024 * 2173;   // 每一片大小2173kB
-    const doUpload = async (fileData, data={}) => {
+    let globalUploadQueue = null;
+    let globalUploadProgress = null;  // -1上传失败
+    const resetGlobalUpload = () => {
+      if(globalUploadQueue) {
+        globalUploadQueue.pause();
+        globalUploadQueue.clear();
+      }
+      globalUploadQueue = new PQueue({concurrency: 4});
+      globalUploadProgress = {};
+    };
+    resetGlobalUpload();
+    const chunkSize = 1024 * 2173;   // 每一片大小2173KB
+    const doUpload = async (fileData, config={}) => {
       try {
         if(isShowDirInput.value) return;
         const file = fileData.file;
@@ -490,12 +498,11 @@ export default {
         const fileName = file.name;
         const fileSize = file.size;
         // 允许上传空文件
-        const chunks = (Math.ceil(fileSize / chunkSize) === 0) ? 1 : Math.ceil(fileSize / chunkSize);
-        // 文件id统一为UUID
-        file.uid = crypto.randomUUID();
-        const fileId = file.uid;
-        const chunkIndex = 1;
-        const path = data.pathVal ? data.pathVal : dir.value;
+        const chunks = Math.max(1, Math.ceil(fileSize / chunkSize));
+        // 文件ID
+        const fileId = crypto.randomUUID();
+        file.uid = fileId;
+        const path = config.path ? config.path : dir.value;
         const key = props.sshKey;
 
         // 添加到传输列表（等待中）
@@ -510,76 +517,125 @@ export default {
         context.emit('updateTransportLists', 0, 0, fileId, fileTransInfo);
 
         // 大文件开始上传提示
-        if(fileSize > 20 * 1024 * 1024 && !data.noStartUpLoad) {
+        if(fileSize > 20 * 1024 * 1024 && !config.noBeforeAlert) {
           ElMessage({
-            message: data.startUpLoad ? data.startUpLoad : i18n.global.t('开始上传'),
+            message: config.beforeAlert ? config.beforeAlert : i18n.global.t('开始上传'),
             type: 'success',
             grouping: true,
           });
         }
         // 分片上传
-        for(let chunk=chunkIndex;chunk<=chunks;chunk++) {
-          // 计算分片
-          const start = (chunk-1) * chunkSize;
-          const end = start + chunkSize >= fileSize ? fileSize : start + chunkSize;
-          // 加密文件片
-          const secretKey = generateRandomString(16);
-          const chunkBuffer = await file.slice(start, end).arrayBuffer();
-          const encryptedBuffer = encodeStrToArray(aesEncryptBuffer(chunkBuffer, secretKey), "UTF-8");
-          const chunkFile = new File([new Blob([encryptedBuffer])], fileName);
-          // 上传文件片
+        globalUploadProgress[fileId] = 0;
+        const uploadTasks = [];
+        for(let chunk=1;chunk<=chunks;chunk++) {
+          // 添加任务至上传队列
+          const task = globalUploadQueue.add(() => {
+            // 计算分片
+            const start = (chunk-1) * chunkSize;
+            const end = start + chunkSize >= fileSize ? fileSize : start + chunkSize;
+            const fileChunk = file.slice(start, end);
+            // 上传文件片
+            const formData = new FormData();
+            formData.append('file', fileChunk);
+            formData.append('chunk', chunk);
+            formData.append('id', fileId);
+            formData.append('sshKey', key);
+            return new Promise((resolve, reject) => {
+              // 上传已失败
+              if(globalUploadProgress[fileId] === -1) {
+                reject();
+                return;
+              }
+              request({
+                url: http_base_url + '/file/chunk/upload',
+                type: 'post',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success(resp) {
+                  // 上传已失败
+                  if(globalUploadProgress[fileId] === -1) {
+                    reject();
+                    return;
+                  }
+                  // 上传中
+                  if(resp.status === 'success') {
+                    // 更新传输列表（等待中）进度
+                    const progress = ++globalUploadProgress[fileId];
+                    fileTransInfo.progress = Math.floor((progress / chunks) * 100);
+                    context.emit('updateTransportLists', 0, 0, fileId, fileTransInfo);
+                    resolve();
+                  }
+                  else {
+                    globalUploadProgress[fileId] = -1;
+                    chunk = chunks + 10;
+                    // 更新传输列表（等待中）状态
+                    fileTransInfo.status = -1;
+                    context.emit('updateTransportLists', 0, 1, fileId, null);
+                    context.emit('updateTransportLists', 3, 0, fileId, fileTransInfo);
+                    ElMessage({
+                      message: resp.info,
+                      type: resp.status,
+                      grouping: true,
+                    });
+                    reject();
+                  }
+                },
+                error() {
+                  // 上传已失败
+                  if(globalUploadProgress[fileId] === -1) {
+                    reject();
+                    return;
+                  }
+                  globalUploadProgress[fileId] = -1;
+                  chunk = chunks + 10;
+                  // 更新传输列表（等待中）状态
+                  fileTransInfo.status = -1;
+                  context.emit('updateTransportLists', 0, 1, fileId, null);
+                  context.emit('updateTransportLists', 3, 0, fileId, fileTransInfo);
+                  reject();
+                },
+              });
+            });
+          }, {priority: -chunk});
+          uploadTasks.push(task);
+        }
+        // 合并文件片
+        Promise.allSettled(uploadTasks).then(() => {
+          const progress = globalUploadProgress[fileId];
+          delete globalUploadProgress[fileId];
+          // 上传已失败
+          if(progress !== chunks) return;
+          // 上传成功
           const formData = new FormData();
-          formData.append('secretKey', rsaEncrypt(secretKey));
-          formData.append('file', chunkFile);
           formData.append('fileName', fileName);
           formData.append('chunks', chunks);
-          formData.append('chunk', chunk);
           formData.append('totalSize', fileSize);
           formData.append('id', fileId);
           formData.append('path', path);
           formData.append('sshKey', key);
-          await request({
-            url: http_base_url + '/file/upload',
+          request({
+            url: http_base_url + '/file/chunk/merge',
             type: 'post',
             data: formData,
             contentType: false,
             processData: false,
             success(resp) {
               if(resp.status === 'success') {
-                // 文件后台上传中
-                if(resp.code === 202) {
-                  ElMessage({
-                    message: data.alert ? data.alert : resp.info,
-                    type: resp.status,
-                    grouping: true,
-                  });
-                  if(path === dir.value) {
-                    setTimeout(() => {
-                      getDirList();
-                    }, Math.min(1000, 500 + chunks * 10));
-                  }
-                }
-                else {
-                  // 更新传输列表（等待中）进度
-                  fileTransInfo.progress = Math.floor((chunk / chunks) * 100);
-                  context.emit('updateTransportLists', 0, 0, fileId, fileTransInfo);
-                }
-              }
-              else {
                 ElMessage({
-                  message: resp.info,
+                  message: config.afterAlert ? config.afterAlert : resp.info,
                   type: resp.status,
                   grouping: true,
                 });
-                chunk = chunks + 10;
-                // 更新传输列表（等待中）状态
-                fileTransInfo.status = -1;
-                context.emit('updateTransportLists', 0, 1, fileId, null);
-                context.emit('updateTransportLists', 3, 0, fileId, fileTransInfo);
+                if(path === dir.value) {
+                  setTimeout(() => {
+                    getDirList();
+                  }, Math.min(1000, 500 + chunks * 10));
+                }
               }
             },
           });
-        }
+        });
       } catch (error) {
         ElMessage({
           message: i18n.global.t("文件上传失败"),
@@ -617,7 +673,7 @@ export default {
       const blob = new Blob([arrayBuffer], { type: 'application/octet-stream' });
       // 创建File对象
       const file = new File([blob], name);
-      doUpload({file: file}, {pathVal: urlParams.path, startUpLoad: i18n.global.t("修改保存中"), alert: i18n.global.t('文件后台保存中')});
+      doUpload({file: file}, {path: urlParams.path, beforeAlert: i18n.global.t('修改保存中'), afterAlert: i18n.global.t('文件后台保存中')});
     };
 
     // 文件/文件夹拖拽
@@ -638,7 +694,7 @@ export default {
         // 文件类型
         if(item.isFile && !item.isDirectory) {
           item.file(file => {
-            doUpload({file:file}, {pathVal: basePath});
+            doUpload({file:file}, {path: basePath});
           });
         }
         // 文件夹类型
@@ -678,7 +734,7 @@ export default {
           // 文件类型
           if(item.isFile && !item.isDirectory) {
             item.file(file => {
-              doUpload({file:file}, {pathVal: basePath, noStartUpLoad: true});
+              doUpload({file:file}, {path: basePath, noBeforeAlert: true});
             });
           }
           // 文件夹类型
@@ -1118,7 +1174,7 @@ export default {
             // 子文件上传
             for(let i=0;i<fileObj.files.length;i++) {
               const file = fileObj.files[i];
-              doUpload({file:file}, {pathVal: basePath + fileObj.path, noStartUpLoad: true});
+              doUpload({file:file}, {path: basePath + fileObj.path, noBeforeAlert: true});
             }
           }
           else {
@@ -1218,6 +1274,7 @@ export default {
           files:[],
         };
         isCtrlX.value = false;
+        resetGlobalUpload();
       }
       selectedFiles.value = [];
       lastSelectedIndex = -1;
