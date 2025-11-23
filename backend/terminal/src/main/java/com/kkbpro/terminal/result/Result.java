@@ -1,6 +1,7 @@
 package com.kkbpro.terminal.result;
 
 import com.alibaba.fastjson.JSON;
+import com.kkbpro.terminal.constant.Constant;
 import com.kkbpro.terminal.utils.AESUtil;
 import com.kkbpro.terminal.utils.I18nUtil;
 import com.kkbpro.terminal.utils.LogUtil;
@@ -52,7 +53,7 @@ public class Result {
         result.setCode(code);
         result.setInfo(info);
         try {
-            if (null == data || "null".equals(data)) result.setData(null);
+            if (data == null || Constant.NULL_STRING.equalsIgnoreCase(data)) result.setData(null);
             else result.setData(AESUtil.encrypt(data));
         } catch (Exception e) {
             LogUtil.logException(Result.class, e);

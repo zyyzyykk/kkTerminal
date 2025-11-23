@@ -1,19 +1,21 @@
-package com.kkbpro.terminal.config;
+package com.kkbpro.terminal.filter;
 
-import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Configuration
-public class CorsConfig implements Filter {
+@Component
+@Order(1)
+public class CorsFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-        HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) res;
 
         String origin = request.getHeader("Origin");
         if (origin != null) {
@@ -36,14 +38,6 @@ public class CorsConfig implements Filter {
         }
 
         chain.doFilter(request, response);
-    }
-
-    @Override
-    public void init(FilterConfig filterConfig) {
-    }
-
-    @Override
-    public void destroy() {
     }
 
 }

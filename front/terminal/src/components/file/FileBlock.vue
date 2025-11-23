@@ -167,7 +167,7 @@
 <script>
 import { ref, onUnmounted, onMounted, watch } from 'vue';
 import useClipboard from "vue-clipboard3";
-import request from "@/utils/RequestUtil";
+import { request } from "@/utils/RequestUtil";
 import { ElMessage } from 'element-plus';
 import { deleteDialog } from "@/components/common/DeleteDialog";
 import { http_base_url } from '@/env/BaseUrl';

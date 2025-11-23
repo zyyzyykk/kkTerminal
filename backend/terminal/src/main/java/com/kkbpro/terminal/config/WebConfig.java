@@ -23,9 +23,11 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(accessInterceptor)
                 .addPathPatterns(Constant.API_PREFIX + "/**")
                 .excludePathPatterns(Constant.API_PREFIX + "/system/**")
-                .excludePathPatterns(Constant.API_PREFIX + "/access/**");
+                .excludePathPatterns(Constant.API_PREFIX + "/access/**")
+                .order(1);
         registry.addInterceptor(businessInterceptor)
-                .addPathPatterns(Constant.API_PREFIX + "/**");
+                .addPathPatterns(Constant.API_PREFIX + "/**")
+                .order(2);
     }
 
 }

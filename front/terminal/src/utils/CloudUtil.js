@@ -1,7 +1,7 @@
 import { aesDecrypt, aesEncrypt } from '@/utils/Encrypt';
 import { generateRandomString } from '@/utils/StringUtil';
 
-import request from "@/utils/RequestUtil";
+import { request } from "@/utils/RequestUtil";
 import { http_base_url } from '@/env/BaseUrl';
 import { ElMessage } from 'element-plus';
 import i18n from "@/locales/i18n";

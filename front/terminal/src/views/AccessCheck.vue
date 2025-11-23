@@ -35,7 +35,7 @@
 import { ref } from 'vue';
 import { useRouter, useRoute } from "vue-router";
 
-import request from "@/utils/RequestUtil";
+import { request } from "@/utils/RequestUtil";
 import { http_base_url } from "@/env/BaseUrl";
 import { localStore } from "@/env/Store";
 import { getUrlParams } from "@/utils/UrlUtil";

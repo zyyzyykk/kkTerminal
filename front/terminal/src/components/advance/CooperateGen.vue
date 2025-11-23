@@ -47,7 +47,7 @@ import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
 import { http_base_url } from '@/env/BaseUrl';
 import i18n from "@/locales/i18n";
-import request from "@/utils/RequestUtil";
+import { request } from "@/utils/RequestUtil";
 import { getPureUrl } from "@/utils/UrlUtil";
 
 export default {

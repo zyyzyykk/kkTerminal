@@ -113,7 +113,7 @@
 <script>
 import { ref } from 'vue';
 import AceEditor from '@/components/common/AceEditor';
-import request from "@/utils/RequestUtil";
+import { request } from "@/utils/RequestUtil";
 import useClipboard from "vue-clipboard3";
 import { ElMessage } from 'element-plus';
 import { previewFileInfo } from '@/components/preview/FileSuffix';

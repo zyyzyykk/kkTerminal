@@ -253,7 +253,7 @@ import { FitAddon } from 'xterm-addon-fit';
 import { WebLinksAddon } from '@xterm/addon-web-links';
 import "xterm/css/xterm.css";
 
-import request from "@/utils/RequestUtil";
+import { request } from "@/utils/RequestUtil";
 import { default_env } from '@/env/Env';
 import { ws_base_url } from '@/env/BaseUrl';
 import { changeStr, changeBase64Str, changeStrBase64, generateRandomString } from '@/utils/StringUtil';

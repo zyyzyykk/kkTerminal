@@ -105,7 +105,7 @@
 
 <script>
 import { ref, computed, watch } from 'vue';
-import request from "@/utils/RequestUtil";
+import { request } from "@/utils/RequestUtil";
 import { http_base_url } from '@/env/BaseUrl';
 import { calcDate } from '@/components/calc/CalcDate';
 import { calcPriority } from '@/components/calc/CalcPriority';

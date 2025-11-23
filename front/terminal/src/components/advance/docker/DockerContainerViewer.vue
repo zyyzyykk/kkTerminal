@@ -27,7 +27,7 @@
 
 <script>
 import { ref } from "vue";
-import request from "@/utils/RequestUtil";
+import { request } from "@/utils/RequestUtil";
 import { http_base_url } from "@/env/BaseUrl";
 import AceEditor from '@/components/common/AceEditor';
 import { ElMessage } from "element-plus";

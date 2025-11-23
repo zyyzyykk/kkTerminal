@@ -151,7 +151,7 @@
 
 <script>
 import { ref, computed } from 'vue';
-import request from "@/utils/RequestUtil";
+import { request } from "@/utils/RequestUtil";
 import { ArrowDown, SortUp, SortDown } from '@element-plus/icons-vue';
 import { http_base_url } from "@/env/BaseUrl";
 import { calcNumber, calcStatus } from "@/components/calc/CalcType";

@@ -3,36 +3,8 @@ import { initChannel } from "@/utils/ChannelUtil";
 initChannel();
 
 // jQuery配置Ajax全局响应拦截，进行数据解密
-import $ from 'jquery';
-import { secretKeyGetter, aesDecrypt } from '@/utils/Encrypt';
-import { ElMessage } from 'element-plus';
-
-$.ajaxSetup({
-    cache: false,                   // 禁用缓存
-    processData: true,
-    xhrFields:{
-      withCredentials: true,        // 携带cookie
-    },
-    statusCode: {                   // 响应码
-        401() {
-            ElMessage({
-                message: i18n.global.t('会话已过期'),
-                type: "warning",
-                grouping: true,
-                repeatNum: Number.MIN_SAFE_INTEGER,
-            });
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
-            return false;
-        },
-    },
-    dataFilter(resp) {
-      resp = JSON.parse(resp);
-      if(resp.data) resp.data = JSON.parse(aesDecrypt(resp.data, secretKeyGetter.response()));
-      return JSON.stringify(resp);
-    },
-});
+import { ajaxSetup } from "@/utils/RequestUtil";
+ajaxSetup();
 
 import { createApp } from 'vue';
 import App from './App.vue';

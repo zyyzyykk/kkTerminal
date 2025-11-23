@@ -1,11 +1,9 @@
 package com.kkbpro.terminal.interceptor;
 
-import com.kkbpro.terminal.annotation.Log;
 import com.kkbpro.terminal.constant.Constant;
 import com.kkbpro.terminal.utils.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +14,6 @@ public class AccessInterceptor implements HandlerInterceptor {
     /**
      * 在请求到达Controller之前进行拦截
      */
-    @Log
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         // 访问权限校验
@@ -31,10 +28,10 @@ public class AccessInterceptor implements HandlerInterceptor {
     }
 
     /**
-     * 在Controller方法处理完之后执行
+     * 在整个请求完成后执行
      */
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         // 移除存储密钥
         AESUtil.key.remove();
     }
