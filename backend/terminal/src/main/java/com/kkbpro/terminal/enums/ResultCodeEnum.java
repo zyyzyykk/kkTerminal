@@ -20,13 +20,4 @@ public enum ResultCodeEnum {
         this.desc = desc;
     }
 
-    public static ResultCodeEnum getByState(Integer state) {
-        for (ResultCodeEnum item : ResultCodeEnum.values()) {
-            if (item.getState().equals(state)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
 }

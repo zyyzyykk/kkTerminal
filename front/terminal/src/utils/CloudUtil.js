@@ -111,18 +111,22 @@ export const syncUpload = async (items) => {
 export const syncDownload = async (userInfo) => {
   if(userInfo) localStorage.setItem(localStore['user'], userInfo);
   const promises = [];
+  const uploadItems = [];
   for(let i = 0; i < syncArr.length; i++) {
     const promise = cloudDownload(syncArr[i]);
     promise.then((content) => {
       if(content) localStorage.setItem(syncArr[i], aesEncrypt(JSON.stringify(content)));
-      // TODO
-      // else localStorage.removeItem(syncArr[i]);
+      else {
+        if(userInfo) localStorage.removeItem(syncArr[i]);
+        else if(localStorage.getItem(syncArr[i])) uploadItems.push(syncArr[i]);
+      }
     });
     promises.push(promise);
   }
 
   return Promise.allSettled(promises).then(() => {
     if(userInfo) window.location.reload();
+    else if(uploadItems.length > 0) syncUpload(uploadItems);
   });
 };
 

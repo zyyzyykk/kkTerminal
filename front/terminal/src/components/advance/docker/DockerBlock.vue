@@ -366,7 +366,7 @@ export default {
             let volume = dockerInfo.value.volume;
             // 容器
             if(currentType === 0) {
-              const containerArr = (resp.data && resp.data !== 'null') ? resp.data.split('$') : [];
+              const containerArr = resp.data ? resp.data.split('$') : [];
               container = [];
               for(let i = 0; i < containerArr.length; i++) {
                 const containerInfo = containerArr[i].split('@');
@@ -381,7 +381,7 @@ export default {
             }
             // 镜像
             else if(currentType === 1) {
-              const imageArr = (resp.data && resp.data !== 'null') ? resp.data.split('$') : [];
+              const imageArr = resp.data ? resp.data.split('$') : [];
               image = [];
               for(let i = 0; i < imageArr.length; i++) {
                 const imageInfo = imageArr[i].split('@');
@@ -395,7 +395,7 @@ export default {
             }
             // 网络
             else if(currentType === 2) {
-              const networkArr = (resp.data && resp.data !== 'null') ? resp.data.split('$') : [];
+              const networkArr = resp.data ? resp.data.split('$') : [];
               network = [];
               for(let i = 0; i < networkArr.length; i++) {
                 const networkInfo = networkArr[i].split('@');
@@ -409,7 +409,7 @@ export default {
             }
             // 数据卷
             else if(currentType === 3) {
-              const volumeArr = (resp.data && resp.data !== 'null') ? resp.data.split('$') : [];
+              const volumeArr = resp.data ? resp.data.split('$') : [];
               volume = [];
               for(let i = 0; i < volumeArr.length; i++) {
                 const volumeInfo = volumeArr[i].split('@');

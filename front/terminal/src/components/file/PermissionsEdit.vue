@@ -13,7 +13,7 @@
       <div class="kk-flex-0 nowrap kk-header-class" >
         <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="16" :height="16" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" />
         <div class="ellipsis" style="margin: 0 5px; font-size: small; line-height: 18px;" >{{ fileInfo.name }}</div>
-        <div style="font-size: small;" >{{ $t('权限修改') }}</div>
+        <div style="font-size: small;" >{{ $t('权限编辑') }}</div>
       </div>
     </template>
     <div style="margin-top: -25px;" ></div>

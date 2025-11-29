@@ -1,7 +1,7 @@
 package com.kkbpro.terminal.result;
 
 import com.alibaba.fastjson.JSON;
-import com.kkbpro.terminal.constant.Constant;
+import com.kkbpro.terminal.enums.ResultStatusEnum;
 import com.kkbpro.terminal.utils.AESUtil;
 import com.kkbpro.terminal.utils.I18nUtil;
 import com.kkbpro.terminal.utils.LogUtil;
@@ -35,68 +35,62 @@ public class Result {
         this.info = I18nUtil.getMessage(info);
     }
 
-    // 失败返回
-    public static Result fail(Integer code, String info) {
+    private static Result newInstance(String status, Integer code, String info, String data) {
         Result result = new Result();
-        result.setStatus("warning");
+        result.setStatus(status);
         result.setCode(code);
         result.setInfo(info);
-        result.setData(null);
+        try {
+            result.setData(data == null ? null : AESUtil.encrypt(data));
+        } catch (Exception e) {
+            LogUtil.logException(Result.class, e);
+            result.setData(null);
+        }
 
         return result;
+    }
+
+    // 警告返回
+    private static Result warningStr(Integer code, String info, String data) {
+        return newInstance(ResultStatusEnum.WARNING.getStatus(), code, info, data);
+    }
+
+    public static Result warning(Integer code, String info) {
+        return Result.warningStr(code, info, null);
     }
 
     // 成功返回
     private static Result successStr(Integer code, String info, String data) {
-        Result result = new Result();
-        result.setStatus("success");
-        result.setCode(code);
-        result.setInfo(info);
-        try {
-            if (data == null || Constant.NULL_STRING.equalsIgnoreCase(data)) result.setData(null);
-            else result.setData(AESUtil.encrypt(data));
-        } catch (Exception e) {
-            LogUtil.logException(Result.class, e);
-            result.setData(null);
-        }
-
-        return result;
-    }
-    public static Result success(Integer code, String info, Object data) {
-       return Result.successStr(code, info, JSON.toJSONString(data));
+        return newInstance(ResultStatusEnum.SUCCESS.getStatus(), code, info, data);
     }
 
     public static Result success(String info, Object data) {
-        return Result.success(200, info, data);
+        return Result.successStr(200, info, data == null ? null : JSON.toJSONString(data));
+    }
+
+    public static Result success(Integer code, String info) {
+        return Result.successStr(code, info, null);
     }
 
     public static Result success(String info) {
-        return Result.success(200, info, null);
+        return Result.successStr(200, info, null);
     }
 
     // 错误返回
-    public static Result error(Integer code, String info, Object data) {
-        Result result = new Result();
-        result.setStatus("error");
-        result.setCode(code);
-        result.setInfo(info);
-        try {
-            if (null == data) result.setData(null);
-            else result.setData(AESUtil.encrypt(JSON.toJSONString(data)));
-        } catch (Exception e) {
-            LogUtil.logException(Result.class, e);
-            result.setData(null);
-        }
+    private static Result errorStr(Integer code, String info, String data) {
+        return newInstance(ResultStatusEnum.ERROR.getStatus(), code, info, data);
+    }
 
-        return result;
+    public static Result error(String info, Object data) {
+        return Result.errorStr(500, info, data == null ? null : JSON.toJSONString(data));
     }
 
     public static Result error(Integer code, String info) {
-        return Result.error(code, info, null);
+        return Result.errorStr(code, info, null);
     }
 
     public static Result error(String info) {
-        return Result.error(500, info);
+        return Result.errorStr(500, info, null);
     }
 
 }

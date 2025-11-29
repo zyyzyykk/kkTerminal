@@ -56,7 +56,7 @@ public class AdvanceController {
      */
     @Log
     @GetMapping("/cooperate/key")
-    public Result cooperateKey(String sshKey, Boolean readOnly, Integer maxHeadCount) throws Exception {
+    public Result cooperateKey(String sshKey, Boolean readOnly, Integer maxCapacity) throws Exception {
         String errorMsg = "协作Key生成失败";
         String successMsg = "协作Key生成成功";
 
@@ -75,7 +75,7 @@ public class AdvanceController {
         CooperateInfo cooperateInfo = new CooperateInfo();
         cooperateInfo.setId(cooperateId);
         cooperateInfo.setReadOnly(readOnly);
-        cooperateInfo.setMaxHeadCount(maxHeadCount);
+        cooperateInfo.setMaxCapacity(maxCapacity);
         webSocketServer.setCooperateInfo(cooperateInfo);
 
         String key = StringUtil.changeBase64ToStr(AESUtil.encrypt(cooperateId + "^" + sshKey, COOPERATE_SECRET_KEY));
@@ -166,7 +166,7 @@ public class AdvanceController {
             return Result.error(errorMsg);
         }
 
-        return Result.success(200, successMsg, status.toString());
+        return Result.success(successMsg, status.toString());
     }
 
     /**
@@ -187,13 +187,13 @@ public class AdvanceController {
         try {
             int exitStatus = SSHUtil.executeCommand(ssh, command, version);
             // 1权限不足/127未安装
-            if (exitStatus != 0) return Result.error(500, errorMsg, exitStatus);
+            if (exitStatus != 0) return Result.error(errorMsg, exitStatus);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
 
-        return Result.success(200, successMsg, version.toString());
+        return Result.success(successMsg, version.toString());
     }
 
     // 完整命令
@@ -227,7 +227,7 @@ public class AdvanceController {
             return Result.error(errorMsg);
         }
 
-        return Result.success(200, successMsg, info.toString());
+        return Result.success(successMsg, info.toString());
     }
 
     /**
@@ -252,7 +252,7 @@ public class AdvanceController {
             return Result.error(errorMsg);
         }
 
-        return Result.success(200, successMsg, null);
+        return Result.success(successMsg);
     }
 
 
@@ -279,7 +279,7 @@ public class AdvanceController {
             return Result.error(errorMsg);
         }
 
-        return Result.success(200, successMsg, container.toString());
+        return Result.success(successMsg, container.toString());
     }
 
 }

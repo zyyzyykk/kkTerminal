@@ -186,7 +186,7 @@ public class FileController {
             }
         }
 
-        return Result.success(200,"文件列表", fileInfoList);
+        return Result.success("文件列表", fileInfoList);
     }
 
 
@@ -216,7 +216,7 @@ public class FileController {
             return Result.error(errorMsg);
         }
 
-        return Result.success(200, successMsg, nums);
+        return Result.success(successMsg, nums);
     }
 
 
@@ -244,7 +244,7 @@ public class FileController {
             return Result.error(errorMsg);
         }
 
-        return Result.success(200, successMsg, size.toString());
+        return Result.success(successMsg, size.toString());
     }
 
     /**
@@ -261,7 +261,7 @@ public class FileController {
         SFTPClient sftp = SSHUtil.getSFTPClient(sshKey);
         String directory = sftp.canonicalize(".");
 
-        return Result.success(200, "家目录", directory);
+        return Result.success("家目录", directory);
     }
 
     /**
@@ -571,7 +571,7 @@ public class FileController {
             return Result.error(FileStateEnum.UPLOAD_ERROR.getState(), "文件片上传失败");
         }
 
-        return Result.success(FileStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功", null);
+        return Result.success(FileStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功");
     }
 
     /**
@@ -617,7 +617,7 @@ public class FileController {
             }
         }).start();
 
-        return Result.success(FileStateEnum.FILE_UPLOADING.getState(), "文件后台上传中", null);
+        return Result.success(FileStateEnum.FILE_UPLOADING.getState(), "文件后台上传中");
     }
 
 }

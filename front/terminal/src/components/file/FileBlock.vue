@@ -597,7 +597,7 @@ export default {
                 },
               });
             });
-          }, {priority: -chunk});
+          }, {priority: -(chunk + Math.random())});
           uploadTasks.push(task);
         }
         // 合并文件片
@@ -1076,6 +1076,8 @@ export default {
           // 删除
           case 'backspace':
             if(selectedFiles.value.length > 0) {
+              isShowMenu.value = false;
+              isShowPop.value = false;
               deleteDialog(i18n.global.t('提示'), i18n.global.t('确定删除此文件吗？'), confirmPopConfirm);
             }
             break;

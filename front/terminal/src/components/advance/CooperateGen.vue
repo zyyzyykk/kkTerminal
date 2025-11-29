@@ -12,9 +12,9 @@
   >
     <div class="no-select" >
       <div class="kk-flex" >
-        <div>{{ $t('编辑权限') }}{{ $t('：') }}</div>
+        <div>{{ $t('启用编辑') }}{{ $t('：') }}</div>
         <div style="flex: 1;" ></div>
-        <el-radio-group v-model="isReadonly" class="ml-4" >
+        <el-radio-group v-model="isReadOnly" class="ml-4" >
           <el-radio :label="false" size="large" >{{ $t('是') }}</el-radio>
           <el-radio :label="true" size="large" >{{ $t('否') }}</el-radio>
         </el-radio-group>
@@ -22,10 +22,10 @@
       </div>
       <div style="margin-top: 10px;" ></div>
       <div class="kk-flex" >
-        <div>{{ $t('人数上限') }}{{ $t('：') }}</div>
+        <div>{{ $t('最大容量') }}{{ $t('：') }}</div>
         <div style="flex: 1;" ></div>
         <div>
-          <el-input-number :style="{width: '80px'}" size="small" v-model="maxHeadCount" :min="1" :max="6" step="1" :step-strictly="true" >
+          <el-input-number :style="{width: '80px'}" size="small" v-model="maxCapacity" :min="1" :max="6" step="1" :step-strictly="true" >
           </el-input-number>
         </div>
         <div style="flex: 1;" ></div>
@@ -61,22 +61,22 @@ export default {
       return DialogVisible.value && props.advance;
     });
 
-    const isReadonly = ref(true);
-    const maxHeadCount = ref(6);
+    const isReadOnly = ref(true);
+    const maxCapacity = ref(6);
 
     // 拷贝
     const { toClipboard } = useClipboard();
 
     // 确定
     const confirm = async () => {
-      const maxHC = maxHeadCount.value;
+      const capacity = maxCapacity.value;
       request({
         url: http_base_url + '/advance/cooperate/key',
         type: 'get',
         data: {
           sshKey: props.sshKey,
-          readOnly: isReadonly.value,
-          maxHeadCount: maxHC,
+          readOnly: isReadOnly.value,
+          maxCapacity: capacity,
         },
         async success(resp) {
           if(resp.status === 'success') {
@@ -88,7 +88,7 @@ export default {
               grouping: true,
               repeatNum: Number.MIN_SAFE_INTEGER,
             });
-            context.emit('handleCooperate', maxHC);
+            context.emit('handleCooperate', capacity);
             closeDialog();
           }
           else {
@@ -105,8 +105,8 @@ export default {
 
     // 重置
     const reset = () => {
-      isReadonly.value = true;
-      maxHeadCount.value = 6;
+      isReadOnly.value = true;
+      maxCapacity.value = 6;
       DialogVisible.value = false;
     };
 
@@ -125,8 +125,8 @@ export default {
       confirm,
       closeDialog,
       reset,
-      isReadonly,
-      maxHeadCount,
+      isReadOnly,
+      maxCapacity,
     }
   }
 }

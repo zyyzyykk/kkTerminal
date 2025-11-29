@@ -11,24 +11,24 @@
         draggable
     >
       <template #title>
-        <div class="kk-flex-0 nowrap kk-header-class" >
+        <div class="kk-flex nowrap kk-header-class" >
           <FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="16" :height="16" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" />
-          <div class="ellipsis" style="margin: 0 5px; font-size: small; line-height: 18px;" >{{ fileInfo.name }}</div>
+          <div class="ellipsis line-height-18" style="margin: 0 5px; font-size: small;" >{{ fileInfo.name }}</div>
           <div style="font-size: small;" >{{ $t('属性') }}</div>
         </div>
       </template>
       <div style="margin-top: -32px;" ></div>
       <div class="no-select" :element-loading-text="$t('加载中...')" v-loading="loading" >
-        <div class="kk-flex" >
+        <div class="kk-flex margin-top-15" >
           <div style="margin-right: 10px;" ><FileIcons :style="{display: 'flex', alignItems: 'center'}" :name="fileInfo.name" :width="32" :height="32" :isFolder="fileInfo.isDirectory" :isLink="fileInfo.isSymlink" /></div>
           <div><el-input @keydown.enter="confirm" v-model="rename" placeholder="" /></div>
         </div>
         <div class="kk-border" ></div>
-        <div class="kk-flex nowrap" >
+        <div class="kk-flex margin-top-15 nowrap" >
           <div class="form-width" >{{ $t('位置') }}{{ $t('：') }}</div>
           <ToolTip :content="fileDir + fileInfo.name" >
             <template #content>
-              <div class="ellipsis" style="line-height: 18px;" >
+              <div class="ellipsis line-height-18" >
                 {{ fileDir + fileInfo.name }}
               </div>
             </template>
@@ -37,9 +37,9 @@
             <el-icon size="18" ><DocumentCopy /></el-icon>
           </div>
         </div>
-        <div v-if="fileInfo.isDirectory" class="kk-flex" >
+        <div v-if="fileInfo.isDirectory" class="kk-flex margin-top-15" >
           <div class="form-width" >{{ $t('包含') }}{{ $t('：') }}</div>
-          <div class="ellipsis" style="line-height: 18px;" >
+          <div class="ellipsis line-height-18" >
             {{ $t(includeInfo) }}
           </div>
           <div v-if="uploading" style="margin-left: 10px;" >
@@ -52,9 +52,9 @@
             <el-icon size="18" ><Refresh /></el-icon>
           </div>
         </div>
-        <div v-else class="kk-flex" >
+        <div v-else class="kk-flex margin-top-15" >
           <div class="form-width" >{{ $t('大小') }}{{ $t('：') }}</div>
-          <div class="ellipsis" style="line-height: 18px;" >
+          <div class="ellipsis line-height-18" >
             {{ calcSize(fileInfo.attributes.size) }} ({{ fileInfo.attributes.size.toLocaleString() + ' ' + $t('字节') }})
           </div>
           <div v-if="uploading" style="margin-left: 10px;" >
@@ -68,20 +68,20 @@
           </div>
         </div>
         <div class="kk-border" ></div>
-        <div class="kk-flex" >
+        <div class="kk-flex margin-top-15" >
           <div class="form-width" >{{ $t('修改时间') }}{{ $t('：') }}</div>
           <div>
             {{ calcDate(fileInfo.attributes.mtime) }}
           </div>
         </div>
-        <div class="kk-flex" >
+        <div class="kk-flex margin-top-15" >
           <div class="form-width" >{{ $t('访问时间') }}{{ $t('：') }}</div>
           <div>
             {{ calcDate(fileInfo.attributes.atime) }}
           </div>
         </div>
         <div class="kk-border" ></div>
-        <div class="kk-flex" >
+        <div class="kk-flex margin-top-15" >
           <div class="form-width" >{{ $t('权限') }}{{ $t('：') }}</div>
           <div>
             {{ calcPriority(fileInfo.attributes.mode.type,fileInfo.attributes.permissions) }}
@@ -290,10 +290,12 @@ export default {
     });
     watch(uploading, (newVal) => {
       if(newVal === false) {
-        setTimeout(() => {
-          if(fileInfo.value.isDirectory) getFolderInclude();
-          else getFileSize();
-        }, 1);
+        if(fileDir.value && fileInfo.value.name) {
+          setTimeout(() => {
+            if(fileInfo.value.isDirectory) getFolderInclude();
+            else getFileSize();
+          }, 1);
+        }
       }
     });
 
@@ -334,15 +336,17 @@ export default {
 </script>
 
 <style scoped>
-.kk-flex-0 {
+.kk-flex {
   display: flex;
   align-items: center;
 }
 
-.kk-flex {
-  display: flex;
-  align-items: center;
+.margin-top-15 {
   margin-top: 15px;
+}
+
+.line-height-18 {
+  line-height: 18px;
 }
 
 .kk-border {
@@ -356,7 +360,6 @@ export default {
 
 .form-width {
   text-align: left;
-  min-width: 100px;
-  max-width: 100px;
+  width: 80px;
 }
 </style>

@@ -16,6 +16,6 @@ public class CooperateInfo {
 
     private Boolean readOnly;
 
-    private Integer maxHeadCount;
+    private Integer maxCapacity;
 
 }

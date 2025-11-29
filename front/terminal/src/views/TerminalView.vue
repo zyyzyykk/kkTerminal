@@ -18,10 +18,9 @@
       <div class="setting-menu no-select" @click="doSettings(8)" ><div>Docker</div></div>
     </div>
     <div v-if="urlParams.mode !== 'headless'" class="kk-flex bar" >
-      <div class="no-select" @click="isShowSetting = !isShowSetting; isShowAdvance = false; showAdvance(false);" >
-        <img src="@/assets/terminal.svg" alt="terminal" style="height: 16px; margin: 0 7px; cursor: pointer;" >
-      </div>
-      <div class="ellipsis no-select" style="font-size: 14px; line-height: 18px;" ><span>kk Terminal</span></div>
+      <img class="logo no-select" src="@/assets/terminal.svg" alt="terminal"
+           @click="isShowSetting = !isShowSetting; isShowAdvance = false; showAdvance(false);" >
+      <div class="ellipsis no-select" style="font-size: 14px;" >kk Terminal</div>
       <div style="flex: 1;" ></div>
       <div v-show="urlParams.mode !== 'headless' && urlParams.mode !== 'pure'" class="kk-flex" >
         <div v-if="cooperating" class="bar-tag" >
@@ -541,6 +540,7 @@ export default {
     const onlineNumber = ref(0);
     const maxNumber = ref(0);
     const handleCooperate = (num) => {
+      onlineNumber.value = 0;
       maxNumber.value = num;
       cooperating.value = true;
     };
@@ -551,8 +551,9 @@ export default {
         data: {
           sshKey: sshKey.value,
         },
-        async success(resp) {
+        success(resp) {
           if(resp.status === 'success') {
+            onlineNumber.value = 0;
             maxNumber.value = 0;
             cooperating.value = false;
           }
@@ -1243,6 +1244,13 @@ export default {
 
 .bar-tag {
   margin-right: 10px;
+  cursor: pointer;
+}
+
+.logo {
+  height: 25px;
+  padding: 4.5px 0;
+  margin: 0 7px;
   cursor: pointer;
 }
 
