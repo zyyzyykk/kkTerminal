@@ -1,5 +1,5 @@
 # basic java image
-FROM openjdk:8-alpine
+FROM amazoncorretto:8-alpine-jre
 
 # customize environment variables
 ENV BANNER="kkTerminal"
