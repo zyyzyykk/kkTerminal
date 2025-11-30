@@ -10,7 +10,9 @@
 | cursorStyle | cursor style                     | block/underline/bar    | cursorStyle=bar                                              |
 | cursorBlink | cursor blink                     | true/false             | cursorBlink=false                                            |
 | tCode       | enable Terminal Code             | true/false             | tCode=false                                                  |
-| cloud       | enable devices sync              | true/false             | cloud=false                                                  |
+| cloud       | enable Devices Sync              | true/false             | cloud=false                                                  |
+| advance     | enable Advanced Func             | true/false             | advance=false                                                |
+| transport   | enable Transport List            | true/false             | transport=false                                              |
 | lang        | language                         | en/zh                  | lang=zh                                                      |
 | mode        | terminal mode                    | headless/pure/-        | mode=pure                                                    |
 | record      | play operation record            | -                      | priority over ssh connection and cooperation                 |

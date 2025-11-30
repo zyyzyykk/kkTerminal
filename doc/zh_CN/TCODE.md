@@ -56,6 +56,8 @@
 | 方法名        | 说明                               | 示例                                                  |
 | ------------- | ---------------------------------- | ----------------------------------------------------- |
 | file.cd       | 打开文件模块并进入指定路径         | `await kkTerminal.file.cd('path')`                    |
+| file.ls       | 进入指定路径并返回文件属性         | `await kkTerminal.file.ls('path')`                    |
+| file.pwd      | 返回文件模块当前路径               | `kkTerminal.file.pwd()`                               |
 | file.open     | 在文件编辑器中打开指定路径下的文件 | `await kkTerminal.file.open('path'[, 编辑器配置={}])` |
 | file.edit     | 在文件编辑器中编辑文件内容         | `kkTerminal.file.edit((editor) => {})`                |
 | file.save     | 以指定编码格式保存文件             | `kkTerminal.file.save('encode')`                      |

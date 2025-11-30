@@ -1,5 +1,12 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.6.0: 
+
+- Add Advance Cooperate function
+- Add Advance Monitor function
+- Add Advance Docker function
+- Optimize packaging volume & webpage display
+
 ##### zyyzyykk/kkterminal:3.5.6: 
 
 - Support more URL parameters

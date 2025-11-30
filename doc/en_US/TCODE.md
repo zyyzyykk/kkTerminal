@@ -52,14 +52,16 @@
 
 ###### kkTerminal Operation File
 
-| Methods       | Description                                   | Example                                                  |
-| ------------- | --------------------------------------------- | -------------------------------------------------------- |
-| file.cd       | Open file module and enter specified path     | `await kkTerminal.file.cd('path')`                       |
-| file.open     | Open file under specified path in file editor | `await kkTerminal.file.open('path'[, editor config={}])` |
-| file.edit     | Edit content in file editor                   | `kkTerminal.file.edit((editor) => {})`                   |
-| file.save     | Save file with specified encoding format      | `kkTerminal.file.save('encode')`                         |
-| file.close    | Close file editor/file module                 | `kkTerminal.file.close([close file module=false])`       |
-| file.download | Download files/folders under specified path   | `await kkTerminal.file.download('path')`                 |
+| Methods       | Description                                     | Example                                                  |
+| ------------- | ----------------------------------------------- | -------------------------------------------------------- |
+| file.cd       | Open file module and enter specified path       | `await kkTerminal.file.cd('path')`                       |
+| file.ls       | Enter specified path and return file attributes | `await kkTerminal.file.ls('path')`                       |
+| file.pwd      | Return file module current path                 | `kkTerminal.file.pwd()`                                  |
+| file.open     | Open file under specified path in file editor   | `await kkTerminal.file.open('path'[, editor config={}])` |
+| file.edit     | Edit content in file editor                     | `kkTerminal.file.edit((editor) => {})`                   |
+| file.save     | Save file with specified encoding format        | `kkTerminal.file.save('encode')`                         |
+| file.close    | Close file editor/file module                   | `kkTerminal.file.close([close file module=false])`       |
+| file.download | Download files/folders under specified path     | `await kkTerminal.file.download('path')`                 |
 
 ###### kkTerminal Reserved Values
 

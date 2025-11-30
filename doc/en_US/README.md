@@ -1,6 +1,6 @@
 # kkTerminal
 
-> kkTerminal, a powerful terminal for Web SSH connection
+> A terminal for Web SSH connection
 >
 > Author: [zyyzyykk](https://github.com/zyyzyykk/)
 >
@@ -10,7 +10,7 @@
 >
 > Preview: https://ssh.kkbpro.com/
 >
-> Update Time: 2025-08-24
+> Update Time: 2025-11-30
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.svg" alt="kkTerminal"></a></p>
@@ -27,7 +27,7 @@
 
 ### ⚡ Quick integration
 
-Using the `iframe` tag in HTML web pages to quick integration:
+Using the HTML tag `iframe` in web pages to quick integration:
 
 ```html
 <iframe src="https://ssh.kkbpro.com/" height="600px" width="800px" ></iframe>
@@ -46,8 +46,9 @@ docker pull zyyzyykk/kkterminal
 ```bash
 docker run -d --name kkterminal \
 -p 3000:3000 \
--e TITLE="kkTerminal" \
--e AESKEY="P5P1SIqVe6kaOxMX" \
+-e BANNER="kkTerminal" \
+-e STORAGE="P5P1SIqVe6kaOxMX" \
+-e PASSWORD="" \
 -v /data/kkterminal/cloud:/cloud \
 zyyzyykk/kkterminal
 ```
@@ -58,13 +59,13 @@ zyyzyykk/kkterminal
 
 Visit this website: https://ssh.kkbpro.com/
 
-![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.8/en/Connect.png)
+![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.7.6/en/Connect.png)
 
-![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.8/en/Preference.png)
+![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.7.6/en/Preference.png)
 
-![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.8/en/File.png)
+![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.7.6/en/File.png)
 
-![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.6.8/en/Editor.png)
+![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.7.6/en/Editor.png)
 
 [**More Module Previews**](./MODULE.md)
 
@@ -72,7 +73,7 @@ Visit this website: https://ssh.kkbpro.com/
 
 1. kkTerminal is a powerful terminal for Web SSH connection; Click on the terminal icon in the upper-left corner and select the connection settings to establish an SSH connection
 
-2. Support the use of `iframe` tags in web pages for quick integration into third-party websites
+2. Support the use of `iframe` tag in web pages for quick integration into third-party websites
 
 3. Support customizing terminal configuration through [URL Parameters](./PARAMS.md)
 
@@ -95,7 +96,7 @@ Visit this website: https://ssh.kkbpro.com/
 
 10. Support file management, open the File Management Module to view, decompress, upload and download files/folders
 
-11. Support shortcut key operations such as multiple/all file selection, copy and paste, cut, selection switch, open, etc
+11. Support shortcut key operations such as multiple/all file selection, copy and paste, cut, selection switch, open, delete, etc
 
 12. Support file browsing and editing, modify your file and save it to the remote server using `ctrl+s`
 
@@ -105,9 +106,22 @@ Visit this website: https://ssh.kkbpro.com/
 
 15. Support Cooperate, Monitor and Docker functions
 
+16. Support access verify
+
 ### 👨‍💻 Update Records
 
-##### zyyzyykk/kkterminal:3.6.8: latest
+##### zyyzyykk/kkterminal:3.7.6: latest
+
+- Support more URL parameters
+- Optimize file transfer process
+- Add access verify function
+- User Terminal Code file module adds API
+- Docker module adds viewing container details
+- Fix bug of data request exception in Docker module
+- Optimize page display
+- Enhance some functions
+
+##### zyyzyykk/kkterminal:3.6.8: 
 
 - Add file transport list
 - Add docker appStore
@@ -117,13 +131,6 @@ Visit this website: https://ssh.kkbpro.com/
 - Optimize the encoding format for opening and saving in file editor
 - User Terminal Code adds reserved values and file module API
 - Refactoring some code and optimizing interface display
-
-##### zyyzyykk/kkterminal:3.6.0: 
-
-- Add Advance Cooperate function
-- Add Advance Monitor function
-- Add Advance Docker function
-- Optimize packaging volume & webpage display
 
 [**History Update Records**](./UPDATE.md)
 
@@ -141,10 +148,6 @@ Vue + Xterm              SpringBoot + SSHJ                Linux OS
 > [!Important]
 >
 > kkTerminal will not actively record any information such as passwords, files, commands, etc which related to remote servers
-
-Author: [zyyzyykk](https://github.com/zyyzyykk/)
-
-Welcome to provide valuable opinions or suggestions on this project, and you can also join us in maintaining and developing this project together
 
 ### 🌟 Stars
 

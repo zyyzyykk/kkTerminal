@@ -11,6 +11,8 @@
 | cursorBlink | 光标闪烁         | true/false          | cursorBlink=false                                            |
 | tCode       | 是否显示终端代码 | true/false          | tCode=false                                                  |
 | cloud       | 是否显示多端同步 | true/false          | cloud=false                                                  |
+| advance     | 是否显示高级功能 | true/false          | advance=false                                                |
+| transport   | 是否显示传输列表 | true/false          | transport=false                                              |
 | lang        | 语言             | en/zh               | lang=zh                                                      |
 | mode        | 终端模式         | headless/pure/-     | mode=pure                                                    |
 | record      | 播放操作录像     | -                   | 优先级高于ssh连接和协作                                      |
