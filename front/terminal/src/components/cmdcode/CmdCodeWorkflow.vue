@@ -56,17 +56,17 @@
             <div class="no-select nowrap" >Workflow</div>
             <div style="flex: 1;" ></div>
             <div @click="workflowTab(1)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
-              <el-tooltip :content="$t('默认模板')" placement="top" >
+              <el-tooltip :content="$t('默认模板')" placement="top" :show-after="300" >
                 <el-icon><Refresh /></el-icon>
               </el-tooltip>
             </div>
             <div @click="workflowTab(2)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
-              <el-tooltip :content="$t('清空')" placement="top" >
+              <el-tooltip :content="$t('清空')" placement="top" :show-after="300" >
                 <el-icon><DocumentDelete /></el-icon>
               </el-tooltip>
             </div>
             <div @click="workflowTab(3)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
-              <el-tooltip :content="$t('保存')" placement="top" >
+              <el-tooltip :content="$t('保存')" placement="top" :show-after="300" >
                 <el-icon><Finished /></el-icon>
               </el-tooltip>
             </div>

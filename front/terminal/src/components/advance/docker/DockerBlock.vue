@@ -16,7 +16,7 @@
         <el-tab-pane :label="$t('部署')" >
           <div v-if="!(hasDocker && hasPermission)" class="kk-flex-column" style="height: 240px;" >
             <div style="flex: 1;" ></div>
-            <div><img style="height: 160px;" src="@/assets/no_docker.png" alt="docker" ></div>
+            <div><img style="height: 160px;" src="@/assets/docker/no_docker.png" alt="docker" ></div>
             <div class="kk-flex" style="margin-top: 25px;" >
               <div style="font-size: large;" >{{ hasDocker ? $t('Docker权限不足？') : $t('Docker未安装？') }}</div>
               <div>
@@ -30,7 +30,7 @@
           <div v-else >
             <div v-if="!deployInfo.isShow" class="no-scrollbar" style="height: 240px; overflow-y: scroll;" >
               <div class="kk-flex" >
-                <span><img src="@/assets/app_store.svg" alt="appstore" style="height: 30px;" ></span>
+                <span><img src="@/assets/docker/app_store.svg" alt="appstore" style="height: 30px;" ></span>
                 <div style="margin-left: 15px; font-size: 20px; font-weight: bolder;" >{{ $t('Docker应用商店') }}</div>
                 <div style="flex: 1;" ></div>
                 <div>
@@ -59,7 +59,14 @@
                       <div class="card-header" >
                         <div class="kk-flex" >
                           <div class="kk-flex-column" style="align-items: start;" >
-                            <span class="app-name" >{{ app.name }}</span>
+                            <div class="kk-flex" >
+                              <span class="app-name" >{{ app.name }}</span>
+                              <el-tooltip v-if="app.isOfficial" :content="$t('Docker官方镜像')" placement="top" :show-after="300" >
+                                <img class="app-official" src="@/assets/docker/official_image.svg" alt="official" >
+                              </el-tooltip>
+                              <el-tag style="margin-left: 4px;" size="small" type="info" >{{ $t(dockerAppTypes[app.type]) }}</el-tag>
+                            </div>
+                            <div style="height: 2px;" ></div>
                             <div class="kk-flex" >
                               <span class="app-author" >{{ app.author }}</span>
                               <a :href="app.link" target="_blank" class="a-link app-details" >
@@ -116,25 +123,25 @@
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('端口映射') }}</div>
                   <div style="flex: 1;" >
-                    <el-input v-model="deployInfo.portMapping" class="w-50 m-2" :placeholder="$t('每行一个，主机端口:容器端口')" type="textarea" ></el-input>
+                    <el-input v-model="deployInfo.portMapping" class="w-50 m-2" :placeholder="$t('每行一个，主机端口:容器端口')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
                   </div>
                 </div>
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('环境变量') }}</div>
                   <div style="flex: 1;" >
-                    <el-input v-model="deployInfo.envVar" class="w-50 m-2" :placeholder="$t('每行一个，环境变量名=值')" type="textarea" ></el-input>
+                    <el-input v-model="deployInfo.envVars" class="w-50 m-2" :placeholder="$t('每行一个，环境变量名=值')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
                   </div>
                 </div>
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('数据卷挂载') }}</div>
                   <div style="flex: 1;" >
-                    <el-input v-model="deployInfo.volumeMounting" class="w-50 m-2" :placeholder="$t('每行一个，主机路径:容器路径')" type="textarea" ></el-input>
+                    <el-input v-model="deployInfo.volumeMounting" class="w-50 m-2" :placeholder="$t('每行一个，主机路径:容器路径')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
                   </div>
                 </div>
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('其它命令选项') }}</div>
                   <div style="flex: 1;" >
-                    <el-input v-model="deployInfo.paramOptions" class="w-50 m-2" :placeholder="$t('每行一个，-命令选项 值')" type="textarea" ></el-input>
+                    <el-input v-model="deployInfo.paramOptions" class="w-50 m-2" :placeholder="$t('每行一个，-命令选项 值')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
                   </div>
                 </div>
                 <div style="height: 10px;" ></div>
@@ -587,7 +594,7 @@ export default {
       imageVersion: '',
       containerName: '',
       portMapping: '',
-      envVar: '',
+      envVars: '',
       volumeMounting: '',
       paramOptions: '',
     };
@@ -607,8 +614,8 @@ export default {
       if(deployInfo.value.portMapping) {
         deployCmd += deployInfo.value.portMapping.split("\n").filter(port => port).map(port => ` -p ${port}`).join("");
       }
-      if(deployInfo.value.envVar) {
-        deployCmd += deployInfo.value.envVar.split("\n").filter(env => env).map(env => ` -e ${env}`).join("");
+      if(deployInfo.value.envVars) {
+        deployCmd += deployInfo.value.envVars.split("\n").filter(env => env).map(env => ` -e ${env}`).join("");
       }
       if(deployInfo.value.volumeMounting) {
         deployCmd += deployInfo.value.volumeMounting.split("\n").filter(volume => volume).map(volume => ` -v ${volume}`).join("");
@@ -634,12 +641,7 @@ export default {
     const appType = ref(0);
     const dockerApps = computed(() => {
       return dockerAppStore.filter(app => {
-        if(!app.name.toLowerCase().includes(appSearch.value.toLowerCase())
-            && !i18n.global.t(app.desc).toLowerCase().includes(appSearch.value.toLowerCase())) {
-          return false;
-        }
-        if(appType.value !== 0 && app.type !== appType.value) return false;
-        else return true;
+        return (appType.value === 0 || appType.value === app.type) && (app.name.toLowerCase().includes(appSearch.value.toLowerCase()) || app.author.toLowerCase().includes(appSearch.value.toLowerCase()) || i18n.global.t(app.desc).toLowerCase().includes(appSearch.value.toLowerCase()));
       });
     });
 
@@ -756,6 +758,12 @@ export default {
   font-size: 16px;
 }
 
+.app-official {
+  height: 18px;
+  margin-left: 2px;
+  cursor: pointer;
+}
+
 .app-author {
   color: #666;
   font-size: 13px;
@@ -764,6 +772,8 @@ export default {
 .app-details {
   font-size: 13px;
   margin-left: 4px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .app-details:hover {

@@ -60,20 +60,20 @@
                     <el-icon @click="gotoOverview" style="margin-right: 10px; cursor: pointer; font-size: 16px;" ><ArrowLeft /></el-icon>
                     <div> {{ modifyTag + currentCmdCode }} </div>
                     <div style="margin-left: 10px;" ></div>
-                    <el-tooltip :content="CmdCodeStatusEnum[userCmdCodes[currentCmdCode].status]" placement="top" >
+                    <el-tooltip :content="CmdCodeStatusEnum[userCmdCodes[currentCmdCode].status]" placement="top" :show-after="300" >
                       <CmdCodeStatus :style="{fontSize: '18px', cursor: 'pointer'}" :status="userCmdCodes[currentCmdCode].status" ></CmdCodeStatus>
                     </el-tooltip>
                     <div style="flex: 1;" ></div>
-                    <el-tooltip v-if="!mode" :content="$t('编辑')" placement="top" >
+                    <el-tooltip v-if="!mode" :content="$t('编辑')" placement="top" :show-after="300" >
                       <el-icon @click="doModifyCmdCode" class="editor-operator" ><Edit /></el-icon>
                     </el-tooltip>
-                    <el-tooltip v-if="!mode" :content="$t('删除')" placement="top" >
+                    <el-tooltip v-if="!mode" :content="$t('删除')" placement="top" :show-after="300" >
                       <el-icon @click="confirmDeleteCmdCode" class="editor-operator" ><Delete /></el-icon>
                     </el-tooltip>
-                    <el-tooltip v-if="mode" :content="$t('只读')" placement="top" >
+                    <el-tooltip v-if="mode" :content="$t('只读')" placement="top" :show-after="300" >
                       <el-icon @click="doOnlyRead" class="editor-operator" ><View /></el-icon>
                     </el-tooltip>
-                    <el-tooltip v-if="mode" :content="$t('保存修改')" placement="top" >
+                    <el-tooltip v-if="mode" :content="$t('保存修改')" placement="top" :show-after="300" >
                       <el-icon @click="doSaveCmdCode" class="editor-operator" ><Finished /></el-icon>
                     </el-tooltip>
                   </div>
@@ -101,7 +101,7 @@
                       </ToolTip>
                       <div style="flex: 1;" ></div>
                       <div style="margin-left: 10px;" ></div>
-                      <el-tooltip :content="CmdCodeStatusEnum[item.status]" placement="top" >
+                      <el-tooltip :content="CmdCodeStatusEnum[item.status]" placement="top" :show-after="300" >
                         <CmdCodeStatus :style="{fontSize: '18px', cursor: 'pointer'}" :status="item.status" ></CmdCodeStatus>
                       </el-tooltip>
                       <el-icon @click="gotoWorkflow(key)" style="margin-left: 15px; cursor: pointer; font-size: 16px;" ><ArrowRight /></el-icon>

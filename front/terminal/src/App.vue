@@ -149,6 +149,10 @@ export default {
   margin-top: 2px;
 }
 
+.el-popper {
+  user-select: none;
+}
+
 /* 左右拉伸 */
 .resize-handle {
   position: absolute;

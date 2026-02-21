@@ -152,7 +152,7 @@
   "月": "/",
   "日，": " ",
   "命令代码": "Command Code",
-  "什么是命令代码？": "What's Command Code?",
+  "什么是命令代码？": "What’s Command Code?",
   "命令代码是用于访问和执行特定操作流程的快捷方式": "Command Code is the shortcut to access and execute specific action process",
   "输入": "Input",
   "并按下回车以查看更多信息": "and Enter to show more details",
@@ -207,7 +207,7 @@
   "运行流畅": "Run Fluently",
   "运行缓慢": "Run Slowly",
   "运行堵塞": "Run Blocked",
-  "Top进程": "Top Process",
+  "Top进程": "Top Processes",
   "网络": "NetWork",
   "磁盘": "Disk",
   "上行": "Up",
@@ -266,6 +266,13 @@
   "数据库": "Database",
   "网盘存储": "Storage",
   "详情": "Details",
+  "Docker官方镜像": "Docker Official Image",
   "指定任意镜像进行应用部署": "Specify any image for application deployment",
-  "kkTerminal是一个强大的Web SSH连接终端": "kkTerminal is a powerful terminal for Web SSH connection"
+  "一个强大的Web SSH连接终端": "A powerful terminal for Web SSH connection",
+  "运行VS Code并在浏览器中访问": "Run VS Code and access it in the browser",
+  "Drawio是一款白板/绘图软件应用": "Drawio is a whiteboard and diagramming software application",
+  "全球最受欢迎的开源数据库": "The world’s most popular open source database",
+  "世界上最快的NoSQL数据库": "The world’s fastest NoSQL database",
+  "一个无痛的自托管Git服务": "A painless self-hosted Git service",
+  "一个支持多存储的文件列表程序": "A file list program that supports multiple storages"
 }

@@ -114,7 +114,8 @@
         <div class="form-width" >{{ $t('其它') }}{{ $t('：') }}</div>
         <div class="kk-flex" >
           <div>{{ $t('语言') }}</div>
-          <el-dropdown style="margin: 0 20px;" hide-timeout="300" >
+          <img style="margin-right: 10px; height: 20px;" src="@/assets/lang_switch.svg" alt="lang switch" >
+          <el-dropdown hide-timeout="300" >
             <span class="a-link no-select" >{{ mapValueToLabel(setInfo.lang) }}<el-icon class="el-icon--right" ><arrow-down /></el-icon></span>
             <template #dropdown>
               <el-dropdown-menu>
