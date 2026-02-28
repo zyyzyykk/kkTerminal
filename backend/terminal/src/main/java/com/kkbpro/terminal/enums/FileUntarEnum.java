@@ -24,19 +24,19 @@ public enum FileUntarEnum {
 
     ZIP(".zip", "unzip ");
 
-    private final String fileSuffix;
+    private final String suffix;
 
     private final String command;
 
-    FileUntarEnum(String fileSuffix, String command) {
-        this.fileSuffix = fileSuffix;
+    FileUntarEnum(String suffix, String command) {
+        this.suffix = suffix;
         this.command = command;
     }
 
     public static FileUntarEnum getByFileName(String fileName) {
         if (StringUtil.isEmpty(fileName)) return null;
         for (FileUntarEnum item : FileUntarEnum.values()) {
-            if (fileName.endsWith(item.getFileSuffix())) {
+            if (fileName.endsWith(item.getSuffix())) {
                 return item;
             }
         }

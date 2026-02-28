@@ -2,7 +2,7 @@ package com.kkbpro.terminal.controller;
 
 import com.kkbpro.terminal.annotation.Log;
 import com.kkbpro.terminal.constant.Constant;
-import com.kkbpro.terminal.enums.FileStateEnum;
+import com.kkbpro.terminal.enums.FileUploadEnum;
 import com.kkbpro.terminal.enums.FileUntarEnum;
 import com.kkbpro.terminal.consumer.WebSocketServer;
 import com.kkbpro.terminal.enums.ResultCodeEnum;
@@ -120,7 +120,7 @@ public class FileController {
         List<FileInfo> fileInfoList = new ArrayList<>();
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接已断开");
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接已断开");
         }
         try {
             SFTPClient sftp = SSHUtil.getSFTPClient(sshKey);
@@ -175,7 +175,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         StringBuilder num = new StringBuilder();
         String[] nums;
@@ -205,7 +205,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         StringBuilder size = new StringBuilder();
         String command = "cd " + path + " && echo -n \"$(du -sb " + item + " | head -n 1 | cut -f1)\"";
@@ -230,7 +230,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接已断开");
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接已断开");
         }
         SFTPClient sftp = SSHUtil.getSFTPClient(sshKey);
         String directory = sftp.canonicalize(".");
@@ -250,7 +250,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         try {
             SFTPClient sftp = SSHUtil.getSFTPClient(sshKey);
@@ -285,7 +285,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         String command = "cd " + path + " && rm -rf " + items;
         try {
@@ -310,7 +310,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         String command = "cd " + src + " && cp -rn " + items + " " + dst;
         try {
@@ -336,7 +336,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         String command = "cd " + src + " && mv -n " + items + " " + dst;
         try {
@@ -362,7 +362,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         String command = "cd " + path + " && test ! -e " + item + " && touch " + item;
         try {
@@ -388,7 +388,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         try {
             SFTPClient sftp = SSHUtil.getSFTPClient(sshKey);
@@ -415,7 +415,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         try {
             SFTPClient sftp = SSHUtil.getSFTPClient(sshKey);
@@ -440,7 +440,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         String ua = "--user-agent=\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36\"";
         String command = "cd " + path + " && wget " + ua + " -b -q -O " + item + " \"" + url + "\"";
@@ -466,7 +466,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         FileUntarEnum fileUntarEnum = FileUntarEnum.getByFileName(item);
         if (fileUntarEnum == null) return Result.error(errorMsg);
@@ -494,7 +494,7 @@ public class FileController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         String command = "cd " + path + " && chmod " + (sub ? "-R " : "") + perms + " " + item;
         try {
@@ -518,7 +518,7 @@ public class FileController {
         String sshKey = fileUploadInfo.getSshKey();
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，文件上传失败");
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，文件上传失败");
         }
 
         MultipartFile file = fileUploadInfo.getFile();
@@ -535,10 +535,10 @@ public class FileController {
         } catch (Exception e) {
             chunkFile.delete();
             LogUtil.logException(this.getClass(), e);
-            return Result.error(FileStateEnum.UPLOAD_ERROR.getState(), "文件片上传失败");
+            return Result.error(FileUploadEnum.UPLOAD_ERROR.getCode(), "文件片上传失败");
         }
 
-        return Result.success(FileStateEnum.CHUNK_UPLOAD_SUCCESS.getState(), "文件片上传成功");
+        return Result.success(FileUploadEnum.CHUNK_UPLOAD_SUCCESS.getCode(), "文件片上传成功");
     }
 
     /**
@@ -551,7 +551,7 @@ public class FileController {
         String sshKey = fileUploadInfo.getSshKey();
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，文件上传失败");
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，文件上传失败");
         }
 
         String fileName = fileUploadInfo.getFileName();
@@ -588,7 +588,7 @@ public class FileController {
             }
         });
 
-        return Result.success(FileStateEnum.FILE_UPLOADING.getState(), "文件后台上传中");
+        return Result.success(FileUploadEnum.FILE_UPLOADING.getCode(), "文件后台上传中");
     }
 
 }

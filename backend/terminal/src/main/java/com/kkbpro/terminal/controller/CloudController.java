@@ -2,7 +2,7 @@ package com.kkbpro.terminal.controller;
 
 import com.kkbpro.terminal.annotation.Log;
 import com.kkbpro.terminal.constant.Constant;
-import com.kkbpro.terminal.enums.FileStateEnum;
+import com.kkbpro.terminal.enums.FileUploadEnum;
 import com.kkbpro.terminal.enums.ResultCodeEnum;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.FileUtil;
@@ -46,7 +46,7 @@ public class CloudController {
         File[] userFiles = userFolder.listFiles();
         // 限制录像文件数量
         if (userFiles != null && userFiles.length > maxCount && countType.equals(type)) {
-            return Result.error(ResultCodeEnum.CLOUD_COUNT_ERROR.getState(),"云端文件过多");
+            return Result.error(ResultCodeEnum.CLOUD_COUNT_ERROR.getCode(),"云端文件过多");
         }
         File targetFile = FileUtil.prepareFile(userFolderPath + "/" + type + name);
         file.transferTo(targetFile);
@@ -64,7 +64,7 @@ public class CloudController {
         File targetFile = FileUtil.getFile(userFolderPath + "/" + fileName);
         // 文件不存在
         if (targetFile == null) {
-            return Result.error(FileStateEnum.FILE_NOT_EXIST.getState(), "文件不存在");
+            return Result.error(FileUploadEnum.FILE_NOT_EXIST.getCode(), "文件不存在");
         }
         StringBuilder content = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(targetFile))) {

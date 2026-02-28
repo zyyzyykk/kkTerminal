@@ -1,6 +1,6 @@
 package com.kkbpro.terminal.utils;
 
-import com.kkbpro.terminal.enums.FileStateEnum;
+import com.kkbpro.terminal.enums.FileUploadEnum;
 import com.kkbpro.terminal.exception.MyException;
 import com.kkbpro.terminal.result.Result;
 
@@ -8,7 +8,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FileUtil {
 
@@ -84,22 +83,22 @@ public class FileUtil {
         // 获取所有文件片
         File[] chunkFiles = folder.listFiles();
         if (chunkFiles == null) {
-            throw new MyException(Result.error(FileStateEnum.UPLOAD_CHUNK_LOST.getState(), "文件片缺失"));
+            throw new MyException(Result.error(FileUploadEnum.UPLOAD_CHUNK_LOST.getCode(), "文件片缺失"));
         }
         try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(mergedFile, true))) {
             List<File> filteredChunkFiles = Arrays.stream(chunkFiles)
                     .filter(chunkFile -> isChunkFile(chunkFile.getName(), chunks, fileName))
-                    .collect(Collectors.toList());
+                    .toList();
             // 文件片数量不匹配
             if (chunks != filteredChunkFiles.size()) {
-                throw new MyException(Result.error(FileStateEnum.UPLOAD_CHUNK_LOST.getState(), "文件片缺失"));
+                throw new MyException(Result.error(FileUploadEnum.UPLOAD_CHUNK_LOST.getCode(), "文件片缺失"));
             }
             // 根据文件片号排序
             List<File> sortedChunkFiles = filteredChunkFiles.parallelStream().sorted(((file1, file2) -> {
                 Integer chunk1 = getChunkFileIndex(file1.getName());
                 Integer chunk2 = getChunkFileIndex(file2.getName());
                 return chunk1 - chunk2;
-            })).collect(Collectors.toList());
+            })).toList();
             // 依次将文件片合并到新文件
             for (File chunkFile : sortedChunkFiles) {
                 try (InputStream inputStream = new BufferedInputStream(Files.newInputStream(chunkFile.toPath()))) {
@@ -113,12 +112,12 @@ public class FileUtil {
             }
         } catch (Exception e) {
             LogUtil.logException(FileUtil.class, e);
-            throw new MyException(Result.error(FileStateEnum.CHUNK_MERGE_ERROR.getState(), "文件片合并失败"));
+            throw new MyException(Result.error(FileUploadEnum.CHUNK_MERGE_ERROR.getCode(), "文件片合并失败"));
         }
 
         // 合并文件大小不一致
         if (mergedFile.length() != totalSize) {
-            throw new MyException(Result.error(FileStateEnum.UPLOAD_SIZE_DIFF.getState(), "上传文件大小不一致"));
+            throw new MyException(Result.error(FileUploadEnum.UPLOAD_SIZE_DIFF.getCode(), "上传文件大小不一致"));
         }
     }
 

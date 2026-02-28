@@ -17,12 +17,12 @@ public enum SocketSendEnum {
 
     FILE_TRANSPORT_UPDATE(3, "Update file transport");
 
-    private final Integer state;
+    private final Integer type;
 
     private final String desc;
 
-    SocketSendEnum(Integer state, String desc) {
-        this.state = state;
+    SocketSendEnum(Integer type, String desc) {
+        this.type = type;
         this.desc = desc;
     }
 

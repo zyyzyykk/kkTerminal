@@ -62,7 +62,7 @@ public class AdvanceController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
 
         WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
@@ -95,7 +95,7 @@ public class AdvanceController {
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         WebSocketServer webSocketServer = WebSocketServer.webSocketServerMap.get(sshKey);
         if (ssh == null || webSocketServer == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
 
         webSocketServer.setCooperateInfo(null);
@@ -138,7 +138,7 @@ public class AdvanceController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         StringBuilder status = new StringBuilder();
         String command = "echo -n \"$(uptime | awk -F'load average: ' '{print $2}' | awk '{print $1}' | sed 's/,//')@\" && \\\n" +
@@ -180,7 +180,7 @@ public class AdvanceController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         StringBuilder version = new StringBuilder();
         String command = "docker version --format \"{{.Server.Version}}\"";
@@ -215,7 +215,7 @@ public class AdvanceController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         StringBuilder info = new StringBuilder();
         String command = DOCKER_INFO_CMD[type];
@@ -241,7 +241,7 @@ public class AdvanceController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         String command = DOCKER_DELETE_CMD[type] + items;
         try {
@@ -267,7 +267,7 @@ public class AdvanceController {
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getState(), "连接断开，" + errorMsg);
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         StringBuilder container = new StringBuilder();
         String command = DOCKER_CONTAINER_CMD[type] + items;

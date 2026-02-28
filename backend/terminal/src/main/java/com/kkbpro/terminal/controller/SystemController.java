@@ -5,6 +5,7 @@ import com.kkbpro.terminal.annotation.Log;
 import com.kkbpro.terminal.config.AppConfig;
 import com.kkbpro.terminal.constant.Constant;
 import com.kkbpro.terminal.consumer.WebSocketServer;
+import com.kkbpro.terminal.enums.OperatingSystemEnum;
 import com.kkbpro.terminal.pojo.vo.OSInfo;
 import com.kkbpro.terminal.result.Result;
 import com.kkbpro.terminal.utils.*;
@@ -20,12 +21,11 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 系统信息接口类
  **/
-
 @RestController
 @RequestMapping(Constant.API_PREFIX + "/system")
 public class SystemController {
 
-    public static String serverOS = "Linux";
+    public static String serverOS = OperatingSystemEnum.LINUX.getName();
 
     private static volatile Thread monitor;
 
@@ -41,11 +41,11 @@ public class SystemController {
     @Log
     @PostMapping("/init")
     public Result init(@RequestHeader("User-Agent") String userAgent) {
-        String clientOS = getOSFromUA(userAgent);
+        String clientOS = OperatingSystemEnum.getOSFromUA(userAgent).getName();
         String windowId = UUID.randomUUID().toString();
         OSInfo osInfo = new OSInfo(serverOS, clientOS, windowId);
-        // PC端，Windows和Mac
-        if (!"Linux".equals(serverOS) && appConfig.getPcWindow()) {
+        // 本地运行
+        if (!OperatingSystemEnum.LINUX.getName().equals(serverOS) && appConfig.getPcWindow()) {
             windowActiveMap.put(windowId, new Date().getTime());
             startMonitor();
         }
@@ -63,23 +63,6 @@ public class SystemController {
         map.put("responseKey", responseKey);
 
         return Result.success(JSONObject.toJSONString(map));
-    }
-
-    private String getOSFromUA(String userAgent) {
-        userAgent = userAgent.toLowerCase();
-        if (userAgent.contains("windows")) {
-            return "Windows";
-        } else if (userAgent.contains("mac")) {
-            return "Mac";
-        } else if (userAgent.contains("linux")) {
-            return "Linux";
-        } else if (userAgent.contains("android")) {
-            return "Android";
-        } else if (userAgent.contains("iphone") || userAgent.contains("ipad")) {
-            return "iOS";
-        } else {
-            return "Other";
-        }
     }
 
 
@@ -114,7 +97,7 @@ public class SystemController {
     @Log
     @PostMapping ("/beat")
     public Result beat(String windowId) {
-        if (!"Linux".equals(serverOS) && appConfig.getPcWindow() && windowId != null)
+        if (!OperatingSystemEnum.LINUX.getName().equals(serverOS) && appConfig.getPcWindow() && windowId != null)
             windowActiveMap.replace(windowId, new Date().getTime());
         return Result.success("窗口续约成功");
     }

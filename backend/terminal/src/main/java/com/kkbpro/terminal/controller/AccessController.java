@@ -39,7 +39,7 @@ public class AccessController {
                 responseKey = StringUtil.generateRandomString(16);
                 SessionUtil.setAttribute(Constant.LOGIN_SESSION, responseKey);
             }
-            else return Result.error(ResultCodeEnum.PASSWORD_INCORRECT.getState(), "密码错误");
+            else return Result.error(ResultCodeEnum.PASSWORD_INCORRECT.getCode(), "密码错误");
         }
         map.put("responseKey", responseKey);
 

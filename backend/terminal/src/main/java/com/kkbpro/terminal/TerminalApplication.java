@@ -1,6 +1,7 @@
 package com.kkbpro.terminal;
 
 import com.kkbpro.terminal.controller.SystemController;
+import com.kkbpro.terminal.enums.OperatingSystemEnum;
 import com.kkbpro.terminal.utils.FileUtil;
 import com.kkbpro.terminal.utils.LogUtil;
 import org.springframework.boot.SpringApplication;
@@ -56,37 +57,38 @@ public class TerminalApplication {
             enableOnceMonitor = false;
         }
         // 打开Web浏览器
-        if (Boolean.parseBoolean(properties.getProperty("kk.pc.window")))
+        if (Boolean.parseBoolean(properties.getProperty("kk.pc.window"))) {
             openWebPage(enableOnceMonitor);
+        }
     }
 
     private static void setServerOS() {
-        // 支持PC端：Windows和Mac
+        // 支持本地运行
         String os = System.getProperty("os.name").toLowerCase();
-        // e.g. mac os x
+        // mac
         if (os.contains("mac")) {
-            SystemController.serverOS = "Mac";
+            SystemController.serverOS = OperatingSystemEnum.MAC.getName();
         }
-        // e.g. windows 10
+        // windows
         else if (os.contains("win")) {
-            SystemController.serverOS = "Windows";
+            SystemController.serverOS = OperatingSystemEnum.WINDOWS.getName();
         }
         else {
-            SystemController.serverOS = "Linux";
+            SystemController.serverOS = OperatingSystemEnum.LINUX.getName();
         }
     }
 
     private static void openWebPage(boolean enableOnceMonitor) {
         Runtime runtime = Runtime.getRuntime();
         try {
-            // e.g. mac os x
-            if ("Mac".equals(SystemController.serverOS)) {
+            // mac
+            if (OperatingSystemEnum.MAC.getName().equals(SystemController.serverOS)) {
                 runtime.exec("open " + getUrl());
                 if (enableOnceMonitor) startOnceMonitor();
                 else System.exit(0); // 结束进程
             }
-            // e.g. windows 10
-            else if ("Windows".equals(SystemController.serverOS)) {
+            // windows
+            else if (OperatingSystemEnum.WINDOWS.getName().equals(SystemController.serverOS)) {
                 runtime.exec("rundll32 url.dll,FileProtocolHandler " + getUrl());
                 if (enableOnceMonitor) startOnceMonitor();
                 else System.exit(0); // 结束进程

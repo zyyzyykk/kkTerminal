@@ -11,12 +11,12 @@ public enum SocketMessageEnum {
 
     HEART_BEAT(2, "Do heartbeat renewal");
 
-    private final Integer state;
+    private final Integer type;
 
     private final String desc;
 
-    SocketMessageEnum(Integer state, String desc) {
-        this.state = state;
+    SocketMessageEnum(Integer type, String desc) {
+        this.type = type;
         this.desc = desc;
     }
 

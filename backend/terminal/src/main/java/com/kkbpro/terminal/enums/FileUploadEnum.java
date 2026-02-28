@@ -3,7 +3,7 @@ package com.kkbpro.terminal.enums;
 import lombok.Getter;
 
 @Getter
-public enum FileStateEnum {
+public enum FileUploadEnum {
 
     FILE_UPLOADING(202, "文件后台上传中"),
 
@@ -21,12 +21,12 @@ public enum FileStateEnum {
 
     CHUNK_MERGE_ERROR(505, "文件片合并失败");
 
-    private final Integer state;
+    private final Integer code;
 
     private final String desc;
 
-    FileStateEnum(Integer state, String desc) {
-        this.state = state;
+    FileUploadEnum(Integer code, String desc) {
+        this.code = code;
         this.desc = desc;
     }
 
