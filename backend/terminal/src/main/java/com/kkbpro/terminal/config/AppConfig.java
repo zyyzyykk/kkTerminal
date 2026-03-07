@@ -1,16 +1,12 @@
 package com.kkbpro.terminal.config;
 
 import com.kkbpro.terminal.utils.StringUtil;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class AppConfig {
 
     /**
@@ -51,6 +47,6 @@ public class AppConfig {
 
     public String getPassword() {
         return StringUtil.isEmpty(password) ? null : password.substring(0, Math.min(password.length(), 16));
-    };
+    }
 
 }

@@ -1,26 +1,26 @@
-### ⌨️ Terminal Code
+### ⌨️ Command Code
 
-> Terminal Code is a shortcut used to access and execute specific operational processes
+> Command Code is a shortcut used to access and execute specific operational processes
 >
-> The length of Terminal Code is 2-6 bits, where the first bit represents its type
+> The length of Command Code is 2-6 bits, where the first bit represents its type
 >
-> Terminal Code is not case sensitive
+> Command Code is not case sensitive
 
-##### Terminal Code Type
+##### Command Code Type
 
-> Enter `STC` in the Terminal Code input box and press enter to show more details
+Enter `SCCC` in the Command Code input box and press enter to show more details
 
-- Function Terminal Code: Start with `F` , used to execute common functions
-- System Terminal Code: Start with `S` , used to access system modules
-- User Terminal Code: Start with `U` , used to customize workflows
+- Function Command Code: Start with `F` , used to execute common functions
+- System Command Code: Start with `S` , used to access system modules
+- User Command Code: Start with `U` , used to customize workflows
 
-##### New User Terminal Code
+##### New User Command Code
 
-1. Enter `STW` in the Terminal Code input box and press enter
-2. Enter the name and description of Terminal Code
-3. Click confirm to add User Terminal Code
+1. Enter `SCCW` in the Command Code input box and press enter
+2. Enter the name and description of Command Code
+3. Click confirm to add User Command Code
 
-##### User Terminal Code Workflow
+##### User Command Code Workflow
 
 > [!Warning] 
 >
@@ -91,13 +91,13 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);
 
 ###### Import/Export
 
-> Import: Import any number of User Terminal Code (will overwrite Terminal Code with the same name)
+> Import: Import any number of User Command Code (will overwrite Command Code with the same name)
 >
-> Export: Export all existing User Terminal Code
+> Export: Export all existing User Command Code
 >
-> Note: The file format for importing and exporting User Terminal Code is json
+> Note: The file format for importing and exporting User Command Code is json
 
-Example of User Terminal Code file:
+Example of User Command Code file:
 
 ```json
 {

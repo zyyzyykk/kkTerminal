@@ -4,6 +4,8 @@ import com.kkbpro.terminal.utils.I18nUtil;
 import com.kkbpro.terminal.utils.LogUtil;
 import com.kkbpro.terminal.utils.SSHUtil;
 import com.kkbpro.terminal.utils.StringUtil;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -18,7 +20,7 @@ public class BusinessInterceptor implements HandlerInterceptor {
      * 在请求到达Controller之前进行拦截
      */
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(@NonNull HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable Object handler) {
         // 获取请求头 X-Accept-Language
         String acceptLang = request.getHeader("X-Accept-Language");
         // 获取请求参数 sshKey
@@ -50,7 +52,7 @@ public class BusinessInterceptor implements HandlerInterceptor {
      * 在整个请求完成后执行
      */
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+    public void afterCompletion(@Nullable HttpServletRequest request, @Nullable HttpServletResponse response, @Nullable Object handler, Exception ex) {
         // 移除语言
         I18nUtil.locale.remove();
         // 移除服务器编码集

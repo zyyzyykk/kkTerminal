@@ -59,12 +59,12 @@ public class WebSocketServer {
         if (webSocketServer == null) return;
         webSocketServer.sendMessage(SocketSendEnum.FILE_TRANSPORT_UPDATE.getDesc(), ResultStatusEnum.SUCCESS.getStatus(),
                 SocketSendEnum.FILE_TRANSPORT_UPDATE.getType(), JSON.toJSONString(fileTransInfo));
-    };
+    }
 
     public static FileTransInfo getTransportingFile(String sshKey, String key) {
         if (fileTransportingMap.get(sshKey) == null) return null;
         return fileTransportingMap.get(sshKey).get(key);
-    };
+    }
 
     public static void removeTransportingFile(String sshKey, String key) {
         FileTransInfo fileTransInfo = getTransportingFile(sshKey, key);
@@ -76,7 +76,7 @@ public class WebSocketServer {
         if (webSocketServer == null) return;
         webSocketServer.sendMessage(SocketSendEnum.FILE_TRANSPORT_UPDATE.getDesc(), ResultStatusEnum.SUCCESS.getStatus(),
                 SocketSendEnum.FILE_TRANSPORT_UPDATE.getType(), JSON.toJSONString(fileTransInfo));
-    };
+    }
 
     private static AppConfig appConfig;
 
@@ -176,7 +176,7 @@ public class WebSocketServer {
             this.sendMessage("Fail to connect remote server !", ResultStatusEnum.WARNING.getStatus(),
                     SocketSendEnum.CONNECT_FAIL.getType(), null);
             return;
-        };
+        }
 
         // 获取服务器编码格式
         try(net.schmizz.sshj.connection.channel.direct.Session sshSession = this.sshClient.startSession();
@@ -247,7 +247,7 @@ public class WebSocketServer {
                 sftpClientMap.put(this.sshKey, sftp);
             } catch (Exception e) {
                 LogUtil.logException(this.getClass(), e);
-            };
+            }
         });
     }
 

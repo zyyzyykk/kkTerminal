@@ -141,23 +141,24 @@ public class AdvanceController {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         StringBuilder status = new StringBuilder();
-        String command = "echo -n \"$(uptime | awk -F'load average: ' '{print $2}' | awk '{print $1}' | sed 's/,//')@\" && \\\n" +
-                "echo -n \"$(top -bn1 | grep \"Cpu(s)\" | sed \"s/.*, *\\([0-9.]*\\)%* id.*/\\1/\" | awk '{print 100 - $1}')@\" && \\\n" +
-                "echo -n \"$(nproc)@\" && \\\n" +
-                "echo -n \"$(free -m | grep Mem | awk '{print $3\"@\"$2}')@\" && \\\n" +
-                "echo -n \"$(df -BMB / | grep / | awk '{print $3\"@\"$2}' | sed 's/[A-Za-z]//g')\" && \\\n" +
-                "echo -n \"^\" && \\\n" +
-                "echo -n \"$(ps -eo pid,user,%cpu,%mem,comm --sort=-%cpu | head -n 5 | awk 'NR>1 {print $1\"@\"$2\"@\"$3\"@\"$4\"@\"$5}' | tr '\\n' '$' | sed 's/\\(.*\\)\\$$/\\1/')\" && \\\n" +
-                "echo -n \"^\" && \\\n" +
-                "echo -n \"$(cat /proc/net/dev | awk 'NR>2 {up+=$10; down+=$2;} END {print \"all:@\"up\"@\"down}')\" && \\\n" +
-                "echo -n \"$\" && \\\n" +
-                "echo -n \"$(cat /proc/net/dev | awk 'NR>2 {print $1\"@\"$10\"@\"$2}' | tr -s ' ' '@' | tr '\\n' '$' | sed 's/\\(.*\\)\\$/\\1/')\" && \\\n" +
-                "echo -n \"^\" && \\\n" +
-                "echo -n \"$(cat /proc/diskstats | awk '{if ($3 ~ /[^0-9]$/) {read+=$6; write+=$10}} END {print \"all@\" read\"@\"write}')\" && \\\n" +
-                "echo -n \"$\" && \\\n" +
-                "echo -n \"$(cat /proc/diskstats | awk '{print $3\"@\"$6\"@\"$10}' | tr -s ' ' '@' | tr '\\n' '$' | sed 's/\\(.*\\)\\$/\\1/')\" && \\\n" +
-                "echo -n \"^\" && \\\n" +
-                "echo -n $(date +%s%3N)";
+        String command = """
+                echo -n "$(uptime | awk -F'load average: ' '{print $2}' | awk '{print $1}' | sed 's/,//')@" && \\
+                echo -n "$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk '{print 100 - $1}')@" && \\
+                echo -n "$(nproc)@" && \\
+                echo -n "$(free -m | grep Mem | awk '{print $3"@"$2}')@" && \\
+                echo -n "$(df -BMB / | grep / | awk '{print $3"@"$2}' | sed 's/[A-Za-z]//g')" && \\
+                echo -n "^" && \\
+                echo -n "$(ps -eo pid,user,%cpu,%mem,comm --sort=-%cpu | head -n 5 | awk 'NR>1 {print $1"@"$2"@"$3"@"$4"@"$5}' | tr '\\n' '$' | sed 's/\\(.*\\)\\$$/\\1/')" && \\
+                echo -n "^" && \\
+                echo -n "$(cat /proc/net/dev | awk 'NR>2 {up+=$10; down+=$2;} END {print "all:@"up"@"down}')" && \\
+                echo -n "$" && \\
+                echo -n "$(cat /proc/net/dev | awk 'NR>2 {print $1"@"$10"@"$2}' | tr -s ' ' '@' | tr '\\n' '$' | sed 's/\\(.*\\)\\$/\\1/')" && \\
+                echo -n "^" && \\
+                echo -n "$(cat /proc/diskstats | awk '{if ($3 ~ /[^0-9]$/) {read+=$6; write+=$10}} END {print "all@" read"@"write}')" && \\
+                echo -n "$" && \\
+                echo -n "$(cat /proc/diskstats | awk '{print $3"@"$6"@"$10}' | tr -s ' ' '@' | tr '\\n' '$' | sed 's/\\(.*\\)\\$/\\1/')" && \\
+                echo -n "^" && \\
+                echo -n $(date +%s%3N)""";
         try {
             int exitStatus = SSHUtil.executeCommand(ssh, command, status);
             if (exitStatus != 0) return Result.error(errorMsg);

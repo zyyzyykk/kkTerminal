@@ -10,15 +10,15 @@
 >
 > 预览：https://ssh.kkbpro.com/
 >
-> 更新时间：2025-11-30
+> 更新时间：2026-03-07
 >
 
 <p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.svg" alt="kkterminal"></a></p>
 
 <p align="center">
   <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/docker/pulls/zyyzyykk/kkterminal?logo=docker" alt="Docker Image"></a>
-  <a href="https://www.oracle.com/cn/java/technologies/downloads/#java8-windows"><img src="https://img.shields.io/badge/jdk-1.8-orange?logo=openjdk&logoColor=%23e3731c" alt="JDK Version"></a>
-  <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/springboot-2.7.15-green?color=6db33f&logo=springboot" alt="SpringBoot Version"></a>
+  <a href="https://www.oracle.com/cn/java/technologies/downloads/#java8-windows"><img src="https://img.shields.io/badge/jdk-21-orange?logo=openjdk&logoColor=%23e3731c" alt="JDK Version"></a>
+  <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/springboot-3.5.10-green?color=6db33f&logo=springboot" alt="SpringBoot Version"></a>
   <a href="https://cn.vuejs.org/"><img src="https://img.shields.io/badge/vue-3.x-green?color=42b883&logo=vue.js" alt="Vue Version"></a>
   <a href="https://www.apache.org/licenses/"><img src="https://img.shields.io/badge/licence-Apache-red?logo=apache&logoColor=%23D22128" alt="Apache Licence"></a>
   <a href="https://github.com/zyyzyykk/kkTerminal"><img src="https://img.shields.io/github/stars/zyyzyykk/kkterminal" alt="GitHub"></a>
@@ -50,60 +50,67 @@ docker run -d --name kkterminal \
 -e STORAGE="P5P1SIqVe6kaOxMX" \
 -e PASSWORD="" \
 -v /data/kkterminal/cloud:/cloud \
+-v /data/kkterminal/log:/log \
+-v /data/kkterminal/temp:/temp \
 zyyzyykk/kkterminal
 ```
 
-3. 在浏览器中访问：`http://服务器IP:3000/`
+3. 在浏览器中访问：`http://<服务器IP>:3000/`
 
 ### 👀 预览
 
 访问此网址：https://ssh.kkbpro.com/
 
-![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.7.6/zh/Connect.png)
+![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.0/zh/Connect.png)
 
-![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.7.6/zh/Preference.png)
+![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.0/zh/Preference.png)
 
-![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.7.6/zh/File.png)
+![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.0/zh/File.png)
 
-![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.7.6/zh/Editor.png)
+![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.0/zh/Editor.png)
 
 [**更多模块预览**](./MODULE.md)
 
 ### 💡 功能说明
 
-1. kkTerminal是一个强大的Web SSH连接终端工具，点击左上角的终端图标，选择连接设置进行ssh连接
-2. 支持在网页中使用 `iframe` 标签引入，可快速集成到第三方网站中
+1. 点击左上角的终端图标选择连接设置进行ssh连接
+2. 支持在网页中使用 `iframe` 标签引入，快速集成到第三方网站中
 3. 支持通过 [URL参数](./PARAMS.md) 自定义终端配置
 4. 支持i18n国际化，支持中/英文语言切换
-5. 支持本地PC端部署，启动时会自动打开浏览器窗口
+5. 支持本地PC运行，启动时浏览器窗口会自动打开
 6. 支持窗口大小自适应和中文输入
 7. 支持偏好设置，例如终端的背/前景色、字体字号、光标显示样式等
 8. 支持自动/手动重启
-9. 支持复制粘贴：
-   - 复制同 `git` 终端，选中文本会自动进行复制
-   - 粘贴同 `cmd` 终端，单击鼠标右键进行粘贴（需要浏览器打开权限）
+9. 支持选中自动复制和单击右键粘贴
 10. 支持文件管理，打开文件管理模块查看、解压、上传与下载文件/文件夹
 11. 支持文件多选/全选、复制粘贴、剪切、选择切换、打开、删除等快捷键操作
 12. 支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
-13. 支持 [终端代码](./TCODE.md) 执行自定义工作流
+13. 支持 [命令代码](./CMDCODE.md) 执行自定义工作流
 14. 支持操作录像、多端同步功能
 15. 支持协作、监控、Docker功能
-16. 支持访问认证
+16. 支持访问密码认证
 
 ### 👨‍💻 更新记录
 
-##### zyyzyykk/kkterminal:3.7.6：latest
+##### zyyzyykk/kkterminal:3.8.0
+
+- Docker模块新增容器详情显示和应用商店更新
+- 增强非安全上下文和低版本的兼容性
+- 升级项目jdk和springboot版本
+- 重构部分代码与优化界面显示
+
+##### zyyzyykk/kkterminal:3.7.6
 
 - 支持更多URL参数
 - 优化文件传输流程
 - 新增访问认证功能
-- 用户终端代码文件模块新增API
+- 用户命令代码文件模块新增API
 - Docker模块新增查看容器详细信息功能
 - 修复Docker模块数据请求异常的bug
 - 优化界面显示
 - 增强部分功能
 
-##### zyyzyykk/kkterminal:3.6.8：
+##### zyyzyykk/kkterminal:3.6.8
 
 - 新增文件传输列表
 - 新增Docker应用商店
@@ -111,7 +118,7 @@ zyyzyykk/kkterminal
 - 优化整体加密逻辑
 - 部分对话框支持左右拉伸调整宽度
 - 优化编辑器打开与保存文件的编码格式
-- 用户终端代码新增保留值与文件模块API
+- 用户命令代码新增保留值与文件模块API
 - 重构部分代码与优化界面显示
 
 [**历史更新记录**](./UPDATE.md)

@@ -871,7 +871,7 @@ export default {
           if(socket.value && socket.value.readyState === WebSocket.OPEN) {
             socket.value.send(aesEncrypt(JSON.stringify({type: 2, content: "", rows: 0, cols: 0}), secretKey.value));
           }
-          // 本地PC端
+          // 本地运行
           if(props.osInfo.serverOS !== "Linux") {
             request({
               url: http_base_url + '/system/beat',

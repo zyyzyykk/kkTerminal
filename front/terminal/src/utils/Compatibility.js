@@ -6,7 +6,7 @@ import { aesDecrypt, aesEncrypt } from "@/utils/Encrypt";
 const current = document.querySelector('meta[name="version"]')?.getAttribute('content');
 const previous = browser.localStorage.getItem(localStore['version']);
 
-// 3.7.6以上版本新增
+// 3.8.0及以上版本新增
 const setupCompatFixes = () => {
     if(current === previous) return;
     for(const fix of fixesChain) {

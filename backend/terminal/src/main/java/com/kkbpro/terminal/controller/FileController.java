@@ -393,8 +393,10 @@ public class FileController {
         try {
             SFTPClient sftp = SSHUtil.getSFTPClient(sshKey);
             String fullPath = path + item;
-            if (sftp.statExistence(fullPath) != null)
+            // 文件夹已存在
+            if (sftp.statExistence(fullPath) != null) {
                 return Result.error(errorMsg);
+            }
             sftp.mkdirs(fullPath);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);

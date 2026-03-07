@@ -76,9 +76,9 @@ public class SystemController {
                     monitor = Thread.ofVirtual().start(() -> {
                         try {
                             while (!windowActiveMap.isEmpty()) {
-                                // 超过33s则移除（判定为窗口已关闭）
+                                // 距离上次心跳续约超过33s则视为无效窗口
                                 windowActiveMap.entrySet().removeIf(entry -> new Date().getTime() - entry.getValue() > 1000L * 33);
-                                Thread.sleep(1000); // 每隔1秒处理一次
+                                Thread.sleep(5000); // 每隔5秒处理一次
                             }
                             System.exit(0); // 结束进程
                         } catch (InterruptedException e) {
