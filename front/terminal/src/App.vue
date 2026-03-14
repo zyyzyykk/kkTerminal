@@ -171,4 +171,8 @@ export default {
 .handle-right {
   right: 0;
 }
+
+.xterm-scrollable-element > [role="presentation"] {
+  display: none;
+}
 </style>

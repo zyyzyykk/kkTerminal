@@ -29,4 +29,8 @@ public class EnvInfo {
 
     private String cooperateKey = null;
 
+    private Integer cols;
+
+    private Integer rows;
+
 }

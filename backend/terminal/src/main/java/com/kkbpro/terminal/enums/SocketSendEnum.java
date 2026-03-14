@@ -7,7 +7,7 @@ public enum SocketSendEnum {
 
     COOPERATE_KEY_INVALID(-2, "Cooperation Key is Invalid"),
 
-    CONNECT_FAIL(-1, "Fail to connect remote server"),
+    CONNECT_FAIL(-1, "Fail to connect remote server !"),
 
     CONNECT_SUCCESS(0, "Connecting success"),
 

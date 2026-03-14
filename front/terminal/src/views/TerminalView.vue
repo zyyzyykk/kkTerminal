@@ -247,10 +247,10 @@ import { ref, onMounted, onUnmounted, getCurrentInstance } from "vue";
 import { secretKeyGetter, aesEncrypt, aesDecrypt, rsaEncrypt } from "@/utils/Encrypt";
 import { ElMessage } from "element-plus";
 
-import { Terminal } from "xterm";
-import { FitAddon } from "xterm-addon-fit";
+import { Terminal } from "@xterm/xterm";
+import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
-import "xterm/css/xterm.css";
+import "@xterm/xterm/css/xterm.css";
 
 import { request } from "@/utils/Request";
 import { default_env } from "@/env/Env";
@@ -492,14 +492,13 @@ export default {
     // 初始化终端
     const terminal = ref();
     let term = null;
-    const isInputted = ref(false);
     const initTerminal = () => {
       term = new Terminal({
         convertEol: true,                                     // 设置光标为下一行开头
         scrollback: Number.MAX_SAFE_INTEGER,                  // 终端回滚量
         disableStdin: false,                                  // 是否禁用输入
         cursorStyle: env.value.cursorStyle,                   // 光标样式(默认block)
-        cursorInactiveStyle: 'outline',                       // 光标样式(失去焦点)
+        cursorInactiveStyle: env.value.cursorStyle === 'block' ? 'outline' : env.value.cursorStyle,   // 光标样式(失去焦点)
         cursorBlink: env.value.cursorBlink,                   // 光标是否闪烁
         theme: {
           foreground: env.value.fg,                           // 终端前景色
@@ -508,23 +507,23 @@ export default {
           selectionBackground: calcBgColor(env.value.bg),     // 选中文本背景色
         },
         lineHeight: 1.2,                                      // 文本行高
-        fontFamily: env.value.fontFamily,                     // 字体(默认Consolas)
+        fontFamily: env.value.fontFamily,                     // 字体(默认Courier New)
         fontSize: env.value.fontSize,                         // 字号(默认16)
       });
       term.loadAddon(fitAddon);
       term.loadAddon(webLinksAddon);
     };
 
-    // 终端视高自适应
+    // 终端窗口自适应
     const termFit = () => {
+      terminal.value.style.width = window.innerWidth + 'px';
       terminal.value.style.height = (window.innerHeight - (urlParams.value.mode !== 'headless' ? 25 : 0)) + 'px';
-      fitAddon.fit();
-      // 修改虚拟终端行列大小
-      if(socket.value && socket.value.readyState === WebSocket.OPEN && term) {
-        const newRows = fitAddon.proposeDimensions().rows;
-        const newCols = fitAddon.proposeDimensions().cols;
+      const newCols = fitAddon.proposeDimensions().cols;
+      const newRows = fitAddon.proposeDimensions().rows;
+      term.resize(newCols, newRows);
+      // 同步修改虚拟终端窗口大小
+      if(socket.value && socket.value.readyState === WebSocket.OPEN) {
         socket.value.send(aesEncrypt(JSON.stringify({type: 1, content: "", rows: newRows, cols: newCols}), secretKey.value));
-        term.resize(newCols, newRows);
       }
     };
     // 终端写入
@@ -581,14 +580,12 @@ export default {
       wsInfo.secretKey = rsaEncrypt(secretKey.value);
       wsInfo.envInfo = aesEncrypt(JSON.stringify({
         ...env.value,
-        cooperateKey: urlParams.value.cooperate
+        cooperateKey: urlParams.value.cooperate,
+        cols: term.cols,
+        rows: term.rows,
       }), secretKey.value);
       // ws连接
       socket.value = new WebSocket(ws_base_url + changeStr(aesEncrypt(JSON.stringify(wsInfo), secretKeyGetter.socket())));
-      // 连接建立
-      socket.value.onopen = () => {
-        termFit();
-      };
       // 接收消息
       socket.value.onmessage = resp => {
         const result = JSON.parse(resp.data);
@@ -611,9 +608,7 @@ export default {
         else if(result.code === 0) {
           term.clear();
           currentConnectStatus.value = connectStatusDict.value['Success'];
-          browser.setTimeout(() => {
-            termFit();
-          }, 1);
+          termFit();
           // 协作成功
           if(urlParams.value.cooperate) {
             termWrite(result.info + ".\n");
@@ -621,9 +616,9 @@ export default {
           }
           sshKey.value = aesDecrypt(result.data, secretKey.value);
           if(urlParams.value.cmd) {
-            // bash命令
+            // 执行bash命令
             if(urlParams.value.cmd.toLowerCase().startsWith('bash:')) sendMessage(urlParams.value.cmd.substring(5) + "\n");
-            // 命令代码命令
+            // 执行命令代码
             else if(urlParams.value.cmd.toLowerCase().startsWith('code:')) {
               browser.setTimeout(() => {
                 cmdcode.value = urlParams.value.cmd.substring(5);
@@ -723,11 +718,6 @@ export default {
     // 文本消息发送
     const sendMessage = (text, active=false) => {
       if(socket.value) {
-        // 第一次输入
-        if(!isInputted.value) {
-          termFit();
-          isInputted.value = true;
-        }
         // 禁止在执行命令代码工作流的过程中进行人为输入
         if(UserCmdCodeHelper.active === active) {
           socket.value.send(aesEncrypt(JSON.stringify({type: 0, content: text, rows: 0, cols: 0}), secretKey.value));
@@ -772,7 +762,6 @@ export default {
         terminal.value.removeEventListener('click', doClick);
       }
       terminal.value.innerHTML = '';
-      isInputted.value = false;
       loadEnv();
       initTerminal();
       term.open(terminal.value);
@@ -781,9 +770,9 @@ export default {
       // 支持中文输入
       terminal.value.addEventListener('compositionend', putChinese);
 
-      // 正常输入
-      term.onKey(e => {
-        sendMessage(e.key);
+      // 全部输入
+      term.onData(data => {
+        sendMessage(data);
       });
 
       // 监听选中文本，自动复制
@@ -1117,10 +1106,11 @@ export default {
     onMounted(async () => {
       // 启动终端
       resetTerminal();
+      // 监听窗口大小变化
+      listenResize();
 
       // 录像
       if(urlParams.value.record) {
-        listenResize();
         recordInfo.value = await cloudDownload('record-' + urlParams.value.record);
         if(recordInfo.value) playRecord(0);
         else termWrite('Record ID is Invalid.\r\n');
@@ -1129,8 +1119,6 @@ export default {
 
       // 连接服务器
       doSSHConnect();
-      // 监听窗口大小变化
-      listenResize();
       // 心跳
       doHeartBeat();
     });

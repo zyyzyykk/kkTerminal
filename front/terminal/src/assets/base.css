@@ -36,11 +36,11 @@ img {
 }
 
 /* 隐藏滚动条 */
-.no-scrollbar, .xterm-viewport {
+.no-scrollbar {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
 
-.no-scrollbar::-webkit-scrollbar, .xterm-viewport::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar {
   display: none !important;
 }

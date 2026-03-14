@@ -40,11 +40,11 @@ import "@/assets/base.css";
 // 防抖: 解决 ElTable 自动宽度高度导致的「ResizeObserver loop limit exceeded」问题
 const debounce = (fn, delay) => {
     let timer = null;
-    return function () {
+    return function() {
         const context = this;
         const args = arguments;
         clearTimeout(timer);
-        timer = browser.setTimeout(function () {
+        timer = browser.setTimeout(function() {
             fn.apply(context, args);
         }, delay);
     }

@@ -30,9 +30,7 @@ import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -80,6 +78,11 @@ public class WebSocketServer {
 
     private static AppConfig appConfig;
 
+    @Autowired
+    public void setAppConfig(AppConfig appConfig) {
+        WebSocketServer.appConfig = appConfig;
+    }
+
     @Getter
     private Session sessionSocket;
 
@@ -108,14 +111,8 @@ public class WebSocketServer {
 
     private Thread shellOutThread;
 
-    @Autowired
-    public void setAppConfig(AppConfig appConfig) {
-        WebSocketServer.appConfig = appConfig;
-    }
-
     @OnOpen
     public void onOpen(Session sessionSocket, @PathParam("ws") String wsInfoStr) throws Exception {
-
         // 获取加密密钥
         wsInfoStr = AESUtil.decrypt(StringUtil.changeStr(wsInfoStr), SOCKET_SECRET_KEY);
         JSONObject jsonObject = JSONObject.parseObject(wsInfoStr);
@@ -173,7 +170,7 @@ public class WebSocketServer {
             this.sshClient = SSHUtil.connectHost(envInfo);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
-            this.sendMessage("Fail to connect remote server !", ResultStatusEnum.WARNING.getStatus(),
+            this.sendMessage(SocketSendEnum.CONNECT_FAIL.getDesc(), ResultStatusEnum.WARNING.getStatus(),
                     SocketSendEnum.CONNECT_FAIL.getType(), null);
             return;
         }
@@ -187,12 +184,13 @@ public class WebSocketServer {
             this.sshClient.setRemoteCharset(this.serverCharset);
         }
 
-        // 开启交互终端和SFTP
+        // 开启交互Shell和SFTP
         net.schmizz.sshj.connection.channel.direct.Session sshSession = this.sshClient.startSession();
-        sshSession.allocateDefaultPTY();
+        sshSession.allocatePTY("xterm-256color", envInfo.getCols(), envInfo.getRows(), 0, 0, Collections.emptyMap());
+        this.shell = (net.schmizz.sshj.connection.channel.direct.Session.Shell) sshSession.exec("exec -a -bash /bin/bash -il");
         this.sftpClient = this.sshClient.newSFTPClient();
 
-        // 生成唯一标识
+        // 生成sshKey
         this.sshKey = envInfo.getLang() + "-" + this.serverCharset.name().replace("-","@") + "-" + UUID.randomUUID();
         this.sendMessage("SSHKey", ResultStatusEnum.SUCCESS.getStatus(),
                 SocketSendEnum.CONNECT_SUCCESS.getType(), this.sshKey);
@@ -207,7 +205,6 @@ public class WebSocketServer {
         // 生成横幅艺术字
         String banner = appConfig.getBanner();
         String bannerArt = FigletFont.convertOneLine(banner);
-
         // 分割成多行
         String[] asciiArts = bannerArt.split("\n");
         for (String asciiArt : asciiArts) {
@@ -215,7 +212,6 @@ public class WebSocketServer {
                     SocketSendEnum.OUT_TEXT.getType(), asciiArt + "\r\n");
         }
 
-        this.shell = sshSession.startShell();
         this.shellInputStream = this.shell.getInputStream();
         this.shellOutputStream = this.shell.getOutputStream();
         this.shellOutThread = Thread.ofVirtual().start(() -> {
@@ -335,7 +331,7 @@ public class WebSocketServer {
 
         // 修改虚拟终端窗口大小
         if (SocketMessageEnum.SIZE_CHANGE.getType().equals(messageInfo.getType())) {
-            this.shell.changeWindowDimensions(messageInfo.getCols(),messageInfo.getRows(),0,0);
+            this.shell.changeWindowDimensions(messageInfo.getCols(), messageInfo.getRows(), 0, 0);
         }
 
         // 文本命令
@@ -355,7 +351,6 @@ public class WebSocketServer {
                         SocketSendEnum.COOPERATE_NUMBER_UPDATE.getType(), Integer.toString(slaveSockets.size()));
             }
         }
-
     }
 
     @OnError
@@ -365,7 +360,6 @@ public class WebSocketServer {
 
     // 向Client发送信息
     public void sendMessage(String message, String type, Integer code, String data) {
-
         synchronized (this.sessionSocket) {
             try {
                 Result result;

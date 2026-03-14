@@ -16,8 +16,8 @@ public class MessageInfo {
 
     private String content;
 
-    private Integer rows;
-
     private Integer cols;
+
+    private Integer rows;
 
 }
