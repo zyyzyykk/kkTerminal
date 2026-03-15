@@ -2,7 +2,7 @@
 <configuration>
 
     <!--日志文件保存路径和名称-->
-    <property name="LOG_PATH" value="log"/>
+    <property name="LOG_PATH" value="./data/log"/>
     <property name="APP_NAME" value="kkTerminal"/>
 
     <!--控制台日志-->

@@ -27,7 +27,7 @@ import java.time.temporal.ChronoUnit;
 @RequestMapping(Constant.API_PREFIX + "/cloud")
 public class CloudController {
 
-    private static final String cloudBasePath = System.getProperty("user.dir") + "/" + "cloud";
+    private static final String cloudBasePath = System.getProperty("user.dir") + "/" + "data" + "/" + "cloud";
 
     private static final String countType = "record-";
 

@@ -20,40 +20,33 @@
     <div v-if="urlParams.mode !== 'headless'" class="kk-flex bar" >
       <img class="logo no-select" src="@/assets/terminal.svg" alt="terminal"
            @click="isShowSetting = !isShowSetting; isShowAdvance = false; showAdvance(false);" >
-      <div class="ellipsis no-select" style="font-size: 14px;" >kk Terminal</div>
+      <div class="ellipsis no-select" style="font-size: 14px; margin-right: 10px;" >kk Terminal</div>
       <div style="flex: 1;" ></div>
       <div v-show="urlParams.mode !== 'headless' && urlParams.mode !== 'pure'" class="kk-flex" >
-        <div v-if="cooperating" class="bar-tag" >
-          <el-tag size="small" @click="endCooperateConfirm" :type="calcType(onlineNumber, maxNumber)" effect="plain" >
-            <div class="kk-flex no-select" >
-              <el-icon class="el-icon--left" style="font-size: 18px;" ><UserFilled /></el-icon>
-              <div>{{ onlineNumber }}</div>
-            </div>
-          </el-tag>
+        <div v-if="env.cloud" class="bar-tab no-select" >
+          <el-icon @click="startRecord" v-if="!recording" style="font-size: 20px; color: #909399;" ><VideoPlay /></el-icon>
+          <el-icon @click="stopRecord" v-else style="font-size: 20px; color: #f56c6c;" ><VideoPause /></el-icon>
         </div>
-        <div v-if="env.cloud" class="bar-tag" >
-          <el-tag @click="recording ? stopRecord() : startRecord()" size="small" :type="recording ? 'danger' : 'info'" effect="plain" >
-            <div v-if="!recording" class="kk-flex no-select" style="color: #313131;" >
-              <el-icon class="el-icon--left" style="font-size: 18px;" ><VideoPlay /></el-icon>
-              <div>{{ $t('开始录制') }}</div>
-            </div>
-            <div v-else class="kk-flex no-select" >
-              <el-icon class="el-icon--left" style="font-size: 18px;" ><VideoPause /></el-icon>
-              <div>{{ $t('录制中') }}</div>
-            </div>
-          </el-tag>
+        <div v-if="env.cloud" class="bar-tab no-select" >
+          <el-icon @click="cloudSync" style="font-size: 20px; color: #909399;" ><ChromeFilled /></el-icon>
         </div>
-        <div v-if="env.cloud" class="bar-tag" >
-          <el-tag @click="cloudSync" size="small" type="info" effect="plain" >
-            <div class="kk-flex no-select" style="color: #313131;" >
-              <el-icon class="el-icon--left" style="font-size: 18px;" ><ChromeFilled /></el-icon>
-              <div>{{ $t('多端同步') }}</div>
-            </div>
-          </el-tag>
+        <div v-if="env.advance" class="bar-tab no-select" >
+          <el-tooltip :disabled="!cooperating" :content="onlineNumber" placement="bottom" :show-after="300" >
+            <el-icon v-if="!cooperating" @click="doSettings(6)" style="font-size: 20px; color: #909399;" ><UserFilled /></el-icon>
+            <el-icon v-else-if="calcType(onlineNumber, maxNumber) === 'success'" @click="doSettings(6)" style="font-size: 20px; color: #67c23a;" ><UserFilled /></el-icon>
+            <el-icon v-else-if="calcType(onlineNumber, maxNumber) === 'warning'" @click="doSettings(6)" style="font-size: 20px; color: #e6a23c;" ><UserFilled /></el-icon>
+            <el-icon v-else @click="doSettings(6)" style="font-size: 20px; color: #f56c6c;" ><UserFilled /></el-icon>
+          </el-tooltip>
         </div>
-        <el-dropdown v-if="env.transport" @visible-change="changeDropdownShowStatus" class="bar-tag no-select" hide-timeout="300" trigger="click" >
-          <el-badge :hidden="isShowDropdown || !isShowDot" :is-dot="true" :offset="[0, 4]" >
-            <span @click="isShowDot = false;" ><img src="@/assets/transport.svg" alt="transport" style="height: 20px;" ></span>
+        <div v-if="env.advance" class="bar-tab no-select" >
+          <img @click="doSettings(7)" src="@/assets/monitor.svg" alt="monitor" style="height: 18px;" >
+        </div>
+        <div v-if="env.advance" class="bar-tab no-select" >
+          <img @click="doSettings(8)" src="@/assets/docker.svg" alt="docker" style="height: 18px;" >
+        </div>
+        <el-dropdown v-if="env.transport" @visible-change="changeDropdownShowStatus" class="bar-tab no-select" hide-timeout="300" trigger="click" >
+          <el-badge :hidden="isShowDropdown || !isShowDot" :is-dot="true" :offset="[0, 2]" >
+            <span @click="isShowDot = false;" ><img src="@/assets/transport.svg" alt="transport" style="height: 18px;" ></span>
           </el-badge>
           <template #dropdown>
             <el-card class="no-select" style="width: 512px;" :body-style="{padding: '5px 5px'}" >
@@ -356,6 +349,11 @@ export default {
     const recordId = ref('');
     const recordInfo = ref([]);
     const startRecord = () => {
+      ElMessage({
+        message: i18n.global.t('操作录像开始'),
+        type: 'success',
+        grouping: true,
+      });
       recordId.value = crypto.randomUUID();
       recordInfo.value = [];
       recordInfo.value.push({
@@ -831,7 +829,8 @@ export default {
       else if(type === 6) {
         if(!(sshKey.value && env.value.advance)) return;
         showSettings(false);
-        cooperateGenRef.value.DialogVisible = true;
+        if(!cooperating.value) cooperateGenRef.value.DialogVisible = true;
+        else endCooperateConfirm();
       }
       // 监控
       else if(type === 7) {
@@ -1229,9 +1228,10 @@ export default {
   border-right: 1px solid #d7d7d7;
 }
 
-.bar-tag {
+.bar-tab {
   margin-right: 10px;
   cursor: pointer;
+  display: inline-flex;
 }
 
 .logo {

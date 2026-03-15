@@ -11,7 +11,7 @@ import java.util.List;
 
 public class FileUtil {
 
-    public static final String tempBasePath = System.getProperty("user.dir") + "/" + "temp";
+    public static final String tempBasePath = System.getProperty("user.dir") + "/" + "data" + "/" + "temp";
 
     /**
      * 获取文件

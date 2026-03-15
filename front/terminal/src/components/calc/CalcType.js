@@ -8,13 +8,13 @@ export const calcType = (a, b) => {
     else return typeArr[2];
 };
 
-const statuArr = ["#5fcb71", "#dca550", "#eb5851"];
+const statusArr = ["#67c23a", "#e6a23c", "#f56c6c"];
 
 export const calcStatus = (str) => {
     const num = calcNumber(str);
-    if(num < 33.4) return statuArr[0];
-    else if(num < 66.7) return statuArr[1];
-    else return statuArr[2];
+    if(num < 33.4) return statusArr[0];
+    else if(num < 66.7) return statusArr[1];
+    else return statusArr[2];
 };
 
 export const calcNumber = (str, fixed=1) => {

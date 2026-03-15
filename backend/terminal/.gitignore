@@ -34,6 +34,4 @@ build/
 
 
 ### Java ###
-temp/
-cloud/
-log/
+data/

@@ -105,7 +105,7 @@
                 <div style="margin-left: 8px;" >{{ $t('返回') }}</div>
               </div>
               <div class="kk-border" ></div>
-              <div style="padding: 0 120px;" >
+              <div style="padding: 0 100px;" >
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('镜像') }}</div>
                   <div class="kk-flex" style="flex: 1;" >
@@ -123,25 +123,25 @@
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('端口映射') }}</div>
                   <div style="flex: 1;" >
-                    <el-input v-model="deployInfo.portMapping" class="w-50 m-2" :placeholder="$t('每行一个，主机端口:容器端口')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
+                    <el-input v-model="deployInfo.portMapping" class="w-50 m-2" :placeholder="$t('每行一个，<主机端口>:<容器端口>')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
                   </div>
                 </div>
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('环境变量') }}</div>
                   <div style="flex: 1;" >
-                    <el-input v-model="deployInfo.envVars" class="w-50 m-2" :placeholder="$t('每行一个，环境变量名=值')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
+                    <el-input v-model="deployInfo.envVars" class="w-50 m-2" :placeholder="$t('每行一个，<环境变量名>=<值>')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
                   </div>
                 </div>
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('数据卷挂载') }}</div>
                   <div style="flex: 1;" >
-                    <el-input v-model="deployInfo.volumeMounting" class="w-50 m-2" :placeholder="$t('每行一个，主机路径:容器路径')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
+                    <el-input v-model="deployInfo.volumeMounting" class="w-50 m-2" :placeholder="$t('每行一个，<主机路径>:<容器路径>')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
                   </div>
                 </div>
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('其它命令选项') }}</div>
                   <div style="flex: 1;" >
-                    <el-input v-model="deployInfo.paramOptions" class="w-50 m-2" :placeholder="$t('每行一个，-命令选项 值')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
+                    <el-input v-model="deployInfo.paramOptions" class="w-50 m-2" :placeholder="$t('每行一个，-<命令选项> <值>')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
                   </div>
                 </div>
                 <div style="height: 10px;" ></div>

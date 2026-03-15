@@ -83,30 +83,30 @@
       <div class="kk-flex item-class" >
         <div class="form-width" >{{ $t('标签') }}{{ $t('：') }}</div>
         <div class="kk-flex" >
-          <div class="form-width-item1" >{{ $t('命令代码') }}</div>
+          <div class="form-width-item1" >{{ $t('多端同步') }}</div>
           <div class="func-switch" >
-            <el-switch v-model="setInfo.cmdcode" />
+            <el-switch v-model="setInfo.cloud" />
           </div>
         </div>
         <div class="kk-flex" >
-          <div class="form-width-item2" >{{ $t('多端同步') }}</div>
+          <div class="form-width-item2" >{{ $t('高级功能') }}</div>
           <div class="func-switch" >
-            <el-switch v-model="setInfo.cloud" />
+            <el-switch v-model="setInfo.advance" />
           </div>
         </div>
       </div>
       <div class="kk-flex item-class" >
         <div class="form-width" ></div>
         <div class="kk-flex" >
-          <div class="form-width-item1" >{{ $t('高级功能') }}</div>
+          <div class="form-width-item1" >{{ $t('传输列表') }}</div>
           <div class="func-switch" >
-            <el-switch v-model="setInfo.advance" />
+            <el-switch v-model="setInfo.transport" />
           </div>
         </div>
         <div class="kk-flex" >
-          <div class="form-width-item2" >{{ $t('传输列表') }}</div>
+          <div class="form-width-item2" >{{ $t('命令代码') }}</div>
           <div class="func-switch" >
-            <el-switch v-model="setInfo.transport" />
+            <el-switch v-model="setInfo.cmdcode" />
           </div>
         </div>
       </div>
