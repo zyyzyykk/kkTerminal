@@ -357,5 +357,6 @@ export default {
 .form-width {
   text-align: left;
   width: 80px;
+  min-width: 80px;
 }
 </style>

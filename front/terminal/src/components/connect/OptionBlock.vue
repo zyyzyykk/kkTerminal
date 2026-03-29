@@ -144,9 +144,8 @@ export default {
 }
 
 .container {
-  height: 30vh;
+  height: 186px;
   overflow-y: scroll;
   width: 100%;
-  border-bottom: 1px solid #ececec;
 }
 </style>

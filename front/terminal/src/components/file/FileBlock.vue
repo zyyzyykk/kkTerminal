@@ -15,54 +15,110 @@
     >
       <div>
         <div class="title kk-flex ellipsis" >
-          <div class="ellipsis" style="flex: 1; line-height: 18px;" >
-            <div v-if="isShowDirInput" >
-              <el-input id="aimDirInput" v-model="dir" :placeholder="$t('输入目录路径')" size="small" @keydown.enter="isShowDirInput = false;" @blur="isShowDirInput = false;" @mousedown.stop @dblclick.stop @change="dirInputCallback" />
-            </div>
-            <div class="kk-flex ellipsis no-select" style="line-height: 18px;" v-else @click="doShowDirInput" >
-              <div class="kk-flex" >
-                <el-icon style="font-size: 16px;" ><Monitor /></el-icon>
-                <el-icon class="dir-level" @click="changeDirByLevel($event,-1)" ><ArrowRight /></el-icon>
-              </div>
-              <div v-for="(item, index) in dirLevels" :key="index" class="kk-flex" >
-                <div>{{ item }}</div>
-                <el-icon class="dir-level" @click="changeDirByLevel($event,index)" ><ArrowRight /></el-icon>
-              </div>
-            </div>
-          </div>
-          <div class="kk-flex" >
-            <el-icon class="hover-class operate-icon" @click="doRefresh" ><Refresh /></el-icon>
-            <el-icon v-if="dir && dir !== '/'" class="hover-class operate-icon" @click="doReturn" ><Fold /></el-icon>
-            <el-icon v-else class="disabled-function operate-icon" ><Fold /></el-icon>
-            <el-icon v-if="selectedFiles.length === 1" class="hover-class operate-icon" @click="doDownload" ><Download /></el-icon>
-            <el-icon v-else class="disabled-function operate-icon" ><Download /></el-icon>
-            <el-dropdown v-if="dirStatus === 0" class="hover-class operate-icon"
-                         v-show="DialogVisible" style="line-height: unset;" placement="bottom-end" size="small" trigger="click" >
-              <el-icon class="hover-class" style="font-size: 18px; cursor: pointer;" ><Upload /></el-icon>
-              <template #dropdown>
-                <el-dropdown-menu v-show="DialogVisible" class="no-select" style="text-align: center;" >
-                  <el-dropdown-item @click="fileUploadTypeChoose(0)" >
-                    <div class="kk-flex" >
-                      <el-icon><DocumentAdd /></el-icon>
-                      <div>{{ $t('文件') }}</div>
-                    </div>
-                  </el-dropdown-item>
-                  <el-dropdown-item @click="fileUploadTypeChoose(1)" >
-                    <div class="kk-flex" >
-                      <el-icon><FolderAdd /></el-icon>
-                      <div>{{ $t('文件夹') }}</div>
-                    </div>
-                  </el-dropdown-item>
-                  <el-dropdown-item @click="fileUploadTypeChoose(2)" >
-                    <div class="kk-flex" >
-                      <el-icon><Link /></el-icon>
-                      <div>URL</div>
-                    </div>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
+          <div v-if="isShowDirInput" style="width: 100%; margin: 1px 0;" >
+            <el-autocomplete id="aimDirInput" v-model="dir" :placeholder="$t('输入目录路径')" placement="bottom" popper-class="kk-autocomplete"
+                             :trigger-on-focus="false" :fetch-suggestions="doCompgen" :debounce="400" fit-input-width
+                             @keydown.enter="dirInputCallback" @blur="dirInputCallback" @mousedown.stop @dblclick.stop >
+              <template #default="{ item }">
+                <div class="ellipsis" >
+                  <ToolTip :isShow="DialogVisible && isShowDirInput" :content="item.value" :parentStyle="{ width: '100%' }" >
+                    <template #content>
+                      <div class="ellipsis" >{{ item.value }}</div>
+                    </template>
+                  </ToolTip>
+                </div>
               </template>
-            </el-dropdown>
-            <el-icon v-else class="disabled-function operate-icon" ><Upload /></el-icon>
+              <template #loading>
+                <div style="height: 100%;" :element-loading-text="$t('加载中...')" v-loading="true" ></div>
+              </template>
+            </el-autocomplete>
+          </div>
+          <div v-else class="kk-flex" style="width: 100%; border: 1px solid #efefef;" >
+            <button ref="closeDropdownButtonRef" style="display: none;" ></button>
+            <div id="dirLevelBar" class="kk-flex level-class no-scrollbar no-select" @click="doShowDirInput" @scroll="handleScroll" >
+              <div class="kk-flex" >
+                <el-button @click="changeDirByLevel($event, -1)" text class="text-button" ><el-icon style="font-size: 16px;" ><Monitor /></el-icon></el-button>
+                <el-dropdown v-show="DialogVisible && !isShowDirInput" placement="bottom-start" size="small" trigger="click" >
+                  <el-button @click="getDirFolders(changeDirByLevel($event, -1, false))" text class="icon-button" ><el-icon><ArrowRight /></el-icon></el-button>
+                  <template #dropdown>
+                    <div :element-loading-text="$t('加载中...')" v-loading="folderLoading" >
+                      <div v-if="folderItems.length > 0" class="folder-list" >
+                        <div v-for="(item, index) in folderItems" :key="index" >
+                          <el-dropdown-item @click="changeDir(folderDir + item)" >
+                            <ToolTip :isShow="DialogVisible && !isShowDirInput" :content="item" >
+                              <template #content>
+                                <div class="ellipsis" >{{ item }}</div>
+                              </template>
+                            </ToolTip>
+                          </el-dropdown-item>
+                        </div>
+                      </div>
+                      <div v-else style="width: 120px; height: 128px;" >
+                        <NoData height="128px" imgWidth="64px" msgSize="12px" v-if="!folderLoading" :msg="i18n.global.k('暂无文件夹')" ></NoData>
+                      </div>
+                    </div>
+                  </template>
+                </el-dropdown>
+              </div>
+              <div class="kk-flex" v-for="(item, index) in dirLevels" :key="index" >
+                <el-button @click="changeDirByLevel($event, index)" text class="text-button" >{{ item }}</el-button>
+                <el-dropdown v-show="DialogVisible && !isShowDirInput" placement="bottom-start" size="small" trigger="click" >
+                  <el-button @click="getDirFolders(changeDirByLevel($event, index, false))" text class="icon-button" ><el-icon><ArrowRight /></el-icon></el-button>
+                  <template #dropdown>
+                    <div :element-loading-text="$t('加载中...')" v-loading="folderLoading" >
+                      <div v-if="folderItems.length > 0" class="folder-list" >
+                        <div v-for="(item, index) in folderItems" :key="index" >
+                          <el-dropdown-item @click="changeDir(folderDir + '/' + item)" >
+                            <ToolTip :isShow="DialogVisible && !isShowDirInput" :content="item" >
+                              <template #content>
+                                <div class="ellipsis" >{{ item }}</div>
+                              </template>
+                            </ToolTip>
+                          </el-dropdown-item>
+                        </div>
+                      </div>
+                      <div v-else style="width: 120px; height: 128px;" >
+                        <NoData height="128px" imgWidth="64px" msgSize="12px" v-if="!folderLoading" :msg="i18n.global.k('暂无文件夹')" ></NoData>
+                      </div>
+                    </div>
+                  </template>
+                </el-dropdown>
+              </div>
+            </div>
+            <div class="kk-flex" >
+              <el-button @click="doShowDirInput" text class="operator-button" ><el-icon style="font-size: 16px;" ><Edit /></el-icon></el-button>
+              <el-button @click="doRefresh" text class="operator-button" ><el-icon style="font-size: 16px;" ><Refresh /></el-icon></el-button>
+              <el-button v-if="dir && dir !== '/'" @click="doReturn" text class="operator-button" ><el-icon style="font-size: 16px;" ><Fold /></el-icon></el-button>
+              <el-button v-else :disabled="true" text class="operator-button" ><el-icon style="font-size: 16px;" ><Fold /></el-icon></el-button>
+              <el-button v-if="selectedFiles.length === 1" @click="doDownload" text class="operator-button" ><el-icon style="font-size: 16px;" ><Download /></el-icon></el-button>
+              <el-button v-else :disabled="true" text class="operator-button" ><el-icon style="font-size: 16px;" ><Download /></el-icon></el-button>
+              <el-dropdown v-if="dirStatus === 0" v-show="DialogVisible" placement="bottom-end" trigger="click" >
+                <el-button text class="operator-button" ><el-icon style="font-size: 16px;" ><Upload /></el-icon></el-button>
+                <template #dropdown>
+                  <el-dropdown-menu v-show="DialogVisible" class="no-select" style="text-align: center;" >
+                    <el-dropdown-item @click="fileUploadTypeChoose(0)" >
+                      <div class="kk-flex" >
+                        <el-icon><DocumentAdd /></el-icon>
+                        <div>{{ $t('文件') }}</div>
+                      </div>
+                    </el-dropdown-item>
+                    <el-dropdown-item @click="fileUploadTypeChoose(1)" >
+                      <div class="kk-flex" >
+                        <el-icon><FolderAdd /></el-icon>
+                        <div>{{ $t('文件夹') }}</div>
+                      </div>
+                    </el-dropdown-item>
+                    <el-dropdown-item @click="fileUploadTypeChoose(2)" >
+                      <div class="kk-flex" >
+                        <el-icon><Link /></el-icon>
+                        <div>URL</div>
+                      </div>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+              <el-button v-else :disabled="true" text class="operator-button" ><el-icon style="font-size: 16px;" ><Upload /></el-icon></el-button>
+            </div>
           </div>
         </div>
         <div id="fileArea" ref="fileAreaRef" :element-loading-text="$t('加载中...')" v-loading="loading" class="list-class no-select"
@@ -77,7 +133,7 @@
                   <div style="margin: 0 10px;" v-if="isShowRenameInput && renameFile && item.id === renameFile.id" >
                     <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                   </div>
-                  <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
+                  <ToolTip :isShow="!isShowMenu" :content="item.name" >
                     <template #content>
                       <div v-if="!(isShowRenameInput && renameFile && item.id === renameFile.id)" class="ellipsis" style="margin: 0 10px; line-height: 18px;" >
                         {{ item.name }}
@@ -92,7 +148,7 @@
                   <div style="margin: 0 10px;" v-if="isShowRenameInput && renameFile && item.id === renameFile.id" >
                     <el-input id="rename" v-model="renameFile.name" placeholder="" size="small" @keydown.enter="isShowRenameInput = false;" @blur="isShowRenameInput = false;" @keydown.stop @contextmenu.stop @mousedown.stop @dblclick.stop @change="handleRename(item)" />
                   </div>
-                  <ToolTip :isShow="!isShowMenu" :content="item.name" :delay="1000" >
+                  <ToolTip :isShow="!isShowMenu" :content="item.name" >
                     <template #content>
                       <div v-if="!(isShowRenameInput && renameFile && item.id === renameFile.id)" class="ellipsis" style="margin: 0 10px; line-height: 18px;" >
                         {{ item.name }}
@@ -171,7 +227,7 @@ import { request } from "@/utils/Request";
 import { ElMessage } from "element-plus";
 import { deleteDialog } from "@/components/common/DeleteDialog";
 import { http_base_url } from "@/env/Base";
-import { Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link, ArrowRight, Monitor } from "@element-plus/icons-vue";
+import { Edit, Refresh, Fold, Download, Upload, DocumentAdd, FolderAdd, Link, ArrowRight, Monitor } from "@element-plus/icons-vue";
 import { escapeItem, escapePath, osFileNaturalSort } from "@/utils/String";
 import { isZipFile } from "@/components/preview/FileSuffix";
 import { getChmodValue } from "@/components/calc/CalcPriority";
@@ -199,6 +255,7 @@ export default {
     MkFile,
     FileAttr,
     FileUrl,
+    Edit,
     Refresh,
     Fold,
     Download,
@@ -280,7 +337,8 @@ export default {
     const dirLevels = ref([]);
     // 保证路径正确
     const confirmDirCorrect = () => {
-      if(dir.value === '' || dir.value[0] !== '/') dir.value = '/' + dir.value;
+      if(dir.value === '') dir.value = homeDir.value;
+      if(dir.value[0] !== '/') dir.value = '/' + dir.value;
       if(dir.value[dir.value.length - 1] !== '/') dir.value = dir.value + '/';
       dir.value = dir.value.replace(/\/{2,}/g, '/');
       // 更新路径显示
@@ -290,7 +348,7 @@ export default {
       if(fullPath === '/') dirLevels.value = [];
       else dirLevels.value = fullPath.substring(1, fullPath.length - 1).split('/');
     };
-    const changeDirByLevel = (event, index) => {
+    const changeDirByLevel = (event, index, change=true) => {
       stopEvent(event);
       let aimDir = '';
       for(let i=0;i<=index;i++) {
@@ -298,12 +356,14 @@ export default {
         aimDir += dirLevels.value[i];
       }
       aimDir += '/';
-      changeDir(aimDir);
+      if(change) changeDir(aimDir);
+      return aimDir;
     };
 
     // 获取初始家目录
     const isShowDirInput = ref(false);
-    const getInitDir = () => {
+    const homeDir = ref('');
+    const getHomeDir = () => {
       if(dir.value) return;
       request({
         url: http_base_url + '/file/home',
@@ -315,13 +375,14 @@ export default {
           if(resp.status === 'success') {
             noDataMsg.value = i18n.global.k('暂无文件');
             dirStatus.value = 0;
-            dir.value = resp.data;
+            homeDir.value = resp.data;
+            dir.value = homeDir.value;
             confirmDirCorrect();
             selectedFiles.value = [];
             files.value = [];
             getDirList();
             // 预留值
-            CmdCodeReservedVarsSetter('home', dir.value);
+            CmdCodeReservedVarsSetter('home', homeDir.value);
           }
           else {
             noDataMsg.value = resp.info;
@@ -332,18 +393,68 @@ export default {
       });
     };
 
-    // 获取当前路径下的文件列表
+    // 文件名称补全
+    const doCompgen = (queryString, callback) => {
+      const currentDir = dir.value;
+      request({
+        url: http_base_url + '/file/compgen',
+        type: 'get',
+        data: {
+          sshKey: props.sshKey,
+          path: currentDir,
+        },
+        success(resp) {
+          if(currentDir === dir.value) {
+            if(resp.status === 'success') {
+              if(!isShowDirInput.value) return;
+              const compgenItems = resp.data.split('|').filter(Boolean)
+                  .filter(item => item.toLowerCase().startsWith(queryString.toLowerCase()))
+                  .map(item => {return { value: item }});
+              callback(compgenItems);
+            }
+          }
+        },
+      });
+    };
+    // ls文件夹
+    const folderDir = ref('');
+    const folderItems = ref([]);
+    const folderLoading = ref(true);
+    const getDirFolders = (path) => {
+      folderDir.value = path;
+      const currentFolder = folderDir.value;
+      request({
+        url: http_base_url + '/file/ls/folders',
+        type: 'get',
+        data: {
+          sshKey: props.sshKey,
+          path: currentFolder,
+        },
+        beforeSend() {      // 发送请求前执行的方法
+          folderLoading.value = true;
+          folderItems.value = [];
+        },
+        success(resp) {
+          if(currentFolder === folderDir.value) {
+            if(resp.status === 'success') {
+              folderItems.value = resp.data.split('/').filter(Boolean);
+            }
+            folderLoading.value = false;
+          }
+        },
+      });
+    };
+    // ls所有文件
+    const dirStatus = ref(0);   // 目录状态: 0 正常 / 1 目录不存在、无权限等
     const noDataMsg = ref(i18n.global.k('暂无文件'));
-    // 目录状态: 0 正常 / 1 目录不存在、无权限等
-    const dirStatus = ref(0);
     const getDirList = async () => {
       if(!dir.value) {
-        getInitDir();
+        getHomeDir();
         return;
       }
       const currentDir = dir.value;
       await request({
-        url: http_base_url + '/file/ls',
+        url: http_base_url + '/file/ls/all',
         type: 'get',
         data: {
           sshKey: props.sshKey,
@@ -357,7 +468,9 @@ export default {
           if(currentDir === dir.value) {
             selectedFiles.value = [];
             if(resp.status === 'success') {
-              files.value = osFileNaturalSort(resp.data);
+              dir.value = resp.data.path;
+              confirmDirCorrect();
+              files.value = osFileNaturalSort(resp.data.fileInfoList);
               noDataMsg.value = i18n.global.k('暂无文件');
               dirStatus.value = 0;
               lastSelectedIndex = -1;
@@ -365,6 +478,7 @@ export default {
                 fileAreaRef.value.tabindex = '0';
                 fileAreaRef.value.focus();
               }, 1);
+              if(resp.data.fileName) preViewFile(resp.data.fileName);
               if(fileAttrRef.value && fileAttrRef.value.DialogVisible) {
                 const currentFileInfo = getFileInfoByName(fileAttrRef.value.fileInfo.name);
                 if(currentFileInfo) {
@@ -389,11 +503,9 @@ export default {
                 fileAreaRef.value.focus();
               }, 1);
             }
+            loading.value = false;
           }
         },
-        complete() {        // 发送请求完成后执行的方法
-          if(currentDir === dir.value) loading.value = false;
-        }
       });
     };
     const fileBlockView = async (path, name) => {
@@ -438,9 +550,7 @@ export default {
     const changeDir = (new_dir) => {
       if(isShowDirInput.value) return;
       dir.value = new_dir;
-      confirmDirCorrect();
-      selectedFiles.value = [];
-      getDirList();
+      dirInputCallback();
     };
 
     // 更改路径回调
@@ -449,6 +559,10 @@ export default {
       confirmDirCorrect();
       selectedFiles.value = [];
       getDirList();
+      browser.setTimeout(() => {
+        const element = document.querySelector('#dirLevelBar');
+        if(element) element.scrollLeft = element.scrollWidth;
+      }, 1);
     };
 
     // 刷新文件列表
@@ -459,13 +573,12 @@ export default {
     // 返回上一级
     const doReturn = () => {
       if(isShowDirInput.value) return;
-      if(dir.value === '/') return;
-      if(dir.value[dir.value.length - 1] === '/') dir.value = dir.value.substring(0,dir.value.length - 1);
-      const index = dir.value.lastIndexOf('/');
-      if(index !== -1) dir.value = dir.value.substring(0, index + 1);
-      confirmDirCorrect();
-      selectedFiles.value = [];
-      doRefresh();
+      let currentDir = dir.value;
+      if(currentDir === '/') return;
+      if(currentDir[currentDir.length - 1] === '/') currentDir = currentDir.substring(0, currentDir.length - 1);
+      const index = currentDir.lastIndexOf('/');
+      if(index !== -1) currentDir = currentDir.substring(0, index + 1);
+      changeDir(currentDir);
     };
     // 下载文件/文件夹
     const doDownload = () => {
@@ -866,9 +979,11 @@ export default {
         isShowPop.value = false;
       }
     };
+    const closeDropdownButtonRef = ref();
     const handleScroll = () => {
       isShowMenu.value = false;
       isShowPop.value = false;
+      if(closeDropdownButtonRef.value) closeDropdownButtonRef.value.click();
     };
     const menuBlockRef = ref();
     // 右键显示
@@ -943,7 +1058,7 @@ export default {
       isShowPop.value = false;
       if(selectedFiles.value.length === 0) return;
       request({
-        url: http_base_url + '/file/rm-rf',
+        url: http_base_url + '/file/rm',
         type: 'post',
         data: {
           sshKey: props.sshKey,
@@ -1279,6 +1394,10 @@ export default {
         loading.value = true;
         files.value = [];
         dir.value = '';
+        homeDir.value = '';
+        folderLoading.value = true;
+        folderItems.value = [];
+        folderDir.value = '';
         dirLevels.value = [];
         isShowDirInput.value = false;
         noDataMsg.value = i18n.global.k('暂无文件');
@@ -1348,18 +1467,24 @@ export default {
     });
 
     return {
+      i18n,
       DialogVisible,
       isShowDirInput,
       confirmDirCorrect,
       dir,
       files,
-      getInitDir,
+      getHomeDir,
+      folderDir,
+      folderItems,
+      folderLoading,
+      getDirFolders,
       getDirList,
       fileBlockView,
       downloadRemoteFile,
       downloadDir,
       changeDir,
       dirInputCallback,
+      doCompgen,
       noDataMsg,
       doRefresh,
       doReturn,
@@ -1375,6 +1500,7 @@ export default {
       isShowMenu,
       stopEvent,
       handleFileDrag,
+      closeDropdownButtonRef,
       handleScroll,
       handleContextMenu,
       handleClick,
@@ -1418,11 +1544,31 @@ export default {
 
 <style scoped>
 .title {
-  height: 32px;
-  font-size: 13px;
-  padding: 4px 10px;
+  font-size: 14px;
   margin-bottom: 15px;
-  background-color: #efefef;
+}
+
+.icon-button {
+  padding: 0 2px;
+}
+
+.text-button {
+  padding: 0 8px;
+}
+
+.operator-button {
+  padding: 0 6px;
+}
+
+.level-class {
+  flex: 1;
+  overflow-x: scroll;
+}
+
+.folder-list {
+  width: 120px;
+  max-height: 192px;
+  overflow-y: scroll;
 }
 
 .kk-flex {
@@ -1450,19 +1596,9 @@ export default {
   background-color: #f3f3f3;
 }
 
-.operate-icon {
-  margin-left: 10px;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.hover-class:hover {
-  color: #409eff;
-}
-
 .item-selected {
   background-color: #efefef !important;
-  border-bottom: 1px solid #d8d8d8;
+  border-bottom: 1px solid #e8e8e8;
 }
 
 .kk-menu {
@@ -1496,25 +1632,30 @@ export default {
   background-color: #f5f7fa;
 }
 
-.disabled-function {
-  color: #a8abb2;
-  pointer-events: none;
-}
-
+/* 定位删除确认框 */
 .confirmPop {
-  /* 定位删除确认框 */
   user-select: none;
 }
+</style>
 
-.dir-level {
-  margin: 0 5px;
-  border: 1px solid #efefef;
-  height: 20px;
+<style>
+.kk-autocomplete .el-autocomplete-suggestion__wrap {
+  padding: 0 0;
 }
 
-.dir-level:hover {
-  text-decoration: none;
-  border: 1px solid var(--link);
-  cursor: pointer;
+.kk-autocomplete ul {
+  max-height: 160px;
+  overflow-y: scroll;
+}
+
+.kk-autocomplete li {
+  height: 32px;
+  line-height: 32px;
+  padding: 0 10px !important;
+}
+
+.kk-autocomplete .is-loading li {
+  height: 160px !important;
+  line-height: unset !important;
 }
 </style>

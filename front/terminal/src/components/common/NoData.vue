@@ -3,11 +3,9 @@
     <div style="flex: 1;" ></div>
     <slot name="mySlot" ></slot>
     <div style="display: flex; align-items: center;" >
-      <div>
-        <img src="@/assets/no_data.png" :alt="$t('暂无数据')" style="width: 120px;" >
-      </div>
+      <div><img src="@/assets/no_data.png" :alt="$t('暂无数据')" :style="{ width: imgWidth }" ></div>
     </div>
-    <div class="msg" >{{ $t(msg) }}</div>
+    <div class="msg" :style="{ fontSize: msgSize }" >{{ $t(msg) }}</div>
     <div style="flex: 1;" ></div>
   </div>
 </template>
@@ -24,17 +22,27 @@ export default {
       required: false,
       default: i18n.global.k('暂无数据'),
     },
-    width:{
+    width: {
       type: String,
       required: false,
     },
-    height:{
+    height: {
       type: String,
       required: false,
     },
-    minHeight:{
+    minHeight: {
       type: String,
       required: false,
+    },
+    imgWidth: {
+      type: String,
+      required: false,
+      default: '120px',
+    },
+    msgSize: {
+      type: String,
+      required: false,
+      default: '14px',
     },
   },
   setup(props) {
@@ -66,6 +74,5 @@ export default {
 .msg {
   margin-top: 10px;
   color: #909399;
-  font-size: 14px;
 }
 </style>

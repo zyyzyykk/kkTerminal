@@ -94,7 +94,7 @@
                         <div class="cmdcode-name" >{{ key }}</div>
                         <div style="flex: 1;" ></div>
                       </div>
-                      <ToolTip :content="item.desc" :delay="1000" >
+                      <ToolTip :content="item.desc" >
                         <template #content>
                           <div class="ellipsis" style="margin-left: 10px; line-height: 18px;" >{{ item.desc }}</div>
                         </template>

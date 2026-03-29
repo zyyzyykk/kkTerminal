@@ -1,6 +1,6 @@
 <template>
   <el-tooltip popper-class="no-select" :content="content" :disabled="!(isShow && isShowTooltip)" :show-after="delay" placement="top" >
-    <div ref="toolTipContentRef" class="tooltip-content" >
+    <div ref="toolTipContentRef" class="tooltip-content ellipsis" :style="parentStyle" >
       <slot name="content" ></slot>
     </div>
   </el-tooltip>
@@ -21,13 +21,18 @@ export default {
     delay: {
       type: Number,
       required: false,
-      default: 200,
+      default: 500,
     },
     isShow: {
       type: Boolean,
       required: false,
       default: true,
-    }
+    },
+    parentStyle: {
+      type: Object,
+      required: false,
+      default: (() => {}),
+    },
   },
   setup() {
 
@@ -80,8 +85,5 @@ export default {
 <style scoped>
 .tooltip-content {
   display: inline-block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 </style>

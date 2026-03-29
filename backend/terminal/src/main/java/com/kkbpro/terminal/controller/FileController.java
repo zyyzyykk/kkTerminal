@@ -112,18 +112,39 @@ public class FileController {
 
 
     /**
-     * 获取文件信息列表 ls
+     * 获取路径下所有文件信息
      */
     @Log
-    @GetMapping("/ls")
-    public Result ls(String sshKey, String path) throws IOException {
+    @GetMapping("/ls/all")
+    public Result lsAll(String sshKey, String path) throws IOException {
+        String errorMsg = "获取文件列表失败";
+        String successMsg = "获取文件列表成功";
+
+        Map<String, Object> map = new HashMap<>();
         List<FileInfo> fileInfoList = new ArrayList<>();
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接已断开");
         }
         try {
+            if (!"/".equals(path) && path.endsWith("/")) {
+                path = path.substring(0, path.length() - 1);
+            }
             SFTPClient sftp = SSHUtil.getSFTPClient(sshKey);
+            // 路径为一个文件
+            if (!FileMode.Type.DIRECTORY.equals(sftp.stat(path).getType())) {
+                int index = path.lastIndexOf("/");
+                String fileName = path.substring(index + 1);
+                map.put("fileName", fileName);
+                path = path.substring(0, index);
+            }
+            // 转化为绝对路径
+            path = sftp.canonicalize(path);
+            if (!"/".equals(path) && !path.endsWith("/")) {
+                path += "/";
+            }
+            map.put("path", path);
+
             List<RemoteResourceInfo> files = sftp.ls(path);
             for (RemoteResourceInfo file : files) {
                 FileInfo fileInfo = new FileInfo();
@@ -146,6 +167,7 @@ public class FileController {
                 fileInfo.setAttributes(file.getAttributes());
                 fileInfoList.add(fileInfo);
             }
+            map.put("fileInfoList", fileInfoList);
         } catch (SFTPException e) {
             LogUtil.logException(this.getClass(), e);
             Response.StatusCode statusCode = e.getStatusCode();
@@ -156,11 +178,65 @@ public class FileController {
                 return Result.error("目录拒绝访问");
             }
             else {
-                return Result.error("文件列表获取失败");
+                return Result.error(errorMsg);
             }
         }
 
-        return Result.success("文件列表", fileInfoList);
+        return Result.success(successMsg, map);
+    }
+
+
+    /**
+     * 获取路径下所有文件夹名称 (以'/'分割)
+     */
+    @Log
+    @GetMapping("/ls/folders")
+    public Result lsFolders(String sshKey, String path) {
+        String errorMsg = "获取文件夹名称失败";
+        String successMsg = "获取文件夹名称成功";
+
+        SSHClient ssh = SSHUtil.getSSHClient(sshKey);
+        if (ssh == null) {
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
+        }
+        StringBuilder names = new StringBuilder();
+        String command = "cd " + path + " && echo -n \"$(find . -mindepth 1 -maxdepth 1 -type d -exec basename {} \\; | paste -sd '/')\"";
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, names);
+            if (exitStatus != 0) return Result.error(errorMsg);
+        } catch (Exception e) {
+            LogUtil.logException(this.getClass(), e);
+            return Result.error(errorMsg);
+        }
+
+        return Result.success(successMsg, names.toString());
+    }
+
+
+    /**
+     * 获取文件补全名称
+     */
+    @Log
+    @GetMapping("/compgen")
+    public Result compgen(String sshKey, String path) {
+        String errorMsg = "获取文件补全名称失败";
+        String successMsg = "获取文件补全名称成功";
+
+        SSHClient ssh = SSHUtil.getSSHClient(sshKey);
+        if (ssh == null) {
+            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
+        }
+        StringBuilder names = new StringBuilder();
+        String command = "echo -n \"$(compgen -f -- " + path + " | paste -sd '|')\"";
+        try {
+            int exitStatus = SSHUtil.executeCommand(ssh, command, names);
+            if (exitStatus != 0) return Result.error(errorMsg);
+        } catch (Exception e) {
+            LogUtil.logException(this.getClass(), e);
+            return Result.error(errorMsg);
+        }
+
+        return Result.success(successMsg, names.toString());
     }
 
 
@@ -222,55 +298,29 @@ public class FileController {
     }
 
     /**
-     * 获取家目录 (首次有效)
+     * 获取家目录
      */
     @Log
     @GetMapping("/home")
     public Result home(String sshKey) throws IOException {
+        String errorMsg = "获取家目录失败";
+        String successMsg = "获取家目录成功";
 
         SSHClient ssh = SSHUtil.getSSHClient(sshKey);
         if (ssh == null) {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接已断开");
         }
-        SFTPClient sftp = SSHUtil.getSFTPClient(sshKey);
-        String directory = sftp.canonicalize(".");
-
-        return Result.success("家目录", directory);
-    }
-
-    /**
-     * 删除文件/文件夹
-     * --方法已弃用--
-     */
-    @Log
-    @PostMapping("/rm")
-    public Result rm(String sshKey, Boolean isDirectory, String path) {
-        String errorMsg = "删除失败";
-        String successMsg = "删除成功";
-
-        SSHClient ssh = SSHUtil.getSSHClient(sshKey);
-        if (ssh == null) {
-            return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
-        }
+        StringBuilder home = new StringBuilder();
+        String command = "echo -n $HOME";
         try {
-            SFTPClient sftp = SSHUtil.getSFTPClient(sshKey);
-            if (isDirectory) rmFolder(sftp, path);
-            else sftp.rm(path);
+            int exitStatus = SSHUtil.executeCommand(ssh, command, home);
+            if (exitStatus != 0) return Result.error(errorMsg);
         } catch (Exception e) {
             LogUtil.logException(this.getClass(), e);
             return Result.error(errorMsg);
         }
 
-        return Result.success(successMsg);
-    }
-    private void rmFolder(SFTPClient sftp, String path) throws IOException {
-        List<RemoteResourceInfo> files = sftp.ls(path);
-        for (RemoteResourceInfo file : files) {
-            String tmp = path + "/" + file.getName();
-            if (file.isDirectory()) rmFolder(sftp,tmp);
-            else sftp.rm(tmp);
-        }
-        sftp.rmdir(path);
+        return Result.success(successMsg, home.toString());
     }
 
 
@@ -278,8 +328,8 @@ public class FileController {
      * rm -rf 快速批量删除
      */
     @Log
-    @PostMapping("/rm-rf")
-    public Result rmRf(String sshKey, String path, String items) {
+    @PostMapping("/rm")
+    public Result rm(String sshKey, String path, String items) {
         String errorMsg = "删除失败";
         String successMsg = "删除成功";
 

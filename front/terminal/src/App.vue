@@ -132,6 +132,10 @@ export default {
   margin-right: 4px;
 }
 
+.el-button+.el-button {
+  margin-left: 0 !important;
+}
+
 .el-loading-text {
   user-select: none;
 }

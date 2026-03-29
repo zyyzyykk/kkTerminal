@@ -62,7 +62,7 @@
                       <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
-                        <ToolTip :content="item.path + item.name" :delay="1000" >
+                        <ToolTip :content="item.path + item.name" >
                           <template #content>
                             <div class="trans-item-name ellipsis" style="width: 360px;" >{{ item.path + item.name }}</div>
                           </template>
@@ -89,7 +89,7 @@
                       <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
-                        <ToolTip :content="item.path + item.name" :delay="1000" >
+                        <ToolTip :content="item.path + item.name" >
                           <template #content>
                             <div class="trans-item-name ellipsis" style="width: 360px;" >{{ item.path + item.name }}</div>
                           </template>
@@ -118,7 +118,7 @@
                       <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
-                        <ToolTip :content="item.path + item.name" :delay="1000" >
+                        <ToolTip :content="item.path + item.name" >
                           <template #content>
                             <div class="trans-item-name ellipsis" style="width: 360px;" >{{ item.path + item.name }}</div>
                           </template>
@@ -147,7 +147,7 @@
                       <FileIcons :name="item.name" :width="24" :height="24" :isFolder="item.size === -1" />
                       <div style="margin-left: 15px;" ></div>
                       <div class="kk-flex-column" >
-                        <ToolTip :content="item.path + item.name" :delay="1000" >
+                        <ToolTip :content="item.path + item.name" >
                           <template #content>
                             <div class="trans-item-name ellipsis" style="width: 360px;" >{{ item.path + item.name }}</div>
                           </template>
@@ -688,7 +688,7 @@ export default {
     };
     let advanceTimer = null;
     const showAdvance = (newVal) => {
-      if(advanceTimer) clearTimeout(advanceTimer);
+      clearTimeout(advanceTimer);
       if(isShowAdvance.value !== newVal) {
         advanceTimer = browser.setTimeout(() => {
           isShowAdvance.value = newVal;
@@ -816,7 +816,7 @@ export default {
       // 文件管理
       else if(type === 4) {
         showSettings(false);
-        fileBlockRef.value.getInitDir();
+        fileBlockRef.value.getHomeDir();
         fileBlockRef.value.DialogVisible = true;
       }
       // 高级
