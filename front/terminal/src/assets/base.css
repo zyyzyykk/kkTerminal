@@ -1,6 +1,7 @@
 :root {
   --link: #007fff;
   --error: #f5222d;
+  font-family: "PingFang SC", sans-serif;
 }
 
 body {

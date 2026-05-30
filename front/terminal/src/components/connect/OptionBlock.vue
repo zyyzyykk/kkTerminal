@@ -32,7 +32,7 @@
           </el-input>
         </div>
         <div style="margin-left: 10px;" >
-          <el-button size="small" type="primary" @click="confirm" >
+          <el-button :disabled="!aimOption" size="small" type="primary" @click="confirm" >
             {{ opType ? $t('保存') : $t('选择') }}
           </el-button>
         </div>

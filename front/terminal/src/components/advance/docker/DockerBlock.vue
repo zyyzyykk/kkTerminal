@@ -196,7 +196,7 @@
               <div style="flex: 1;" ></div>
               <div class="kk-flex hover-class" @click="getDockerInfo(0)" >
                 <el-icon style="font-size: 18px;" ><Refresh /></el-icon>
-                <div style="margin-left: 8px;" >{{ $t('刷新') }}</div>
+                <div style="margin-left: 5px;" >{{ $t('刷新') }}</div>
               </div>
             </div>
           </template>
@@ -229,7 +229,7 @@
               <div style="flex: 1;" ></div>
               <div class="kk-flex hover-class" @click="getDockerInfo(1)" >
                 <el-icon style="font-size: 18px;" ><Refresh /></el-icon>
-                <div style="margin-left: 8px;" >{{ $t('刷新') }}</div>
+                <div style="margin-left: 5px;" >{{ $t('刷新') }}</div>
               </div>
             </div>
           </template>
@@ -262,7 +262,7 @@
               <div style="flex: 1;" ></div>
               <div class="kk-flex hover-class" @click="getDockerInfo(2)" >
                 <el-icon style="font-size: 18px;" ><Refresh /></el-icon>
-                <div style="margin-left: 8px;" >{{ $t('刷新') }}</div>
+                <div style="margin-left: 5px;" >{{ $t('刷新') }}</div>
               </div>
             </div>
           </template>
@@ -294,7 +294,7 @@
               <div style="flex: 1;" ></div>
               <div class="kk-flex hover-class" @click="getDockerInfo(3)" >
                 <el-icon style="font-size: 18px;" ><Refresh /></el-icon>
-                <div style="margin-left: 8px;" >{{ $t('刷新') }}</div>
+                <div style="margin-left: 5px;" >{{ $t('刷新') }}</div>
               </div>
             </div>
           </template>

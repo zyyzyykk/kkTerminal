@@ -179,14 +179,14 @@
           <div style="margin-right: 3px;" >
             <el-input
               v-model="cmdcode"
-              :style="{ width: '110px', height: '20px', fontSize: '12px'}"
+              :style="{ width: '112px', height: '20px', fontSize: '12px'}"
               @keydown="handleCmdCode"
               maxlength="6"
               :placeholder="$t('命令代码')"
             >
             </el-input>
           </div>
-          <el-popover v-if="env.cmdcode" placement="bottom-end" :width="$t('242')" trigger="click" >
+          <el-popover v-if="env.cmdcode" placement="bottom-end" :width="$t('244')" trigger="click" >
             <template #reference>
               <el-icon :style="{ color: '#606266', cursor: 'pointer' }" ><QuestionFilled /></el-icon>
             </template>
