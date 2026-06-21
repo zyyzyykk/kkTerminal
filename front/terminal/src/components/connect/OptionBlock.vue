@@ -32,7 +32,7 @@
           </el-input>
         </div>
         <div style="margin-left: 10px;" >
-          <el-button :disabled="!aimOption" size="small" type="primary" @click="confirm" >
+          <el-button :disabled="!aimOption || !aimOption.trim()" size="small" type="primary" @click="confirm" >
             {{ opType ? $t('保存') : $t('选择') }}
           </el-button>
         </div>
@@ -44,6 +44,7 @@
 <script>
 import { ref } from "vue";
 import browser from "@/utils/Browser";
+import { isAlphaNumeric } from "@/utils/String";
 import { CircleClose } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { deleteDialog } from "@/components/common/DeleteDialog";
@@ -68,8 +69,17 @@ export default {
 
     // 确定
     const confirm = () => {
-      if(!aimOption.value.trim()) return;
-      context.emit('callback',aimOption.value.trim());
+      const optionName = aimOption.value.trim();
+      if(!isAlphaNumeric(optionName)) {
+        ElMessage({
+          message: i18n.global.t('配置名称只能由字母和数字组成'),
+          type: 'error',
+          grouping: true,
+          repeatNum: Number.MIN_SAFE_INTEGER,
+        });
+        return;
+      }
+      context.emit('callback', optionName);
       closeDialog();
     };
 

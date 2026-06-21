@@ -10,7 +10,7 @@ import { localStore, cloudStore } from "@/env/Store";
 
 const getUserInfo = () => {
   if(!browser.localStorage.getItem(localStore['user'])) {
-    browser.localStorage.setItem(localStore['user'], aesEncrypt(crypto.randomUUID() + '@' + generateRandomString(16) + '@' + new Date().getTime()), false);
+    browser.localStorage.setItem(localStore['user'], aesEncrypt(browser.crypto.randomUUID() + '@' + generateRandomString(16) + '@' + new Date().getTime()), false);
   }
   const userInfo = aesDecrypt(browser.localStorage.getItem(localStore['user'])).split('@');
   return {

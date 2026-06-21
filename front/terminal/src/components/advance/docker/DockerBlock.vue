@@ -36,7 +36,8 @@
                 <div>
                   <el-input v-model="appSearch" class="w-50 m-2" :placeholder="$t('搜索应用')" >
                     <template #suffix>
-                      <el-icon class="el-input__icon" ><Search /></el-icon>
+                      <el-icon v-if="!appSearch" class="el-input__icon" ><Search /></el-icon>
+                      <el-icon v-else @click="appSearch = ''" class="el-input__icon" style="cursor: pointer;" ><CircleClose /></el-icon>
                     </template>
                   </el-input>
                 </div>
@@ -141,7 +142,7 @@
                 <div class="kk-flex deploy-item" >
                   <div class="form-width" >{{ $t('其它命令选项') }}</div>
                   <div style="flex: 1;" >
-                    <el-input v-model="deployInfo.paramOptions" class="w-50 m-2" :placeholder="$t('每行一个，-<命令选项> <值>')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
+                    <el-input v-model="deployInfo.paramOptions" class="w-50 m-2" :placeholder="$t('每行一个，<命令选项> <值>')" type="textarea" :autosize="{ minRows: 2 }" ></el-input>
                   </div>
                 </div>
                 <div style="height: 10px;" ></div>
@@ -318,7 +319,7 @@ import NoData from "@/components/common/NoData";
 import { computed, ref } from "vue";
 import { request } from "@/utils/Request";
 import { http_base_url } from "@/env/Base";
-import { ArrowDown, ArrowLeft, Search, Document, Operation, Refresh, TopRight } from "@element-plus/icons-vue";
+import { ArrowDown, ArrowLeft, Search, CircleClose, Document, Operation, Refresh, TopRight } from "@element-plus/icons-vue";
 import i18n from "@/locales/i18n";
 import { ElMessage } from "element-plus";
 import { deleteDialog } from "@/components/common/DeleteDialog";
@@ -334,6 +335,7 @@ export default {
     ArrowDown,
     ArrowLeft,
     Search,
+    CircleClose,
     Document,
     Operation,
     Refresh,

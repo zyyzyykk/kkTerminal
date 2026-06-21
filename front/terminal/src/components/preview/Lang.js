@@ -30,6 +30,7 @@ const langMappingDict = {
     "jsp": "jsp",
     "md": "markdown",
     "markdown": "markdown",
+    "php": "php",
     "properties": "properties",
     "py": "python",
     "sh": "sh",

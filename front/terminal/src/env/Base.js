@@ -1,7 +1,6 @@
 // 生产环境
 // const http_protocol = window.location.protocol;
-// let ws_protocol = 'ws://';
-// if(http_protocol === 'https:') ws_protocol = 'wss://';
+// const ws_protocol = (http_protocol === 'https:') ? 'wss://' : 'ws://';
 // export const ws_base_url = ws_protocol + window.location.host + '/api/socket/ssh/';
 // export const http_base_url = http_protocol + '//' + window.location.host + '/api';
 

@@ -1,3 +1,9 @@
+// 是否仅由数字和字母组成
+export const isAlphaNumeric = (str) => {
+  const regex = /^[A-Za-z0-9]+$/;
+  return regex.test(str);
+};
+
 // 将 '/' 转为 '@'
 export const changeStr = (str) => {
   return str.replace(/\//g, '@');

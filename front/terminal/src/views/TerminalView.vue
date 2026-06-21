@@ -355,7 +355,7 @@ export default {
         type: 'success',
         grouping: true,
       });
-      recordId.value = crypto.randomUUID();
+      recordId.value = browser.crypto.randomUUID();
       recordInfo.value = [];
       recordInfo.value.push({
         time: new Date().getTime(),

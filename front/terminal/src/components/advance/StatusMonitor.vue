@@ -62,10 +62,10 @@
         </el-tab-pane>
         <el-tab-pane :label="$t('Top进程')" >
           <el-table @cell-dblclick="tableDataCopy" style="height: 200px; width: 100%;" v-if="statusInfo.processes.length > 0" :data="statusInfo.processes" border stripe >
-            <el-table-column prop="pid" label="PID" width="80" />
-            <el-table-column prop="user" label="User" width="100" />
-            <el-table-column prop="cpu" label="%CPU" width="100" />
-            <el-table-column prop="mem" label="%MEM" width="100" />
+            <el-table-column prop="pid" label="PID" width="100" />
+            <el-table-column prop="user" label="User" width="120" />
+            <el-table-column prop="cpu" label="%CPU" width="80" />
+            <el-table-column prop="mem" label="%MEM" width="80" />
             <el-table-column prop="cmd" label="Command" />
           </el-table>
           <div v-else >

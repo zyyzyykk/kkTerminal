@@ -91,8 +91,9 @@
 import browser from "@/utils/Browser";
 import { ref } from "vue";
 import { ElMessage } from "element-plus";
-import AceEditor from "@/components/common/AceEditor";
 import { CollectionTag, EditPen, Upload, Download, Refresh, Finished, DocumentDelete } from "@element-plus/icons-vue";
+import { isAlphaNumeric } from "@/utils/String";
+import AceEditor from "@/components/common/AceEditor";
 import i18n from "@/locales/i18n";
 import { localStore } from "@/env/Store";
 
@@ -152,11 +153,6 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
       if(browser.localStorage.getItem(localStore['cmdcode-draft'])) {
         userCmdCodeEditorRef.value.setValue(browser.localStorage.getItem(localStore['cmdcode-draft']));
       }
-    };
-    // 仅有数字字母组成
-    const isAlphaNumeric = (str) => {
-      const regex = /^[A-Za-z0-9]+$/;
-      return regex.test(str);
     };
 
     // 导入导出命令代码

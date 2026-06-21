@@ -22,6 +22,7 @@ import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/mode-jsp";
 import "ace-builds/src-noconflict/mode-markdown";
+import "ace-builds/src-noconflict/mode-php";
 import "ace-builds/src-noconflict/mode-properties";
 import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/mode-sh";
@@ -45,6 +46,7 @@ import "ace-builds/src-noconflict/snippets/javascript";
 import "ace-builds/src-noconflict/snippets/json";
 import "ace-builds/src-noconflict/snippets/jsp";
 import "ace-builds/src-noconflict/snippets/markdown";
+import "ace-builds/src-noconflict/snippets/php";
 import "ace-builds/src-noconflict/snippets/properties";
 import "ace-builds/src-noconflict/snippets/python";
 import "ace-builds/src-noconflict/snippets/sh";
@@ -152,7 +154,6 @@ export default {
         copyWithEmptySelection: false,
         showPrintMargin: false,
         highlightActiveLine: true,
-        // fontFamily: 'monospace',
         enableBasicAutocompletion: true,                      // 启用基本自动补全
         enableSnippets: true,                                 // 启用代码片段
         enableLiveAutocompletion: true,                       // 启用实时自动补全
@@ -171,12 +172,12 @@ export default {
       });
 
       // 查找替换
-      aceEditor.value.find('needle',{
+      aceEditor.value.find('needle', {
         backwards: false,
         wrap: false,
         caseSensitive: false,
         wholeWord: false,
-        regExp: false
+        regExp: false,
       });
       aceEditor.value.findNext();
       aceEditor.value.findPrevious();
