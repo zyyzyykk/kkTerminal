@@ -2,6 +2,7 @@ package com.kkbpro.terminal;
 
 import com.kkbpro.terminal.controller.SystemController;
 import com.kkbpro.terminal.enums.OperatingSystemEnum;
+import com.kkbpro.terminal.utils.CompatibilityUtil;
 import com.kkbpro.terminal.utils.FileUtil;
 import com.kkbpro.terminal.utils.LogUtil;
 import org.springframework.boot.SpringApplication;
@@ -32,9 +33,9 @@ public class TerminalApplication {
 
     public static void cleanTempData() {
         // 清除临时数据
-        File tempFolder = FileUtil.getDirectory(FileUtil.tempBasePath);
-        if (tempFolder != null) {
-            FileUtil.forceDeleteFolder(tempFolder);
+        File tempBaseFolder = FileUtil.getDirectory(FileUtil.tempBasePath);
+        if (tempBaseFolder != null) {
+            FileUtil.forceDeleteFolder(tempBaseFolder);
         }
     }
 
@@ -44,6 +45,8 @@ public class TerminalApplication {
     }
 
     public static void main(String[] args) {
+        // 兼容性修复
+        CompatibilityUtil.setupCompatFixes(properties.getProperty("kk.app.version"));
         // 重置临时数据
         cleanTempData();
         FileUtil.prepareDirectory(FileUtil.tempBasePath);

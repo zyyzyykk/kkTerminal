@@ -27,29 +27,39 @@ import java.time.temporal.ChronoUnit;
 @RequestMapping(Constant.API_PREFIX + "/cloud")
 public class CloudController {
 
-    private static final String cloudBasePath = System.getProperty("user.dir") + "/" + "data" + "/" + "cloud";
+    public static final String userBasePath = FileUtil.basePath + "user" + "/";
 
-    private static final String countType = "record-";
+    public static final String dataPath = "/" + "data" + "/";
 
-    private static final Integer maxCount = 100;
+    public static final String recordPath = "/" + "record" + "/";
 
-    private static final Integer expirationDays = 7;
+    public static final String recordPrefix = "record-";
+
+    private static final Integer recordMaxCount = 100;
+
+    private static final Integer recordExpirationDays = 7;
 
     /**
      * 上传文件
      */
     @Log
     @PostMapping("/upload")
-    public Result uploadCloud(String user, String type, String name, MultipartFile file) throws IOException {
-        String userFolderPath = cloudBasePath + "/" + user;
-        File userFolder = FileUtil.prepareDirectory(userFolderPath);
-        File[] userFiles = userFolder.listFiles();
+    public Result uploadCloud(String user, String type, String name, MultipartFile file) {
+        String fileFolderPath = userBasePath + user + (recordPrefix.equals(type) ? recordPath : dataPath);
         // 限制录像文件数量
-        if (userFiles != null && userFiles.length > maxCount && countType.equals(type)) {
-            return Result.error(ResultCodeEnum.CLOUD_COUNT_ERROR.getCode(),"云端文件过多");
+        if (recordPrefix.equals(type)) {
+            File recordFolder = FileUtil.prepareDirectory(fileFolderPath);
+            File[] recordFiles = recordFolder.listFiles();
+            if (recordFiles != null && recordFiles.length > recordMaxCount) {
+                return Result.error(ResultCodeEnum.RECORD_COUNT_EXCEEDED.getCode(), "录像文件过多");
+            }
         }
-        File targetFile = FileUtil.prepareFile(userFolderPath + "/" + type + name);
-        file.transferTo(targetFile);
+        try {
+            File targetFile = FileUtil.prepareFile(fileFolderPath + type + name);
+            file.transferTo(targetFile);
+        } catch (IOException e) {
+            LogUtil.logException(this.getClass(), e);
+        }
 
         return Result.success("云端上传成功");
     }
@@ -60,8 +70,8 @@ public class CloudController {
     @Log
     @GetMapping("/download")
     public Result downloadCloud(String user, String fileName) {
-        String userFolderPath = cloudBasePath + "/" + user;
-        File targetFile = FileUtil.getFile(userFolderPath + "/" + fileName);
+        String fileFolderPath = userBasePath + user + ((fileName != null && fileName.startsWith(recordPrefix)) ? recordPath : dataPath);
+        File targetFile = FileUtil.getFile(fileFolderPath + fileName);
         // 文件不存在
         if (targetFile == null) {
             return Result.error(FileUploadEnum.FILE_NOT_EXIST.getCode(), "文件不存在");
@@ -84,34 +94,30 @@ public class CloudController {
      */
     @Scheduled(cron = "0 0 0 */1 * ?")
     protected void clean() {
-        File cloudFolder = FileUtil.prepareDirectory(cloudBasePath);
-        File[] userFolders = cloudFolder.listFiles();
+        File userBaseFolder = FileUtil.prepareDirectory(userBasePath);
+        File[] userFolders = userBaseFolder.listFiles();
         if (userFolders == null) return;
         for (File userFolder : userFolders) {
             if (userFolder.isDirectory()) {
-                File[] userFiles = userFolder.listFiles();
-                if (userFiles == null) continue;
-                for (File userFile : userFiles) {
-                    if (!userFile.isDirectory()) {
-                        // 只删除录像文件
-                        if (userFile.getName().startsWith(countType)) {
-                            try {
-                                // 获取文件的基本属性
-                                BasicFileAttributes attrs = Files.readAttributes(userFile.toPath(), BasicFileAttributes.class);
-                                // 获取文件创建时间
-                                Instant creationTime = attrs.creationTime().toInstant();
-                                // 判断是否超过有效期
-                                long daysBetween = ChronoUnit.DAYS.between(creationTime, Instant.now());
-                                if (daysBetween > expirationDays) userFile.delete();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
+                File recordFolder = FileUtil.prepareDirectory(userFolder.getPath() + recordPath);
+                File[] recordFiles = recordFolder.listFiles();
+                if (recordFiles == null) continue;
+                for (File recordFile : recordFiles) {
+                    if (!recordFile.isDirectory()) {
+                        try {
+                            // 获取文件的基本属性
+                            BasicFileAttributes attrs = Files.readAttributes(recordFile.toPath(), BasicFileAttributes.class);
+                            // 获取文件创建时间
+                            Instant creationTime = attrs.creationTime().toInstant();
+                            // 判断是否超过有效期
+                            long daysBetween = ChronoUnit.DAYS.between(creationTime, Instant.now());
+                            if (daysBetween > recordExpirationDays) recordFile.delete();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
                         }
                     }
-                    else FileUtil.forceDeleteFolder(userFile);
                 }
             }
-            else userFolder.delete();
         }
     }
 

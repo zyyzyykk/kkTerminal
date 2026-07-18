@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ResultCodeEnum {
 
-    CLOUD_COUNT_ERROR(506, "云端文件过多"),
+    RECORD_COUNT_EXCEEDED(506, "录像文件过多"),
 
     PASSWORD_INCORRECT(507, "密码错误"),
 

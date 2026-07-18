@@ -11,7 +11,9 @@ import java.util.List;
 
 public class FileUtil {
 
-    public static final String tempBasePath = System.getProperty("user.dir") + "/" + "data" + "/" + "temp";
+    public static final String basePath = System.getProperty("user.dir") + "/" + "data" + "/";
+
+    public static final String tempBasePath = basePath + "temp" + "/";
 
     /**
      * 获取文件
@@ -38,7 +40,7 @@ public class FileUtil {
             file.delete();
         }
         // 确保父目录存在
-        else if (!file.getParentFile().exists()) {
+        if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
 
@@ -79,7 +81,7 @@ public class FileUtil {
     public static void mergeFileChunks(String folderPath, String fileName, Integer chunks, Long totalSize) {
         File folder = FileUtil.getDirectory(folderPath);
         // 合并后的文件
-        File mergedFile = FileUtil.prepareFile(folderPath + "/" + fileName);
+        File mergedFile = FileUtil.prepareFile(folderPath + fileName);
         // 获取所有文件片
         File[] chunkFiles = folder.listFiles();
         if (chunkFiles == null) {

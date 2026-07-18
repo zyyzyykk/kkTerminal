@@ -44,7 +44,7 @@ export const cloudUpload = async (type, name, content) => {
         if(resp.status !== 'success') {
           if(resp.code === 506) {
             ElMessage({
-              message: i18n.global.t('云端文件过多'),
+              message: i18n.global.t('录像文件过多'),
               type: resp.status,
               grouping: true,
             });

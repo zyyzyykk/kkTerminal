@@ -91,6 +91,13 @@
             <version>75.1</version>
         </dependency>
 
+        <!--版本号工具-->
+        <dependency>
+            <groupId>org.semver4j</groupId>
+            <artifactId>semver4j</artifactId>
+            <version>6.0.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

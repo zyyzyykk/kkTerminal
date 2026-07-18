@@ -30,7 +30,7 @@ import java.util.*;
 @RequestMapping(Constant.API_PREFIX + "/file")
 public class FileController {
 
-    public static final String transportPath = "/" + "transport" + "/";
+    public static final String transportPath = FileUtil.tempBasePath + "transport" + "/";
 
     /**
      * 下载远程文件
@@ -157,7 +157,7 @@ public class FileController {
                 else if (file.isRegularFile()) fileInfo.setIsDirectory(false);
                 else {
                     try {
-                        fileInfo.setIsDirectory(FileMode.Type.DIRECTORY.equals(sftp.stat(path + "/" + file.getName()).getType()));
+                        fileInfo.setIsDirectory(FileMode.Type.DIRECTORY.equals(sftp.stat(path + file.getName()).getType()));
                     } catch (SFTPException e) {
                         LogUtil.logException(this.getClass(), e);
                         fileInfo.setIsDirectory(false);
@@ -577,9 +577,9 @@ public class FileController {
         String id = fileUploadInfo.getId();
         Integer chunk = fileUploadInfo.getChunk();
 
-        String transPath = FileUtil.tempBasePath + transportPath + sshKey;
-        String transFileFolderPath = transPath + "/" + id;
-        String chunkFilePath = transFileFolderPath + "/" + id + "-" + chunk;
+        String transPath = transportPath + sshKey + "/";
+        String transFileFolderPath = transPath + id + "/";
+        String chunkFilePath = transFileFolderPath + id + "-" + chunk;
         File chunkFile = FileUtil.prepareFile(chunkFilePath);
         // 写入数据
         try {
@@ -612,11 +612,11 @@ public class FileController {
         Integer chunks = fileUploadInfo.getChunks();
         Long totalSize = fileUploadInfo.getTotalSize();
 
-        String transPath = FileUtil.tempBasePath + transportPath + sshKey;
+        String transPath = transportPath + sshKey + "/";
         File transFolder = FileUtil.prepareDirectory(transPath);
-        String transFileFolderPath = transPath + "/" + id;
+        String transFileFolderPath = transPath + id + "/";
         File transFileFolder = FileUtil.prepareDirectory(transFileFolderPath);
-        String transFilePath = transFileFolderPath + "/" + id;
+        String transFilePath = transFileFolderPath + id;
 
         FileTransInfo fileTransInfo = new FileTransInfo(id, path, fileName, totalSize, 1, 0);
         WebSocketServer.putTransportingFile(sshKey, id, fileTransInfo);

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SSHUtil {
 
-    private static final String keyProvidersPath = "/" + "keyProviders" + "/";
+    private static final String keyProvidersPath = FileUtil.tempBasePath + "keyProviders" + "/";
 
     // 服务器编码集
     public static final ThreadLocal<String> charset = new ThreadLocal<>();
@@ -48,12 +48,12 @@ public class SSHUtil {
             if (authType != 1) sshClient.authPassword(username, password);          // 使用用户名和密码进行身份验证
             else {
                 // 创建本地私钥文件
-                String keyPath = FileUtil.tempBasePath + keyProvidersPath + UUID.randomUUID();
-                keyFile = FileUtil.prepareFile(keyPath);
+                String keyFilePath = keyProvidersPath + UUID.randomUUID();
+                keyFile = FileUtil.prepareFile(keyFilePath);
                 // 写入私钥内容
                 Files.write(Paths.get(keyFile.getAbsolutePath()), privateKey.getContent().getBytes());
                 // 加载私钥
-                KeyProvider keyProvider = sshClient.loadKeys(keyPath, privateKey.getPassphrase());
+                KeyProvider keyProvider = sshClient.loadKeys(keyFilePath, privateKey.getPassphrase());
                 // 使用私钥进行身份验证
                 sshClient.authPublickey(username, keyProvider);
             }

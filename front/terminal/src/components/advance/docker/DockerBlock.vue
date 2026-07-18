@@ -579,7 +579,7 @@ export default {
 
     // 复制表格数据
     const tableDataCopy = async (row, column) => {
-      if(column.property === 'createTime' || !row[column.property]) return;
+      if(!row[column.property]) return;
       await browser.navigator.clipboard.writeText(row[column.property]);
       ElMessage({
         message: i18n.global.t('复制成功'),

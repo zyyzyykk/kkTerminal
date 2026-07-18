@@ -309,7 +309,7 @@ public class WebSocketServer {
             } catch (Exception e) {
                 LogUtil.logException(this.getClass(), e);
             }
-            String transPath = FileUtil.tempBasePath + FileController.transportPath + sshKey;
+            String transPath = FileController.transportPath + sshKey + "/";
             File transFolder = FileUtil.getDirectory(transPath);
             if (transFolder == null) return;
             if (isClosed) {

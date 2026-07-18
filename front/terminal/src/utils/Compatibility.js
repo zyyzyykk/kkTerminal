@@ -1,18 +1,18 @@
 import browser from "@/utils/Browser";
 import { localStore } from "@/env/Store";
 import { aesDecrypt, aesEncrypt } from "@/utils/Encrypt";
+import { eq, valid, lte, compare } from "semver";
 
-// 版本号
-const current = document.querySelector('meta[name="version"]')?.getAttribute('content');
-const previous = browser.localStorage.getItem(localStore['version']);
+// 最新版本号
+const latestVersion = document.querySelector('meta[name="version"]')?.getAttribute('content');
 
-// 3.8.0及以上版本新增
 const setupCompatFixes = () => {
-    if(current === previous) return;
-    for(const fix of fixesChain) {
-        if(!previous || previous <= fix.version) fix.action();
+    const currentVersion = browser.localStorage.getItem(localStore['version']);
+    if(eq(latestVersion, currentVersion)) return;
+    for(const fixItem of sortedFixesChain) {
+        if(!valid(currentVersion) || lte(currentVersion, fixItem.version)) fixItem.run();
     }
-    browser.localStorage.setItem(localStore['version'], current);
+    browser.localStorage.setItem(localStore['version'], latestVersion);
 };
 
 export default setupCompatFixes;
@@ -41,6 +41,6 @@ const fixFor376 = () => {
     }
 };
 
-const fixesChain = [
-    { version: "3.7.6", action: fixFor376 },
-];
+const sortedFixesChain = [
+    { version: "3.7.6", run: fixFor376 },
+].sort((a, b) => compare(a.version, b.version));

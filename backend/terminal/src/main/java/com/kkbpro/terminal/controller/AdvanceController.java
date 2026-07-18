@@ -109,24 +109,6 @@ public class AdvanceController {
         return Result.success(successMsg);
     }
 
-    //    完整命令
-    //    echo -n "$(uptime | awk -F'load average: ' '{print $2}' | awk '{print $1}' | sed 's/,//')@" && \
-    //    echo -n "$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')@" && \
-    //    echo -n "$(nproc)@" && \
-    //    echo -n "$(free -m | grep Mem | awk '{print $3"@"$2}')@" && \
-    //    echo -n "$(df -BMB / | grep / | awk '{print $3"@"$2}' | sed 's/[A-Za-z]//g')" && \
-    //    echo -n "^" && \
-    //    echo -n "$(ps -eo pid,user,%cpu,%mem,comm --sort=-%cpu | head -n 5 | awk 'NR>1 {print $1"@"$2"@"$3"@"$4"@"$5}' | tr '\n' '$' | sed 's/\(.*\)\$$/\1/')" && \
-    //    echo -n "^" && \
-    //    echo -n "$(cat /proc/net/dev | awk 'NR>2 {up+=$10; down+=$2;} END {print "all:@"up"@"down}')" && \
-    //    echo -n "$" && \
-    //    echo -n "$(cat /proc/net/dev | awk 'NR>2 {print $1"@"$10"@"$2}' | tr -s ' ' '@' | tr '\n' '$' | sed 's/\(.*\)\$/\1/')" && \
-    //    echo -n "^" && \
-    //    echo -n "$(cat /proc/diskstats | awk '{if ($3 ~ /[^0-9]$/) {read+=$6; write+=$10}} END {print "all@" read"@"write}')" && \
-    //    echo -n "$" && \
-    //    echo -n "$(cat /proc/diskstats | awk '{print $3"@"$6"@"$10}' | tr -s ' ' '@' | tr '\n' '$' | sed 's/\(.*\)\$/\1/')" && \
-    //    echo -n "^" && \
-    //    echo -n $(date +%s%3N)
     /**
      * 获取监控状态
      */
@@ -197,14 +179,6 @@ public class AdvanceController {
         return Result.success(successMsg, version.toString());
     }
 
-    // 完整命令
-    //    echo -n "$(docker ps -a --format "{{.ID}}@{{.Names}}@{{.Status}}@{{.Image}}@{{.Ports}}" | paste -sd '$' -)" && \
-    //    echo -n "^" && \
-    //    echo -n "$(docker images --format "{{.ID}}@{{.Repository}}@{{.Size}}@{{.CreatedAt}}" | paste -sd '$' -)" && \
-    //    echo -n "^" && \
-    //    echo -n "$(docker network ls --format "{{.Name}}" | xargs -I {} docker network inspect {} --format "{{.Name}}@{{range .IPAM.Config}}{{.Subnet}}{{end}}@{{range .IPAM.Config}}{{.Gateway}}{{end}}@{{.Created}}" | paste -sd'$' -)" && \
-    //    echo -n "^" && \
-    //    echo -n "$(docker volume ls --format "{{.Name}}" | xargs -I {} docker volume inspect {} --format "{{.Name}}@{{.Mountpoint}}@{{.CreatedAt}}" | paste -sd'$' -)"
     /**
      * 获取Docker信息
      */

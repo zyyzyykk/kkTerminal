@@ -28,6 +28,12 @@ public class AppConfig {
     private String banner;
 
     /**
+     * 最新版本
+     */
+    @Value("${kk.app.version:}")
+    private String version;
+
+    /**
      * 本地PC端窗口
      */
     @Value("${kk.pc.window:}")

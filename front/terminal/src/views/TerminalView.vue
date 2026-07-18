@@ -54,7 +54,7 @@
                 <el-tab-pane>
                   <template #label >
                     <el-badge :show-zero="false" :value="Object.keys(waitingList).length" :max="99" :offset="[6, 2]" type="warning" >
-                      <div>{{ $t('等待中') }}</div>
+                      <div>{{ $t('准备中') }}</div>
                     </el-badge>
                   </template>
                   <div v-if="Object.keys(waitingList).length > 0" class="trans-items no-scrollbar" >

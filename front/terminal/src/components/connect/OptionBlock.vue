@@ -33,7 +33,7 @@
         </div>
         <div style="margin-left: 10px;" >
           <el-button :disabled="!aimOption || !aimOption.trim()" size="small" type="primary" @click="confirm" >
-            {{ opType ? $t('保存') : $t('选择') }}
+            {{ (opType === 0) ? $t('选择') : $t('保存') }}
           </el-button>
         </div>
       </div>
@@ -70,7 +70,7 @@ export default {
     // 确定
     const confirm = () => {
       const optionName = aimOption.value.trim();
-      if(!isAlphaNumeric(optionName)) {
+      if(props.opType !== 0 && !isAlphaNumeric(optionName)) {
         ElMessage({
           message: i18n.global.t('配置名称只能由字母和数字组成'),
           type: 'error',
