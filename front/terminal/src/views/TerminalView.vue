@@ -31,7 +31,7 @@
           <el-icon @click="cloudSync" style="font-size: 20px; color: #909399;" ><ChromeFilled /></el-icon>
         </div>
         <div v-if="env.advance" class="bar-tab no-select" >
-          <el-tooltip :disabled="!cooperating" :content="onlineNumber" placement="bottom" :show-after="300" >
+          <el-tooltip :disabled="!cooperating" :content="$t('在线人数：') + onlineNumber" placement="bottom" :show-after="300" >
             <el-icon v-if="!cooperating" @click="doSettings(6)" style="font-size: 20px; color: #909399;" ><UserFilled /></el-icon>
             <el-icon v-else-if="calcType(onlineNumber, maxNumber) === 'success'" @click="doSettings(6)" style="font-size: 20px; color: #67c23a;" ><UserFilled /></el-icon>
             <el-icon v-else-if="calcType(onlineNumber, maxNumber) === 'warning'" @click="doSettings(6)" style="font-size: 20px; color: #e6a23c;" ><UserFilled /></el-icon>
@@ -334,7 +334,7 @@ export default {
       'Success': 'Connecting success !\r\n',
       'Connecting': 'Connecting to remote server ...\r\n',
       'Disconnected': 'Disconnect to remote server.\r\n',
-      'End': 'This Cooperation is Ended.\r\n',
+      'End': 'Cooperation Ended.\r\n',
     });
     const currentConnectStatus = ref(connectStatusDict.value['Connecting']);
 
@@ -359,7 +359,7 @@ export default {
       recordInfo.value = [];
       recordInfo.value.push({
         time: new Date().getTime(),
-        content: 'Record ' + recordId.value + ' Start.\r\n',
+        content: 'Record ' + recordId.value + ' Started.\r\n',
       });
       recording.value = true;
     };
@@ -367,7 +367,7 @@ export default {
       recording.value = false;
       recordInfo.value.push({
         time: new Date().getTime(),
-        content: '\r\nRecord ' + recordId.value + ' Over.',
+        content: '\r\nRecord ' + recordId.value + ' Stopped.',
       });
       cloudUpload('record-', recordId.value, JSON.stringify(recordInfo.value)).then(() => {
         browser.navigator.clipboard.writeText(getPureUrl() + '?record=' + recordId.value).then(() => {
@@ -535,7 +535,7 @@ export default {
     const termWrite = (content) => {
       if(!content) return;
       term.options.cursorBlink = env.value.cursorBlink;
-      term.focus();
+      if(!UserCmdCodeHelper.active) term.focus();
       globalWriteQueue.add(async () => {
         const items = parseCustomAnsi(content);
         for(const item of items) {

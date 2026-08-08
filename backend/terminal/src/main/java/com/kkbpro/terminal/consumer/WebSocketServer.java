@@ -144,7 +144,7 @@ public class WebSocketServer {
                     // 成功加入协作
                     if (maxCapacity > slaveSockets.size()) {
                         type = SocketSendEnum.CONNECT_SUCCESS.getType();
-                        cooperateTip = (readOnly ? "Read-Only" : "Editable") + " Cooperation Success";
+                        cooperateTip = (readOnly ? "Read-Only" : "Editable") + " Cooperation Started";
                         slaveSockets.add(this);
                         this.sshKey = sshKey;
                         this.cooperator = true;

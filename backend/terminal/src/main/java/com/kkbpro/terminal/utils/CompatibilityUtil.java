@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 public class CompatibilityUtil {
 
-    private static final String versionFilePath = FileUtil.basePath + "VERSION";
+    private static final String versionFilePath = FileUtil.basePath + "version";
 
     private static String getCurrentVersion() {
         File versionFile = FileUtil.getFile(versionFilePath);
