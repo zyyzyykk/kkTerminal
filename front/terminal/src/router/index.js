@@ -25,7 +25,9 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory((window.location.pathname + '/')
+      .replace(/\/{2,}/g, '/')
+      .replace(/\/index\.html\/$/, "/")),
   routes,
 });
 
