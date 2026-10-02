@@ -5,17 +5,32 @@
       <div class="setting-menu no-select" @click="doSettings(1)" ><div>{{ $t('连接设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(2)" ><div>{{ $t('偏好设置') }}</div></div>
       <div class="setting-menu no-select" @click="doSettings(4)" ><div>{{ $t('文件管理') }}</div></div>
-      <div @mousemove="showAdvance(true)" @mouseleave="showAdvance(false)" :class="['setting-menu', 'no-select', (sshKey && env.advance) ? '':'disabled']" @click="doSettings(5)" >
+      <div @mousemove="!(sshKey && env.advance) ? $event.stopPropagation() : showAdvance(true)"
+           @mouseleave="!(sshKey && env.advance) ? $event.stopPropagation() : showAdvance(false)"
+           :class="['setting-menu', 'no-select', !(sshKey && env.advance) ? 'disabled-text':'']"
+           @click="!(sshKey && env.advance) ? $event.stopPropagation() : doSettings(5)" >
         <div>{{ $t('高级') }}</div>
         <div style="flex: 1;" ></div>
         <el-icon><ArrowRight /></el-icon>
       </div>
       <div class="setting-menu no-select" @click="doSettings(3)" ><div>{{ $t('重启') }}</div></div>
     </div>
-    <div @mousemove="showAdvance(true)" @mouseleave="showAdvance(false)" :class="['advance', (sshKey && env.advance) ? '':'disabled']" v-show="isShowSetting && isShowAdvance && (urlParams.mode !== 'headless' && urlParams.mode !== 'pure')" >
-      <div class="setting-menu no-select" @click="doSettings(6)" ><div>{{ $t('协作') }}</div></div>
-      <div class="setting-menu no-select" @click="doSettings(7)" ><div>{{ $t('监控') }}</div></div>
-      <div class="setting-menu no-select" @click="doSettings(8)" ><div>Docker</div></div>
+    <div @mousemove="!(sshKey && env.advance) ? $event.stopPropagation() : showAdvance(true)"
+         @mouseleave="!(sshKey && env.advance) ? $event.stopPropagation() : showAdvance(false)"
+         :class="['advance', !(sshKey && env.advance) ? 'disabled-text':'']"
+         v-show="isShowSetting && isShowAdvance && (urlParams.mode !== 'headless' && urlParams.mode !== 'pure')" >
+      <div class="setting-menu no-select"
+           @click="!(sshKey && env.advance) ? $event.stopPropagation() : doSettings(6)" >
+        <div>{{ $t('协作') }}</div>
+      </div>
+      <div class="setting-menu no-select"
+           @click="!(sshKey && env.advance) ? $event.stopPropagation() : doSettings(7)" >
+        <div>{{ $t('监控') }}</div>
+      </div>
+      <div class="setting-menu no-select"
+           @click="!(sshKey && env.advance) ? $event.stopPropagation() : doSettings(8)" >
+        <div>Docker</div>
+      </div>
     </div>
     <div v-if="urlParams.mode !== 'headless'" class="kk-flex bar" >
       <img class="logo no-select" src="@/assets/terminal.svg" alt="terminal"
@@ -30,23 +45,25 @@
         <div v-if="env.cloud" class="bar-tab no-select" >
           <el-icon @click="cloudSync" style="font-size: 20px; color: #909399;" ><ChromeFilled /></el-icon>
         </div>
-        <div v-if="env.advance" class="bar-tab no-select" >
+        <div v-if="env.advance" :class="['bar-tab', 'no-select', !sshKey ? 'disabled-icon':'']" >
           <el-tooltip :disabled="!cooperating" :content="$t('在线人数：') + onlineNumber" placement="bottom" :show-after="300" >
-            <el-icon v-if="!cooperating" @click="doSettings(6)" style="font-size: 20px; color: #909399;" ><UserFilled /></el-icon>
-            <el-icon v-else-if="calcType(onlineNumber, maxNumber) === 'success'" @click="doSettings(6)" style="font-size: 20px; color: #67c23a;" ><UserFilled /></el-icon>
-            <el-icon v-else-if="calcType(onlineNumber, maxNumber) === 'warning'" @click="doSettings(6)" style="font-size: 20px; color: #e6a23c;" ><UserFilled /></el-icon>
-            <el-icon v-else @click="doSettings(6)" style="font-size: 20px; color: #f56c6c;" ><UserFilled /></el-icon>
+            <el-icon v-if="!cooperating" @click="!sshKey ? $event.stopPropagation() : doSettings(6)" style="font-size: 20px; color: #909399;" ><UserFilled /></el-icon>
+            <el-icon v-else-if="calcType(onlineNumber, maxNumber) === 'success'" @click="!sshKey ? $event.stopPropagation() : doSettings(6)" style="font-size: 20px; color: #67c23a;" ><UserFilled /></el-icon>
+            <el-icon v-else-if="calcType(onlineNumber, maxNumber) === 'warning'" @click="!sshKey ? $event.stopPropagation() : doSettings(6)" style="font-size: 20px; color: #e6a23c;" ><UserFilled /></el-icon>
+            <el-icon v-else @click="!sshKey ? $event.stopPropagation() : doSettings(6)" style="font-size: 20px; color: #f56c6c;" ><UserFilled /></el-icon>
           </el-tooltip>
         </div>
-        <div v-if="env.advance" class="bar-tab no-select" >
-          <img @click="doSettings(7)" src="@/assets/monitor.svg" alt="monitor" style="height: 18px;" >
+        <div v-if="env.advance" :class="['bar-tab', 'no-select', !sshKey ? 'disabled-icon':'']" >
+          <img @click="!sshKey ? $event.stopPropagation() : doSettings(7)" src="@/assets/monitor.svg" alt="monitor" style="height: 18px;" >
         </div>
-        <div v-if="env.advance" class="bar-tab no-select" >
-          <img @click="doSettings(8)" src="@/assets/docker.svg" alt="docker" style="height: 18px;" >
+        <div v-if="env.advance" :class="['bar-tab', 'no-select', !sshKey ? 'disabled-icon':'']" >
+          <img @click="!sshKey ? $event.stopPropagation() : doSettings(8)" src="@/assets/docker.svg" alt="docker" style="height: 18px;" >
         </div>
-        <el-dropdown v-if="env.transport" @visible-change="changeDropdownShowStatus" class="bar-tab no-select" hide-timeout="300" trigger="click" >
+        <el-dropdown v-if="env.transport" @visible-change="changeDropdownShowStatus"
+                     :class="['bar-tab', 'no-select', !sshKey ? 'disabled-icon':'']"
+                     hide-timeout="300" trigger="click" >
           <el-badge :hidden="isShowDropdown || !isShowDot" :is-dot="true" :offset="[0.8, 1.5]" >
-            <img @click="isShowDot = false;" src="@/assets/transport.svg" alt="transport" style="height: 16px;" >
+            <img @click="!sshKey ? $event.stopPropagation() : isShowDot = false;" src="@/assets/transport.svg" alt="transport" style="height: 16px;" >
           </el-badge>
           <template #dropdown>
             <el-card class="no-select" style="width: 512px;" :body-style="{padding: '5px 5px'}" >
@@ -590,6 +607,7 @@ export default {
                 onHandleMenuSelect: (type, data) => {
                   handleMenuSelect(type, data);
                 },
+                isDisabled: (urlParams.value.record || !sshKey.value),
               });
               render(vnode, element);
             });
@@ -1455,12 +1473,6 @@ export default {
   cursor: pointer;
   border: 2px solid #f2f2f2;
   border-left: 2px solid #efefef;
-}
-
-.disabled {
-  pointer-events: none;
-  color: #a8abb2;
-  background-color: #f5f7fa;
 }
 
 .cmdcode-name {

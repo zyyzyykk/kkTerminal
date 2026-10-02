@@ -87,6 +87,12 @@
             <el-icon class="el-icon--left" ><DocumentCopy /></el-icon>{{ $t('复制') }}
           </el-button>
         </div>
+        <div style="margin-right: 20px;" ></div>
+        <div style="flex: 1;" ></div>
+        <div class="kk-flex hover-class" @click="initText" >
+          <el-icon style="font-size: 18px;" ><Refresh /></el-icon>
+          <div style="margin-left: 5px;" >{{ $t('刷新') }}</div>
+        </div>
       </div>
       <div :element-loading-text="$t('加载中...')" v-loading="loading" style="width: 100%; height: 60vh; position: relative; margin-bottom: 10px;" >
         <AceEditor class="preview" v-show="!loading && previewInfo.preview === 'editor'" ref="codeEditorRef" @handleChange="handleChange" @handleSave="handleSave" ></AceEditor>
@@ -120,7 +126,7 @@ import { previewFileInfo } from "@/components/preview/FileSuffix";
 import { changeStr2 } from "@/utils/String";
 import { getUrlParams } from "@/utils/Url";
 import { encodeStrToArray, decodeArrayToStr } from "@/components/preview/Encode";
-import { ArrowDown, DocumentCopy } from "@element-plus/icons-vue";
+import { ArrowDown, DocumentCopy, Refresh } from "@element-plus/icons-vue";
 import FileIcons from "file-icons-vue";
 import i18n from "@/locales/i18n";
 
@@ -131,6 +137,7 @@ export default {
     FileIcons,
     ArrowDown,
     DocumentCopy,
+    Refresh,
   },
   setup(props, context) {
 
@@ -390,6 +397,11 @@ export default {
 .kk-flex {
   display: flex;
   align-items: center;
+}
+
+.hover-class:hover {
+  color: #409eff;
+  cursor: pointer;
 }
 
 .preview {

@@ -115,17 +115,14 @@ export default {
     const DialogVisible = ref(false);
     const loading = ref(false);
 
-    const workflowTemplate = `const path = '/root/terminal';
-await kkTerminal.write('cd ' + path, 1200);
-const port = 3000;
-await kkTerminal.write('lsof -ti :' + port, 1200);
-const resultArr = kkTerminal.read();
-if(resultArr.length >= 2) {
-    const pid = resultArr[1];
-	if(pid && /^\\d+$/.test(pid)) await kkTerminal.write('kill -9 ' + pid, 1200);
-}
+    const workflowTemplate = `const port = 3000;
+await kkTerminal.write('lsof -ti :' + port);
+const pid = kkTerminal.read()[0];
+if(pid && /^\\d+$/.test(pid)) await kkTerminal.write('kill -9 ' + pid);
+const path = '/root/terminal';
+await kkTerminal.write('cd ' + path);
 const jar = 'kkTerminal.jar';
-await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);`;
+await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &');`;
 
     const userCmdCodeEditorRef = ref();
     const userCmdCodeInfo = ref({

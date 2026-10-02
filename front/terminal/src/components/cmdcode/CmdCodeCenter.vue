@@ -74,7 +74,10 @@
                       <el-icon @click="doOnlyRead" class="editor-operator" ><View /></el-icon>
                     </el-tooltip>
                     <el-tooltip v-if="mode" :content="$t('保存修改')" placement="top" :show-after="300" >
-                      <el-icon @click="doSaveCmdCode" class="editor-operator" ><Finished /></el-icon>
+                      <el-icon :class="['editor-operator', modifyTag !== '*' ? 'disabled-icon':'']"
+                               @click="doSaveCmdCode" >
+                        <Finished />
+                      </el-icon>
                     </el-tooltip>
                   </div>
                   <div style="width: 100%; height: 180px;" >

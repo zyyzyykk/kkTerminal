@@ -185,7 +185,7 @@ export const UserCmdCodeExecutor = {
         },
     },
     // 写入后等待
-    async write(content, timeout = 3000) {
+    async write(content, timeout = 10000) {
         return new Promise((resolve, reject) => {
             if(content === null || content === undefined) content = '';
             content = content.toString();

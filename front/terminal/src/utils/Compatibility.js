@@ -4,10 +4,10 @@ import { aesDecrypt, aesEncrypt } from "@/utils/Encrypt";
 import { eq, valid, lte, compare } from "semver";
 
 // 最新版本号
-const latestVersion = document.querySelector('meta[name="version"]')?.getAttribute('content');
+const latestVersion = document.querySelector('meta[name="version"]').getAttribute('content');
 
 const setupCompatFixes = () => {
-    const currentVersion = browser.localStorage.getItem(localStore['version']);
+    const currentVersion = browser.localStorage.getItem(localStore['version']) || '0.0.0';
     if(eq(latestVersion, currentVersion)) return;
     for(const fixItem of sortedFixesChain) {
         if(!valid(currentVersion) || lte(currentVersion, fixItem.version)) fixItem.run();

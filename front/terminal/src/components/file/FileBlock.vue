@@ -198,13 +198,38 @@
 
   <!-- 菜单项 -->
   <div ref="menuBlockRef" @contextmenu="stopEvent" v-show="isShowMenu" class="kk-menu no-select" >
-    <div style="border-bottom: 1px solid #ddd;" class="kk-menu-item" @click="handleMenuSelect(1)" key="1" >{{ $t('刷新') }}</div>
-    <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(2)" key="2" >{{ $t('打开') }}</div>
-    <div style="border-bottom: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length > 1 ? 'disabled':'']" @click="handleMenuSelect(3)" key="3" >{{ $t('复制路径') }}</div>
-    <div style="border-bottom: 1px solid #ddd;" v-show="selectedFiles.length === 1 && isZipFile(selectedFiles[0].name)" :class="['kk-menu-item', !(selectedFiles.length === 1 && isZipFile(selectedFiles[0].name)) ? 'disabled':'']" @click="handleMenuSelect(9)" key="9" >{{ $t('解压') }}</div>
-    <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(4)" key="4" >{{ $t('下载') }}</div>
-    <div :class="['kk-menu-item', dirStatus === 1 ? 'disabled':'']" @click="handleMenuSelect(5)" key="5" >{{ $t('新建') }}</div>
-    <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(6)" key="6" >{{ $t('重命名') }}</div>
+    <div style="border-bottom: 1px solid #ddd;"
+         class="kk-menu-item"
+         @click="handleMenuSelect(1)" key="1" >
+      {{ $t('刷新') }}
+    </div>
+    <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled-text':'']"
+         @click="selectedFiles.length !== 1 ? $event.stopPropagation() : handleMenuSelect(2)" key="2" >
+      {{ $t('打开') }}
+    </div>
+    <div style="border-bottom: 1px solid #ddd;"
+         :class="['kk-menu-item', selectedFiles.length > 1 ? 'disabled-text':'']"
+         @click="selectedFiles.length > 1 ? $event.stopPropagation() : handleMenuSelect(3)" key="3" >
+      {{ $t('复制路径') }}
+    </div>
+    <div style="border-bottom: 1px solid #ddd;"
+         v-show="selectedFiles.length === 1 && isZipFile(selectedFiles[0].name)"
+         :class="['kk-menu-item', !(selectedFiles.length === 1 && isZipFile(selectedFiles[0].name)) ? 'disabled-text':'']"
+         @click="!(selectedFiles.length === 1 && isZipFile(selectedFiles[0].name)) ? $event.stopPropagation() : handleMenuSelect(9)" key="9" >
+      {{ $t('解压') }}
+    </div>
+    <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled-text':'']"
+         @click="selectedFiles.length !== 1 ? $event.stopPropagation() : handleMenuSelect(4)" key="4" >
+      {{ $t('下载') }}
+    </div>
+    <div :class="['kk-menu-item', dirStatus === 1 ? 'disabled-text':'']"
+         @click="dirStatus === 1 ? $event.stopPropagation() : handleMenuSelect(5)" key="5" >
+      {{ $t('新建') }}
+    </div>
+    <div :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled-text':'']"
+         @click="selectedFiles.length !== 1 ? $event.stopPropagation() : handleMenuSelect(6)" key="6" >
+      {{ $t('重命名') }}
+    </div>
     <el-popconfirm :title="$t('确定删除此文件吗？')"
       :confirm-button-text="$t('确定')" :cancel-button-text="$t('取消')"
       @confirm="confirmPopConfirm" @cancel="cancelPopConfirm"
@@ -212,12 +237,18 @@
       :popper-style="{zIndex: 3466, fontSize: '13px', color: 'black'}" popper-class="confirmPop"
       placement="right" confirm-button-type="danger" >
       <template #reference>
-        <div :class="['kk-menu-item', selectedFiles.length === 0 ? 'disabled':'']" key="7" >
-          <div @click="handleMenuSelect(7)" >{{ $t('删除') }}</div>
+        <div :class="['kk-menu-item', selectedFiles.length === 0 ? 'disabled-text':'']" key="7" >
+          <div @click="selectedFiles.length === 0 ? $event.stopPropagation() : handleMenuSelect(7)" >
+            {{ $t('删除') }}
+          </div>
         </div>
       </template>
     </el-popconfirm>
-    <div style="border-top: 1px solid #ddd;" :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled':'']" @click="handleMenuSelect(8)" key="8" >{{ $t('属性') }}</div>
+    <div style="border-top: 1px solid #ddd;"
+         :class="['kk-menu-item', selectedFiles.length !== 1 ? 'disabled-text':'']"
+         @click="selectedFiles.length !== 1 ? $event.stopPropagation() : handleMenuSelect(8)" key="8" >
+      {{ $t('属性') }}
+    </div>
   </div>
 
 </template>
@@ -1680,12 +1711,6 @@ export default {
 
 .kk-menu-item:hover {
   background-color: #efefef;
-}
-
-.disabled {
-  pointer-events: none;
-  color: #a8abb2;
-  background-color: #f5f7fa;
 }
 
 /* 定位删除确认框 */

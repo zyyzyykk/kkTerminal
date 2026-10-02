@@ -176,6 +176,17 @@ export default {
   right: 0;
 }
 
+.disabled-text, .disabled-text:hover {
+  cursor: not-allowed !important;
+  color: #a8abb2 !important;
+  background-color: #f5f7fa !important;
+}
+
+.disabled-icon, .disabled-icon:hover {
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+}
+
 .xterm-scrollable-element > [role="presentation"] {
   display: none;
 }

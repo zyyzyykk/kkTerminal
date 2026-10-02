@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { router_base_path } from "@/env/Base";
 
 import TerminalView from "@/views/TerminalView";
 import AccessCheck from "@/views/AccessCheck";
@@ -25,9 +26,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory((window.location.pathname + '/')
-      .replace(/\/{2,}/g, '/')
-      .replace(/\/index\.html\/$/, "/")),
+  history: createWebHistory(router_base_path),
   routes,
 });
 

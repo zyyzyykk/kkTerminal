@@ -3,11 +3,28 @@
     <CircleCloseFilled v-if="statusType === -1" @click="clickDecoration" @mouseleave="showMenu(false)" :style="statusStyle" />
     <SuccessFilled v-else-if="statusType === 1" @click="clickDecoration" @mouseleave="showMenu(false)" :style="statusStyle" />
     <Remove v-else :style="statusStyle" />
-    <div ref="decorationMenuRef" v-if="isShowMenu" @mousemove="showMenu(true)" @mouseleave="showMenu(false)" class="kk-menu no-select" :style="{ width: i18n.global.t('130') + 'px', top: menuTop + 'px' }" >
-      <div @click="handleMenuSelect(1)" style="border-bottom: 1px solid #ddd;" class="kk-menu-item" key="1" >{{ i18n.global.t('重新运行此命令') }}</div>
-      <div @click="handleMenuSelect(2)" class="kk-menu-item" key="2" >{{ i18n.global.t('复制此命令') }}</div>
-      <div @click="handleMenuSelect(3)" style="border-bottom: 1px solid #ddd;" class="kk-menu-item" key="3" >{{ i18n.global.t('复制命令输出') }}</div>
-      <div @click="handleMenuSelect(4)" class="kk-menu-item" key="4" >{{ i18n.global.t('打开运行目录') }}</div>
+    <div ref="decorationMenuRef" v-if="isShowMenu"
+         @mousemove="showMenu(true)" @mouseleave="showMenu(false)"
+         class="kk-menu no-select"
+         :style="{ width: i18n.global.t('130') + 'px', top: menuTop + 'px' }" >
+      <div :class="['kk-menu-item', isDisabled ? 'disabled-text':'']"
+           @click="isDisabled ? $event.stopPropagation() : handleMenuSelect(1)"
+           style="border-bottom: 1px solid #ddd;" key="1" >
+        {{ i18n.global.t('重新运行此命令') }}
+      </div>
+      <div class="kk-menu-item"
+           @click="handleMenuSelect(2)" key="2" >
+        {{ i18n.global.t('复制此命令') }}
+      </div>
+      <div class="kk-menu-item"
+           @click="handleMenuSelect(3)"
+           style="border-bottom: 1px solid #ddd;" key="3" >
+        {{ i18n.global.t('复制命令输出') }}
+      </div>
+      <div :class="['kk-menu-item', isDisabled ? 'disabled-text':'']"
+           @click="isDisabled ? $event.stopPropagation() : handleMenuSelect(4)" key="4" >
+        {{ i18n.global.t('打开运行目录') }}
+      </div>
     </div>
   </div>
 </template>
@@ -33,6 +50,10 @@ export default {
     data: {
       type: Object,
       default: (() => {}),
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false,
     },
   },
   setup(props, context) {
