@@ -189,7 +189,9 @@ public class WebSocketServer {
         sshSession.allocatePTY("xterm-256color", envInfo.getCols(), envInfo.getRows(), 0, 0, Collections.emptyMap());
         // 终端集成脚本
         String shellIntegrationScript = """
+                unset PS2
                 export PS2="> "
+                readonly PS2
 
                 __kkterminal_lastcmd=""
                 __kkterminal_counter=1
@@ -199,12 +201,29 @@ public class WebSocketServer {
                   printf "\\e]666;%s|%s|%s|%s\\e\\\\" "${__kkterminal_counter}" "${exit_code}" "$(pwd)" "${__kkterminal_lastcmd}"
                 }
 
+                declare -a __kkterminal_skipcmds=()
+                __kkterminal_skipcmds+=("__kkterminal_prompt")
+                for __kkterminal_skipcmd in "${PROMPT_COMMAND[@]}"; do
+                  __kkterminal_skipcmds+=("${__kkterminal_skipcmd}")
+                done
+                readonly __kkterminal_skipcmds
+
+                unset PROMPT_COMMAND
                 export PROMPT_COMMAND="__kkterminal_prompt"
+                readonly PROMPT_COMMAND
                 __kkterminal_prompt
 
                 trap '
-                if [[ "$BASH_COMMAND" != "__kkterminal_prompt" ]]; then
-                  __kkterminal_lastcmd=$BASH_COMMAND
+                __kkterminal_skip=0
+                for __kkterminal_skipcmd in "${__kkterminal_skipcmds[@]}"; do
+                  if [[ "${BASH_COMMAND}" == "${__kkterminal_skipcmd}" ]]; then
+                    __kkterminal_skip=1
+                    break
+                  fi
+                done
+
+                if (( ! __kkterminal_skip )); then
+                  __kkterminal_lastcmd="${BASH_COMMAND}"
                   ((__kkterminal_counter++))
                 fi
                 ' DEBUG

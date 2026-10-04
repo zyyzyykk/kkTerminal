@@ -7,17 +7,17 @@
          @mousemove="showMenu(true)" @mouseleave="showMenu(false)"
          class="kk-menu no-select"
          :style="{ width: i18n.global.t('130') + 'px', top: menuTop + 'px' }" >
-      <div :class="['kk-menu-item', isDisabled ? 'disabled-text':'']"
-           @click="isDisabled ? $event.stopPropagation() : handleMenuSelect(1)"
+      <div :class="['kk-menu-item', (isDisabled || !data.execCmd) ? 'disabled-text':'']"
+           @click="(isDisabled || !data.execCmd) ? $event.stopPropagation() : handleMenuSelect(1)"
            style="border-bottom: 1px solid #ddd;" key="1" >
         {{ i18n.global.t('重新运行此命令') }}
       </div>
-      <div class="kk-menu-item"
-           @click="handleMenuSelect(2)" key="2" >
+      <div :class="['kk-menu-item', !data.execCmd ? 'disabled-text':'']"
+           @click="!data.execCmd ? $event.stopPropagation() : handleMenuSelect(2)" key="2" >
         {{ i18n.global.t('复制此命令') }}
       </div>
-      <div class="kk-menu-item"
-           @click="handleMenuSelect(3)"
+      <div :class="['kk-menu-item', (!data.cmdOutput || data.cmdOutput.length === 0) ? 'disabled-text':'']"
+           @click="(!data.cmdOutput || data.cmdOutput.length === 0) ? $event.stopPropagation() : handleMenuSelect(3)"
            style="border-bottom: 1px solid #ddd;" key="3" >
         {{ i18n.global.t('复制命令输出') }}
       </div>
