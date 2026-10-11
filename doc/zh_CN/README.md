@@ -6,14 +6,14 @@
 >
 > 源代码：https://github.com/zyyzyykk/kkTerminal
 >
-> Docker仓库地址：https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general
+> Docker仓库：https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general
 >
-> 预览：https://ssh.kkbpro.com/
+> 预览：https://kkterminal.com
 >
-> 更新时间：2026-03-07
+> 更新时间：2026-10-11
 >
 
-<p align="center"><a href="https://ssh.kkbpro.com/" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.svg" alt="kkterminal"></a></p>
+<p align="center"><a href="https://kkterminal.com" target="_blank" rel="noopener noreferrer"><img width="100" src="https://kkbapps.oss-cn-shanghai.aliyuncs.com/logo/terminal.svg" alt="kkterminal"></a></p>
 
 <p align="center">
   <a href="https://hub.docker.com/repository/docker/zyyzyykk/kkterminal/general"><img src="https://img.shields.io/docker/pulls/zyyzyykk/kkterminal?logo=docker" alt="Docker Image"></a>
@@ -27,70 +27,110 @@
 
 ### ⚡ 快速集成
 
-在网页中使用html标签 `iframe` 实现快速集成：
-
 ```html
-<iframe src="https://ssh.kkbpro.com/" height="600px" width="800px" ></iframe>
+<iframe src="https://kkterminal.com" height="600px" width="800px" ></iframe>
 ```
 
 ### 🐳 Docker部署
 
-1. 拉取镜像：
+1. 拉取最新镜像：
 
-```bash
-docker pull zyyzyykk/kkterminal
-```
+   ```bash
+   docker pull zyyzyykk/kkterminal:latest
+   ```
 
 2. 创建并运行容器：
 
-```bash
-docker run -d --name kkterminal \
--p 3000:3000 \
--e BANNER="kkTerminal" \
--e STORAGE="P5P1SIqVe6kaOxMX" \
--e PASSWORD="" \
--v /data/kkterminal/cloud:/cloud \
--v /data/kkterminal/log:/log \
--v /data/kkterminal/temp:/temp \
-zyyzyykk/kkterminal
-```
+   ```bash
+   docker run -d --name kkterminal \
+   -p 3000:3000 \
+   -e PASSWORD="" \
+   -v /data/kkterminal:/data \
+   zyyzyykk/kkterminal:latest
+   ```
 
-3. 在浏览器中访问：`http://<服务器IP>:3000/`
+3. 配置Nginx反向代理：
+
+   ```nginx
+   # 部署在根路径
+   location ^~ / {
+   	proxy_pass http://127.0.0.1:3000;
+   	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+   	proxy_set_header X-Real-IP $remote_addr;
+   	proxy_set_header Host $http_host;
+   
+   	proxy_http_version 1.1;
+   	proxy_set_header Upgrade $http_upgrade;
+   	proxy_set_header Connection "upgrade";
+   	proxy_read_timeout 36000s;
+   }
+   ```
+
+   ```nginx
+   # 部署在子路径
+   location ^~ /subpath/ {
+   	proxy_pass http://127.0.0.1:3000/;
+   	proxy_set_header X-Forwarded-Prefix /subpath;
+   	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+   	proxy_set_header X-Real-IP $remote_addr;
+   	proxy_set_header Host $http_host;
+   
+   	proxy_http_version 1.1;
+   	proxy_set_header Upgrade $http_upgrade;
+   	proxy_set_header Connection "upgrade";
+   	proxy_read_timeout 36000s;
+   }
+   ```
+
+4. 在浏览器中访问：`http://<服务器IP>:3000/[子路径]`
 
 ### 👀 预览
 
-访问此网址：https://ssh.kkbpro.com/
+访问此网址：https://kkterminal.com
 
-![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.0/zh/Connect.png)
+![Connect](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.8/zh/Connect.png)
 
-![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.0/zh/Preference.png)
+![Preference](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.8/zh/Preference.png)
 
-![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.0/zh/File.png)
+![File](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.8/zh/File.png)
 
-![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.0/zh/Editor.png)
+![Editor](https://kkbapps.oss-cn-shanghai.aliyuncs.com/terminal/3.8.8/zh/Editor.png)
 
 [**更多模块预览**](./MODULE.md)
 
 ### 💡 功能说明
 
-1. 点击左上角的终端图标选择连接设置进行ssh连接
-2. 支持在网页中使用 `iframe` 标签引入，快速集成到第三方网站中
-3. 支持通过 [URL参数](./PARAMS.md) 自定义终端配置
-4. 支持i18n国际化，支持中/英文语言切换
-5. 支持本地PC运行，启动时浏览器窗口会自动打开
-6. 支持窗口大小自适应和中文输入
-7. 支持偏好设置，例如终端的背/前景色、字体字号、光标显示样式等
-8. 支持自动/手动重启
-9. 支持选中自动复制和单击右键粘贴
-10. 支持文件管理，打开文件管理模块查看、解压、上传与下载文件/文件夹
-11. 支持文件多选/全选、复制粘贴、剪切、选择切换、打开、删除等快捷键操作
-12. 支持文件的浏览与编辑，修改文件后使用 `ctrl+s` 保存至远程服务器
-13. 支持 [命令代码](./CMDCODE.md) 执行自定义工作流
-14. 支持操作录像、多端同步功能
-15. 支持协作、监控、Docker功能
-16. 支持访问密码认证
+1. 点击左上角的终端图标，选择 `Connect` 以建立SSH连接
+2. 使用 `<iframe>` 标签将终端快速嵌入第三方网站
+3. 通过 [URL参数](./PARAMS.md) 自定义终端设置
+4. i18n国际化中/英文切换
+5. 可部署在本地电脑或远程服务器
+6. 自适配窗口尺寸和中文输入
+7. 配置终端背景色/前景色、字体大小、光标样式等偏好
+8. 自动/手动重启
+9. 文本选中自动复制和单击右键粘贴
+10. 打开文件管理模块查看、解压、上传和下载文件/文件夹
+11. 使用快捷键执行文件操作，包括多选、全选、复制、粘贴、剪切、反选、打开、删除等
+12. 浏览并编辑文件，按 ``Ctrl+S`` 将更改保存到远程服务器
+13. 通过 [命令代码](./CMDCODE.md) 执行自定义工作流
+14. 记录和回放终端操作
+15. 在不同设备间同步数据
+16. 提供高级功能：协作、监控、Docker
+17. 需要密码验证才可访问
+18. 启用终端集成
 
 ### 👨‍💻 更新记录
+
+##### zyyzyykk/kkterminal:3.8.8
+
+- 新增终端集成功能
+- 支持子路径部署
+- 文件管理模块新增跟随终端目录功能
+- 更新Docker应用商店
+- 文件管理模块新增目录导航下拉菜单
+- 重构云端数据存储路径
+- 优化界面显示
+- 增强部分功能
 
 ##### zyyzyykk/kkterminal:3.8.0
 
@@ -110,17 +150,6 @@ zyyzyykk/kkterminal
 - 优化界面显示
 - 增强部分功能
 
-##### zyyzyykk/kkterminal:3.6.8
-
-- 新增文件传输列表
-- 新增Docker应用商店
-- 新增日志记录功能
-- 优化整体加密逻辑
-- 部分对话框支持左右拉伸调整宽度
-- 优化编辑器打开与保存文件的编码格式
-- 用户命令代码新增保留值与文件模块API
-- 重构部分代码与优化界面显示
-
 [**历史更新记录**](./UPDATE.md)
 
 ### 🧬 架构
@@ -132,12 +161,18 @@ zyyzyykk/kkterminal
 Vue + Xterm              SpringBoot + SSHJ                Linux OS    
 ```
 
-### 🏘️ 关于此项目
+### 🛡️ 隐私与安全
 
-> [!Important] 
+> [!Warning]
 >
-> kkTerminal不会主动记录密码、文件、命令等任何与远程服务器相关的信息
-
-### 🌟 点赞
-
-[![Stars](https://starchart.cc/zyyzyykk/kkTerminal.svg?variant=adaptive)](https://starchart.cc/zyyzyykk/kkTerminal)
+> **🔐 零知识加密**
+>
+> 云端同步数据采用零知识加密进行保护，因此服务端无法获取原始内容
+>
+> **⏱️ 临时存储**
+>
+> 文件和私钥仅被临时存储，并在传输或登录完成后删除
+>
+> **⚠️ 免责声明**
+>
+> 本项目按”原样“提供，仅用于个人学习和研究，严禁任何非法使用

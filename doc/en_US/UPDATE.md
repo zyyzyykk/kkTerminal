@@ -1,5 +1,16 @@
 ### 👨‍💻 History Update Records
 
+##### zyyzyykk/kkterminal:3.6.8
+
+- Add file transport list
+- Add docker appStore
+- Add logging function
+- Optimize the overall encryption logic
+- Some dialogs support left and right stretching to adjust width
+- Optimize the encoding format for opening and saving in file editor
+- User Command Code adds reserved values and file module API
+- Refactoring some codes and optimizing UI display
+
 ##### zyyzyykk/kkterminal:3.6.0
 
 - Add Advance Cooperate function

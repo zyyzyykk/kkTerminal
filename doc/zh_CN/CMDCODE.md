@@ -35,13 +35,13 @@
 
 ###### kkTerminal 基础功能
 
-| 方法名  | 说明                                     | 示例                                                       |
-| ------- | ---------------------------------------- | ---------------------------------------------------------- |
-| write   | 写入内容并等待输出结果                   | `await kkTerminal.write('写入内容'[, 获取结果延时=200ms])` |
-| read    | 获取从上次写入命令开始的全部输出结果数组 | `kkTerminal.read()`                                        |
-| readAll | 获取从工作流执行开始的全部输出结果数组   | `kkTerminal.readAll()`                                     |
-| hide    | 在终端中隐藏工作流执行过程               | `kkTerminal.hide()`                                        |
-| show    | 在终端中显示工作流执行过程               | `kkTerminal.show()`                                        |
+| 方法名  | 说明                                   | 示例                                                 |
+| ------- | -------------------------------------- | ---------------------------------------------------- |
+| write   | 向终端写入内容并等待输出结果           | `await kkTerminal.write('写入内容'[, 等待超时=10s])` |
+| read    | 返回前第k条命令的输出结果数组          | `kkTerminal.read(-k)`                                |
+| readAll | 返回从工作流开始以来的全部输出结果数组 | `kkTerminal.readAll()`                               |
+| hide    | 在终端中隐藏工作流执行过程             | `kkTerminal.hide()`                                  |
+| show    | 在终端中显示工作流执行过程             | `kkTerminal.show()`                                  |
 
 ###### kkTerminal 存取变量
 
@@ -70,24 +70,22 @@
 
 | 名称           | 说明                |
 | -------------- | ------------------- |
-| CONNECT_OPTION | 当前ssh连接的配置名 |
-| HOME_PATH      | 文件模块家路径      |
-| CURRENT_DIR    | 文件模块当前目录    |
+| CONNECT_OPTION | 当前SSH连接的配置名 |
+| HOME_DIRECTORY | 当前用户的家目录    |
+| FILE_DIRECTORY | 当前文件模块目录    |
+| WORK_DIRECTORY | 当前终端的工作目录  |
 
 ###### 默认工作流模版（部署jar包）
 
 ```js
-const path = '/root/terminal';
-await kkTerminal.write('cd ' + path, 1200);
 const port = 3000;
-await kkTerminal.write('lsof -ti :' + port, 1200);
-const resultArr = kkTerminal.read();
-if(resultArr.length >= 2) {
-    const pid = resultArr[1];
-    if(pid && /^\d+$/.test(pid)) await kkTerminal.write('kill -9 ' + pid, 1200);
-}
+await kkTerminal.write('lsof -ti :' + port);
+const pid = kkTerminal.read()[0];
+if(pid && /^\d+$/.test(pid)) await kkTerminal.write('kill -9 ' + pid);
+const path = '/root/terminal';
+await kkTerminal.write('cd ' + path);
 const jar = 'kkTerminal.jar';
-await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);
+await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &');
 ```
 
 ###### 导入导出
@@ -103,8 +101,8 @@ await kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);
 ```json
 {
     "UJAR": {
-        "desc": "start jar",
-        "workflow": "const path = '/root/terminal';\nawait kkTerminal.write('cd ' + path, 1200);\nconst port = 3000;\nawait kkTerminal.write('lsof -ti :' + port, 1200);\nconst resultArr = kkTerminal.read();\nif(resultArr.length >= 2) {\n    const pid = resultArr[1];\n\tif(pid && /^\\d+$/.test(pid)) await kkTerminal.write('kill -9 ' + pid, 1200);\n}\nconst jar = 'kkTerminal.jar';\nawait kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &', 1200);",
+        "desc": "运行Jar",
+        "workflow": "const port = 3000;\nawait kkTerminal.write('lsof -ti :' + port);\nconst pid = kkTerminal.read()[0];\nif(pid && /^\\d+$/.test(pid)) await kkTerminal.write('kill -9 ' + pid);\nconst path = '/root/terminal';\nawait kkTerminal.write('cd ' + path);\nconst jar = 'kkTerminal.jar';\nawait kkTerminal.write('nohup java -jar ./' + jar + ' > ./out.log &');",
         "status": "Not Active"
     }
 }
