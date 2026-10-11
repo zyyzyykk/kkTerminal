@@ -54,31 +54,31 @@
    ```nginx
    # 部署在根路径
    location ^~ / {
-   	proxy_pass http://127.0.0.1:3000;
-   	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-   	proxy_set_header X-Real-IP $remote_addr;
-   	proxy_set_header Host $http_host;
+     proxy_pass http://127.0.0.1:3000;
+     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+     proxy_set_header X-Real-IP $remote_addr;
+     proxy_set_header Host $http_host;
    
-   	proxy_http_version 1.1;
-   	proxy_set_header Upgrade $http_upgrade;
-   	proxy_set_header Connection "upgrade";
-   	proxy_read_timeout 36000s;
+     proxy_http_version 1.1;
+     proxy_set_header Upgrade $http_upgrade;
+     proxy_set_header Connection "upgrade";
+     proxy_read_timeout 36000s;
    }
    ```
 
    ```nginx
    # 部署在子路径
    location ^~ /subpath/ {
-   	proxy_pass http://127.0.0.1:3000/;
-   	proxy_set_header X-Forwarded-Prefix /subpath;
-   	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-   	proxy_set_header X-Real-IP $remote_addr;
-   	proxy_set_header Host $http_host;
+     proxy_pass http://127.0.0.1:3000/;
+     proxy_set_header X-Forwarded-Prefix /subpath;
+     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+     proxy_set_header X-Real-IP $remote_addr;
+     proxy_set_header Host $http_host;
    
-   	proxy_http_version 1.1;
-   	proxy_set_header Upgrade $http_upgrade;
-   	proxy_set_header Connection "upgrade";
-   	proxy_read_timeout 36000s;
+     proxy_http_version 1.1;
+     proxy_set_header Upgrade $http_upgrade;
+     proxy_set_header Connection "upgrade";
+     proxy_read_timeout 36000s;
    }
    ```
 
