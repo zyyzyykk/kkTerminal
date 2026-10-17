@@ -3,10 +3,10 @@ import re
 import json
 
 # i18n JSON
-TRANSLATION_FILE_PATH = "../backend/terminal/src/main/resources/locales/en_US.json"
+TRANSLATION_FILE_PATH = "../backend/src/main/resources/locales/en_US.json"
 
 # search dir
-SEARCH_DIR = "../backend/terminal/src"
+SEARCH_DIR = "../backend/src"
 # ignore dirs
 IGNORE_DIRS = ['test']
 
