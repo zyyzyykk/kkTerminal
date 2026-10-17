@@ -1,0 +1,429 @@
+package com.kkterminal.terminal.consumer;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.github.lalyos.jfiglet.FigletFont;
+import com.kkterminal.terminal.config.AppConfig;
+import com.kkterminal.terminal.constant.Constant;
+import com.kkterminal.terminal.controller.FileController;
+import com.kkterminal.terminal.enums.ResultStatusEnum;
+import com.kkterminal.terminal.enums.SocketMessageEnum;
+import com.kkterminal.terminal.enums.SocketSendEnum;
+import com.kkterminal.terminal.controller.AdvanceController;
+import com.kkterminal.terminal.pojo.dto.CooperateInfo;
+import com.kkterminal.terminal.pojo.dto.EnvInfo;
+import com.kkterminal.terminal.pojo.dto.MessageInfo;
+import com.kkterminal.terminal.pojo.vo.FileTransInfo;
+import com.kkterminal.terminal.result.Result;
+import com.kkterminal.terminal.utils.*;
+import lombok.Getter;
+import lombok.Setter;
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.common.IOUtils;
+import net.schmizz.sshj.sftp.SFTPClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import jakarta.websocket.*;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.PathParam;
+import jakarta.websocket.server.ServerEndpoint;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+
+@Component
+@ServerEndpoint(Constant.API_PREFIX + "/socket/ssh/{ws}")  // 注意不要以'/'结尾
+public class WebSocketServer {
+
+    public static final String SOCKET_SECRET_KEY = StringUtil.generateRandomString(16);
+
+    public static final ConcurrentHashMap<String, WebSocketServer> webSocketServerMap = new ConcurrentHashMap<>();
+
+    public static final ConcurrentHashMap<String, List<WebSocketServer>> cooperateMap = new ConcurrentHashMap<>();
+
+    public static final ConcurrentHashMap<String, SSHClient> sshClientMap = new ConcurrentHashMap<>();
+
+    public static final ConcurrentHashMap<String, SFTPClient> sftpClientMap = new ConcurrentHashMap<>();
+
+    private static final ConcurrentHashMap<String, ConcurrentHashMap<String, FileTransInfo>> fileTransportingMap = new ConcurrentHashMap<>();
+
+    public static void putTransportingFile(String sshKey, String key, FileTransInfo fileTransInfo) {
+        if (fileTransportingMap.get(sshKey) == null) return;
+        fileTransportingMap.get(sshKey).put(key, fileTransInfo);
+        WebSocketServer webSocketServer = webSocketServerMap.get(sshKey);
+        if (webSocketServer == null) return;
+        webSocketServer.sendMessage(SocketSendEnum.FILE_TRANSPORT_UPDATE.getDesc(), ResultStatusEnum.SUCCESS.getStatus(),
+                SocketSendEnum.FILE_TRANSPORT_UPDATE.getType(), JSON.toJSONString(fileTransInfo));
+    }
+
+    public static FileTransInfo getTransportingFile(String sshKey, String key) {
+        if (fileTransportingMap.get(sshKey) == null) return null;
+        return fileTransportingMap.get(sshKey).get(key);
+    }
+
+    public static void removeTransportingFile(String sshKey, String key) {
+        FileTransInfo fileTransInfo = getTransportingFile(sshKey, key);
+        if (fileTransInfo == null) return;
+        // 修改类型为 已完成
+        fileTransInfo.setIndex(3);
+        fileTransportingMap.get(sshKey).remove(key);
+        WebSocketServer webSocketServer = webSocketServerMap.get(sshKey);
+        if (webSocketServer == null) return;
+        webSocketServer.sendMessage(SocketSendEnum.FILE_TRANSPORT_UPDATE.getDesc(), ResultStatusEnum.SUCCESS.getStatus(),
+                SocketSendEnum.FILE_TRANSPORT_UPDATE.getType(), JSON.toJSONString(fileTransInfo));
+    }
+
+    private static AppConfig appConfig;
+
+    @Autowired
+    public void setAppConfig(AppConfig appConfig) {
+        WebSocketServer.appConfig = appConfig;
+    }
+
+    @Getter
+    private Session sessionSocket;
+
+    private String secretKey;
+
+    @Getter @Setter
+    private CooperateInfo cooperateInfo;
+
+    private Boolean cooperator = false;
+
+    private String sshKey;
+
+    private Charset serverCharset;
+
+    @Getter
+    private SSHClient sshClient;
+
+    @Getter
+    private SFTPClient sftpClient;
+
+    private net.schmizz.sshj.connection.channel.direct.Session.Shell shell;
+
+    private InputStream shellInputStream;
+
+    private OutputStream shellOutputStream;
+
+    private Thread shellOutThread;
+
+    @OnOpen
+    public void onOpen(Session sessionSocket, @PathParam("ws") String wsInfoStr) throws Exception {
+        // 获取加密密钥
+        wsInfoStr = AESUtil.decrypt(StringUtil.changeStr(wsInfoStr), SOCKET_SECRET_KEY);
+        JSONObject jsonObject = JSONObject.parseObject(wsInfoStr);
+        this.secretKey = RSAUtil.decrypt(jsonObject.getString("secretKey"));
+        // 获取连接信息
+        String envInfoStr = AESUtil.decrypt(jsonObject.getString("envInfo"), this.secretKey);
+        EnvInfo envInfo = JSONObject.parseObject(envInfoStr, EnvInfo.class);
+
+        // 建立WebSocket连接
+        this.sessionSocket = sessionSocket;
+
+        // 协作
+        String cooperateKey = envInfo.getCooperateKey();
+        if (!StringUtil.isEmpty(cooperateKey)) {
+            Integer type = SocketSendEnum.COOPERATE_KEY_INVALID.getType();
+            String cooperateTip = SocketSendEnum.COOPERATE_KEY_INVALID.getDesc();
+            try {
+                String[] keyInfo = AESUtil.decrypt(StringUtil.changeStrToBase64(cooperateKey), AdvanceController.COOPERATE_SECRET_KEY).split("\\^");
+                String cooperateId = keyInfo[0];
+                String sshKey = keyInfo[1];
+                WebSocketServer masterSocket = webSocketServerMap.get(sshKey);
+                if (masterSocket == null || masterSocket.cooperateInfo == null || !masterSocket.cooperateInfo.getId().equals(cooperateId))
+                    throw new RuntimeException();
+
+                List<WebSocketServer> slaveSockets = cooperateMap.computeIfAbsent(sshKey, k -> new ArrayList<>());
+                synchronized (slaveSockets) {
+                    Integer maxCapacity = masterSocket.cooperateInfo.getMaxCapacity();
+                    Boolean readOnly = masterSocket.cooperateInfo.getReadOnly();
+                    // 成功加入协作
+                    if (maxCapacity > slaveSockets.size()) {
+                        type = SocketSendEnum.CONNECT_SUCCESS.getType();
+                        cooperateTip = (readOnly ? "Read-Only" : "Editable") + " Cooperation Started";
+                        slaveSockets.add(this);
+                        this.sshKey = sshKey;
+                        this.cooperator = true;
+                        this.serverCharset = masterSocket.serverCharset;
+                        if (!readOnly) {
+                            this.shell = masterSocket.shell;
+                            this.shellOutputStream = masterSocket.shellOutputStream;
+                        }
+                        masterSocket.sendMessage(SocketSendEnum.COOPERATE_NUMBER_UPDATE.getDesc(), ResultStatusEnum.SUCCESS.getStatus(),
+                                SocketSendEnum.COOPERATE_NUMBER_UPDATE.getType(), Integer.toString(slaveSockets.size()));
+                    }
+                    else cooperateTip = "Capacity Limit Exceeded";
+                }
+            } catch (Exception e) {
+                LogUtil.logException(this.getClass(), e);
+            }
+            this.sendMessage(cooperateTip, ResultStatusEnum.WARNING.getStatus(), type, null);
+            return;
+        }
+
+        // 建立交互SSH连接
+        try {
+            this.sshClient = SSHUtil.connectHost(envInfo);
+        } catch (Exception e) {
+            LogUtil.logException(this.getClass(), e);
+            this.sendMessage(SocketSendEnum.CONNECT_FAIL.getDesc(), ResultStatusEnum.WARNING.getStatus(),
+                    SocketSendEnum.CONNECT_FAIL.getType(), null);
+            return;
+        }
+
+        // 获取服务器编码格式
+        try(net.schmizz.sshj.connection.channel.direct.Session sshSession = this.sshClient.startSession();
+            net.schmizz.sshj.connection.channel.direct.Session.Command command = sshSession.exec("echo -n $(locale charmap)")) {
+            String charsetName = IOUtils.readFully(command.getInputStream()).toString();
+            command.join(Constant.CMD_EXECUTE_TIMEOUT, TimeUnit.SECONDS);
+            this.serverCharset = Charset.forName(charsetName);
+            this.sshClient.setRemoteCharset(this.serverCharset);
+        }
+
+        // 开启交互Shell和SFTP
+        net.schmizz.sshj.connection.channel.direct.Session sshSession = this.sshClient.startSession();
+        sshSession.allocatePTY("xterm-256color", envInfo.getCols(), envInfo.getRows(), 0, 0, Collections.emptyMap());
+        // 终端集成脚本
+        String shellIntegrationScript = """
+                unset PS2
+                export PS2="> "
+                readonly PS2
+
+                __kkterminal_lastcmd=""
+                __kkterminal_counter=1
+
+                __kkterminal_prompt() {
+                  local exit_code=$?
+                  printf "\\e]666;%s|%s|%s|%s\\e\\\\" "${__kkterminal_counter}" "${exit_code}" "$(pwd)" "${__kkterminal_lastcmd}"
+                }
+
+                declare -a __kkterminal_skipcmds=()
+                __kkterminal_skipcmds+=("__kkterminal_prompt")
+                for __kkterminal_skipcmd in "${PROMPT_COMMAND[@]}"; do
+                  __kkterminal_skipcmds+=("${__kkterminal_skipcmd}")
+                done
+                readonly __kkterminal_skipcmds
+
+                unset PROMPT_COMMAND
+                export PROMPT_COMMAND="__kkterminal_prompt"
+                readonly PROMPT_COMMAND
+                __kkterminal_prompt
+
+                trap '
+                __kkterminal_skip=0
+                for __kkterminal_skipcmd in "${__kkterminal_skipcmds[@]}"; do
+                  if [[ "${BASH_COMMAND}" == "${__kkterminal_skipcmd}" ]]; then
+                    __kkterminal_skip=1
+                    break
+                  fi
+                done
+
+                if (( ! __kkterminal_skip )); then
+                  __kkterminal_lastcmd="${BASH_COMMAND}"
+                  ((__kkterminal_counter++))
+                fi
+                ' DEBUG
+                """;
+        String shellIntegrationScriptBase64 = Base64.getEncoder().encodeToString(shellIntegrationScript.getBytes());
+        String PROMPT_COMMAND = "export PROMPT_COMMAND='eval \"$(echo " + shellIntegrationScriptBase64 + " | base64 -d)\"'; ";
+        this.shell = (net.schmizz.sshj.connection.channel.direct.Session.Shell) sshSession.exec(PROMPT_COMMAND + "exec -a -bash /bin/bash -il");
+        this.sftpClient = this.sshClient.newSFTPClient();
+
+        // 生成sshKey
+        this.sshKey = envInfo.getLang() + "-" + this.serverCharset.name().replace("-", "@") + "-" + UUID.randomUUID();
+        this.sendMessage("SSHKey", ResultStatusEnum.SUCCESS.getStatus(),
+                SocketSendEnum.CONNECT_SUCCESS.getType(), this.sshKey);
+        webSocketServerMap.put(this.sshKey, this);
+        fileTransportingMap.put(this.sshKey, new ConcurrentHashMap<>());
+
+        StringBuilder termConnectMsg = new StringBuilder();
+        // 欢迎语
+        termConnectMsg.append(appConfig.getWelcome()).append("\r\n");
+        // github源地址
+        termConnectMsg.append(appConfig.getSource()).append("\r\n");
+        // 生成横幅艺术字
+        String banner = appConfig.getBanner();
+        String bannerArt = FigletFont.convertOneLine(banner);
+        // 分割成多行
+        String[] asciiArts = bannerArt.split("\n");
+        for (String asciiArt : asciiArts) {
+            termConnectMsg.append(asciiArt).append("\r\n");
+        }
+        this.sendMessage("Message", ResultStatusEnum.SUCCESS.getStatus(),
+                SocketSendEnum.OUT_TEXT.getType(), termConnectMsg.toString());
+
+        this.shellInputStream = this.shell.getInputStream();
+        this.shellOutputStream = this.shell.getOutputStream();
+        this.shellOutThread = Thread.ofVirtual().start(() -> {
+            byte[] buffer = new byte[Constant.BUFFER_SIZE];
+            int len;
+            try {
+                while ((len = this.shellInputStream.read(buffer)) != -1) {
+                    String shellOutput = new String(buffer, 0, len, this.serverCharset);
+                    this.sendMessage("shellOutput", ResultStatusEnum.SUCCESS.getStatus(),
+                            SocketSendEnum.OUT_TEXT.getType(), shellOutput);
+                    List<WebSocketServer> slaveSockets = cooperateMap.get(this.sshKey);
+                    if (slaveSockets != null) {
+                        for (WebSocketServer slaveSocket : slaveSockets) {
+                            slaveSocket.sendMessage("shellOutput", ResultStatusEnum.SUCCESS.getStatus(),
+                                    SocketSendEnum.OUT_TEXT.getType(), shellOutput);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                LogUtil.logException(this.getClass(), e);
+            }
+        });
+        // 异步建立传输SSH连接
+        Thread.ofVirtual().start(() -> {
+            try {
+                SSHClient ssh = SSHUtil.connectHost(envInfo);
+                SFTPClient sftp = ssh.newSFTPClient();
+                sshClientMap.put(this.sshKey, ssh);
+                sftpClientMap.put(this.sshKey, sftp);
+            } catch (Exception e) {
+                LogUtil.logException(this.getClass(), e);
+            }
+        });
+    }
+
+    @OnClose
+    public void onClose() {
+        // 释放协作资源
+        if (this.cooperator) {
+            List<WebSocketServer> slaveSockets = cooperateMap.get(this.sshKey);
+            if (slaveSockets != null) {
+                slaveSockets.remove(this);
+                WebSocketServer masterSocket = webSocketServerMap.get(this.sshKey);
+                if (masterSocket != null) {
+                    masterSocket.sendMessage(SocketSendEnum.COOPERATE_NUMBER_UPDATE.getDesc(), ResultStatusEnum.SUCCESS.getStatus(),
+                            SocketSendEnum.COOPERATE_NUMBER_UPDATE.getType(), Integer.toString(slaveSockets.size()));
+                }
+            }
+            return;
+        }
+        List<WebSocketServer> slaveSockets = cooperateMap.remove(this.sshKey);
+        if (slaveSockets != null) {
+            for (WebSocketServer slaveSocket : slaveSockets) {
+                IOUtils.closeQuietly(slaveSocket.getSessionSocket());
+            }
+        }
+        // 释放ssh资源
+        if (this.shellOutThread != null && !shellOutThread.isInterrupted()) {
+            this.shellOutThread.interrupt();
+        }
+        IOUtils.closeQuietly(this.shellOutputStream, this.shellInputStream, this.shell,
+                this.sftpClient, this.sshClient, this.sessionSocket);
+        webSocketServerMap.remove(this.sshKey);
+        Boolean isClosed = closeTransClient(this.sshKey);
+        // 删除临时文件
+        Thread.ofVirtual().start(() -> {
+            // 延时5s执行
+            try {
+                Thread.sleep(5000);
+            } catch (Exception e) {
+                LogUtil.logException(this.getClass(), e);
+            }
+            String transPath = FileController.transportPath + sshKey + "/";
+            File transFolder = FileUtil.getDirectory(transPath);
+            if (transFolder == null) return;
+            if (isClosed) {
+                FileUtil.forceDeleteFolder(transFolder);
+                return;
+            }
+            File[] transFilesFolders = transFolder.listFiles();
+            if (transFilesFolders == null) return;
+            for (File transFileFolder : transFilesFolders) {
+                if (transFileFolder.isDirectory()) {
+                    FileTransInfo fileTransInfo = getTransportingFile(this.sshKey, transFileFolder.getName());
+                    // 忽略上传中/下载中的文件
+                    if (fileTransInfo != null && fileTransInfo.getIndex() != null
+                            && (fileTransInfo.getIndex().equals(1) || fileTransInfo.getIndex().equals(2))) {
+                        continue;
+                    }
+                    FileUtil.forceDeleteFolder(transFileFolder);
+                }
+                else transFileFolder.delete();
+            }
+        });
+    }
+    // 关闭传输资源
+    public static Boolean closeTransClient(String sshKey) {
+        // 当前没有正在传输的文件
+        if (fileTransportingMap.get(sshKey) == null || fileTransportingMap.get(sshKey).isEmpty()) {
+            fileTransportingMap.remove(sshKey);
+            SFTPClient sftp = sftpClientMap.remove(sshKey);
+            SSHClient ssh = sshClientMap.remove(sshKey);
+            IOUtils.closeQuietly(sftp, ssh);
+            return true;
+        }
+
+        return false;
+    }
+
+    // 从Client接收消息
+    @OnMessage
+    public void onMessage(String message) throws Exception {
+        if (this.shell == null || this.shellOutputStream == null) return;
+
+        message = AESUtil.decrypt(message, this.secretKey);
+        MessageInfo messageInfo = JSONObject.parseObject(message, MessageInfo.class);
+
+        // 修改虚拟终端窗口大小
+        if (SocketMessageEnum.SIZE_CHANGE.getType().equals(messageInfo.getType())) {
+            this.shell.changeWindowDimensions(messageInfo.getCols(), messageInfo.getRows(), 0, 0);
+        }
+
+        // 文本命令
+        if (SocketMessageEnum.USER_TEXT.getType().equals(messageInfo.getType())) {
+            this.shellOutputStream.write(messageInfo.getContent().getBytes(this.serverCharset));
+            this.shellOutputStream.flush();
+        }
+        // WebSocket心跳续约
+        if (SocketMessageEnum.HEART_BEAT.getType().equals(messageInfo.getType())) {
+            // SSH心跳续约
+            SSHUtil.doHeartBeat(this.sshClient);
+            SSHUtil.doHeartBeat(SSHUtil.getTransSSHClient(this.sshKey));
+            // 更新协作者数量
+            List<WebSocketServer> slaveSockets = cooperateMap.get(this.sshKey);
+            if (slaveSockets != null) {
+                this.sendMessage(SocketSendEnum.COOPERATE_NUMBER_UPDATE.getDesc(), ResultStatusEnum.SUCCESS.getStatus(),
+                        SocketSendEnum.COOPERATE_NUMBER_UPDATE.getType(), Integer.toString(slaveSockets.size()));
+            }
+        }
+    }
+
+    @OnError
+    public void onError(Session sessionSocket, Throwable e) {
+        LogUtil.logException(this.getClass(), e);
+    }
+
+    // 向Client发送信息
+    public void sendMessage(String message, String type, Integer code, String data) {
+        synchronized (this.sessionSocket) {
+            try {
+                Result result;
+                if (ResultStatusEnum.SUCCESS.getStatus().equals(type)) {
+                    result = Result.success(code, message);
+                } else if (ResultStatusEnum.WARNING.getStatus().equals(type)) {
+                    result = Result.warning(code, message);
+                } else {
+                    result = Result.error(code, message);
+                }
+                // 重写数据加密逻辑
+                if (data != null) {
+                    String encryptedData = AESUtil.encrypt(data, this.secretKey);
+                    result.setData(encryptedData);
+                }
+                this.sessionSocket.getBasicRemote().sendText(JSON.toJSONString(result));
+            } catch(Exception e) {
+                LogUtil.logException(this.getClass(), e);
+            }
+        }
+    }
+
+}

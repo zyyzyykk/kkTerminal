@@ -1,0 +1,23 @@
+package com.kkterminal.terminal.enums;
+
+import lombok.Getter;
+
+@Getter
+public enum ResultCodeEnum {
+
+    RECORD_COUNT_EXCEEDED(506, "录像文件过多"),
+
+    PASSWORD_INCORRECT(507, "密码错误"),
+
+    SSH_NOT_EXIST(602, "ssh连接断开");
+
+    private final Integer code;
+
+    private final String desc;
+
+    ResultCodeEnum(Integer code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
+
+}
