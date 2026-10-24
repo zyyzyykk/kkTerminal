@@ -196,8 +196,8 @@ export default {
       network: {},
       disk: {},
       time: [],
-    }
-    const statusInfo = ref({...initStatusInfo});
+    };
+    const statusInfo = ref(structuredClone(initStatusInfo));
     const selectedNetwork = ref('all');
     const selectedDisk = ref('all');
     const getStatusInfo = () => {
@@ -387,9 +387,14 @@ export default {
     // 重置
     const reset = (deep=false) => {
       if(deep) {
-        statusInfo.value = {...initStatusInfo};
         selectedNetwork.value = 'all';
         selectedDisk.value = 'all';
+        statusInfo.value = structuredClone(initStatusInfo);
+        // 强制触发响应式
+        statusInfo.value.processes = [];
+        statusInfo.value.network = {};
+        statusInfo.value.disk = {};
+        statusInfo.value.time = [];
       }
       DialogVisible.value = false;
     };

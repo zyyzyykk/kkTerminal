@@ -92,7 +92,7 @@ public class CloudController {
     /**
      * 清除过期文件
      */
-    @Scheduled(cron = "0 0 0 */1 * ?")
+    @Scheduled(cron = "0 0 3 */1 * ?")
     protected void clean() {
         File userBaseFolder = FileUtil.prepareDirectory(userBasePath);
         File[] userFolders = userBaseFolder.listFiles();

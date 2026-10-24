@@ -106,7 +106,7 @@ public class TerminalApplication {
     }
 
     private static void startOnceMonitor() {
-        Thread.ofVirtual().start(() -> {
+        Thread.ofPlatform().start(() -> {
             try {
                 Thread.sleep(1000 * 18);
                 if (!SystemController.isEnableMonitor()) System.exit(0); // 结束进程

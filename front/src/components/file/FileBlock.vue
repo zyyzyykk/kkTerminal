@@ -616,13 +616,15 @@ export default {
 
     // 更改路径回调
     const dirInputCallback = (focus=true) => {
-      isShowDirInput.value = false;
-      confirmDirCorrect();
-      selectedFiles.value = [];
-      getDirList(focus);
       browser.setTimeout(() => {
-        const element = document.querySelector('#dirLevelBar');
-        if(element) element.scrollLeft = element.scrollWidth;
+        isShowDirInput.value = false;
+        confirmDirCorrect();
+        selectedFiles.value = [];
+        getDirList(focus);
+        browser.setTimeout(() => {
+          const element = document.querySelector('#dirLevelBar');
+          if(element) element.scrollLeft = element.scrollWidth;
+        }, 1);
       }, 1);
     };
 
@@ -1216,6 +1218,7 @@ export default {
       stopEvent(event);
       // 上下箭头
       if(event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        if(files.value.length === 0) return;
         // 上箭头
         if(event.key === 'ArrowUp') {
           if(lastSelectedIndex === -1 || lastSelectedIndex > files.value.length) lastSelectedIndex = files.value.length;

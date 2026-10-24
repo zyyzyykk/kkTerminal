@@ -11,7 +11,6 @@ import com.kkterminal.terminal.utils.LogUtil;
 import com.kkterminal.terminal.utils.SSHUtil;
 import com.kkterminal.terminal.utils.StringUtil;
 import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.common.IOUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -102,7 +101,7 @@ public class AdvanceController {
         List<WebSocketServer> slaveSockets = WebSocketServer.cooperateMap.remove(sshKey);
         if (slaveSockets != null) {
             for (WebSocketServer slaveSocket : slaveSockets) {
-                IOUtils.closeQuietly(slaveSocket.getSessionSocket());
+                SSHUtil.closeQuietly(slaveSocket.getSessionSocket());
             }
         }
 
@@ -140,7 +139,7 @@ public class AdvanceController {
                 echo -n "$" && \\
                 echo -n "$(cat /proc/diskstats | awk '{print $3"@"$6"@"$10}' | tr -s ' ' '@' | tr '\\n' '$' | sed 's/\\(.*\\)\\$/\\1/')" && \\
                 echo -n "^" && \\
-                echo -n $(date +%s%3N)""";
+                echo -n $(date +%s%N | cut -c1-13)""";
         try {
             int exitStatus = SSHUtil.executeCommand(ssh, command, status);
             if (exitStatus != 0) return Result.error(errorMsg);

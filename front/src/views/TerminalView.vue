@@ -607,7 +607,7 @@ export default {
                 onHandleMenuSelect: (type, data) => {
                   handleMenuSelect(type, data);
                 },
-                isDisabled: (urlParams.value.record || !sshKey.value),
+                isDisabled: (urlParams.value.record || urlParams.value.cooperate || !sshKey.value),
               });
               render(vnode, element);
             });
@@ -1320,6 +1320,7 @@ export default {
         terminal.value.removeEventListener('click', doClick);
       }
       if(timer) clearInterval(timer);
+      if(socket.value) socket.value.close(3333);  // 主动释放资源，必需
     });
 
     return {

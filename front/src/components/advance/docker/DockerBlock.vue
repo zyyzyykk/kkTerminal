@@ -366,7 +366,7 @@ export default {
       network: [],
       volume: [],
     };
-    const dockerInfo = ref({...initDockerInfo});
+    const dockerInfo = ref(structuredClone(initDockerInfo));
     const getDockerVersion = (sshKey) => {
       loading.value = true;
       request({
@@ -600,14 +600,14 @@ export default {
       volumeMounting: '',
       paramOptions: '',
     };
-    const deployInfo = ref({...initDeployInfo});
+    const deployInfo = ref(structuredClone(initDeployInfo));
     const handleAppGet = (appInfo) => {
-      deployInfo.value = {...initDeployInfo, ...appInfo};
+      deployInfo.value = {...structuredClone(initDeployInfo), ...appInfo};
       if(deployInfo.value.containerName) deployInfo.value.containerName += "_" + generateRandomString(4);
       deployInfo.value.isShow = true;
     };
     const handleReset = (isShow=true) => {
-      deployInfo.value = {...initDeployInfo};
+      deployInfo.value = structuredClone(initDeployInfo);
       deployInfo.value.isShow = isShow;
     };
     const handleDeploy = () => {
@@ -652,8 +652,8 @@ export default {
       if(deep) {
         hasDocker.value = false;
         hasPermission.value = false;
-        dockerInfo.value = {...initDockerInfo};
-        deployInfo.value = {...initDeployInfo};
+        dockerInfo.value = structuredClone(initDockerInfo);
+        deployInfo.value = structuredClone(initDeployInfo);
       }
       containerType.value = 0;
       deleteType.value = 0;

@@ -19,7 +19,7 @@ export default {
         text: '',
       },
       tooltip: {
-        trigger: 'axis'
+        trigger: 'axis',
       },
       legend: {
         data: props.legend,
@@ -28,7 +28,7 @@ export default {
         left: '3%',
         right: '4%',
         bottom: '3%',
-        containLabel: true
+        containLabel: true,
       },
       xAxis: {
         type: 'category',
@@ -36,14 +36,14 @@ export default {
         data: [],
       },
       yAxis: {
-        name : props.yName,
-        type: 'value'
+        name: props.yName,
+        type: 'value',
       },
       series: [],
     };
 
     let chart = null;
-    const update = (time,series) => {
+    const update = (time, series) => {
       option.xAxis.data = time;
       option.series = series;
       // 更新图表

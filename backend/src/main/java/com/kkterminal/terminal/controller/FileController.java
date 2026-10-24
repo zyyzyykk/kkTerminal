@@ -622,7 +622,7 @@ public class FileController {
 
         FileTransInfo fileTransInfo = new FileTransInfo(id, path, fileName, totalSize, 1, 0);
         WebSocketServer.putTransportingFile(sshKey, id, fileTransInfo);
-        Thread.ofVirtual().start(() -> {
+        Thread.ofPlatform().start(() -> {
             try {
                 // 合并文件片
                 FileUtil.mergeFileChunks(transFileFolderPath, id, chunks, totalSize);

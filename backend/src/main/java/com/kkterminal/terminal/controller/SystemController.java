@@ -76,7 +76,7 @@ public class SystemController {
         if (monitor == null) {
             synchronized (this) {
                 if (monitor == null) {
-                    monitor = Thread.ofVirtual().start(() -> {
+                    monitor = Thread.ofPlatform().start(() -> {
                         try {
                             while (!windowActiveMap.isEmpty()) {
                                 // 距离上次心跳续约超过33s则视为无效窗口

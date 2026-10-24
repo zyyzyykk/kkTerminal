@@ -12,6 +12,7 @@ import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -57,6 +58,9 @@ public class SSHUtil {
                 // 使用私钥进行身份验证
                 sshClient.authPublickey(username, keyProvider);
             }
+        } catch (Exception e) {
+            closeQuietly(sshClient);
+            throw e;
         } finally {
             // 删除本地私钥文件
             if (keyFile != null) keyFile.delete();
@@ -138,6 +142,23 @@ public class SSHUtil {
         }
 
         return false;
+    }
+
+    /**
+     * 静默关闭
+     */
+    public static void closeQuietly(Closeable... closeables) {
+        if (closeables != null && closeables.length > 0) {
+            for (Closeable closeable : closeables) {
+                if (closeable != null) {
+                    try {
+                        closeable.close();
+                    } catch (Exception e) {
+                        LogUtil.logException(SSHUtil.class, e);
+                    }
+                }
+            }
+        }
     }
 
 }
