@@ -5,7 +5,7 @@ const MB = BYTES_PER_KILOBYTE * KB;
 const GB = BYTES_PER_KILOBYTE * MB;
 
 export const calcSize = (size) => {
-    if(!size) return "";
+    if(!size) return "0 B";
     const _size = Math.max(0, parseInt(size));
 
     let value;

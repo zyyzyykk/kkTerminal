@@ -2,7 +2,7 @@
 const threshold = 128;
 
 export const calcBgColor = (hexColor) => {
-    // 去掉 #
+    // 去除 #
     const hex = hexColor.replace('#', '');
 
     // 解析 R/G/B

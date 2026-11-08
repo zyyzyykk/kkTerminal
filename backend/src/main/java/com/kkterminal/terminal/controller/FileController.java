@@ -161,7 +161,6 @@ public class FileController {
                     try {
                         fileInfo.setIsDirectory(FileMode.Type.DIRECTORY.equals(sftp.stat(path + file.getName()).getType()));
                     } catch (SFTPException e) {
-                        LogUtil.logException(this.getClass(), e);
                         fileInfo.setIsDirectory(false);
                     }
                 }
@@ -171,7 +170,6 @@ public class FileController {
             }
             map.put("fileInfoList", fileInfoList);
         } catch (SFTPException e) {
-            LogUtil.logException(this.getClass(), e);
             Response.StatusCode statusCode = e.getStatusCode();
             if (Response.StatusCode.NO_SUCH_FILE.equals(statusCode)) {
                 return Result.error("目录不存在");
@@ -202,7 +200,7 @@ public class FileController {
             return Result.error(ResultCodeEnum.SSH_NOT_EXIST.getCode(), "连接断开，" + errorMsg);
         }
         StringBuilder names = new StringBuilder();
-        String command = "cd " + path + " && echo -n \"$(find . -mindepth 1 -maxdepth 1 -type d -exec basename {} \\; | paste -sd '/')\"";
+        String command = "cd " + path + " && echo -n \"$(find -L . -mindepth 1 -maxdepth 1 -type d -exec basename {} \\; | paste -sd '/')\"";
         try {
             int exitStatus = SSHUtil.executeCommand(ssh, command, names);
             if (exitStatus != 0) return Result.error(errorMsg);

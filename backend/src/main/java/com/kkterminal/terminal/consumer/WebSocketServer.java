@@ -30,6 +30,7 @@ import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -171,7 +172,6 @@ public class WebSocketServer {
         try {
             this.sshClient = SSHUtil.connectHost(envInfo);
         } catch (Exception e) {
-            LogUtil.logException(this.getClass(), e);
             this.sendMessage(SocketSendEnum.CONNECT_FAIL.getDesc(), ResultStatusEnum.WARNING.getStatus(),
                     SocketSendEnum.CONNECT_FAIL.getCode(), null);
             return;
@@ -182,6 +182,7 @@ public class WebSocketServer {
             net.schmizz.sshj.connection.channel.direct.Session.Command command = sshSession.exec("echo -n $(locale charmap)")) {
             String charsetName = IOUtils.readFully(command.getInputStream()).toString();
             command.join(Constant.CMD_EXECUTE_TIMEOUT, TimeUnit.SECONDS);
+            if (StringUtil.isEmpty(charsetName)) charsetName = StandardCharsets.UTF_8.name();
             this.serverCharset = Charset.forName(charsetName);
             this.sshClient.setRemoteCharset(this.serverCharset);
         }
@@ -277,7 +278,7 @@ public class WebSocketServer {
                     }
                 }
             } catch (Exception e) {
-                LogUtil.logException(this.getClass(), e);
+                // 不记录异常信息
             } finally {
                 SSHUtil.closeQuietly(this.shellInputStream);
             }
@@ -290,7 +291,7 @@ public class WebSocketServer {
                 sshClientMap.put(this.sshKey, ssh);
                 sftpClientMap.put(this.sshKey, sftp);
             } catch (Exception e) {
-                LogUtil.logException(this.getClass(), e);
+                // 不记录异常信息
             }
         });
     }

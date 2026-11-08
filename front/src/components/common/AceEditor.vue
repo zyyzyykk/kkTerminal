@@ -6,7 +6,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import ace from "ace-builds/src-noconflict/ace";
 import "ace-builds/src-noconflict/ext-searchbox";
-import "ace-builds/src-noconflict/theme-chrome";
+import "ace-builds/src-noconflict/theme-xcode";
 
 
 // 引入语言高亮样式
@@ -126,7 +126,7 @@ export default {
     const setFontSize = (fontSize) => {
       if(aceEditor.value) aceEditor.value.setOptions({
         fontSize: fontSize,
-      })
+      });
     };
 
     // 保存代码
@@ -157,7 +157,7 @@ export default {
         enableBasicAutocompletion: true,                      // 启用基本自动补全
         enableSnippets: true,                                 // 启用代码片段
         enableLiveAutocompletion: true,                       // 启用实时自动补全
-        theme: 'ace/theme/chrome',                            // 主题
+        theme: 'ace/theme/xcode',                             // 主题
         mode: 'ace/mode/text',                                // 高亮
       });
       // 自定义智能提示

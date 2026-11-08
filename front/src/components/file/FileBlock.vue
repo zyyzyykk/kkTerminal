@@ -85,7 +85,7 @@
                 </el-dropdown>
               </div>
             </div>
-            <div class="kk-flex" >
+            <div class="kk-flex operator-button-box" >
               <el-button @click="doShowDirInput" text class="operator-button" ><el-icon style="font-size: 16px;" ><Edit /></el-icon></el-button>
               <el-button @click="doRefresh" text class="operator-button" ><el-icon style="font-size: 16px;" ><Refresh /></el-icon></el-button>
               <el-button v-if="dir && dir !== '/'" @click="doReturn" text class="operator-button" ><el-icon style="font-size: 16px;" ><Fold /></el-icon></el-button>
@@ -1648,6 +1648,10 @@ export default {
 
 .operator-button {
   padding: 0 6px;
+}
+
+.operator-button-box .el-button+.el-button {
+  margin-left: 0 !important;
 }
 
 .level-class {

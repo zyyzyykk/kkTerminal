@@ -53,7 +53,7 @@
           </div>
           <div class="kk-border" ></div>
           <div class="kk-flex" style="margin: 7px 0;" >
-            <div class="no-select nowrap" >Workflow</div>
+            <div class="no-select nowrap" >{{ $t('工作流') }}</div>
             <div style="flex: 1;" ></div>
             <div @click="workflowTab(1)" style="font-size: 18px; cursor: pointer; margin-left: 15px;" >
               <el-tooltip :content="$t('默认模板')" placement="top" :show-after="300" >
