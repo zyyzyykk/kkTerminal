@@ -7,7 +7,7 @@ on:
 
 jobs:
   run-checker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       # Step 1: check repo code
